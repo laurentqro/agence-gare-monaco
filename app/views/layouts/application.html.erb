@@ -24,7 +24,7 @@
   </head>
 
   <body class="font-['Montserrat',Helvetica,Arial,Verdana,sans-serif] text-[#212529] text-xs">
-    <%= render "shared/navbar" %>
+    <%= render "shared/navbar", homepage: content_for?(:homepage) %>
 
     <main>
       <%= yield %>

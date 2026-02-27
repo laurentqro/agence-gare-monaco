@@ -74,7 +74,21 @@ Implemented the full public site layout with navbar and footer using TDD (22 tes
 - Added nav.privacy translation to all 8 locale files
 - 178 total tests passing (156 existing + 22 new)
 
-### Task 6: Homepage
+### Task 6: Homepage ✅
+Implemented the full homepage with all sections per PRD using TDD (24 tests):
+- Hero section: full-viewport-height hero with navy background, overlay, tagline ("L'Immobilier à Monaco depuis 1942"), and CIM membership subtitle — all translated per locale
+- Transparent navbar: navbar overlays the hero with transparent background on homepage (solid navy on all other pages), using content_for(:homepage) signaling and CSS class toggle
+- Category cards: three linked cards (Sales Monaco, Rentals Monaco, France) with translated titles and descriptions, linking to correct locale-aware listing paths
+- About section: agency founding story (1942, Pierre Maré) with translated title and text for all 8 locales
+- Image carousel: 5 slides (Port Hercule, Monte-Carlo, Le Rocher, Fontvieille, Larvotto) with Stimulus carousel_controller.js for prev/next navigation
+- Videos section: placeholder section for YouTube Data API integration (API key to be provided later)
+- Team section: Pierre Maré (Co-Gérant), Adrien Maré (Directeur/Négociateur), Josiane Alesi (Secrétariat/Gestion) — roles translated per locale
+- Featured articles section: loads published+featured articles from DB, displays title in current locale with fallback to default locale, truncated body text, and "Read more" link
+- Contact section: agency address (3 Rue Langlé, MC 98000), phone number, email link
+- i18n: added 15+ new translation keys to all 8 locale files (category labels/descriptions, about title/text, team title/roles, featured articles title, read more, contact title, carousel title, videos title)
+- Section dividers: horizontal rules between sections matching current site pattern
+- 202 total tests passing (178 existing + 24 new)
+
 ### Task 7: (Merged into Task 5 — footer implemented alongside layout & navbar)
 
 ## Phase 3: Properties

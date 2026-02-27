@@ -1,4 +1,5 @@
-<nav class="fixed top-0 left-0 right-0 z-50 bg-[#090956]" data-controller="mobile-menu">
+<% homepage = local_assigns.fetch(:homepage, false) %>
+<nav class="fixed top-0 left-0 right-0 z-50 <%= homepage ? 'homepage-nav-transparent bg-transparent' : 'bg-[#090956]' %>" data-controller="mobile-menu">
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex items-center justify-between h-20">
       <%# Logo %>
@@ -79,5 +80,7 @@
   </div>
 </nav>
 
-<%# Spacer to push content below fixed navbar %>
-<div class="h-20"></div>
+<%# Spacer to push content below fixed navbar (not on homepage — hero is full-height) %>
+<% unless homepage %>
+  <div class="h-20"></div>
+<% end %>

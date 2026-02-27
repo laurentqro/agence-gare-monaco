@@ -13,6 +13,24 @@
   homepage:
     hero_title: "Eiendom i Monaco siden 1942"
     hero_subtitle: "Medlem av Chambre Immobilière Monégasque"
+    category_sales_monaco: "Salg Monaco"
+    category_rentals_monaco: "Utleie Monaco"
+    category_france: "Frankrike"
+    category_sales_monaco_desc: "Oppdag våre eiendommer til salgs i Fyrstedømmet"
+    category_rentals_monaco_desc: "Finn din ideelle leiebolig i Monaco"
+    category_france_desc: "Våre eiendommer til salgs på den franske rivieraen"
+    about_title: "Vår Historie"
+    about_text: "Agence Immobilière de la Gare ble grunnlagt i 1942 av Pierre Maré og er et av de eldste eiendomsmeglerforetakene i Monaco. I dag ledet av Adrien Maré, viderefører byrået en familietradisjon med ekspertise og personlig service innen eiendom i Monaco."
+    team_title: "Vårt Team"
+    team:
+      pierre_role: "Medleder"
+      adrien_role: "Direktør / Forhandler"
+      josiane_role: "Sekretariat / Forvaltning"
+    featured_articles_title: "Artikler"
+    read_more: "Les mer"
+    contact_title: "Kontakt oss"
+    carousel_title: "Monaco"
+    videos_title: "Videoer"
 
   routes:
     sales: "salg"

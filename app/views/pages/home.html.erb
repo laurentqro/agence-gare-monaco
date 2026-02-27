@@ -1,2 +1,184 @@
-<h1><%= t("homepage.hero_title") %></h1>
-<p><%= t("homepage.hero_subtitle") %></p>
+<% content_for :homepage, "true" %>
+
+<%# === Hero Section === %>
+<section data-testid="hero" class="relative h-screen flex items-center justify-center bg-[#090956] overflow-hidden">
+  <%# Background overlay %>
+  <div class="absolute inset-0 bg-black/40 z-10"></div>
+
+  <%# Hero content %>
+  <div class="relative z-20 text-center text-white px-4">
+    <h1 class="text-3xl md:text-5xl font-bold tracking-wide uppercase mb-4">
+      <%= t("homepage.hero_title") %>
+    </h1>
+    <p class="text-sm md:text-lg font-light tracking-wider">
+      <%= t("homepage.hero_subtitle") %>
+    </p>
+  </div>
+</section>
+
+<%# === Category Cards === %>
+<section data-testid="category-cards" class="max-w-7xl mx-auto px-4 py-16 -mt-20 relative z-30">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <%# Sales Monaco %>
+    <a href="<%= locale_sales_monaco_path %>" class="group block bg-white rounded shadow-lg hover:shadow-xl transition-shadow p-8 text-center border border-gray-100">
+      <h3 class="text-sm font-bold uppercase tracking-wide text-[#090956] mb-2">
+        <%= t("homepage.category_sales_monaco") %>
+      </h3>
+      <p class="text-xs text-[#6E8297]"><%= t("homepage.category_sales_monaco_desc") %></p>
+    </a>
+
+    <%# Rentals Monaco %>
+    <a href="<%= locale_rentals_monaco_path %>" class="group block bg-white rounded shadow-lg hover:shadow-xl transition-shadow p-8 text-center border border-gray-100">
+      <h3 class="text-sm font-bold uppercase tracking-wide text-[#090956] mb-2">
+        <%= t("homepage.category_rentals_monaco") %>
+      </h3>
+      <p class="text-xs text-[#6E8297]"><%= t("homepage.category_rentals_monaco_desc") %></p>
+    </a>
+
+    <%# France %>
+    <a href="<%= locale_sales_france_path %>" class="group block bg-white rounded shadow-lg hover:shadow-xl transition-shadow p-8 text-center border border-gray-100">
+      <h3 class="text-sm font-bold uppercase tracking-wide text-[#090956] mb-2">
+        <%= t("homepage.category_france") %>
+      </h3>
+      <p class="text-xs text-[#6E8297]"><%= t("homepage.category_france_desc") %></p>
+    </a>
+  </div>
+</section>
+
+<hr class="max-w-7xl mx-auto border-gray-200">
+
+<%# === About Section === %>
+<section data-testid="about" class="max-w-7xl mx-auto px-4 py-16">
+  <h2 class="text-2xl font-bold text-[#090956] text-center mb-8">
+    <%= t("homepage.about_title") %>
+  </h2>
+  <p class="text-sm leading-relaxed text-[#212529] max-w-3xl mx-auto text-center">
+    <%= t("homepage.about_text") %>
+  </p>
+</section>
+
+<hr class="max-w-7xl mx-auto border-gray-200">
+
+<%# === Image Carousel === %>
+<section data-testid="carousel" class="max-w-7xl mx-auto px-4 py-16" data-controller="carousel">
+  <h2 class="text-2xl font-bold text-[#090956] text-center mb-8">
+    <%= t("homepage.carousel_title") %>
+  </h2>
+  <div class="relative overflow-hidden rounded-lg">
+    <div data-carousel-target="track" class="flex transition-transform duration-500">
+      <div data-testid="carousel-slide" class="min-w-full aspect-[16/9] bg-[#090956]/10 flex items-center justify-center">
+        <span class="text-[#6E8297] text-sm">Port Hercule</span>
+      </div>
+      <div data-testid="carousel-slide" class="min-w-full aspect-[16/9] bg-[#090956]/10 flex items-center justify-center">
+        <span class="text-[#6E8297] text-sm">Monte-Carlo</span>
+      </div>
+      <div data-testid="carousel-slide" class="min-w-full aspect-[16/9] bg-[#090956]/10 flex items-center justify-center">
+        <span class="text-[#6E8297] text-sm">Le Rocher</span>
+      </div>
+      <div data-testid="carousel-slide" class="min-w-full aspect-[16/9] bg-[#090956]/10 flex items-center justify-center">
+        <span class="text-[#6E8297] text-sm">Fontvieille</span>
+      </div>
+      <div data-testid="carousel-slide" class="min-w-full aspect-[16/9] bg-[#090956]/10 flex items-center justify-center">
+        <span class="text-[#6E8297] text-sm">Larvotto</span>
+      </div>
+    </div>
+    <%# Navigation buttons %>
+    <button data-action="carousel#prev" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow" aria-label="Previous">
+      <svg class="w-5 h-5 text-[#090956]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <button data-action="carousel#next" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow" aria-label="Next">
+      <svg class="w-5 h-5 text-[#090956]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</section>
+
+<hr class="max-w-7xl mx-auto border-gray-200">
+
+<%# === Videos Section === %>
+<section data-testid="videos" class="max-w-7xl mx-auto px-4 py-16">
+  <h2 class="text-2xl font-bold text-[#090956] text-center mb-8">
+    <%= t("homepage.videos_title") %>
+  </h2>
+  <p class="text-sm text-[#6E8297] text-center">
+    <%# YouTube videos will be loaded dynamically via YouTube Data API when API key is provided %>
+  </p>
+</section>
+
+<hr class="max-w-7xl mx-auto border-gray-200">
+
+<%# === Team Section === %>
+<section data-testid="team" class="max-w-7xl mx-auto px-4 py-16">
+  <h2 class="text-2xl font-bold text-[#090956] text-center mb-8">
+    <%= t("homepage.team_title") %>
+  </h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="text-center">
+      <div class="w-32 h-32 mx-auto rounded-full bg-gray-200 mb-4"></div>
+      <h4 class="text-sm font-bold text-[#090956]">Pierre Maré</h4>
+      <p class="text-xs text-[#6E8297]"><%= t("homepage.team.pierre_role") %></p>
+    </div>
+    <div class="text-center">
+      <div class="w-32 h-32 mx-auto rounded-full bg-gray-200 mb-4"></div>
+      <h4 class="text-sm font-bold text-[#090956]">Adrien Maré</h4>
+      <p class="text-xs text-[#6E8297]"><%= t("homepage.team.adrien_role") %></p>
+    </div>
+    <div class="text-center">
+      <div class="w-32 h-32 mx-auto rounded-full bg-gray-200 mb-4"></div>
+      <h4 class="text-sm font-bold text-[#090956]">Josiane Alesi</h4>
+      <p class="text-xs text-[#6E8297]"><%= t("homepage.team.josiane_role") %></p>
+    </div>
+  </div>
+</section>
+
+<hr class="max-w-7xl mx-auto border-gray-200">
+
+<%# === Featured Articles === %>
+<section data-testid="featured-articles" class="max-w-7xl mx-auto px-4 py-16">
+  <h2 class="text-2xl font-bold text-[#090956] text-center mb-8">
+    <%= t("homepage.featured_articles_title") %>
+  </h2>
+  <% if @featured_articles.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <% @featured_articles.each do |article| %>
+        <a href="<%= locale_articles_path %>/<%=article.slug %>" class="group block bg-white rounded shadow hover:shadow-lg transition-shadow border border-gray-100">
+          <div class="p-6">
+            <h3 class="text-sm font-bold text-[#090956] group-hover:text-[#6E8297] transition-colors mb-2">
+              <%= article.title[I18n.locale.to_s] || article.title[I18n.default_locale.to_s] %>
+            </h3>
+            <p class="text-xs text-[#6E8297] mb-3">
+              <%= truncate(
+                (article.body[I18n.locale.to_s] || article.body[I18n.default_locale.to_s]).to_s,
+                length: 120
+              ) %>
+            </p>
+            <span class="text-xs font-medium text-[#090956] uppercase tracking-wide"><%= t("homepage.read_more") %> &rarr;</span>
+          </div>
+        </a>
+      <% end %>
+    </div>
+  <% end %>
+</section>
+
+<hr class="max-w-7xl mx-auto border-gray-200">
+
+<%# === Contact Section === %>
+<section data-testid="contact-section" class="max-w-7xl mx-auto px-4 py-16">
+  <h2 class="text-2xl font-bold text-[#090956] text-center mb-8">
+    <%= t("homepage.contact_title") %>
+  </h2>
+  <div class="max-w-lg mx-auto text-center">
+    <p class="text-sm text-[#212529] mb-2">Agence Immobilière de la Gare</p>
+    <p class="text-xs text-[#6E8297] leading-relaxed">
+      3, Rue Langlé<br>
+      MC 98000 Monaco
+    </p>
+    <p class="text-xs text-[#6E8297] mt-3">
+      Tél : (+377) 93 30 22 36
+    </p>
+    <p class="mt-3">
+      <a href="mailto:info@agencegaremonaco.com" class="text-xs text-[#090956] hover:text-[#6E8297] transition-colors font-medium">
+        info@agencegaremonaco.com
+      </a>
+    </p>
+  </div>
+</section>

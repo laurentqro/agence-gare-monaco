@@ -13,6 +13,24 @@ de:
   homepage:
     hero_title: "Immobilien in Monaco seit 1942"
     hero_subtitle: "Mitglied der Chambre Immobilière Monégasque"
+    category_sales_monaco: "Verkauf Monaco"
+    category_rentals_monaco: "Vermietung Monaco"
+    category_france: "Frankreich"
+    category_sales_monaco_desc: "Entdecken Sie unsere Immobilien zum Verkauf im Fürstentum"
+    category_rentals_monaco_desc: "Finden Sie Ihre ideale Mietwohnung in Monaco"
+    category_france_desc: "Unsere Immobilien zum Verkauf an der Côte d'Azur"
+    about_title: "Unsere Geschichte"
+    about_text: "Die 1942 von Pierre Maré gegründete Agence Immobilière de la Gare ist eine der ältesten Immobilienagenturen in Monaco. Heute von Adrien Maré geleitet, führt die Agentur eine Familientradition der Exzellenz und des persönlichen Service in der Immobilienbranche Monacos fort."
+    team_title: "Unser Team"
+    team:
+      pierre_role: "Co-Geschäftsführer"
+      adrien_role: "Direktor / Verhandlungsführer"
+      josiane_role: "Sekretariat / Verwaltung"
+    featured_articles_title: "Artikel"
+    read_more: "Weiterlesen"
+    contact_title: "Kontaktieren Sie uns"
+    carousel_title: "Monaco"
+    videos_title: "Videos"
 
   routes:
     sales: "verkauf"
