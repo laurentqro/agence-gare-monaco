@@ -32,6 +32,31 @@ fi:
     carousel_title: "Monaco"
     videos_title: "Videot"
 
+  listings:
+    sales: "Myynti"
+    rentals: "Vuokraus"
+    sales_monaco: "Myynti Monacossa"
+    rentals_monaco: "Vuokraus Monacossa"
+    sales_france: "Myynti Ranskassa"
+    sales_in_district: "Myynti Monacossa — %{district}"
+    rentals_in_district: "Vuokraus Monacossa — %{district}"
+    property_count:
+      one: "%{count} kiinteistö"
+      other: "%{count} kiinteistöä"
+    no_properties: "Kriteereitäsi vastaavia kiinteistöjä ei löytynyt."
+    filter_type: "Tyyppi"
+    filter_district: "Kaupunginosa"
+    filter_all_types: "Kaikki tyypit"
+    filter_all_districts: "Kaikki kaupunginosat"
+    filter_apply: "Suodata"
+    new_badge: "UUSI"
+    rooms: "huonetta"
+    bedrooms: "makuuh."
+    bathrooms: "kylpyh."
+    parkings: "pysäköinti"
+    area: "m²"
+    price_on_request: "Hinta pyynnöstä"
+
   routes:
     sales: "myynti"
     rentals: "vuokraus"

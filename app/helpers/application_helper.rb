@@ -48,6 +48,39 @@ module ApplicationHelper
     sv: "Svenska", no: "Norsk", da: "Dansk", fi: "Suomi"
   }.freeze
 
+  def locale_property_path(property, locale = I18n.locale)
+    props = I18n.t("routes.properties", locale: locale)
+    slug = property.title_for(locale).parameterize
+    "/#{locale}/#{props}/#{property.id}-#{slug}"
+  end
+
+  def listing_heading
+    transaction = params[:transaction_type]
+    country = params[:country]
+    district = @district if defined?(@district)
+
+    if district
+      key = transaction == "sale" ? "listings.sales_in_district" : "listings.rentals_in_district"
+      t(key, district: district.name)
+    elsif country == "MC" && transaction == "sale"
+      t("listings.sales_monaco")
+    elsif country == "MC" && transaction == "rental"
+      t("listings.rentals_monaco")
+    elsif country == "FR"
+      t("listings.sales_france")
+    elsif transaction == "sale"
+      t("listings.sales")
+    elsif transaction == "rental"
+      t("listings.rentals")
+    else
+      t("listings.sales")
+    end
+  end
+
+  def property_type_options
+    Property.publicly_visible.distinct.pluck(:property_type).compact.sort
+  end
+
   def flag_image_for(locale)
     LOCALE_FLAGS[locale.to_sym] || locale.to_s
   end

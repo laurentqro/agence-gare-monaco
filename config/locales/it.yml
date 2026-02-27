@@ -32,6 +32,31 @@ it:
     carousel_title: "Monaco"
     videos_title: "Video"
 
+  listings:
+    sales: "Vendite"
+    rentals: "Affitti"
+    sales_monaco: "Vendite a Monaco"
+    rentals_monaco: "Affitti a Monaco"
+    sales_france: "Vendite in Francia"
+    sales_in_district: "Vendite a Monaco — %{district}"
+    rentals_in_district: "Affitti a Monaco — %{district}"
+    property_count:
+      one: "%{count} immobile"
+      other: "%{count} immobili"
+    no_properties: "Nessun immobile corrisponde ai tuoi criteri."
+    filter_type: "Tipo"
+    filter_district: "Quartiere"
+    filter_all_types: "Tutti i tipi"
+    filter_all_districts: "Tutti i quartieri"
+    filter_apply: "Filtra"
+    new_badge: "NUOVO"
+    rooms: "locali"
+    bedrooms: "cam."
+    bathrooms: "bagni"
+    parkings: "parking"
+    area: "m²"
+    price_on_request: "Prezzo su richiesta"
+
   routes:
     sales: "vendite"
     rentals: "affitti"

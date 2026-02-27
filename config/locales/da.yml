@@ -32,6 +32,31 @@ da:
     carousel_title: "Monaco"
     videos_title: "Videoer"
 
+  listings:
+    sales: "Salg"
+    rentals: "Udlejning"
+    sales_monaco: "Salg i Monaco"
+    rentals_monaco: "Udlejning i Monaco"
+    sales_france: "Salg i Frankrig"
+    sales_in_district: "Salg i Monaco — %{district}"
+    rentals_in_district: "Udlejning i Monaco — %{district}"
+    property_count:
+      one: "%{count} ejendom"
+      other: "%{count} ejendomme"
+    no_properties: "Ingen ejendomme fundet, der matcher dine kriterier."
+    filter_type: "Type"
+    filter_district: "Kvarter"
+    filter_all_types: "Alle typer"
+    filter_all_districts: "Alle kvarterer"
+    filter_apply: "Filtrer"
+    new_badge: "NY"
+    rooms: "værelser"
+    bedrooms: "sover."
+    bathrooms: "bade."
+    parkings: "parkering"
+    area: "m²"
+    price_on_request: "Pris på forespørgsel"
+
   routes:
     sales: "salg"
     rentals: "udlejning"

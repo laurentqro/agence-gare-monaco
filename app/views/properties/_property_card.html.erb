@@ -1,0 +1,70 @@
+<div data-testid="property-card" class="bg-white rounded shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+  <a href="<%= locale_property_path(property) %>" class="block">
+    <%# Property image %>
+    <div class="relative aspect-[4/3] bg-gray-100">
+      <% if property.cover_image %>
+        <img src="<%= property.cover_image.medium_url || property.cover_image.remote_url %>"
+             alt="<%= property.title_for(I18n.locale) %>"
+             class="w-full h-full object-cover"
+             loading="lazy"
+             srcset="<%= property.cover_image.small_url %> 400w, <%= property.cover_image.medium_url %> 800w, <%= property.cover_image.large_url %> 1200w"
+             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw">
+      <% else %>
+        <div class="w-full h-full flex items-center justify-center text-gray-400">
+          <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+          </svg>
+        </div>
+      <% end %>
+
+      <%# NEW badge %>
+      <% if property.recent? %>
+        <span data-testid="new-badge" class="absolute top-2 left-2 bg-[#090956] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+          <%= t("listings.new_badge") %>
+        </span>
+      <% end %>
+
+      <%# Exclusivity badge %>
+      <% if property.exclusivity? %>
+        <span class="absolute top-2 right-2 bg-[#6E8297] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+          Exclusivité
+        </span>
+      <% end %>
+    </div>
+
+    <%# Property info %>
+    <div class="p-4">
+      <h3 class="text-sm font-semibold text-[#090956] mb-1 line-clamp-1">
+        <%= property.title_for(I18n.locale) %>
+      </h3>
+
+      <%# Price %>
+      <p class="text-base font-bold text-[#090956] mb-2">
+        <% if property.price.present? %>
+          <%= property.formatted_price %> €
+        <% else %>
+          <%= t("listings.price_on_request") %>
+        <% end %>
+      </p>
+
+      <%# Property details %>
+      <div class="flex flex-wrap gap-3 text-xs text-[#6E8297]">
+        <% if property.num_rooms.present? && property.num_rooms > 0 %>
+          <span><%= property.num_rooms %> <%= t("listings.rooms") %></span>
+        <% end %>
+        <% if property.num_bedrooms.present? && property.num_bedrooms > 0 %>
+          <span><%= property.num_bedrooms %> <%= t("listings.bedrooms") %></span>
+        <% end %>
+        <% if property.num_bathrooms.present? && property.num_bathrooms > 0 %>
+          <span><%= property.num_bathrooms %> <%= t("listings.bathrooms") %></span>
+        <% end %>
+        <% if property.num_parkings.present? && property.num_parkings > 0 %>
+          <span><%= property.num_parkings %> <%= t("listings.parkings") %></span>
+        <% end %>
+        <% if property.living_area.present? && property.living_area > 0 %>
+          <span><%= property.living_area.to_i %> <%= t("listings.area") %></span>
+        <% end %>
+      </div>
+    </div>
+  </a>
+</div>

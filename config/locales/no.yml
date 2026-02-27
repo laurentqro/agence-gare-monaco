@@ -32,6 +32,31 @@
     carousel_title: "Monaco"
     videos_title: "Videoer"
 
+  listings:
+    sales: "Salg"
+    rentals: "Utleie"
+    sales_monaco: "Salg i Monaco"
+    rentals_monaco: "Utleie i Monaco"
+    sales_france: "Salg i Frankrike"
+    sales_in_district: "Salg i Monaco — %{district}"
+    rentals_in_district: "Utleie i Monaco — %{district}"
+    property_count:
+      one: "%{count} eiendom"
+      other: "%{count} eiendommer"
+    no_properties: "Ingen eiendommer funnet som passer kriteriene dine."
+    filter_type: "Type"
+    filter_district: "Bydel"
+    filter_all_types: "Alle typer"
+    filter_all_districts: "Alle bydeler"
+    filter_apply: "Filtrer"
+    new_badge: "NY"
+    rooms: "rom"
+    bedrooms: "sover."
+    bathrooms: "bad"
+    parkings: "parkering"
+    area: "m²"
+    price_on_request: "Pris på forespørsel"
+
   routes:
     sales: "salg"
     rentals: "utleie"

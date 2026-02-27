@@ -32,6 +32,31 @@ de:
     carousel_title: "Monaco"
     videos_title: "Videos"
 
+  listings:
+    sales: "Verkauf"
+    rentals: "Vermietung"
+    sales_monaco: "Verkauf in Monaco"
+    rentals_monaco: "Vermietung in Monaco"
+    sales_france: "Verkauf in Frankreich"
+    sales_in_district: "Verkauf in Monaco — %{district}"
+    rentals_in_district: "Vermietung in Monaco — %{district}"
+    property_count:
+      one: "%{count} Immobilie"
+      other: "%{count} Immobilien"
+    no_properties: "Keine Immobilien gefunden, die Ihren Kriterien entsprechen."
+    filter_type: "Typ"
+    filter_district: "Stadtteil"
+    filter_all_types: "Alle Typen"
+    filter_all_districts: "Alle Stadtteile"
+    filter_apply: "Filtern"
+    new_badge: "NEU"
+    rooms: "Zimmer"
+    bedrooms: "Schlafz."
+    bathrooms: "Bäder"
+    parkings: "Parkplatz"
+    area: "m²"
+    price_on_request: "Preis auf Anfrage"
+
   routes:
     sales: "verkauf"
     rentals: "vermietung"

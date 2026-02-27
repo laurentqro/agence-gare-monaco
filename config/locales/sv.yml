@@ -32,6 +32,31 @@ sv:
     carousel_title: "Monaco"
     videos_title: "Videor"
 
+  listings:
+    sales: "Försäljning"
+    rentals: "Uthyrning"
+    sales_monaco: "Försäljning i Monaco"
+    rentals_monaco: "Uthyrning i Monaco"
+    sales_france: "Försäljning i Frankrike"
+    sales_in_district: "Försäljning i Monaco — %{district}"
+    rentals_in_district: "Uthyrning i Monaco — %{district}"
+    property_count:
+      one: "%{count} fastighet"
+      other: "%{count} fastigheter"
+    no_properties: "Inga fastigheter hittades som matchar dina kriterier."
+    filter_type: "Typ"
+    filter_district: "Stadsdel"
+    filter_all_types: "Alla typer"
+    filter_all_districts: "Alla stadsdelar"
+    filter_apply: "Filtrera"
+    new_badge: "NY"
+    rooms: "rum"
+    bedrooms: "sovr."
+    bathrooms: "badr."
+    parkings: "parkering"
+    area: "m²"
+    price_on_request: "Pris på förfrågan"
+
   routes:
     sales: "forsaljning"
     rentals: "uthyrning"

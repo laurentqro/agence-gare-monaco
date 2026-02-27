@@ -92,7 +92,19 @@ Implemented the full homepage with all sections per PRD using TDD (24 tests):
 ### Task 7: (Merged into Task 5 — footer implemented alongside layout & navbar)
 
 ## Phase 3: Properties
-### Task 8: Property Listings (sale/rental pages with filters)
+### Task 8: Property Listings (sale/rental pages with filters) ✅
+Implemented property listing pages with filtering and property cards using TDD (28 tests):
+- PropertiesController#index: queries published, non-off-market properties with chainable filters (transaction_type, country, district, property_type via query param)
+- Property model: added scopes (publicly_visible, in_country, in_district, of_type), instance methods (title_for, description_for, cover_image, formatted_price, recent?)
+- Property listing view: responsive 3-column grid of property cards, page heading, property count
+- Property card partial: cover image with srcset (CDN size variants), title in current locale, European-formatted price (1.290.000 €), room/bedroom/bathroom/parking counts, living area, NOUVEAU badge for recent properties, exclusivity badge, link to property detail
+- Filter UI: property type dropdown, district dropdown (Monaco listings only), submit button, form submits via GET query params
+- Empty state: message displayed when no properties match filters
+- Page headings: dynamic translated headings per transaction type, country, and district (e.g. "Sales in Monaco — Carré d'Or")
+- i18n: added `listings` translation keys to all 8 locale files (headings, property count with pluralization, filter labels, property detail labels, badges, price on request)
+- ApplicationHelper: added locale_property_path, listing_heading, property_type_options helpers
+- 230 total tests passing (202 existing + 28 new)
+
 ### Task 9: Property Detail Page
 ### Task 10: Property Gallery & Media
 

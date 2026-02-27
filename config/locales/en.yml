@@ -32,6 +32,31 @@ en:
     carousel_title: "Monaco"
     videos_title: "Videos"
 
+  listings:
+    sales: "Sales"
+    rentals: "Rentals"
+    sales_monaco: "Sales in Monaco"
+    rentals_monaco: "Rentals in Monaco"
+    sales_france: "Sales in France"
+    sales_in_district: "Sales in Monaco — %{district}"
+    rentals_in_district: "Rentals in Monaco — %{district}"
+    property_count:
+      one: "%{count} property"
+      other: "%{count} properties"
+    no_properties: "No properties found matching your criteria."
+    filter_type: "Type"
+    filter_district: "District"
+    filter_all_types: "All types"
+    filter_all_districts: "All districts"
+    filter_apply: "Filter"
+    new_badge: "NEW"
+    rooms: "rooms"
+    bedrooms: "bed."
+    bathrooms: "bath."
+    parkings: "parking"
+    area: "m²"
+    price_on_request: "Price on request"
+
   routes:
     sales: "sales"
     rentals: "rentals"
