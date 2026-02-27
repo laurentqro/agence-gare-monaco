@@ -17,7 +17,7 @@ for ((i=1; i<=$1; i++)); do
   tmpfile=$(mktemp)
   trap "rm -f $tmpfile" EXIT
 
-  docker sandbox run claude \
+  claude \
     --permission-mode acceptEdits \
     --verbose \
     --print \
