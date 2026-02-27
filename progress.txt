@@ -60,9 +60,22 @@ Implemented fully translated URL segments for all 8 locales with TDD (50 tests):
 - 156 total tests passing (106 existing + 50 new)
 
 ## Phase 2: Design
-### Task 5: Layout & Navbar (Tailwind reproduction)
+
+### Task 5: Layout, Navbar & Footer ✅
+Implemented the full public site layout with navbar and footer using TDD (22 tests):
+- Application layout: Montserrat font (Google Fonts), `<html lang>` attribute per locale, Tailwind body styling
+- Separate admin layout: admin and session controllers use "admin" layout (no public navbar/footer)
+- Navbar partial (`shared/_navbar`): fixed top, dark navy (#090956) background, agency logo linking to locale root, 4 main nav links (Sales Monaco, Rentals Monaco, France, Articles) — all translated per locale via helper methods, language switcher dropdown with flag SVGs for all 8 locales (Stimulus controller for toggle/close-on-outside-click), responsive mobile hamburger menu (Stimulus controller for toggle), current locale highlighting
+- Footer partial (`shared/_footer`): agency address (3 Rue Langlé, MC 98000), phone/fax numbers, email link, 4 social media links (LinkedIn, Facebook, Instagram, YouTube) with inline SVG icons, CIM (Chambre Immobilière Monégasque) logo, copyright text, locale-translated privacy policy link
+- ApplicationHelper: locale-aware path helpers (locale_root_path, locale_sales_monaco_path, locale_rentals_monaco_path, locale_sales_france_path, locale_articles_path, locale_contact_path, locale_privacy_path, switch_locale_path), flag/locale name mappings
+- Stimulus controllers: mobile_menu_controller.js (toggle mobile nav), language_switcher_controller.js (toggle dropdown, close on outside click)
+- Flag SVG images for all 8 locales (fr, gb, it, de, se, no, dk, fi)
+- CIM logo (logo-cim.png) downloaded from live site
+- Added nav.privacy translation to all 8 locale files
+- 178 total tests passing (156 existing + 22 new)
+
 ### Task 6: Homepage
-### Task 7: Footer
+### Task 7: (Merged into Task 5 — footer implemented alongside layout & navbar)
 
 ## Phase 3: Properties
 ### Task 8: Property Listings (sale/rental pages with filters)

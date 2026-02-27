@@ -8,6 +8,7 @@ fi:
     france: "Ranska"
     articles: "Artikkelit"
     contact: "Yhteystiedot"
+    privacy: "Tietosuoja"
 
   homepage:
     hero_title: "Kiinteistöt Monacossa vuodesta 1942"

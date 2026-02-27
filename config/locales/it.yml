@@ -8,6 +8,7 @@ it:
     france: "Francia"
     articles: "Articoli"
     contact: "Contatto"
+    privacy: "Privacy"
 
   homepage:
     hero_title: "Immobiliare a Monaco dal 1942"

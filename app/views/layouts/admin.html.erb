@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="<%= I18n.locale %>">
+<html>
   <head>
-    <title><%= content_for(:title) || "Agence Immobilière de la Gare | Monaco" %></title>
+    <title><%= content_for(:title) || "Admin | Agence Gare Monaco" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Agence Gare Monaco">
@@ -23,13 +23,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="font-['Montserrat',Helvetica,Arial,Verdana,sans-serif] text-[#212529] text-xs">
-    <%= render "shared/navbar" %>
-
-    <main>
-      <%= yield %>
-    </main>
-
-    <%= render "shared/footer" %>
+  <body class="font-['Montserrat',Helvetica,Arial,Verdana,sans-serif] text-[#212529]">
+    <%= yield %>
   </body>
 </html>
