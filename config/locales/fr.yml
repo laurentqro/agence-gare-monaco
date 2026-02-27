@@ -1,0 +1,23 @@
+fr:
+  site_name: "Agence Immobilière de la Gare"
+  tagline: "L'Immobilier à Monaco depuis 1942"
+
+  nav:
+    sales_monaco: "Ventes Monaco"
+    rentals_monaco: "Location Monaco"
+    france: "France"
+    articles: "Articles"
+    contact: "Contact"
+
+  homepage:
+    hero_title: "L'Immobilier à Monaco depuis 1942"
+    hero_subtitle: "Membre de la Chambre Immobilière Monégasque"
+
+  routes:
+    sales: "ventes"
+    rentals: "locations"
+    properties: "biens"
+    articles: "articles"
+    contact: "contact"
+    privacy: "confidentialite"
+    france: "france"

@@ -1,0 +1,23 @@
+sv:
+  site_name: "Agence Immobilière de la Gare"
+  tagline: "Fastigheter i Monaco sedan 1942"
+
+  nav:
+    sales_monaco: "Försäljning Monaco"
+    rentals_monaco: "Uthyrning Monaco"
+    france: "Frankrike"
+    articles: "Artiklar"
+    contact: "Kontakt"
+
+  homepage:
+    hero_title: "Fastigheter i Monaco sedan 1942"
+    hero_subtitle: "Medlem i Chambre Immobilière Monégasque"
+
+  routes:
+    sales: "forsaljning"
+    rentals: "uthyrning"
+    properties: "fastigheter"
+    articles: "artiklar"
+    contact: "kontakt"
+    privacy: "integritet"
+    france: "frankrike"

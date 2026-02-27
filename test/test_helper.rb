@@ -10,6 +10,14 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
-    # Add more helper methods to be used by all tests here...
+    # Ensure tests run with English locale by default for consistent error messages.
+    # Tests that need a specific locale should set it explicitly.
+    setup do
+      I18n.locale = :en
+    end
+
+    teardown do
+      I18n.locale = I18n.default_locale
+    end
   end
 end

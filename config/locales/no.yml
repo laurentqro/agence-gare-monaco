@@ -1,0 +1,23 @@
+"no":
+  site_name: "Agence Immobilière de la Gare"
+  tagline: "Eiendom i Monaco siden 1942"
+
+  nav:
+    sales_monaco: "Salg Monaco"
+    rentals_monaco: "Utleie Monaco"
+    france: "Frankrike"
+    articles: "Artikler"
+    contact: "Kontakt"
+
+  homepage:
+    hero_title: "Eiendom i Monaco siden 1942"
+    hero_subtitle: "Medlem av Chambre Immobilière Monégasque"
+
+  routes:
+    sales: "salg"
+    rentals: "utleie"
+    properties: "eiendommer"
+    articles: "artikler"
+    contact: "kontakt"
+    privacy: "personvern"
+    france: "frankrike"

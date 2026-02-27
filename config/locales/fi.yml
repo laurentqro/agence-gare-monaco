@@ -1,0 +1,23 @@
+fi:
+  site_name: "Agence Immobilière de la Gare"
+  tagline: "Kiinteistöt Monacossa vuodesta 1942"
+
+  nav:
+    sales_monaco: "Myynti Monaco"
+    rentals_monaco: "Vuokraus Monaco"
+    france: "Ranska"
+    articles: "Artikkelit"
+    contact: "Yhteystiedot"
+
+  homepage:
+    hero_title: "Kiinteistöt Monacossa vuodesta 1942"
+    hero_subtitle: "Chambre Immobilière Monégasquen jäsen"
+
+  routes:
+    sales: "myynti"
+    rentals: "vuokraus"
+    properties: "kiinteistot"
+    articles: "artikkelit"
+    contact: "yhteystiedot"
+    privacy: "tietosuoja"
+    france: "ranska"

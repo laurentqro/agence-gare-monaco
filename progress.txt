@@ -29,7 +29,20 @@ Implemented Rails 8 built-in authentication with TDD (15 tests):
 - Temporary root route pointing to login (until public site is built)
 - 89 total tests passing (74 existing + 15 new)
 
-### Task 3: i18n Setup (8 languages)
+### Task 3: i18n Setup (8 languages) ✅
+Implemented full i18n infrastructure with TDD (17 tests):
+- Configured 8 locales: FR (default), EN, IT, DE, SV, NO, DA, FI
+- Created locale files for all 8 languages with: site_name, tagline, nav translations, homepage translations, translated route segments
+- Route segment translations per PRD: ventes/sales/verkauf/vendite/forsaljning/salg/salg/myynti etc.
+- Localizable concern (around_action with I18n.with_locale, default_url_options)
+- PagesController with locale-aware homepage
+- Locale-scoped routing: /:locale prefix for public pages, constraint validates locale
+- Bare root (/) redirects to /fr (302)
+- Admin and session routes remain unaffected by locale
+- Added rails-i18n gem for complete ActiveRecord/ActionView translations in all 8 languages
+- Test helper sets English locale by default for consistent error message assertions
+- 106 total tests passing (89 existing + 17 new)
+
 ### Task 4: Translated Routes
 
 ## Phase 2: Design
