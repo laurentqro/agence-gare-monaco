@@ -1,0 +1,57 @@
+## Phase 1: Foundation
+
+### Task 1: Core Database Schema ✅
+Created all database migrations, models, and tests for the core schema:
+- districts (name, city, lat/lng, slug, immotoolbox_id)
+- buildings (name, name_alt, address, district FK, city, immotoolbox_id)
+- properties (full schema: reference, multilingual title/description as JSON, price, transaction_type, property_type, country, city, district/building FKs, coordinates, room/area counts, boolean flags, immotoolbox sync fields)
+- property_images (property FK, remote_url + CDN size variants, position, is_plan, immotoolbox_id)
+- property_documents (property FK, label, Active Storage file)
+- categories (name, slug)
+- articles (multilingual title/body as JSON, slug, category FK, published, featured, published_at)
+- contacts (first_name, last_name, email, phone)
+- contact_submissions (form_type, name, email, phone, country, subject, message, property FK, read)
+
+All tables have proper indexes, foreign keys, null constraints, and unique constraints.
+74 model tests passing covering validations, associations, defaults, scopes.
+Commit: 5f9b275
+
+### Task 2: Admin Authentication ✅
+Implemented Rails 8 built-in authentication with TDD (15 tests):
+- User model with has_secure_password, email normalization (strip + downcase), uniqueness validation
+- Session model (belongs_to user, stores ip_address and user_agent)
+- Current model (ActiveSupport::CurrentAttributes for request-scoped session/user)
+- Authentication concern (cookie-based sessions, require_authentication before_action, allow_unauthenticated_access class method)
+- SessionsController (login form, create session with rate limiting, destroy session)
+- Admin::BaseController and Admin::DashboardController (protected by authentication)
+- Login view styled with Tailwind CSS matching agency branding
+- Routes: resource :session, admin namespace with dashboard
+- Temporary root route pointing to login (until public site is built)
+- 89 total tests passing (74 existing + 15 new)
+
+### Task 3: i18n Setup (8 languages)
+### Task 4: Translated Routes
+
+## Phase 2: Design
+### Task 5: Layout & Navbar (Tailwind reproduction)
+### Task 6: Homepage
+### Task 7: Footer
+
+## Phase 3: Properties
+### Task 8: Property Listings (sale/rental pages with filters)
+### Task 9: Property Detail Page
+### Task 10: Property Gallery & Media
+
+## Phase 4: Immotoolbox Sync
+### Task 11: API Client & Sync Service
+### Task 12: Scheduled Sync Job
+
+## Phase 5: Blog + SEO
+### Task 13: Articles/Blog CRUD
+### Task 14: SEO (hreflang, sitemaps, meta tags, JSON-LD)
+### Task 15: Legacy URL Redirects
+
+## Phase 6: Contacts + Polish
+### Task 16: Contact Forms (homepage + property enquiry)
+### Task 17: Contacts & Property Sharing
+### Task 18: Error Pages, Analytics, Currency Conversion

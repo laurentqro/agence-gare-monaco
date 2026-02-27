@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_27_220241) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_28_000002) do
   create_table "articles", force: :cascade do |t|
     t.json "body"
     t.integer "category_id", null: false
@@ -167,6 +167,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_220241) do
     t.index ["property_id"], name: "index_property_images_on_property_id"
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email_address", null: false
+    t.string "password_digest", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_users_on_email_address", unique: true
+  end
+
   add_foreign_key "articles", "categories"
   add_foreign_key "buildings", "districts"
   add_foreign_key "contact_submissions", "properties"
@@ -174,4 +191,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_27_220241) do
   add_foreign_key "properties", "districts"
   add_foreign_key "property_documents", "properties"
   add_foreign_key "property_images", "properties"
+  add_foreign_key "sessions", "users"
 end
