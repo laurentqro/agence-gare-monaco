@@ -1,0 +1,177 @@
+# This file is auto-generated from the current state of the database. Instead
+# of editing this file, please use the migrations feature of Active Record to
+# incrementally modify your database, and then regenerate this schema definition.
+#
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
+# be faster and is potentially less error prone than running all of your
+# migrations from scratch. Old migrations may fail to apply correctly if those
+# migrations use external dependencies or application code.
+#
+# It's strongly recommended that you check this file into your version control system.
+
+ActiveRecord::Schema[8.1].define(version: 2026_02_27_220241) do
+  create_table "articles", force: :cascade do |t|
+    t.json "body"
+    t.integer "category_id", null: false
+    t.datetime "created_at", null: false
+    t.boolean "featured", default: false
+    t.boolean "published", default: false
+    t.datetime "published_at"
+    t.string "slug", null: false
+    t.json "title"
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_articles_on_category_id"
+    t.index ["featured"], name: "index_articles_on_featured"
+    t.index ["published"], name: "index_articles_on_published"
+    t.index ["slug"], name: "index_articles_on_slug", unique: true
+  end
+
+  create_table "buildings", force: :cascade do |t|
+    t.string "address"
+    t.string "city"
+    t.datetime "created_at", null: false
+    t.integer "district_id"
+    t.integer "immotoolbox_id"
+    t.string "name", null: false
+    t.string "name_alt"
+    t.datetime "updated_at", null: false
+    t.index ["district_id"], name: "index_buildings_on_district_id"
+    t.index ["immotoolbox_id"], name: "index_buildings_on_immotoolbox_id", unique: true
+  end
+
+  create_table "categories", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_categories_on_slug", unique: true
+  end
+
+  create_table "contact_submissions", force: :cascade do |t|
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.string "form_type", null: false
+    t.text "message", null: false
+    t.string "name", null: false
+    t.string "phone"
+    t.integer "property_id"
+    t.boolean "read", default: false
+    t.string "subject"
+    t.datetime "updated_at", null: false
+    t.index ["form_type"], name: "index_contact_submissions_on_form_type"
+    t.index ["property_id"], name: "index_contact_submissions_on_property_id"
+    t.index ["read"], name: "index_contact_submissions_on_read"
+  end
+
+  create_table "contacts", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.string "first_name", null: false
+    t.string "last_name", null: false
+    t.string "phone"
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_contacts_on_email", unique: true
+  end
+
+  create_table "districts", force: :cascade do |t|
+    t.string "city", null: false
+    t.datetime "created_at", null: false
+    t.integer "immotoolbox_id"
+    t.decimal "latitude", precision: 10, scale: 7
+    t.decimal "longitude", precision: 10, scale: 7
+    t.string "name", null: false
+    t.string "slug"
+    t.datetime "updated_at", null: false
+    t.index ["immotoolbox_id"], name: "index_districts_on_immotoolbox_id", unique: true
+    t.index ["slug"], name: "index_districts_on_slug", unique: true
+  end
+
+  create_table "properties", force: :cascade do |t|
+    t.string "address"
+    t.integer "building_id"
+    t.string "city", null: false
+    t.string "country", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "EUR"
+    t.json "description"
+    t.integer "district_id"
+    t.boolean "exclusivity", default: false
+    t.boolean "featured", default: false
+    t.integer "floor"
+    t.boolean "furnished", default: false
+    t.decimal "garden_area", precision: 10, scale: 2
+    t.boolean "has_360_tour", default: false
+    t.integer "immotoolbox_id"
+    t.decimal "land_area", precision: 10, scale: 2
+    t.decimal "latitude", precision: 10, scale: 7
+    t.decimal "living_area", precision: 10, scale: 2
+    t.decimal "longitude", precision: 10, scale: 7
+    t.boolean "manually_edited", default: false
+    t.integer "num_bathrooms"
+    t.integer "num_bedrooms"
+    t.integer "num_cellars"
+    t.integer "num_parkings"
+    t.integer "num_rooms"
+    t.boolean "off_market", default: false
+    t.integer "price"
+    t.string "property_type", null: false
+    t.boolean "published", default: false
+    t.string "reference", null: false
+    t.integer "service_charges"
+    t.boolean "service_charges_included", default: false
+    t.boolean "shared_exclusivity", default: false
+    t.string "subtype"
+    t.datetime "synced_at"
+    t.decimal "terrace_area", precision: 10, scale: 2
+    t.json "title"
+    t.decimal "total_area", precision: 10, scale: 2
+    t.string "transaction_type", null: false
+    t.datetime "updated_at", null: false
+    t.string "video_url"
+    t.string "virtual_tour_url"
+    t.index ["building_id"], name: "index_properties_on_building_id"
+    t.index ["country"], name: "index_properties_on_country"
+    t.index ["district_id"], name: "index_properties_on_district_id"
+    t.index ["featured"], name: "index_properties_on_featured"
+    t.index ["immotoolbox_id"], name: "index_properties_on_immotoolbox_id", unique: true
+    t.index ["off_market"], name: "index_properties_on_off_market"
+    t.index ["published"], name: "index_properties_on_published"
+    t.index ["reference"], name: "index_properties_on_reference", unique: true
+    t.index ["transaction_type"], name: "index_properties_on_transaction_type"
+  end
+
+  create_table "property_documents", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "label"
+    t.integer "property_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["property_id"], name: "index_property_documents_on_property_id"
+  end
+
+  create_table "property_images", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "immotoolbox_id"
+    t.boolean "is_plan", default: false
+    t.string "large_url"
+    t.string "medium_url"
+    t.integer "position", default: 0
+    t.integer "property_id", null: false
+    t.string "remote_url", null: false
+    t.string "small_url"
+    t.string "thumb_url"
+    t.datetime "updated_at", null: false
+    t.index ["immotoolbox_id"], name: "index_property_images_on_immotoolbox_id", unique: true
+    t.index ["property_id", "position"], name: "index_property_images_on_property_id_and_position"
+    t.index ["property_id"], name: "index_property_images_on_property_id"
+  end
+
+  add_foreign_key "articles", "categories"
+  add_foreign_key "buildings", "districts"
+  add_foreign_key "contact_submissions", "properties"
+  add_foreign_key "properties", "buildings"
+  add_foreign_key "properties", "districts"
+  add_foreign_key "property_documents", "properties"
+  add_foreign_key "property_images", "properties"
+end
