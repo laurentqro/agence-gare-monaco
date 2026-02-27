@@ -43,7 +43,21 @@ Implemented full i18n infrastructure with TDD (17 tests):
 - Test helper sets English locale by default for consistent error message assertions
 - 106 total tests passing (89 existing + 17 new)
 
-### Task 4: Translated Routes
+### Task 4: Translated Routes ✅
+Implemented fully translated URL segments for all 8 locales with TDD (50 tests):
+- Routes iterate over all locales, reading translated segments from i18n YAML files
+- Property listings: /{locale}/{sales|rentals}[/monaco[/{district}]] and /{locale}/{sales}/{france}
+- Property detail: /{locale}/{properties}/{id}-{slug}
+- Articles: /{locale}/{articles} (listing), /{locale}/{articles}/{slug} (category or article)
+- Contact: /{locale}/{contact}
+- Privacy: /{locale}/{privacy}
+- All segments translated per locale (e.g. /fr/ventes/monaco, /en/sales/monaco, /de/verkauf/monaco)
+- District filtering via slug param, validated against District model (404 if not found)
+- PropertiesController: index (listings with transaction_type/country/district filters), show (detail)
+- ArticlesController: index (listing), show (disambiguates category vs article by slug)
+- PagesController: home, contact, privacy actions
+- Wrong translation for locale returns 404 (e.g. /fr/sales → 404)
+- 156 total tests passing (106 existing + 50 new)
 
 ## Phase 2: Design
 ### Task 5: Layout & Navbar (Tailwind reproduction)
