@@ -102,6 +102,21 @@ de:
     listings_rentals_district_description: "Mietimmobilien im Stadtteil %{district} in Monaco."
     listings_all_description: "Entdecken Sie alle unsere Immobilien in Monaco und Frankreich."
 
+  contact_form:
+    title: "Kontakt"
+    info_title: "Unsere Kontaktdaten"
+    phone: "Tel"
+    fax: "Fax"
+    name: "Name"
+    email: "E-Mail"
+    subject: "Betreff"
+    message: "Nachricht"
+    country: "Land"
+    send: "Absenden"
+    success: "Ihre Nachricht wurde erfolgreich gesendet. Wir werden uns in Kürze bei Ihnen melden."
+    enquiry_title: "Immobilienanfrage"
+    enquiry_reference: "Immobilienreferenz"
+
   routes:
     sales: "verkauf"
     rentals: "vermietung"

@@ -102,6 +102,21 @@ fi:
     listings_rentals_district_description: "Vuokrakiinteistöt kaupunginosassa %{district}, Monaco."
     listings_all_description: "Tutustu kaikkiin kiinteistöihimme Monacossa ja Ranskassa."
 
+  contact_form:
+    title: "Yhteystiedot"
+    info_title: "Yhteystietomme"
+    phone: "Puh"
+    fax: "Faksi"
+    name: "Nimi"
+    email: "Sähköposti"
+    subject: "Aihe"
+    message: "Viesti"
+    country: "Maa"
+    send: "Lähetä"
+    success: "Viestisi on lähetetty onnistuneesti. Otamme sinuun yhteyttä mahdollisimman pian."
+    enquiry_title: "Kiinteistötiedustelu"
+    enquiry_reference: "Kiinteistöviite"
+
   routes:
     sales: "myynti"
     rentals: "vuokraus"

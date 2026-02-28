@@ -188,6 +188,20 @@ Implemented all legacy URL redirects (301) for the 3 existing languages (FR, EN,
 - 490 total tests passing (458 existing + 32 new)
 
 ## Phase 6: Contacts + Polish
-### Task 16: Contact Forms (homepage + property enquiry)
+### Task 16: Contact Forms (homepage + property enquiry) ✅
+Implemented both contact forms (homepage + property enquiry) with Action Mailer email delivery and honeypot spam protection using TDD (23 tests):
+- **ContactMailer** (`app/mailers/contact_mailer.rb`): two email methods. `contact_email` sends homepage contact form submissions with sender name, email, subject, and message. `enquiry_email` sends property enquiry submissions with sender details, property reference, title, price, and a link to the property page. Both emails sent to `info@agencegaremonaco.com` with reply-to set to the sender's email.
+- **ContactSubmissionsController** (`app/controllers/contact_submissions_controller.rb`): handles POST form submissions. Auto-determines `form_type` (contact vs enquiry) based on `property_id` presence. Honeypot spam protection: if hidden `website` field is filled, silently redirects as if successful (does not reveal rejection to bot). On success: saves to DB, sends email, redirects with flash notice. On validation failure: re-renders the originating page (contact page or property detail page) with errors.
+- **Homepage contact form** (`app/views/pages/contact.html.erb`): full contact page with agency details (address, phone, fax, email) on the left and contact form on the right. Fields: name, email, subject, message. Honeypot field hidden via CSS positioning. Styled with agency branding (Tailwind).
+- **Property enquiry form** (added to `app/views/properties/show.html.erb`): enquiry form section below property description, before similar properties. Shows pre-filled property reference. Fields: name, email, phone, country, message, hidden property_id. Honeypot field.
+- **Flash notices**: added flash notice/alert display to application layout (`<main>` section) with green/red styling.
+- **ApplicationMailer**: updated default `from` to `info@agencegaremonaco.com`.
+- **Email templates**: HTML emails for both contact and enquiry (`app/views/contact_mailer/`). Enquiry email includes property details table and "View Property on Website" button linking to the French property page.
+- **Routes**: `resources :contact_submissions, only: [:create]` added for POST `/contact_submissions`.
+- **PagesController**: initializes `@submission = ContactSubmission.new` for contact form.
+- **PropertiesController**: initializes `@submission = ContactSubmission.new` for enquiry form.
+- **i18n**: added `contact_form.*` translation keys to all 8 locale files (13 keys each: title, info_title, phone, fax, name, email, subject, message, country, send, success, enquiry_title, enquiry_reference).
+- 513 total tests passing (490 existing + 23 new: 12 mailer tests + 11 controller tests)
+
 ### Task 17: Contacts & Property Sharing
 ### Task 18: Error Pages, Analytics, Currency Conversion

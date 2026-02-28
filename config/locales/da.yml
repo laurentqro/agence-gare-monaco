@@ -102,6 +102,21 @@ da:
     listings_rentals_district_description: "Udlejningsejendomme i %{district}, Monaco."
     listings_all_description: "Opdag alle vores ejendomme i Monaco og Frankrig."
 
+  contact_form:
+    title: "Kontakt"
+    info_title: "Vores kontaktoplysninger"
+    phone: "Tlf"
+    fax: "Fax"
+    name: "Navn"
+    email: "E-mail"
+    subject: "Emne"
+    message: "Besked"
+    country: "Land"
+    send: "Send"
+    success: "Din besked er blevet sendt. Vi vender tilbage hurtigst muligt."
+    enquiry_title: "Ejendomsforespørgsel"
+    enquiry_reference: "Ejendomsreference"
+
   routes:
     sales: "salg"
     rentals: "udlejning"

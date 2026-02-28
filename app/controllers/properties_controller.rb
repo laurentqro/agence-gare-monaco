@@ -35,6 +35,8 @@ class PropertiesController < ApplicationController
     @similar_properties = @similar_properties.where(district: @property.district) if @property.district.present?
     @similar_properties = @similar_properties.includes(:property_images, :district).limit(3)
 
+    @submission = ContactSubmission.new
+
     set_seo(page_type: :property, property: @property)
   end
 end

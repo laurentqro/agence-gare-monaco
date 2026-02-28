@@ -102,6 +102,21 @@ sv:
     listings_rentals_district_description: "Hyresfastigheter i %{district}, Monaco."
     listings_all_description: "Upptäck alla våra fastigheter i Monaco och Frankrike."
 
+  contact_form:
+    title: "Kontakt"
+    info_title: "Våra kontaktuppgifter"
+    phone: "Tel"
+    fax: "Fax"
+    name: "Namn"
+    email: "E-post"
+    subject: "Ämne"
+    message: "Meddelande"
+    country: "Land"
+    send: "Skicka"
+    success: "Ditt meddelande har skickats. Vi återkommer så snart som möjligt."
+    enquiry_title: "Fastighetsförfrågan"
+    enquiry_reference: "Fastighetsreferens"
+
   routes:
     sales: "forsaljning"
     rentals: "uthyrning"

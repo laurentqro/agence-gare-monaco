@@ -9,6 +9,7 @@ class PagesController < ApplicationController
   end
 
   def contact
+    @submission = ContactSubmission.new
     set_seo(page_type: :contact)
   end
 

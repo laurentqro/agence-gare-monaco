@@ -102,6 +102,21 @@ fr:
     listings_rentals_district_description: "Biens immobiliers à louer dans le quartier %{district} à Monaco."
     listings_all_description: "Découvrez tous nos biens immobiliers à Monaco et en France."
 
+  contact_form:
+    title: "Contact"
+    info_title: "Nos coordonnées"
+    phone: "Tél"
+    fax: "Fax"
+    name: "Nom"
+    email: "Email"
+    subject: "Objet"
+    message: "Message"
+    country: "Pays"
+    send: "Envoyer"
+    success: "Votre message a bien été envoyé. Nous vous répondrons dans les plus brefs délais."
+    enquiry_title: "Demande d'information"
+    enquiry_reference: "Référence du bien"
+
   routes:
     sales: "ventes"
     rentals: "locations"

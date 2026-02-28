@@ -1,0 +1,27 @@
+<h2>New Contact Form Submission</h2>
+
+<table cellpadding="8" cellspacing="0" border="0" style="border-collapse: collapse; width: 100%; max-width: 600px;">
+  <tr>
+    <td style="font-weight: bold; color: #6E8297; vertical-align: top; width: 120px;">Name:</td>
+    <td style="color: #212529;"><%= @submission.name %></td>
+  </tr>
+  <tr>
+    <td style="font-weight: bold; color: #6E8297; vertical-align: top;">Email:</td>
+    <td style="color: #212529;"><%= @submission.email %></td>
+  </tr>
+  <% if @submission.subject.present? %>
+  <tr>
+    <td style="font-weight: bold; color: #6E8297; vertical-align: top;">Subject:</td>
+    <td style="color: #212529;"><%= @submission.subject %></td>
+  </tr>
+  <% end %>
+  <tr>
+    <td style="font-weight: bold; color: #6E8297; vertical-align: top;">Message:</td>
+    <td style="color: #212529;"><%= simple_format(@submission.message) %></td>
+  </tr>
+</table>
+
+<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+<p style="color: #6E8297; font-size: 12px;">
+  This message was sent via the contact form on agencegaremonaco.com
+</p>

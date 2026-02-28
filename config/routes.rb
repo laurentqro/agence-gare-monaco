@@ -76,6 +76,9 @@ Rails.application.routes.draw do
     get "immobile/:legacy_id", to: "legacy_redirects#property"
   end
 
+  # Contact form submissions
+  resources :contact_submissions, only: [:create]
+
   # SEO: XML Sitemaps
   get "sitemap.xml", to: "sitemaps#index", as: :sitemap, defaults: { format: :xml }
   get "sitemaps/:locale.xml", to: "sitemaps#show", as: :sitemap_locale, defaults: { format: :xml }

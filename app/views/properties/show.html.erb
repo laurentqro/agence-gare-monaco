@@ -267,6 +267,83 @@
     </div>
   </div>
 
+  <%# Enquiry form %>
+  <div data-testid="enquiry-form" class="mt-12">
+    <hr class="border-gray-200 mb-8">
+    <h2 class="text-lg font-bold text-[#090956] mb-6"><%= t("contact_form.enquiry_title") %></h2>
+
+    <div class="max-w-xl">
+      <p class="text-xs text-[#6E8297] mb-4">
+        <%= t("contact_form.enquiry_reference") %>:
+        <span class="font-semibold text-[#212529]"><%= @property.reference %></span>
+      </p>
+
+      <% enquiry = @submission || ContactSubmission.new %>
+      <% if enquiry.errors.any? %>
+        <div data-testid="form-errors" class="bg-red-50 border border-red-200 rounded p-4 mb-6">
+          <ul class="text-xs text-red-600 space-y-1">
+            <% enquiry.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_with(model: enquiry, url: contact_submissions_path, method: :post, local: true, class: "space-y-4") do |f| %>
+        <%# Honeypot field %>
+        <div style="position: absolute; left: -9999px;" aria-hidden="true">
+          <label for="website">Website</label>
+          <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <%= f.hidden_field :property_id, value: @property.id %>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="contact_submission_name" class="block text-xs font-medium text-[#212529] mb-1">
+              <%= t("contact_form.name") %> *
+            </label>
+            <%= f.text_field :name, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#090956] focus:outline-none", required: true %>
+          </div>
+
+          <div>
+            <label for="contact_submission_email" class="block text-xs font-medium text-[#212529] mb-1">
+              <%= t("contact_form.email") %> *
+            </label>
+            <%= f.email_field :email, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#090956] focus:outline-none", required: true %>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="contact_submission_phone" class="block text-xs font-medium text-[#212529] mb-1">
+              <%= t("contact_form.phone") %>
+            </label>
+            <%= f.telephone_field :phone, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#090956] focus:outline-none" %>
+          </div>
+
+          <div>
+            <label for="contact_submission_country" class="block text-xs font-medium text-[#212529] mb-1">
+              <%= t("contact_form.country") %>
+            </label>
+            <%= f.text_field :country, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#090956] focus:outline-none" %>
+          </div>
+        </div>
+
+        <div>
+          <label for="contact_submission_message" class="block text-xs font-medium text-[#212529] mb-1">
+            <%= t("contact_form.message") %> *
+          </label>
+          <%= f.text_area :message, rows: 5, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#090956] focus:outline-none", required: true %>
+        </div>
+
+        <div>
+          <%= f.submit t("contact_form.send"), class: "bg-white border border-[#2E4C87] text-[#090956] px-6 py-2 rounded text-xs font-semibold hover:bg-gray-50 cursor-pointer" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
   <%# Similar properties %>
   <% if @similar_properties.any? %>
     <div data-testid="similar-properties" class="mt-12">
