@@ -1,1 +1,285 @@
-<h1>Property Detail</h1>
+<% title = @property.title_for(I18n.locale) %>
+<% content_for :title do %>
+<%= title %><% if @property.formatted_price %> | <%= @property.formatted_price %> €<% end %> | Agence de la Gare Monaco
+<% end %>
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <%# Back link %>
+  <div data-testid="back-link" class="mb-6">
+    <% if @property.transaction_type == "sale" %>
+      <% if @property.country == "MC" %>
+        <a href="<%= locale_sales_monaco_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
+          &larr; <%= t("property_detail.back_to_sales") %>
+        </a>
+      <% else %>
+        <a href="<%= locale_sales_france_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
+          &larr; <%= t("property_detail.back_to_sales") %>
+        </a>
+      <% end %>
+    <% else %>
+      <a href="<%= locale_rentals_monaco_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
+        &larr; <%= t("property_detail.back_to_rentals") %>
+      </a>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <%# Left column: gallery + description %>
+    <div class="lg:col-span-2">
+      <%# Photo gallery %>
+      <% if @photos.any? %>
+        <div data-testid="property-gallery" data-controller="gallery" class="mb-8">
+          <%# Main image %>
+          <div class="relative aspect-[4/3] bg-gray-100 rounded overflow-hidden mb-3">
+            <% @photos.each_with_index do |photo, index| %>
+              <img src="<%= photo.large_url || photo.remote_url %>"
+                   alt="<%= t('property_detail.photo_alt', title: title, number: index + 1) %>"
+                   class="w-full h-full object-cover absolute inset-0 transition-opacity duration-300 <%= index == 0 ? 'opacity-100' : 'opacity-0' %>"
+                   loading="<%= index == 0 ? 'eager' : 'lazy' %>"
+                   data-gallery-photo
+                   data-gallery-target="photo"
+                   data-index="<%= index %>"
+                   srcset="<%= photo.small_url %> 400w, <%= photo.medium_url %> 800w, <%= photo.large_url %> 1200w"
+                   sizes="(max-width: 768px) 100vw, 66vw">
+            <% end %>
+
+            <%# Navigation arrows %>
+            <% if @photos.size > 1 %>
+              <button data-action="gallery#prev" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center text-[#090956] shadow">
+                &lsaquo;
+              </button>
+              <button data-action="gallery#next" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center text-[#090956] shadow">
+                &rsaquo;
+              </button>
+            <% end %>
+          </div>
+
+          <%# Thumbnails %>
+          <div data-testid="gallery-thumbnails" class="flex gap-2 overflow-x-auto">
+            <% @photos.each_with_index do |photo, index| %>
+              <button data-action="gallery#goTo" data-gallery-index-param="<%= index %>"
+                      class="flex-shrink-0 w-16 h-12 rounded overflow-hidden border-2 <%= index == 0 ? 'border-[#090956]' : 'border-transparent' %>"
+                      data-gallery-target="thumbnail">
+                <img src="<%= photo.thumb_url || photo.small_url || photo.remote_url %>"
+                     alt="<%= t('property_detail.photo_alt', title: title, number: index + 1) %>"
+                     class="w-full h-full object-cover"
+                     loading="lazy">
+              </button>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Badges %>
+      <div class="flex gap-2 mb-4">
+        <% if @property.recent? %>
+          <span data-testid="new-badge" class="bg-[#090956] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+            <%= t("listings.new_badge") %>
+          </span>
+        <% end %>
+        <% if @property.exclusivity? %>
+          <span data-testid="exclusivity-badge" class="bg-[#6E8297] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+            <%= t("property_detail.exclusivity") %>
+          </span>
+        <% end %>
+      </div>
+
+      <%# Title %>
+      <h1 data-testid="property-title" class="text-2xl font-bold text-[#090956] mb-2"><%= title %></h1>
+
+      <%# Price %>
+      <p data-testid="property-price" class="text-xl font-bold text-[#090956] mb-6">
+        <% if @property.price.present? %>
+          <%= @property.formatted_price %> €<%= @property.transaction_type == "rental" ? t("property_detail.per_month") : "" %>
+        <% else %>
+          <%= t("listings.price_on_request") %>
+        <% end %>
+      </p>
+
+      <hr class="border-gray-200 mb-6">
+
+      <%# Description %>
+      <div data-testid="property-description" class="text-xs text-[#212529] leading-relaxed mb-8">
+        <%= simple_format(@property.description_for(I18n.locale)) %>
+      </div>
+
+      <%# Floor plans %>
+      <% if @plans.any? %>
+        <div data-testid="floor-plans" class="mb-8">
+          <h2 class="text-lg font-bold text-[#090956] mb-4"><%= t("property_detail.floor_plans") %></h2>
+          <div class="grid grid-cols-1 gap-4">
+            <% @plans.each_with_index do |plan, index| %>
+              <div class="bg-gray-50 rounded p-2">
+                <img src="<%= plan.large_url || plan.remote_url %>"
+                     alt="<%= t('property_detail.plan_alt', title: title) %>"
+                     class="w-full h-auto"
+                     loading="lazy">
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Virtual tour %>
+      <% if @property.virtual_tour_url.present? %>
+        <div data-testid="virtual-tour" class="mb-8">
+          <h2 class="text-lg font-bold text-[#090956] mb-4"><%= t("property_detail.virtual_tour") %></h2>
+          <a href="<%= @property.virtual_tour_url %>" target="_blank" rel="noopener noreferrer"
+             class="inline-flex items-center gap-2 bg-white border border-[#2E4C87] text-[#090956] px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
+            <%= t("property_detail.view_virtual_tour") %>
+          </a>
+        </div>
+      <% end %>
+
+      <%# Video %>
+      <% if @property.video_url.present? %>
+        <div data-testid="property-video" class="mb-8">
+          <h2 class="text-lg font-bold text-[#090956] mb-4"><%= t("property_detail.video") %></h2>
+          <% youtube_id = @property.video_url[/(?:v=|\/embed\/|youtu\.be\/)([^&?\/]+)/, 1] %>
+          <% if youtube_id %>
+            <div class="aspect-video rounded overflow-hidden">
+              <iframe src="https://www.youtube-nocookie.com/embed/<%= youtube_id %>"
+                      class="w-full h-full"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen
+                      loading="lazy"></iframe>
+            </div>
+          <% else %>
+            <a href="<%= @property.video_url %>" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 bg-white border border-[#2E4C87] text-[#090956] px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
+              <%= t("property_detail.video") %>
+            </a>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Right column: details table %>
+    <div>
+      <div data-testid="property-details" class="bg-gray-50 rounded p-6 sticky top-20">
+        <h2 class="text-lg font-bold text-[#090956] mb-4"><%= title %></h2>
+        <table class="w-full text-xs">
+          <tbody>
+            <tr class="border-b border-gray-200">
+              <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.reference") %></td>
+              <td class="py-2 text-[#212529] text-right"><%= @property.reference %></td>
+            </tr>
+            <% if @property.building.present? %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.building") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.building.name %></td>
+              </tr>
+            <% end %>
+            <% if @property.district.present? %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.district") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.district.name %></td>
+              </tr>
+            <% end %>
+            <tr class="border-b border-gray-200">
+              <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.type") %></td>
+              <td class="py-2 text-[#212529] text-right capitalize"><%= @property.property_type %><%= @property.subtype.present? ? " (#{@property.subtype})" : "" %></td>
+            </tr>
+            <% if @property.num_rooms.present? && @property.num_rooms > 0 %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.rooms") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.num_rooms %></td>
+              </tr>
+            <% end %>
+            <% if @property.num_bedrooms.present? && @property.num_bedrooms > 0 %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.bedrooms") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.num_bedrooms %></td>
+              </tr>
+            <% end %>
+            <% if @property.num_bathrooms.present? && @property.num_bathrooms > 0 %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.bathrooms") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.num_bathrooms %></td>
+              </tr>
+            <% end %>
+            <% if @property.living_area.present? && @property.living_area > 0 %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.living_area") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.living_area.to_i %> m²</td>
+              </tr>
+            <% end %>
+            <% if @property.total_area.present? && @property.total_area > 0 %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.total_area") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.total_area.to_i %> m²</td>
+              </tr>
+            <% end %>
+            <% if @property.terrace_area.present? && @property.terrace_area > 0 %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.terrace_area") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.terrace_area.to_i %> m²</td>
+              </tr>
+            <% end %>
+            <% if @property.land_area.present? && @property.land_area > 0 %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.land_area") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.land_area.to_i %> m²</td>
+              </tr>
+            <% end %>
+            <% if @property.garden_area.present? && @property.garden_area > 0 %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.garden_area") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.garden_area.to_i %> m²</td>
+              </tr>
+            <% end %>
+            <% if @property.floor.present? %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.floor") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.floor %></td>
+              </tr>
+            <% end %>
+            <% if @property.num_parkings.present? && @property.num_parkings > 0 %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.parkings") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.num_parkings %></td>
+              </tr>
+            <% end %>
+            <% if @property.num_cellars.present? && @property.num_cellars > 0 %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.cellars") %></td>
+                <td class="py-2 text-[#212529] text-right"><%= @property.num_cellars %></td>
+              </tr>
+            <% end %>
+            <% if @property.furnished? %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.furnished") %></td>
+                <td class="py-2 text-[#212529] text-right">&#10003;</td>
+              </tr>
+            <% end %>
+            <% if @property.service_charges.present? && @property.service_charges > 0 %>
+              <tr class="border-b border-gray-200">
+                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.service_charges") %></td>
+                <td class="py-2 text-[#212529] text-right">
+                  <%= @property.service_charges %> €
+                  <% if @property.service_charges_included? %>
+                    <span class="text-[#6E8297]"><%= t("property_detail.service_charges_included") %></span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <%# Similar properties %>
+  <% if @similar_properties.any? %>
+    <div data-testid="similar-properties" class="mt-12">
+      <hr class="border-gray-200 mb-8">
+      <h2 class="text-lg font-bold text-[#090956] mb-6"><%= t("property_detail.similar_properties") %></h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @similar_properties.each do |property| %>
+          <%= render "properties/property_card", property: property %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

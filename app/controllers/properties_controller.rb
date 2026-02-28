@@ -22,6 +22,14 @@ class PropertiesController < ApplicationController
   end
 
   def show
-    @property = Property.find(params[:id])
+    @property = Property.includes(:district, :building, :property_images).find(params[:id])
+    @photos = @property.photos
+    @plans = @property.plans
+
+    @similar_properties = Property.publicly_visible
+      .where(transaction_type: @property.transaction_type)
+      .where.not(id: @property.id)
+    @similar_properties = @similar_properties.where(district: @property.district) if @property.district.present?
+    @similar_properties = @similar_properties.includes(:property_images, :district).limit(3)
   end
 end

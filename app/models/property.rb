@@ -32,6 +32,18 @@ class Property < ApplicationRecord
     property_images.order(:position).first
   end
 
+  def photos
+    property_images.where(is_plan: false).order(:position)
+  end
+
+  def plans
+    property_images.where(is_plan: true).order(:position)
+  end
+
+  def slug_for(locale)
+    title_for(locale).parameterize
+  end
+
   def formatted_price
     return nil if price.blank?
     price.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1.').reverse

@@ -105,8 +105,27 @@ Implemented property listing pages with filtering and property cards using TDD (
 - ApplicationHelper: added locale_property_path, listing_heading, property_type_options helpers
 - 230 total tests passing (202 existing + 28 new)
 
-### Task 9: Property Detail Page
-### Task 10: Property Gallery & Media
+### Task 9: Property Detail Page (with gallery & media) ✅
+Implemented the full property detail page with photo gallery, details table, and all media sections using TDD (53 tests):
+- PropertiesController#show: loads property with eager-loaded associations (district, building, property_images), splits photos vs floor plans, queries similar properties (same district + transaction type, limit 3)
+- Property model: added `photos`, `plans`, `slug_for` methods
+- Photo gallery: Stimulus gallery_controller.js for image navigation (prev/next arrows, thumbnail click), large hero image with fade transitions, thumbnail strip with active border highlight, srcset with CDN size variants, proper alt text ("{title} - Photo {n}"), first image eager-loaded / subsequent lazy-loaded
+- Property details table: sticky sidebar with all property specs — reference, building name, district name, type/subtype, rooms, bedrooms, bathrooms, living area, total area, terrace area, land area, garden area, floor, parking, cellars, furnished status, service charges (with included indicator). All fields conditionally rendered (hidden when nil/zero)
+- Price display: European formatting (1.850.000 €), "Price on request" when nil, "/month" suffix for rentals
+- Description: locale-aware with simple_format for paragraph rendering
+- Floor plans section: separate from photo gallery, renders plan images with proper alt text ("Plan - {title}"), hidden when no plans exist
+- Virtual tour: external link to Matterport/360 tour URL, hidden when no URL
+- Video section: YouTube embed via youtube-nocookie.com iframe (extracts video ID from URL), fallback link for non-YouTube URLs, hidden when no video URL
+- Badges: NEW (recent properties), Exclusivity — displayed above title
+- Back link: context-aware (back to sales/rentals, Monaco/France)
+- Similar properties: up to 3 properties in same district + transaction type, rendered using existing property card partial
+- Page title: "{property_title} | {price} € | Agence de la Gare Monaco" (price omitted when nil)
+- i18n: added `property_detail` translation keys to all 8 locale files (30 keys each: reference, building, district, type, floor, rooms, bedrooms, bathrooms, parkings, cellars, living_area, total_area, terrace_area, land_area, garden_area, furnished, service_charges, back links, similar properties, floor plans, virtual tour, video, gallery, photo/plan alt text, exclusivity)
+- All 8 locales render correctly
+- Edge cases: no images, no building, no district all render gracefully
+- 283 total tests passing (230 existing + 53 new)
+
+### Task 10: (Merged into Task 9 — gallery & media implemented as part of property detail page)
 
 ## Phase 4: Immotoolbox Sync
 ### Task 11: API Client & Sync Service

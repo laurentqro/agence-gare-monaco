@@ -1,0 +1,409 @@
+require "test_helper"
+
+class PropertyDetailTest < ActionDispatch::IntegrationTest
+  setup do
+    @district = District.create!(name: "Carré d'Or", city: "Monaco", slug: "carre-dor")
+    @building = Building.create!(name: "Le Montaigne", address: "1 Av. Princess Grace", city: "Monaco", district: @district)
+
+    @property = Property.create!(
+      reference: "MC-100",
+      title: { "fr" => "Studio vue mer Carré d'Or", "en" => "Sea view studio Carré d'Or" },
+      description: { "fr" => "Magnifique studio avec vue mer dans le prestigieux Carré d'Or.", "en" => "Beautiful sea view studio in the prestigious Carré d'Or." },
+      transaction_type: "sale",
+      property_type: "apartment",
+      subtype: "studio",
+      country: "MC",
+      city: "Monaco",
+      district: @district,
+      building: @building,
+      price: 1_850_000,
+      currency: "EUR",
+      num_rooms: 1,
+      num_bedrooms: 0,
+      num_bathrooms: 1,
+      num_parkings: 1,
+      num_cellars: 1,
+      living_area: 35.5,
+      terrace_area: 8.0,
+      floor: 7,
+      furnished: true,
+      published: true,
+      exclusivity: true,
+      video_url: "https://www.youtube.com/watch?v=abc123",
+      virtual_tour_url: "https://my.matterport.com/show/?m=abc123"
+    )
+
+    # Create property images (photos)
+    @image1 = @property.property_images.create!(
+      remote_url: "https://cdn.immotoolbox.com/images/photo1.jpg",
+      thumb_url: "https://cdn.immotoolbox.com/images/photo1_thumb.jpg",
+      small_url: "https://cdn.immotoolbox.com/images/photo1_small.jpg",
+      medium_url: "https://cdn.immotoolbox.com/images/photo1_medium.jpg",
+      large_url: "https://cdn.immotoolbox.com/images/photo1_large.jpg",
+      position: 0,
+      is_plan: false
+    )
+    @image2 = @property.property_images.create!(
+      remote_url: "https://cdn.immotoolbox.com/images/photo2.jpg",
+      thumb_url: "https://cdn.immotoolbox.com/images/photo2_thumb.jpg",
+      small_url: "https://cdn.immotoolbox.com/images/photo2_small.jpg",
+      medium_url: "https://cdn.immotoolbox.com/images/photo2_medium.jpg",
+      large_url: "https://cdn.immotoolbox.com/images/photo2_large.jpg",
+      position: 1,
+      is_plan: false
+    )
+    # Floor plan image
+    @plan = @property.property_images.create!(
+      remote_url: "https://cdn.immotoolbox.com/images/plan1.jpg",
+      thumb_url: "https://cdn.immotoolbox.com/images/plan1_thumb.jpg",
+      small_url: "https://cdn.immotoolbox.com/images/plan1_small.jpg",
+      medium_url: "https://cdn.immotoolbox.com/images/plan1_medium.jpg",
+      large_url: "https://cdn.immotoolbox.com/images/plan1_large.jpg",
+      position: 10,
+      is_plan: true
+    )
+
+    # Similar property in the same district
+    @similar = Property.create!(
+      reference: "MC-101",
+      title: { "en" => "Another studio Carré d'Or", "fr" => "Autre studio Carré d'Or" },
+      transaction_type: "sale",
+      property_type: "apartment",
+      country: "MC",
+      city: "Monaco",
+      district: @district,
+      price: 2_100_000,
+      published: true
+    )
+    @similar.property_images.create!(
+      remote_url: "https://cdn.immotoolbox.com/images/similar1.jpg",
+      position: 0
+    )
+  end
+
+  # === Basic rendering ===
+
+  test "property detail page renders successfully" do
+    get "/en/properties/#{@property.id}-sea-view-studio-carre-d-or"
+    assert_response :success
+  end
+
+  test "property detail page works with just the ID (ignores slug)" do
+    get "/en/properties/#{@property.id}-wrong-slug"
+    assert_response :success
+  end
+
+  test "property detail page renders in French locale" do
+    get "/fr/biens/#{@property.id}-studio-vue-mer-carre-d-or"
+    assert_response :success
+  end
+
+  test "property detail page renders for all 8 locales" do
+    locales_with_properties = {
+      fr: "biens", en: "properties", it: "immobili", de: "immobilien",
+      sv: "fastigheter", no: "eiendommer", da: "ejendomme", fi: "kiinteistot"
+    }
+    locales_with_properties.each do |locale, segment|
+      get "/#{locale}/#{segment}/#{@property.id}-slug"
+      assert_response :success, "Failed for locale #{locale}"
+    end
+  end
+
+  # === Property title and description ===
+
+  test "displays property title in current locale" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-title']", text: /Sea view studio/
+  end
+
+  test "displays property title in French locale" do
+    get "/fr/biens/#{@property.id}-slug"
+    assert_select "[data-testid='property-title']", text: /Studio vue mer/
+  end
+
+  test "displays property description in current locale" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-description']", text: /Beautiful sea view studio/
+  end
+
+  # === Price display ===
+
+  test "displays price with European formatting" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-price']", text: /1\.850\.000/
+  end
+
+  test "displays price on request when price is nil" do
+    @property.update!(price: nil)
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-price']", text: /Price on request/
+  end
+
+  # === Property details table ===
+
+  test "displays property reference" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-details']", text: /MC-100/
+  end
+
+  test "displays building name" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-details']", text: /Le Montaigne/
+  end
+
+  test "displays district name" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-details']", text: /Carré d'Or/
+  end
+
+  test "displays property type" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-details']"
+  end
+
+  test "displays room count" do
+    get "/en/properties/#{@property.id}-slug"
+    details = css_select("[data-testid='property-details']").to_html
+    assert_match(/Rooms/, details)
+  end
+
+  test "displays bathroom count" do
+    get "/en/properties/#{@property.id}-slug"
+    details = css_select("[data-testid='property-details']").to_html
+    assert_match(/Bathrooms/, details)
+  end
+
+  test "displays living area" do
+    get "/en/properties/#{@property.id}-slug"
+    details = css_select("[data-testid='property-details']").to_html
+    assert_match(/35 m²/, details)
+  end
+
+  test "displays terrace area" do
+    get "/en/properties/#{@property.id}-slug"
+    details = css_select("[data-testid='property-details']").to_html
+    assert_match(/8 m²/, details)
+  end
+
+  test "displays floor" do
+    get "/en/properties/#{@property.id}-slug"
+    details = css_select("[data-testid='property-details']").to_html
+    assert_match(/Floor/, details)
+    assert_match(/>7</, details)
+  end
+
+  test "displays parking count" do
+    get "/en/properties/#{@property.id}-slug"
+    details = css_select("[data-testid='property-details']").to_html
+    assert_match(/Parking/, details)
+  end
+
+  test "displays cellar count" do
+    get "/en/properties/#{@property.id}-slug"
+    details = css_select("[data-testid='property-details']").to_html
+    assert_match(/Cellars/, details)
+  end
+
+  test "displays furnished status when true" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-details']", text: /Furnished/i
+  end
+
+  test "does not display furnished when false" do
+    @property.update!(furnished: false)
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-details']"
+    assert_no_match(/Furnished/i, response.body.gsub(/Unfurnished/i, ""))
+  end
+
+  test "displays service charges when present" do
+    @property.update!(service_charges: 500)
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-details']", text: /500/
+  end
+
+  # === Photo gallery ===
+
+  test "displays property photo gallery" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-gallery']"
+  end
+
+  test "displays all property photos (excluding plans)" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-gallery'] img[data-gallery-photo]", 2
+  end
+
+  test "photo gallery uses large image URLs" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-gallery'] img[src*='photo1_large']"
+  end
+
+  test "first photo is eager-loaded" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-gallery'] img[loading='eager']", { minimum: 1 }
+  end
+
+  test "subsequent photos are lazy-loaded" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-gallery'] img[loading='lazy']", { minimum: 1 }
+  end
+
+  test "gallery images have proper alt text" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "img[alt='Sea view studio Carré d\\'Or - Photo 1']"
+  end
+
+  test "displays thumbnail navigation" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='gallery-thumbnails']"
+    assert_select "[data-testid='gallery-thumbnails'] img", { minimum: 2 }
+  end
+
+  # === Floor plans ===
+
+  test "displays floor plans section when plans exist" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='floor-plans']"
+  end
+
+  test "displays floor plan images" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='floor-plans'] img[src*='plan1_large']"
+  end
+
+  test "floor plan has proper alt text" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "img[alt*='Plan']"
+  end
+
+  test "floor plans section hidden when no plans exist" do
+    @plan.destroy!
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='floor-plans']", count: 0
+  end
+
+  # === Virtual tour and video ===
+
+  test "displays virtual tour link when URL present" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='virtual-tour'] a[href='https://my.matterport.com/show/?m=abc123']"
+  end
+
+  test "hides virtual tour section when no URL" do
+    @property.update!(virtual_tour_url: nil)
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='virtual-tour']", count: 0
+  end
+
+  test "displays video section when video URL present" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-video']"
+  end
+
+  test "hides video section when no video URL" do
+    @property.update!(video_url: nil)
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-video']", count: 0
+  end
+
+  # === Badges ===
+
+  test "displays exclusivity badge" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='exclusivity-badge']"
+  end
+
+  test "hides exclusivity badge when not exclusive" do
+    @property.update!(exclusivity: false)
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='exclusivity-badge']", count: 0
+  end
+
+  test "displays NEW badge for recent properties" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='new-badge']"
+  end
+
+  # === Back to listings link ===
+
+  test "displays back to listings link for sales" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='back-link']"
+    assert_select "a[href*='/en/sales']"
+  end
+
+  # === Similar properties ===
+
+  test "displays similar properties section" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='similar-properties']"
+  end
+
+  test "similar properties shows other properties in same district and transaction type" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='similar-properties'] [data-testid='property-card']", { minimum: 1 }
+  end
+
+  test "similar properties does not include the current property" do
+    get "/en/properties/#{@property.id}-slug"
+    # The similar section should not contain the current property's reference
+    similar_html = css_select("[data-testid='similar-properties']").to_html
+    assert_no_match(/MC-100/, similar_html)
+  end
+
+  # === SEO ===
+
+  test "page title includes property title and price" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "title", text: /Sea view studio.*1\.850\.000/
+  end
+
+  test "page title omits price when price on request" do
+    @property.update!(price: nil)
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "title", text: /Sea view studio/
+    title_html = css_select("title").text
+    assert_no_match(/1\.850\.000/, title_html)
+  end
+
+  test "image alt text includes property title and photo number" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "img[alt='Sea view studio Carré d\\'Or - Photo 1']"
+    assert_select "img[alt='Sea view studio Carré d\\'Or - Photo 2']"
+  end
+
+  test "property images use srcset with CDN size variants" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "img[srcset*='photo1_small']"
+    assert_select "img[srcset*='photo1_medium']"
+    assert_select "img[srcset*='photo1_large']"
+  end
+
+  # === Edge cases ===
+
+  test "returns 404 for non-existent property" do
+    get "/en/properties/999999-non-existent"
+    assert_response :not_found
+  end
+
+  test "property without images still renders" do
+    @property.property_images.destroy_all
+    get "/en/properties/#{@property.id}-slug"
+    assert_response :success
+  end
+
+  test "property without building still renders" do
+    @property.update!(building: nil)
+    get "/en/properties/#{@property.id}-slug"
+    assert_response :success
+    # Building row should not appear
+    assert_no_match(/Le Montaigne/, response.body)
+  end
+
+  test "property without district still renders" do
+    @property.update!(district: nil)
+    get "/en/properties/#{@property.id}-slug"
+    assert_response :success
+  end
+end
