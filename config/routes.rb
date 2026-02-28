@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     resources :articles
     resources :categories
     resources :contacts
-    resources :properties, only: [] do
+    resources :properties do
       resource :share, only: [:new, :create], controller: "property_shares"
     end
   end

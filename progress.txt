@@ -238,3 +238,12 @@ Implemented staging environment protection to prevent search engine indexing of 
 - **Kamal deploy config**: `config/deploy.yml` updated with `SITE_HOST: https://curau.dev` in clear env vars, so the staging deployment automatically activates staging mode.
 - **staging? helper**: `SeoHelper#staging?` returns true when `SITE_HOST` differs from `PRODUCTION_HOST`, used by views and templates.
 - 594 total tests passing (583 existing + 11 new: 4 staging guard helper tests + 7 staging environment integration tests)
+
+### Task 20: Admin Property CRUD ✅
+Implemented full admin property management (CRUD) with TDD (23 tests):
+- **Admin::PropertiesController** (`app/controllers/admin/properties_controller.rb`): full CRUD (index, new, create, edit, update, destroy). Index lists all properties ordered by most recent, with reference, French title, transaction type, property type, formatted price, published/draft/featured/off-market status badges, and actions (edit, share, delete). Create/edit form with all property fields organized in fieldsets: core details (reference, price, transaction type, property type, subtype, floor), location (country, city, district, building, address), dimensions & rooms (all area and count fields), multilingual title (input per locale), multilingual description (textarea per locale), media (video URL, virtual tour URL, 360° tour toggle), and sidebar toggles (published, featured, off-market, exclusivity, furnished, service charges).
+- **Synced property protection**: When editing a property that has an `immotoolbox_id` (synced from Immotoolbox), the controller automatically sets `manually_edited = true` to prevent the next sync from overwriting admin changes. Non-synced properties are not affected. Synced properties show an info badge with their Immotoolbox ID.
+- **Admin routes**: `resources :properties` in admin namespace (was `only: []`, now full CRUD). Share nested resource preserved.
+- **Admin layout updated**: Properties link added to admin sidebar navigation (positioned first, before Articles).
+- **Form UI**: Tailwind-styled 3-column grid layout matching existing admin patterns (articles, categories). Error display, district/building select dropdowns, checkbox toggles for boolean flags.
+- 617 total tests passing (594 existing + 23 new: 1 auth test + 5 index tests + 3 new/form tests + 4 create tests + 1 edit test + 6 update tests + 1 destroy test + 1 navigation test + 1 combined route/view test)
