@@ -177,7 +177,15 @@ Implemented full multilingual SEO infrastructure with TDD (76 tests):
 - **i18n translations**: added `seo.*` keys to all 8 locale files (11 keys each): homepage_title, homepage_description, articles_description, contact_description, privacy_description, listings_sales_monaco_description, listings_rentals_monaco_description, listings_sales_france_description, listings_sales_district_description, listings_rentals_district_description, listings_all_description.
 - 458 total tests passing (382 existing + 76 new: 32 helper tests + 25 integration tests + 14 sitemap tests + 5 robots tests)
 
-### Task 15: Legacy URL Redirects
+### Task 15: Legacy URL Redirects ✅
+Implemented all legacy URL redirects (301) for the 3 existing languages (FR, EN, IT) with TDD (32 tests):
+- **LegacyRedirectsController** (`app/controllers/legacy_redirects_controller.rb`): dedicated controller handling all legacy URL patterns. Looks up properties by `immotoolbox_id` to generate new URLs with slugs. Returns 410 Gone for missing/unpublished properties.
+- **French legacy routes**: `/fr/location/monaco` → `/fr/locations/monaco`, `/fr/bien/{id}` → `/fr/biens/{id}-{slug}`, `/fr/bien-off-market/{id}` → property detail or 410, `/fr/pdf-download/{id}.pdf` → property detail, `/fr/pdf-download-nologo/{id}.pdf` → property detail, `/fr/posts/{category}/` → `/fr/articles/{category-slug}`, `/fr/article/{id}/{slug}/` → `/fr/articles/{slug}`, `/fr/post/{id}/{slug}` → `/fr/articles/{slug}`, `/fr/recherche/{location}` → district page or `/fr/ventes/monaco`
+- **English legacy routes**: `/en/rental/monaco` → `/en/rentals/monaco`, `/en/property/{id}` → `/en/properties/{id}-{slug}`, `/en/properties-off-market/sale` → `/en/sales/monaco`, `/en/properties-off-market/rental` → `/en/rentals/monaco`, `/en/news` → `/en/articles`, `/en/article/{id}/{slug}` → `/en/articles/{slug}`
+- **Italian legacy routes**: `/it/affitto/monaco` → `/it/affitti/monaco`, `/it/immobile/{id}` → `/it/immobili/{id}-{slug}`
+- **Trailing slash handling**: `TrailingSlashRedirector` Rack middleware (`lib/trailing_slash_redirector.rb`) at top of middleware stack. All paths with trailing slashes (except root `/`) get 301 redirected to the version without trailing slash. Consistent URL format across the entire site.
+- **Edge cases**: unpublished properties return 410, missing immotoolbox_id returns 410, search with matching district slug redirects to district page, search without match redirects to sales monaco
+- 490 total tests passing (458 existing + 32 new)
 
 ## Phase 6: Contacts + Polish
 ### Task 16: Contact Forms (homepage + property enquiry)

@@ -47,6 +47,35 @@ Rails.application.routes.draw do
     end
   end
 
+  # === Legacy URL Redirects (301) ===
+  # French legacy routes
+  scope "/fr", defaults: { locale: "fr" } do
+    get "location/monaco", to: redirect("/fr/locations/monaco", status: 301)
+    get "bien/:legacy_id",            to: "legacy_redirects#property"
+    get "bien-off-market/:legacy_id", to: "legacy_redirects#off_market_property"
+    get "pdf-download/:legacy_id",    to: "legacy_redirects#pdf_download", constraints: { legacy_id: /\d+\.pdf/ }
+    get "pdf-download-nologo/:legacy_id", to: "legacy_redirects#pdf_download", constraints: { legacy_id: /\d+\.pdf/ }
+    get "posts/:category_slug",       to: "legacy_redirects#posts_category"
+    get "article/:id/:slug",          to: "legacy_redirects#article"
+    get "post/:id/:slug",             to: "legacy_redirects#article"
+    get "recherche/:location",        to: "legacy_redirects#search"
+  end
+
+  # English legacy routes
+  scope "/en", defaults: { locale: "en" } do
+    get "rental/monaco", to: redirect("/en/rentals/monaco", status: 301)
+    get "property/:legacy_id",                to: "legacy_redirects#property"
+    get "properties-off-market/:transaction", to: "legacy_redirects#off_market_listing"
+    get "news",                               to: "legacy_redirects#news"
+    get "article/:id/:slug",                  to: "legacy_redirects#article"
+  end
+
+  # Italian legacy routes
+  scope "/it", defaults: { locale: "it" } do
+    get "affitto/monaco", to: redirect("/it/affitti/monaco", status: 301)
+    get "immobile/:legacy_id", to: "legacy_redirects#property"
+  end
+
   # SEO: XML Sitemaps
   get "sitemap.xml", to: "sitemaps#index", as: :sitemap, defaults: { format: :xml }
   get "sitemaps/:locale.xml", to: "sitemaps#show", as: :sitemap_locale, defaults: { format: :xml }

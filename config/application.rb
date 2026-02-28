@@ -32,5 +32,9 @@ module AgenceGareMonaco
     config.i18n.available_locales = %i[fr en it de sv no da fi]
     config.i18n.default_locale = :fr
     config.i18n.fallbacks = true
+
+    # Redirect trailing slashes to non-trailing-slash URLs (301)
+    require_relative "../lib/trailing_slash_redirector"
+    config.middleware.insert_before(0, TrailingSlashRedirector)
   end
 end
