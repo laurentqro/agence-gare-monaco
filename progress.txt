@@ -140,7 +140,12 @@ Implemented the Immotoolbox API client and sync service with TDD (34 tests):
 - Added `webmock` gem for HTTP request stubbing in tests
 - 317 total tests passing (283 existing + 34 new)
 
-### Task 12: Scheduled Sync Job
+### Task 12: Scheduled Sync Job ✅
+Implemented the scheduled Immotoolbox sync job with TDD (9 tests):
+- **ImmotoolboxSyncJob** (`app/jobs/immotoolbox_sync_job.rb`): ActiveJob that runs the full Immotoolbox sync. Reads API token from `IMMOTOOLBOX_API_TOKEN` env var with fallback to Rails credentials (`credentials.immotoolbox.api_token`). Logs sync results (districts/buildings/properties created/updated/unpublished/skipped). Skips gracefully with warning when no API token is available.
+- **Retry handling**: Retries on `ImmotoolboxClient::ApiError` and `Net::OpenTimeout` with polynomial backoff, up to 5 attempts each.
+- **Recurring schedule** (`config/recurring.yml`): Configured to run daily at 6am in production via Solid Queue's recurring job scheduler.
+- 326 total tests passing (317 existing + 9 new)
 
 ## Phase 5: Blog + SEO
 ### Task 13: Articles/Blog CRUD
