@@ -17,14 +17,24 @@ class ArticleTest < ActiveSupport::TestCase
     assert article.valid?
   end
 
-  test "requires slug" do
+  test "requires slug when title has no generatable text" do
     article = Article.new(
-      title: { "fr" => "Test" },
+      title: nil,
       body: { "fr" => "Content" },
       category: @category
     )
     assert_not article.valid?
     assert_includes article.errors[:slug], "can't be blank"
+  end
+
+  test "auto-generates slug from French title when slug is blank" do
+    article = Article.new(
+      title: { "fr" => "Le marché immobilier" },
+      body: { "fr" => "Content" },
+      category: @category
+    )
+    assert article.valid?
+    assert_equal "le-marche-immobilier", article.slug
   end
 
   test "slug is unique" do

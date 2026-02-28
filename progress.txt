@@ -148,7 +148,18 @@ Implemented the scheduled Immotoolbox sync job with TDD (9 tests):
 - 326 total tests passing (317 existing + 9 new)
 
 ## Phase 5: Blog + SEO
-### Task 13: Articles/Blog CRUD
+### Task 13: Articles/Blog CRUD ✅
+Implemented full articles/blog CRUD with admin interface and public views using TDD (56 tests):
+- **Admin::ArticlesController**: full CRUD (index, new, create, edit, update, destroy). Index shows all articles ordered by most recent, with category, published/draft status badge, featured badge, and date. Create/edit form with multilingual title fields (input per locale) and multilingual body fields (textarea per locale), slug field (auto-generated from French title when blank), category select, published/featured checkboxes. Published_at auto-set when first published, preserved on subsequent edits.
+- **Admin::CategoriesController**: full CRUD (index, new, create, edit, update, destroy). Index shows categories with article count. Slug auto-generated from name when blank. Delete cascades to articles (via model `dependent: :destroy`).
+- **Admin layout with navigation**: sidebar with navy (#090956) background, links to Dashboard/Articles/Categories, current user email display, logout link. Flash notice/alert messages.
+- **Article model enhancements**: `title_for(locale)` and `body_for(locale)` with fallback to default locale (FR). `before_validation :generate_slug` auto-generates slug from French title via `parameterize` when slug is blank. Existing `published` and `featured` scopes preserved.
+- **Public ArticlesController**: index loads published articles ordered by `published_at` desc. Show disambiguates category vs article by slug — category match renders filtered index, article match renders detail. Draft articles return 404 (scoped to `Article.published`).
+- **Public article views**: index with responsive 3-column grid of article cards (category badge, title, truncated body, published date), category filter links (pills). Show with breadcrumb (Articles > Category), title, category + date, body rendered via `simple_format`. All locale-aware with translated route segments.
+- **Admin routes**: `resources :articles` and `resources :categories` in admin namespace.
+- Updated existing model test for slug validation (auto-generate changes behavior).
+- 382 total tests passing (326 existing + 56 new)
+
 ### Task 14: SEO (hreflang, sitemaps, meta tags, JSON-LD)
 ### Task 15: Legacy URL Redirects
 
