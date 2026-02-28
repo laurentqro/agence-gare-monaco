@@ -89,6 +89,19 @@ it:
     plan_alt: "Planimetria - %{title}"
     exclusivity: "Esclusiva"
 
+  seo:
+    homepage_title: "Agence Immobilière de la Gare | Immobiliare a Monaco dal 1942"
+    homepage_description: "Membro della Chambre Immobilière Monégasque, l'Agence Immobilière de la Gare fu fondata nel 1942. Vendite, affitti e gestione immobiliare a Monaco."
+    articles_description: "Articoli e notizie sull'immobiliare a Monaco."
+    contact_description: "Contattate l'Agence Immobilière de la Gare a Monaco. 3, Rue Langlé, MC 98000 Monaco."
+    privacy_description: "Politica sulla privacy dell'Agence Immobilière de la Gare Monaco."
+    listings_sales_monaco_description: "Scoprite i nostri immobili in vendita a Monaco. Monolocali, appartamenti, attici, uffici e parcheggi in tutti i quartieri."
+    listings_rentals_monaco_description: "Scoprite i nostri immobili in affitto a Monaco. Monolocali, appartamenti e uffici in tutti i quartieri."
+    listings_sales_france_description: "Scoprite i nostri immobili in vendita in Francia, sulla Costa Azzurra."
+    listings_sales_district_description: "Immobili in vendita nel quartiere %{district} a Monaco."
+    listings_rentals_district_description: "Immobili in affitto nel quartiere %{district} a Monaco."
+    listings_all_description: "Scoprite tutti i nostri immobili a Monaco e in Francia."
+
   routes:
     sales: "vendite"
     rentals: "affitti"

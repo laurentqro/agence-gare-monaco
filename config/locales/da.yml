@@ -89,6 +89,19 @@ da:
     plan_alt: "Plantegning - %{title}"
     exclusivity: "Eksklusivitet"
 
+  seo:
+    homepage_title: "Agence Immobilière de la Gare | Ejendomme i Monaco siden 1942"
+    homepage_description: "Medlem af Chambre Immobilière Monégasque, Agence Immobilière de la Gare blev grundlagt i 1942. Salg, udlejning og ejendomsforvaltning i Monaco."
+    articles_description: "Artikler og nyheder om ejendomme i Monaco."
+    contact_description: "Kontakt Agence Immobilière de la Gare i Monaco. 3, Rue Langlé, MC 98000 Monaco."
+    privacy_description: "Privatlivspolitik for Agence Immobilière de la Gare Monaco."
+    listings_sales_monaco_description: "Opdag vores ejendomme til salg i Monaco. Studier, lejligheder, penthuse, kontorer og parkeringspladser i alle kvarterer."
+    listings_rentals_monaco_description: "Opdag vores udlejningsejendomme i Monaco. Studier, lejligheder og kontorer i alle kvarterer."
+    listings_sales_france_description: "Opdag vores ejendomme til salg i Frankrig, på den franske riviera."
+    listings_sales_district_description: "Ejendomme til salg i %{district}, Monaco."
+    listings_rentals_district_description: "Udlejningsejendomme i %{district}, Monaco."
+    listings_all_description: "Opdag alle vores ejendomme i Monaco og Frankrig."
+
   routes:
     sales: "salg"
     rentals: "udlejning"

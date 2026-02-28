@@ -160,7 +160,23 @@ Implemented full articles/blog CRUD with admin interface and public views using 
 - Updated existing model test for slug validation (auto-generate changes behavior).
 - 382 total tests passing (326 existing + 56 new)
 
-### Task 14: SEO (hreflang, sitemaps, meta tags, JSON-LD)
+### Task 14: SEO (hreflang, sitemaps, meta tags, JSON-LD) ✅
+Implemented full multilingual SEO infrastructure with TDD (76 tests):
+- **SeoHelper** (`app/helpers/seo_helper.rb`): centralized helper module providing all SEO tag generation. Methods: `canonical_url`, `hreflang_tags`, `seo_meta_description`, `seo_title`, `og_tags`, `twitter_tags`, `json_ld_organization`, `json_ld_property`, `json_ld_article`, `json_ld_breadcrumbs`, `listing_breadcrumbs`.
+- **Canonical URLs**: self-referencing `<link rel="canonical">` on every public page. Filter query params excluded from canonical (listings canonicalise to base path). Absolute URLs using `https://agencegaremonaco.com`.
+- **Hreflang tags**: all 8 locales + `x-default` (French) on every public page. Norwegian uses `nb` hreflang code with `/no` URL prefix. Property pages use locale-specific slugs in hreflang URLs.
+- **Meta descriptions**: per-page translated descriptions via i18n `seo.*` keys. Property pages use property description (truncated to 160 chars). Article pages use body text. Listing pages vary by transaction type, country, district.
+- **Page titles**: dynamic per page type. Property: `{title} | {price} € | Agence de la Gare Monaco`. Article: `{title} | Agence de la Gare Monaco`. Listings: `{heading} | {site_name}`. Homepage: translated tagline.
+- **Open Graph tags**: `og:type`, `og:site_name`, `og:locale`, `og:locale:alternate` for all other locales, `og:url`, `og:title`, `og:description`, `og:image`. Property pages use cover image. Article pages use `og:type="article"` with `article:published_time` and `article:section`.
+- **Twitter Card tags**: `summary_large_image` card type, `@agencedelagare` site handle, title, description, image.
+- **JSON-LD structured data**: `RealEstateAgent` organization on every page, `RealEstateListing` on property pages (with offers, address, geo, room counts, floor size), `Article` on article pages (with headline, dates, author, publisher, language, section), `BreadcrumbList` on listing pages.
+- **SeoConfigurable concern** (`app/controllers/concerns/seo_configurable.rb`): controller concern that provides `set_seo(page_type:, **opts)` and `seo_config` helper method. Included in PagesController, PropertiesController, ArticlesController.
+- **Layout integration**: SEO partial (`shared/_seo_tags.html.erb`) rendered in `<head>` of application layout. Dynamic title generation replaces hardcoded fallback.
+- **XML Sitemaps**: `SitemapsController` with two actions. Sitemap index at `/sitemap.xml` references 8 per-language sitemaps. Per-language sitemaps at `/sitemaps/{locale}.xml` include: homepage, all listing pages (sales/rentals × all/monaco/france), district-filtered listings (only for districts with published properties), all published property detail pages, articles index, all published articles, contact page, privacy page. Every `<url>` includes `<xhtml:link>` hreflang alternates for all 8 locales. Property and article entries include `<lastmod>`.
+- **Dynamic robots.txt**: `RobotsController` serves `/robots.txt` dynamically. Allows all crawlers, disallows `/admin/` and `/rails/`, references sitemap index URL. Removed static `public/robots.txt`.
+- **i18n translations**: added `seo.*` keys to all 8 locale files (11 keys each): homepage_title, homepage_description, articles_description, contact_description, privacy_description, listings_sales_monaco_description, listings_rentals_monaco_description, listings_sales_france_description, listings_sales_district_description, listings_rentals_district_description, listings_all_description.
+- 458 total tests passing (382 existing + 76 new: 32 helper tests + 25 integration tests + 14 sitemap tests + 5 robots tests)
+
 ### Task 15: Legacy URL Redirects
 
 ## Phase 6: Contacts + Polish

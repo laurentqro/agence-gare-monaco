@@ -1,5 +1,6 @@
 class PropertiesController < ApplicationController
   include Localizable
+  include SeoConfigurable
   allow_unauthenticated_access
 
   def index
@@ -19,6 +20,8 @@ class PropertiesController < ApplicationController
     @properties = @properties.includes(:property_images, :district).order(created_at: :desc)
 
     @districts = District.where(city: "Monaco").order(:name) if @country == "MC"
+
+    set_seo(page_type: :listings, transaction_type: @transaction_type, country: @country, district: @district)
   end
 
   def show
@@ -31,5 +34,7 @@ class PropertiesController < ApplicationController
       .where.not(id: @property.id)
     @similar_properties = @similar_properties.where(district: @property.district) if @property.district.present?
     @similar_properties = @similar_properties.includes(:property_images, :district).limit(3)
+
+    set_seo(page_type: :property, property: @property)
   end
 end

@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="<%= I18n.locale %>">
   <head>
-    <title><%= content_for(:title) || "Agence Immobilière de la Gare | Monaco" %></title>
+    <title><%= content_for?(:title) ? content_for(:title) : (defined?(seo_config) && seo_config[:page_type] ? seo_title(**seo_config) : "Agence Immobilière de la Gare | Monaco") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Agence Gare Monaco">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+
+    <%= render "shared/seo_tags" if defined?(seo_config) && seo_config[:page_type].present? %>
 
     <%= yield :head %>
 

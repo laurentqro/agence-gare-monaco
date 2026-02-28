@@ -47,6 +47,13 @@ Rails.application.routes.draw do
     end
   end
 
+  # SEO: XML Sitemaps
+  get "sitemap.xml", to: "sitemaps#index", as: :sitemap, defaults: { format: :xml }
+  get "sitemaps/:locale.xml", to: "sitemaps#show", as: :sitemap_locale, defaults: { format: :xml }
+
+  # SEO: Dynamic robots.txt
+  get "robots.txt", to: "robots#show", as: :robots, defaults: { format: :text }
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check

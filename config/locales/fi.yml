@@ -89,6 +89,19 @@ fi:
     plan_alt: "Pohjapiirros - %{title}"
     exclusivity: "Yksinoikeus"
 
+  seo:
+    homepage_title: "Agence Immobilière de la Gare | Kiinteistöt Monacossa vuodesta 1942"
+    homepage_description: "Chambre Immobilière Monégasquen jäsen, Agence Immobilière de la Gare perustettiin vuonna 1942. Myynti, vuokraus ja kiinteistöhallinta Monacossa."
+    articles_description: "Artikkeleita ja uutisia Monacon kiinteistöistä."
+    contact_description: "Ota yhteyttä Agence Immobilière de la Gareen Monacossa. 3, Rue Langlé, MC 98000 Monaco."
+    privacy_description: "Agence Immobilière de la Gare Monacon tietosuojakäytäntö."
+    listings_sales_monaco_description: "Tutustu myytäviin kiinteistöihimme Monacossa. Studiot, asunnot, kattoasunnot, toimistot ja pysäköintipaikat kaikissa kaupunginosissa."
+    listings_rentals_monaco_description: "Tutustu vuokrakiinteistöihimme Monacossa. Studiot, asunnot ja toimistot kaikissa kaupunginosissa."
+    listings_sales_france_description: "Tutustu myytäviin kiinteistöihimme Ranskassa, Ranskan Rivieralla."
+    listings_sales_district_description: "Myytävät kiinteistöt kaupunginosassa %{district}, Monaco."
+    listings_rentals_district_description: "Vuokrakiinteistöt kaupunginosassa %{district}, Monaco."
+    listings_all_description: "Tutustu kaikkiin kiinteistöihimme Monacossa ja Ranskassa."
+
   routes:
     sales: "myynti"
     rentals: "vuokraus"

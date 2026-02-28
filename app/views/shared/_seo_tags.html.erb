@@ -1,0 +1,16 @@
+<% if defined?(seo_config) && seo_config[:page_type].present? %>
+<%= tag(:link, rel: "canonical", href: canonical_url(**seo_config)) %>
+<%= tag(:meta, name: "description", content: seo_meta_description(**seo_config)) %>
+<%= hreflang_tags(**seo_config) %>
+<%= og_tags(**seo_config) %>
+<%= twitter_tags(**seo_config) %>
+<%= json_ld_organization %>
+<% if seo_config[:page_type] == :property && seo_config[:property] %>
+<%= json_ld_property(seo_config[:property]) %>
+<% elsif seo_config[:page_type] == :article && seo_config[:article] %>
+<%= json_ld_article(seo_config[:article]) %>
+<% end %>
+<% if seo_config[:page_type] == :listings %>
+<%= json_ld_breadcrumbs(listing_breadcrumbs(seo_config)) %>
+<% end %>
+<% end %>
