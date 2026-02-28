@@ -203,5 +203,14 @@ Implemented both contact forms (homepage + property enquiry) with Action Mailer 
 - **i18n**: added `contact_form.*` translation keys to all 8 locale files (13 keys each: title, info_title, phone, fax, name, email, subject, message, country, send, success, enquiry_title, enquiry_reference).
 - 513 total tests passing (490 existing + 23 new: 12 mailer tests + 11 controller tests)
 
-### Task 17: Contacts & Property Sharing
+### Task 17: Contacts & Property Sharing ✅
+Implemented contacts CRUD and property sharing via email with TDD (29 tests):
+- **Admin::ContactsController** (`app/controllers/admin/contacts_controller.rb`): full CRUD (index, new, create, edit, update, destroy). Index lists contacts sorted by last name, shows first name, last name, email, phone. Create/edit form with first name, last name, email, phone fields. Validation: first_name, last_name, email required; email unique.
+- **Admin::PropertySharesController** (`app/controllers/admin/property_shares_controller.rb`): property sharing workflow. `new` action renders a contact selection form with property summary and checkboxes for all contacts. `create` action sends individual HTML emails to each selected contact via `PropertyMailer.share_email`. Validates at least one contact is selected, redirects with alert if none selected.
+- **PropertyMailer** (`app/mailers/property_mailer.rb`): `share_email(property, contact)` sends a formatted HTML email to the contact. Email includes: agency branded header, personalised greeting with contact's first name, property title, up to 4 photos (medium size), details table (reference, price, type, rooms, bedrooms, living area), description, CTA button linking to the property page on agencegaremonaco.com, and agency footer with phone/fax/email.
+- **Admin views**: contacts index table (last name, first name, email, phone, edit/delete actions), new/edit forms, property share contact selection form with checkboxes.
+- **Admin layout updated**: Contacts link added to admin sidebar navigation.
+- **Routes**: `resources :contacts` and `resources :properties { resource :share }` added to admin namespace.
+- 542 total tests passing (513 existing + 29 new: 12 contacts controller tests + 8 property shares controller tests + 9 property mailer tests)
+
 ### Task 18: Error Pages, Analytics, Currency Conversion

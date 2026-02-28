@@ -5,6 +5,10 @@ Rails.application.routes.draw do
     get "/", to: "dashboard#show", as: :root
     resources :articles
     resources :categories
+    resources :contacts
+    resources :properties, only: [] do
+      resource :share, only: [:new, :create], controller: "property_shares"
+    end
   end
 
   # Public site with translated route segments per locale

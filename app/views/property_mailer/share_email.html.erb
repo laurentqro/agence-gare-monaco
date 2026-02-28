@@ -1,0 +1,85 @@
+<div style="font-family: 'Montserrat', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #212529;">
+  <div style="background-color: #090956; padding: 20px; text-align: center;">
+    <h1 style="color: #ffffff; margin: 0; font-size: 18px;">Agence Immobilière de la Gare</h1>
+    <p style="color: #ffffff; opacity: 0.8; margin: 5px 0 0; font-size: 12px;">L'Immobilier à Monaco depuis 1942</p>
+  </div>
+
+  <div style="padding: 20px;">
+    <p style="color: #212529; font-size: 14px;">Bonjour <%= @contact.first_name %>,</p>
+    <p style="color: #212529; font-size: 14px;">Nous avons le plaisir de vous présenter ce bien :</p>
+
+    <h2 style="color: #090956; font-size: 18px; margin-top: 20px;"><%= @property.title_for(:fr) %></h2>
+
+    <% if @images.any? %>
+      <div style="margin: 15px 0;">
+        <% @images.each do |image| %>
+          <img src="<%= image.medium_url.presence || image.remote_url %>" alt="<%= @property.title_for(:fr) %>" style="width: 100%; max-width: 560px; height: auto; border-radius: 4px; margin-bottom: 10px; display: block;" />
+        <% end %>
+      </div>
+    <% end %>
+
+    <table cellpadding="8" cellspacing="0" border="0" style="border-collapse: collapse; width: 100%; max-width: 560px; margin: 15px 0;">
+      <tr>
+        <td style="font-weight: bold; color: #6E8297; vertical-align: top; width: 140px; font-size: 13px;">Référence :</td>
+        <td style="color: #212529; font-size: 13px;"><%= @property.reference %></td>
+      </tr>
+      <% if @property.price.present? %>
+      <tr>
+        <td style="font-weight: bold; color: #6E8297; vertical-align: top; font-size: 13px;">Prix :</td>
+        <td style="color: #212529; font-size: 13px; font-weight: bold;"><%= @property.formatted_price %> €<%= " /mois" if @property.transaction_type == "rental" %></td>
+      </tr>
+      <% end %>
+      <% if @property.property_type.present? %>
+      <tr>
+        <td style="font-weight: bold; color: #6E8297; vertical-align: top; font-size: 13px;">Type :</td>
+        <td style="color: #212529; font-size: 13px;"><%= @property.property_type.capitalize %></td>
+      </tr>
+      <% end %>
+      <% if @property.num_rooms.to_i > 0 %>
+      <tr>
+        <td style="font-weight: bold; color: #6E8297; vertical-align: top; font-size: 13px;">Pièces :</td>
+        <td style="color: #212529; font-size: 13px;"><%= @property.num_rooms %></td>
+      </tr>
+      <% end %>
+      <% if @property.num_bedrooms.to_i > 0 %>
+      <tr>
+        <td style="font-weight: bold; color: #6E8297; vertical-align: top; font-size: 13px;">Chambres :</td>
+        <td style="color: #212529; font-size: 13px;"><%= @property.num_bedrooms %></td>
+      </tr>
+      <% end %>
+      <% if @property.living_area.to_f > 0 %>
+      <tr>
+        <td style="font-weight: bold; color: #6E8297; vertical-align: top; font-size: 13px;">Surface :</td>
+        <td style="color: #212529; font-size: 13px;"><%= @property.living_area %> m²</td>
+      </tr>
+      <% end %>
+    </table>
+
+    <% if @property.description_for(:fr).present? %>
+    <div style="margin: 15px 0; padding: 15px; background-color: #f9fafb; border-radius: 4px;">
+      <p style="color: #212529; font-size: 13px; line-height: 1.6; margin: 0;"><%= @property.description_for(:fr) %></p>
+    </div>
+    <% end %>
+
+    <p style="margin-top: 20px; text-align: center;">
+      <a href="<%= "https://agencegaremonaco.com/fr/biens/#{@property.id}-#{@property.title_for(:fr).parameterize}" %>"
+         style="display: inline-block; background-color: #090956; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600;">
+        Voir le bien sur notre site
+      </a>
+    </p>
+  </div>
+
+  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+
+  <div style="padding: 0 20px 20px; text-align: center;">
+    <p style="color: #090956; font-weight: bold; font-size: 13px; margin-bottom: 5px;">Agence Immobilière de la Gare</p>
+    <p style="color: #6E8297; font-size: 12px; margin: 3px 0;">3, Rue Langlé — MC 98000 Monaco</p>
+    <p style="color: #6E8297; font-size: 12px; margin: 3px 0;">Tél. +377 93 30 22 36 — Fax +377 93 25 05 34</p>
+    <p style="color: #6E8297; font-size: 12px; margin: 3px 0;">
+      <a href="mailto:info@agencegaremonaco.com" style="color: #6E8297;">info@agencegaremonaco.com</a>
+    </p>
+    <p style="color: #6E8297; font-size: 12px; margin: 3px 0;">
+      <a href="https://agencegaremonaco.com" style="color: #6E8297;">agencegaremonaco.com</a>
+    </p>
+  </div>
+</div>
