@@ -1,5 +1,6 @@
 module SeoHelper
-  SITE_HOST = "https://agencegaremonaco.com".freeze
+  PRODUCTION_HOST = "https://agencegaremonaco.com".freeze
+  SITE_HOST = (ENV["SITE_HOST"].presence || PRODUCTION_HOST).freeze
 
   HREFLANG_CODES = {
     fr: "fr", en: "en", it: "it", de: "de",
@@ -10,6 +11,18 @@ module SeoHelper
     fr: "fr_FR", en: "en_GB", it: "it_IT", de: "de_DE",
     sv: "sv_SE", no: "nb_NO", da: "da_DK", fi: "fi_FI"
   }.freeze
+
+  # --- Staging detection ---
+
+  def staging?
+    SITE_HOST != PRODUCTION_HOST
+  end
+
+  def noindex_meta_tag
+    return nil unless staging?
+
+    tag(:meta, name: "robots", content: "noindex, nofollow")
+  end
 
   # --- Canonical URL ---
 

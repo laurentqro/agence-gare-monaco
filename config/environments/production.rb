@@ -58,7 +58,8 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "curau.dev" }
+  # SITE_HOST env var controls both SEO URLs and mailer links (staging vs production).
+  config.action_mailer.default_url_options = { host: ENV.fetch("SITE_HOST", "https://agencegaremonaco.com").delete_prefix("https://").delete_prefix("http://") }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
   # config.action_mailer.smtp_settings = {

@@ -9,6 +9,7 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%= noindex_meta_tag %>
     <%= render "shared/seo_tags" if defined?(seo_config) && seo_config[:page_type].present? %>
 
     <%= yield :head %>
@@ -24,7 +25,9 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
 
+    <% unless staging? %>
     <script defer data-domain="agencegaremonaco.com" src="https://plausible.io/js/script.js"></script>
+    <% end %>
   </head>
 
   <body class="font-['Montserrat',Helvetica,Arial,Verdana,sans-serif] text-[#212529] text-xs">

@@ -226,3 +226,15 @@ Implemented custom error pages, Plausible Analytics, and currency conversion wit
   - View integration: converted price displayed below EUR price on property cards (listings) and property detail page, only when locale has a non-EUR currency and exchange rate is available. Uses `data-testid="converted-price"` for testing.
 - **Routes**: `match "/404"`, `match "/422"`, `match "/500"` added for error pages.
 - 583 total tests passing (542 existing + 41 new: 12 error page tests + 4 analytics tests + 10 exchange rate model tests + 4 currency converter service tests + 1 exchange rate refresh job test + 7 currency helper tests + 4 currency display integration tests - 1 adjustment)
+
+## Phase 7: Launch
+### Task 19: Staging Environment (noindex, robots.txt, analytics gating) ✅
+Implemented staging environment protection to prevent search engine indexing of the staging site at curau.dev using TDD (11 tests):
+- **SITE_HOST environment variable**: `SeoHelper` now reads `SITE_HOST` env var (defaults to `https://agencegaremonaco.com`). When set to a non-production host (e.g. `https://curau.dev`), the site enters "staging mode" — all SEO protections activate automatically.
+- **Noindex meta tag**: `noindex_meta_tag` helper renders `<meta name="robots" content="noindex, nofollow">` in the `<head>` of every public page when in staging mode. Returns nil on production. Added to `app/views/layouts/application.html.erb`.
+- **Robots.txt blocking**: `app/views/robots/show.text.erb` now conditionally renders `Disallow: /` (blocking all crawlers) in staging mode, or the normal production robots.txt (Allow with admin/rails exclusions and sitemap reference) on production.
+- **Plausible Analytics gating**: Plausible analytics script tag in the application layout is wrapped in `<% unless staging? %>`, preventing analytics tracking on staging.
+- **Mailer host fix**: `config/environments/production.rb` — `action_mailer.default_url_options` now derives host from `SITE_HOST` env var instead of hardcoded `curau.dev`, ensuring mailer links point to the correct domain in both staging and production.
+- **Kamal deploy config**: `config/deploy.yml` updated with `SITE_HOST: https://curau.dev` in clear env vars, so the staging deployment automatically activates staging mode.
+- **staging? helper**: `SeoHelper#staging?` returns true when `SITE_HOST` differs from `PRODUCTION_HOST`, used by views and templates.
+- 594 total tests passing (583 existing + 11 new: 4 staging guard helper tests + 7 staging environment integration tests)

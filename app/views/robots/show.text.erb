@@ -1,3 +1,7 @@
+<% if staging? %>
+User-agent: *
+Disallow: /
+<% else %>
 User-agent: *
 Allow: /
 
@@ -5,3 +9,4 @@ Disallow: /admin/
 Disallow: /rails/
 
 Sitemap: https://agencegaremonaco.com/sitemap.xml
+<% end %>

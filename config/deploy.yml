@@ -21,6 +21,7 @@ env:
     - RAILS_MASTER_KEY
   clear:
     SOLID_QUEUE_IN_PUMA: true
+    SITE_HOST: https://curau.dev
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"
