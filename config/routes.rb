@@ -94,6 +94,11 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
+  # Error pages
+  match "/404", to: "errors#not_found", via: :all
+  match "/422", to: "errors#unprocessable_entity", via: :all
+  match "/500", to: "errors#internal_server_error", via: :all
+
   # Bare root redirects to default locale
   root to: redirect("/fr", status: 302)
 end

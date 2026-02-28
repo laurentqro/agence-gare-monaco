@@ -36,5 +36,8 @@ module AgenceGareMonaco
     # Redirect trailing slashes to non-trailing-slash URLs (301)
     require_relative "../lib/trailing_slash_redirector"
     config.middleware.insert_before(0, TrailingSlashRedirector)
+
+    # Use dynamic error pages (Rails routes) instead of static HTML in public/
+    config.exceptions_app = routes
   end
 end

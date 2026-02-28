@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_28_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_28_101924) do
   create_table "articles", force: :cascade do |t|
     t.json "body"
     t.integer "category_id", null: false
@@ -86,6 +86,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_000002) do
     t.datetime "updated_at", null: false
     t.index ["immotoolbox_id"], name: "index_districts_on_immotoolbox_id", unique: true
     t.index ["slug"], name: "index_districts_on_slug", unique: true
+  end
+
+  create_table "exchange_rates", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "currency", null: false
+    t.datetime "fetched_at", null: false
+    t.decimal "rate", precision: 12, scale: 6, null: false
+    t.datetime "updated_at", null: false
+    t.index ["currency"], name: "index_exchange_rates_on_currency", unique: true
   end
 
   create_table "properties", force: :cascade do |t|

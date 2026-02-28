@@ -42,6 +42,9 @@
       <p class="text-base font-bold text-[#090956] mb-2">
         <% if property.price.present? %>
           <%= property.formatted_price %> €
+          <% if (converted = converted_price_tag(property.price)) %>
+            <span data-testid="converted-price" class="text-xs font-normal text-[#6E8297] block"><%= converted %></span>
+          <% end %>
         <% else %>
           <%= t("listings.price_on_request") %>
         <% end %>

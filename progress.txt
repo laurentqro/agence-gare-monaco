@@ -213,4 +213,16 @@ Implemented contacts CRUD and property sharing via email with TDD (29 tests):
 - **Routes**: `resources :contacts` and `resources :properties { resource :share }` added to admin namespace.
 - 542 total tests passing (513 existing + 29 new: 12 contacts controller tests + 8 property shares controller tests + 9 property mailer tests)
 
-### Task 18: Error Pages, Analytics, Currency Conversion
+### Task 18: Error Pages, Analytics, Currency Conversion ✅
+Implemented custom error pages, Plausible Analytics, and currency conversion with TDD (41 tests):
+- **Custom Error Pages**: `ErrorsController` (inherits `ActionController::Base` to bypass `allow_browser` filter) with dedicated `error` layout. Custom 404 (not found), 422 (unprocessable), and 500 (internal server error) pages — all styled with agency branding (Montserrat font, navy #090956 color, logo, noindex meta tag). 404 page includes browse suggestion links (homepage + Monaco sales). Removed static `public/404.html`, `public/422.html`, `public/500.html`, `public/400.html` — replaced by dynamic error pages via `config.exceptions_app = routes`. Kept `public/406-unsupported-browser.html` for `allow_browser` filter.
+- **Plausible Analytics**: Added `<script defer data-domain="agencegaremonaco.com" src="https://plausible.io/js/script.js">` to the public application layout. Cookie-free, GDPR-compliant, no cookie consent needed. Not present on admin pages (admin uses separate layout).
+- **Currency Conversion**: Full pipeline from API to display.
+  - `exchange_rates` table: currency (unique), rate (decimal 12,6), fetched_at.
+  - `ExchangeRate` model: validations, `locale_currency(locale)` mapping (SV→SEK, NO→NOK, DA→DKK, EN→GBP, FR/DE/IT/FI→EUR), `convert(amount_eur, target_currency)` class method.
+  - `CurrencyConverter` service: fetches latest EUR rates from Frankfurter API (`api.frankfurter.dev/v1/latest`) for SEK, NOK, DKK, GBP, CHF, USD. Creates/updates ExchangeRate records. Handles API errors and network timeouts gracefully.
+  - `ExchangeRateRefreshJob`: ActiveJob that calls `CurrencyConverter.refresh`. Scheduled daily at 7am in production via Solid Queue (`config/recurring.yml`).
+  - `CurrencyHelper`: `converted_price_tag(price_eur)` returns formatted parenthetical conversion (e.g. "~14.512.500 SEK") or nil for EUR locales / missing rates. `format_converted_price(amount)` uses European number formatting.
+  - View integration: converted price displayed below EUR price on property cards (listings) and property detail page, only when locale has a non-EUR currency and exchange rate is available. Uses `data-testid="converted-price"` for testing.
+- **Routes**: `match "/404"`, `match "/422"`, `match "/500"` added for error pages.
+- 583 total tests passing (542 existing + 41 new: 12 error page tests + 4 analytics tests + 10 exchange rate model tests + 4 currency converter service tests + 1 exchange rate refresh job test + 7 currency helper tests + 4 currency display integration tests - 1 adjustment)
