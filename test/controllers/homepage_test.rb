@@ -6,12 +6,12 @@ class HomepageTest < ActionDispatch::IntegrationTest
   test "homepage displays hero section with tagline" do
     get "/fr"
     assert_response :success
-    assert_select "[data-testid='hero'] h1", text: /1942/
+    assert_select "[data-testid='hero'] h1", text: /Monaco/
   end
 
-  test "homepage hero displays CIM membership subtitle" do
+  test "homepage hero displays subtitle" do
     get "/fr"
-    assert_select "[data-testid='hero'] p", text: /Chambre Immobilière Monégasque/
+    assert_select "[data-testid='hero'] p", text: /1942/
   end
 
   test "homepage hero is translated per locale" do
@@ -230,9 +230,8 @@ class HomepageTest < ActionDispatch::IntegrationTest
 
   # === Navbar Transparency on Homepage ===
 
-  test "homepage navbar is transparent (no solid background on hero)" do
+  test "homepage navbar has white background" do
     get "/fr"
-    # The navbar on homepage should have transparent styling for hero overlay
-    assert_select "nav.homepage-nav-transparent"
+    assert_select "nav.bg-white"
   end
 end
