@@ -57,41 +57,38 @@
   <h2 class="text-2xl font-bold text-[#090956] text-center mb-8">
     <%= t("homepage.about_title") %>
   </h2>
-  <p class="text-sm leading-relaxed text-[#212529] max-w-3xl mx-auto text-center">
-    <%= t("homepage.about_text") %>
-  </p>
+  <div class="text-sm leading-relaxed text-[#212529] max-w-3xl mx-auto text-justify space-y-4">
+    <%= simple_format(t("homepage.about_text"), {}, wrapper_tag: "p") %>
+  </div>
 </section>
 
 <hr class="max-w-7xl mx-auto border-gray-200">
 
 <%# === Image Carousel === %>
-<section data-testid="carousel" class="max-w-7xl mx-auto px-4 py-16" data-controller="carousel">
-  <h2 class="text-2xl font-bold text-[#090956] text-center mb-8">
-    <%= t("homepage.carousel_title") %>
-  </h2>
-  <div class="relative overflow-hidden rounded-lg">
+<section data-testid="carousel" class="w-full" data-controller="carousel">
+  <div class="relative overflow-hidden">
     <div data-carousel-target="track" class="flex transition-transform duration-500">
-      <div data-testid="carousel-slide" class="min-w-full aspect-[16/9] bg-[#090956]/10 flex items-center justify-center">
-        <span class="text-[#6E8297] text-sm">Port Hercule</span>
+      <div data-testid="carousel-slide" class="min-w-full">
+        <img src="/images/carousel/agence-gare-monaco-2025-9.jpg" alt="Agence de la Gare Monaco" class="w-full h-[70vh] object-cover" loading="eager">
       </div>
-      <div data-testid="carousel-slide" class="min-w-full aspect-[16/9] bg-[#090956]/10 flex items-center justify-center">
-        <span class="text-[#6E8297] text-sm">Monte-Carlo</span>
+      <div data-testid="carousel-slide" class="min-w-full">
+        <img src="/images/carousel/agence-gare-monaco-2025-12.jpg" alt="Agence de la Gare Monaco" class="w-full h-[70vh] object-cover" loading="lazy">
       </div>
-      <div data-testid="carousel-slide" class="min-w-full aspect-[16/9] bg-[#090956]/10 flex items-center justify-center">
-        <span class="text-[#6E8297] text-sm">Le Rocher</span>
+      <div data-testid="carousel-slide" class="min-w-full">
+        <img src="/images/carousel/agence-gare-monaco-2025-34.jpg" alt="Agence de la Gare Monaco" class="w-full h-[70vh] object-cover" loading="lazy">
       </div>
-      <div data-testid="carousel-slide" class="min-w-full aspect-[16/9] bg-[#090956]/10 flex items-center justify-center">
-        <span class="text-[#6E8297] text-sm">Fontvieille</span>
+      <div data-testid="carousel-slide" class="min-w-full">
+        <img src="/images/carousel/agence-gare-monaco-2025-41.jpg" alt="Agence de la Gare Monaco" class="w-full h-[70vh] object-cover" loading="lazy">
       </div>
-      <div data-testid="carousel-slide" class="min-w-full aspect-[16/9] bg-[#090956]/10 flex items-center justify-center">
-        <span class="text-[#6E8297] text-sm">Larvotto</span>
+      <div data-testid="carousel-slide" class="min-w-full">
+        <img src="/images/carousel/team3.jpg" alt="Équipe Agence de la Gare" class="w-full h-[70vh] object-cover" loading="lazy">
       </div>
     </div>
     <%# Navigation buttons %>
-    <button data-action="carousel#prev" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow" aria-label="Previous">
+    <button data-action="carousel#prev" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-3 shadow-lg" aria-label="Previous">
       <svg class="w-5 h-5 text-[#090956]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
     </button>
-    <button data-action="carousel#next" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow" aria-label="Next">
+    <button data-action="carousel#next" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-3 shadow-lg" aria-label="Next">
       <svg class="w-5 h-5 text-[#090956]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
     </button>
   </div>
