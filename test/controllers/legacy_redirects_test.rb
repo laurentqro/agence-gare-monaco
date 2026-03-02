@@ -28,10 +28,10 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
 
   # === French Legacy Routes ===
 
-  test "FR legacy /fr/location/monaco redirects to /fr/locations/monaco" do
+  test "FR legacy /fr/location/monaco redirects to /locations/monaco" do
     get "/fr/location/monaco"
     assert_response :moved_permanently
-    assert_redirected_to "/fr/locations/monaco"
+    assert_redirected_to "/locations/monaco"
   end
 
   test "FR legacy /fr/bien/{id} redirects to property detail" do

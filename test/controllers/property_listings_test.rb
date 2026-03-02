@@ -173,7 +173,7 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
   end
 
   test "property card displays title in French locale" do
-    get "/fr/ventes/monaco"
+    get "/ventes/monaco"
     assert_response :success
     assert_select "[data-testid='property-card']", text: /Studio/
   end
@@ -297,9 +297,15 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
 
   test "listing renders correctly for all 8 locales" do
     locales_with_sales = {
-      fr: "ventes", en: "sales", it: "vendite", de: "verkauf",
+      en: "sales", it: "vendite", de: "verkauf",
       sv: "forsaljning", no: "salg", da: "salg", fi: "myynti"
     }
+    # French has no locale prefix
+    get "/ventes/monaco"
+    assert_response :success, "Failed for locale fr"
+    assert_select "h1", { minimum: 1 }, "Missing h1 for locale fr"
+    assert_select "[data-testid='property-card']", { minimum: 1 }, "Missing property cards for locale fr"
+
     locales_with_sales.each do |locale, segment|
       get "/#{locale}/#{segment}/monaco"
       assert_response :success, "Failed for locale #{locale}"

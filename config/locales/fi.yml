@@ -31,6 +31,7 @@ fi:
     contact_title: "Ota yhteyttä"
     carousel_title: "Monaco"
     videos_title: "Videot"
+    videos_view_channel: "Katso kaikki videomme"
 
   listings:
     sales: "Myynti"

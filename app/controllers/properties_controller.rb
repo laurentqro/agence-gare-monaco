@@ -2,6 +2,7 @@ class PropertiesController < ApplicationController
   include Localizable
   include SeoConfigurable
   allow_unauthenticated_access
+  before_action :initialize_contact_submission
 
   def index
     @transaction_type = params[:transaction_type]
@@ -35,8 +36,12 @@ class PropertiesController < ApplicationController
     @similar_properties = @similar_properties.where(district: @property.district) if @property.district.present?
     @similar_properties = @similar_properties.includes(:property_images, :district).limit(3)
 
-    @submission = ContactSubmission.new
-
     set_seo(page_type: :property, property: @property)
+  end
+
+  private
+
+  def initialize_contact_submission
+    @submission = ContactSubmission.new
   end
 end

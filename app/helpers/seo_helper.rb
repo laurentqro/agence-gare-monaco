@@ -277,7 +277,8 @@ module SeoHelper
 
   def listing_breadcrumbs(seo_opts)
     locale = I18n.locale
-    crumbs = [{ name: I18n.t("homepage.hero_title"), url: "#{SITE_HOST}/#{locale}" }]
+    home_path = locale.to_sym == :fr ? "/" : "/#{locale}"
+    crumbs = [{ name: I18n.t("homepage.hero_title"), url: "#{SITE_HOST}#{home_path}" }]
 
     transaction = seo_opts[:transaction_type]
     country = seo_opts[:country]
@@ -303,7 +304,7 @@ module SeoHelper
   def locale_path_for(page_type, locale, **opts)
     case page_type
     when :homepage
-      "/#{locale}"
+      locale.to_sym == :fr ? "/" : "/#{locale}"
     when :listings
       listing_path_for(locale, opts)
     when :property
@@ -329,7 +330,8 @@ module SeoHelper
     district = opts[:district]
 
     base = transaction == "rental" ? rentals : sales
-    path = "/#{locale}/#{base}"
+    prefix = locale.to_sym == :fr ? "" : "/#{locale}"
+    path = "#{prefix}/#{base}"
 
     if country == "MC"
       path += "/monaco"

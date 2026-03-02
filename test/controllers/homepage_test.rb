@@ -1,16 +1,35 @@
 require "test_helper"
 
 class HomepageTest < ActionDispatch::IntegrationTest
+  # === French homepage served at / (no /fr prefix) ===
+
+  test "root URL serves French homepage directly" do
+    get "/"
+    assert_response :success
+    assert_select "[data-testid='hero']"
+  end
+
+  test "/fr redirects to / with 301" do
+    get "/fr"
+    assert_redirected_to "/"
+    assert_response :moved_permanently
+  end
+
+  test "language switcher links to / for French" do
+    get "/"
+    assert_select "a[href='/']", minimum: 1
+  end
+
   # === Hero Section ===
 
   test "homepage displays hero section with tagline" do
-    get "/fr"
+    get "/"
     assert_response :success
     assert_select "[data-testid='hero'] h1", text: /Monaco/
   end
 
   test "homepage hero displays subtitle" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='hero'] p", text: /1942/
   end
 
@@ -29,11 +48,11 @@ class HomepageTest < ActionDispatch::IntegrationTest
   # === Category Cards ===
 
   test "homepage displays three category cards" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='category-cards']" do
-      assert_select "a[href='/fr/ventes/monaco']", text: /Ventes Monaco/i
-      assert_select "a[href='/fr/locations/monaco']", text: /Location Monaco/i
-      assert_select "a[href='/fr/ventes/france']", text: /France/i
+      assert_select "a[href='/ventes/monaco']", text: /Ventes Monaco/i
+      assert_select "a[href='/locations/monaco']", text: /Location Monaco/i
+      assert_select "a[href='/ventes/france']", text: /France/i
     end
   end
 
@@ -49,14 +68,14 @@ class HomepageTest < ActionDispatch::IntegrationTest
   # === About Section ===
 
   test "homepage displays about section with agency history" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='about']" do
       assert_match "1942", response.body
     end
   end
 
   test "about section mentions founding story" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='about']" do
       assert_match I18n.t("homepage.about_title", locale: :fr), response.body
     end
@@ -72,7 +91,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   # === Team Section ===
 
   test "homepage displays team section with three members" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='team']" do
       assert_match "Pierre Maré", response.body
       assert_match "Adrien Maré", response.body
@@ -81,7 +100,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   end
 
   test "team section shows roles" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='team']" do
       assert_match I18n.t("homepage.team.pierre_role", locale: :fr), response.body
       assert_match I18n.t("homepage.team.adrien_role", locale: :fr), response.body
@@ -100,7 +119,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   # === Featured Articles ===
 
   test "homepage displays featured articles section" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='featured-articles']"
   end
 
@@ -116,7 +135,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
       published_at: Time.current
     )
 
-    get "/fr"
+    get "/"
     assert_select "[data-testid='featured-articles']" do
       assert_match "Monaco en 2025", response.body
     end
@@ -152,7 +171,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
       published_at: Time.current
     )
 
-    get "/fr"
+    get "/"
     assert_no_match "Article brouillon", response.body
   end
 
@@ -168,7 +187,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
       published_at: Time.current
     )
 
-    get "/fr"
+    get "/"
     assert_select "[data-testid='featured-articles']" do
       assert_no_match "Article normal", response.body
     end
@@ -177,7 +196,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   # === Contact Section ===
 
   test "homepage displays contact section with agency address" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='contact-section']" do
       assert_match "3, Rue Langlé", response.body
       assert_match "MC 98000", response.body
@@ -185,40 +204,120 @@ class HomepageTest < ActionDispatch::IntegrationTest
   end
 
   test "homepage contact section includes phone number" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='contact-section']" do
       assert_match "(+377) 93 30 22 36", response.body
     end
   end
 
   test "homepage contact section includes email" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='contact-section'] a[href='mailto:info@agencegaremonaco.com']"
   end
 
   # === Image Carousel ===
 
   test "homepage displays image carousel section" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='carousel']"
   end
 
   test "carousel has multiple slides" do
-    get "/fr"
+    get "/"
     assert_select "[data-testid='carousel'] [data-testid='carousel-slide']", { minimum: 3 }
   end
 
   # === Videos Section ===
 
-  test "homepage displays videos section placeholder" do
-    get "/fr"
+  test "homepage displays videos section with title" do
+    get "/"
+    assert_select "[data-testid='videos']" do
+      assert_select "h2", text: I18n.t("homepage.videos_title", locale: :fr)
+    end
+  end
+
+  test "homepage renders video iframes when videos exist" do
+    YoutubeVideo.create!(video_id: "abc123", title: "Monaco Tour", published_at: 1.day.ago)
+    YoutubeVideo.create!(video_id: "def456", title: "Property Visit", published_at: 2.days.ago)
+
+    get "/"
+    assert_select "[data-testid='videos'] iframe[src='https://www.youtube-nocookie.com/embed/abc123']"
+    assert_select "[data-testid='videos'] iframe[src='https://www.youtube-nocookie.com/embed/def456']"
+  end
+
+  test "homepage shows video titles" do
+    YoutubeVideo.create!(video_id: "abc123", title: "Monaco Tour", published_at: 1.day.ago)
+
+    get "/"
+    assert_select "[data-testid='videos']" do
+      assert_match "Monaco Tour", response.body
+    end
+  end
+
+  test "homepage displays channel link" do
+    YoutubeVideo.create!(video_id: "abc123", title: "Test", published_at: 1.day.ago)
+
+    get "/"
+    assert_select "[data-testid='videos'] a[href='#{YoutubeVideo::CHANNEL_URL}']"
+  end
+
+  test "homepage shows at most 4 videos" do
+    5.times { |i| YoutubeVideo.create!(video_id: "vid#{i}", title: "Video #{i}", published_at: i.days.ago) }
+
+    get "/"
+    assert_select "[data-testid='videos'] iframe", 4
+  end
+
+  test "homepage videos are in reverse chronological order" do
+    YoutubeVideo.create!(video_id: "old", title: "Old Video", published_at: 2.days.ago)
+    YoutubeVideo.create!(video_id: "new", title: "New Video", published_at: 1.day.ago)
+
+    get "/"
+    iframes = css_select("[data-testid='videos'] iframe")
+    srcs = iframes.map { |iframe| iframe["src"] }
+    assert_equal "https://www.youtube-nocookie.com/embed/new", srcs.first
+    assert_equal "https://www.youtube-nocookie.com/embed/old", srcs.last
+  end
+
+  test "homepage videos section degrades gracefully when empty" do
+    get "/"
+    assert_select "[data-testid='videos']" do
+      assert_select "h2", text: I18n.t("homepage.videos_title", locale: :fr)
+      assert_select "iframe", 0
+    end
+  end
+
+  test "homepage renders when @youtube_videos is nil" do
+    PagesController.class_eval do
+      def home
+        @featured_articles = Article.published.featured.order(published_at: :desc).limit(3)
+        @youtube_videos = nil
+        @submission = ContactSubmission.new
+        set_seo(page_type: :homepage)
+      end
+    end
+    get "/"
+    assert_response :success
     assert_select "[data-testid='videos']"
+  ensure
+    PagesController.class_eval do
+      def home
+        @featured_articles = Article.published.featured.order(published_at: :desc).limit(3)
+        @youtube_videos = YoutubeVideo.latest
+        @submission = ContactSubmission.new
+        set_seo(page_type: :homepage)
+      end
+    end
   end
 
   # === All Locales Render ===
 
   test "homepage renders successfully for all 8 locales" do
-    %w[fr en it de sv no da fi].each do |locale|
+    get "/"
+    assert_response :success, "Homepage failed for locale fr"
+    assert_select "[data-testid='hero']", { minimum: 1 }, "Missing hero for locale fr"
+
+    %w[en it de sv no da fi].each do |locale|
       get "/#{locale}"
       assert_response :success, "Homepage failed for locale #{locale}"
       assert_select "[data-testid='hero']", { minimum: 1 }, "Missing hero for locale #{locale}"
@@ -231,7 +330,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   # === Navbar Transparency on Homepage ===
 
   test "homepage navbar has white background" do
-    get "/fr"
+    get "/"
     assert_select "nav.bg-white"
   end
 end

@@ -15,13 +15,13 @@ class StagingEnvironmentTest < ActionDispatch::IntegrationTest
   end
 
   test "production: homepage does not have noindex meta tag" do
-    get "/fr"
+    get "/"
     assert_response :success
     assert_no_match(/name="robots".*noindex/, response.body)
   end
 
   test "production: homepage includes Plausible analytics script" do
-    get "/fr"
+    get "/"
     assert_response :success
     assert_includes response.body, "plausible.io/js/script.js"
   end
@@ -42,7 +42,7 @@ class StagingEnvironmentTest < ActionDispatch::IntegrationTest
 
   test "staging: homepage has noindex nofollow meta tag" do
     with_staging_host do
-      get "/fr"
+      get "/"
       assert_response :success
       assert_select 'meta[name="robots"][content="noindex, nofollow"]'
     end
@@ -50,7 +50,7 @@ class StagingEnvironmentTest < ActionDispatch::IntegrationTest
 
   test "staging: homepage does not include Plausible analytics script" do
     with_staging_host do
-      get "/fr"
+      get "/"
       assert_response :success
       assert_not_includes response.body, "plausible.io/js/script.js"
     end

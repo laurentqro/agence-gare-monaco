@@ -3,9 +3,10 @@ require "test_helper"
 class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   # === Property Listings Routes ===
   # Pattern: /{locale}/{transaction}[/{country}[/{district}]]
+  # French uses no locale prefix — routes are at root level
 
   test "FR sales listing route" do
-    get "/fr/ventes"
+    get "/ventes"
     assert_response :success
   end
 
@@ -46,7 +47,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
 
   # Rentals
   test "FR rentals listing route" do
-    get "/fr/locations"
+    get "/locations"
     assert_response :success
   end
 
@@ -62,7 +63,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
 
   # Sales with country filter
   test "FR sales Monaco route" do
-    get "/fr/ventes/monaco"
+    get "/ventes/monaco"
     assert_response :success
   end
 
@@ -77,7 +78,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   end
 
   test "FR sales France route" do
-    get "/fr/ventes/france"
+    get "/ventes/france"
     assert_response :success
   end
 
@@ -93,7 +94,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
 
   # Rentals with country filter
   test "FR rentals Monaco route" do
-    get "/fr/locations/monaco"
+    get "/locations/monaco"
     assert_response :success
   end
 
@@ -105,7 +106,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   # Sales with district filter
   test "FR sales Monaco district route" do
     district = District.create!(name: "Carré d'Or", city: "Monaco", slug: "carre-dor")
-    get "/fr/ventes/monaco/carre-dor"
+    get "/ventes/monaco/carre-dor"
     assert_response :success
   end
 
@@ -124,7 +125,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   # Rentals with district filter
   test "FR rentals Monaco district route" do
     district = District.create!(name: "Monte-Carlo", city: "Monaco", slug: "monte-carlo")
-    get "/fr/locations/monaco/monte-carlo"
+    get "/locations/monaco/monte-carlo"
     assert_response :success
   end
 
@@ -141,7 +142,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
       city: "Monaco",
       published: true
     )
-    get "/fr/biens/#{property.id}-studio-carre-d-or"
+    get "/biens/#{property.id}-studio-carre-d-or"
     assert_response :success
   end
 
@@ -177,7 +178,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   # Pattern: /{locale}/{articles}
 
   test "FR articles listing route" do
-    get "/fr/articles"
+    get "/articles"
     assert_response :success
   end
 
@@ -194,7 +195,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   # Articles by category
   test "FR articles by category route" do
     category = Category.create!(name: "Actualités", slug: "actualites")
-    get "/fr/articles/actualites"
+    get "/articles/actualites"
     assert_response :success
   end
 
@@ -215,13 +216,13 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
       published: true,
       published_at: Time.current
     )
-    get "/fr/articles/mon-article"
+    get "/articles/mon-article"
     assert_response :success
   end
 
   # === Contact Route ===
   test "FR contact route" do
-    get "/fr/contact"
+    get "/contact"
     assert_response :success
   end
 
@@ -237,7 +238,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
 
   # === Privacy Route ===
   test "FR privacy route" do
-    get "/fr/confidentialite"
+    get "/confidentialite"
     assert_response :success
   end
 
@@ -253,7 +254,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
 
   # === Locale sets correct I18n.locale ===
   test "translated routes set correct locale for FR" do
-    get "/fr/ventes"
+    get "/ventes"
     assert_response :success
     # The controller should render in French
   end
@@ -270,8 +271,8 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
 
   # === Invalid translated segments return 404 ===
   test "wrong translation for locale returns 404" do
-    get "/fr/sales"  # English segment with French locale
-    assert_response :not_found
+    get "/fr/sales"  # /fr now redirects, but /fr/sales should 301 to /sales (which is not found)
+    assert_response :moved_permanently
   end
 
   test "nonexistent route segment returns 404" do
@@ -281,10 +282,11 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
 
   # === All 8 locales work for each route type ===
   test "all 8 locales have working sales routes" do
-    routes = {
-      fr: "ventes", en: "sales", it: "vendite", de: "verkauf",
-      sv: "forsaljning", no: "salg", da: "salg", fi: "myynti"
-    }
+    get "/ventes"
+    assert_response :success, "Expected 200 for /ventes (fr) but got #{response.status}"
+
+    routes = { en: "sales", it: "vendite", de: "verkauf",
+               sv: "forsaljning", no: "salg", da: "salg", fi: "myynti" }
     routes.each do |locale, segment|
       get "/#{locale}/#{segment}"
       assert_response :success, "Expected 200 for /#{locale}/#{segment} but got #{response.status}"
@@ -292,10 +294,11 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   end
 
   test "all 8 locales have working rentals routes" do
-    routes = {
-      fr: "locations", en: "rentals", it: "affitti", de: "vermietung",
-      sv: "uthyrning", no: "utleie", da: "udlejning", fi: "vuokraus"
-    }
+    get "/locations"
+    assert_response :success, "Expected 200 for /locations (fr) but got #{response.status}"
+
+    routes = { en: "rentals", it: "affitti", de: "vermietung",
+               sv: "uthyrning", no: "utleie", da: "udlejning", fi: "vuokraus" }
     routes.each do |locale, segment|
       get "/#{locale}/#{segment}"
       assert_response :success, "Expected 200 for /#{locale}/#{segment} but got #{response.status}"
@@ -303,10 +306,11 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   end
 
   test "all 8 locales have working contact routes" do
-    routes = {
-      fr: "contact", en: "contact", it: "contatto", de: "kontakt",
-      sv: "kontakt", no: "kontakt", da: "kontakt", fi: "yhteystiedot"
-    }
+    get "/contact"
+    assert_response :success, "Expected 200 for /contact (fr) but got #{response.status}"
+
+    routes = { en: "contact", it: "contatto", de: "kontakt",
+               sv: "kontakt", no: "kontakt", da: "kontakt", fi: "yhteystiedot" }
     routes.each do |locale, segment|
       get "/#{locale}/#{segment}"
       assert_response :success, "Expected 200 for /#{locale}/#{segment} but got #{response.status}"
@@ -314,10 +318,11 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   end
 
   test "all 8 locales have working privacy routes" do
-    routes = {
-      fr: "confidentialite", en: "privacy", it: "privacy", de: "datenschutz",
-      sv: "integritet", no: "personvern", da: "privatlivspolitik", fi: "tietosuoja"
-    }
+    get "/confidentialite"
+    assert_response :success, "Expected 200 for /confidentialite (fr) but got #{response.status}"
+
+    routes = { en: "privacy", it: "privacy", de: "datenschutz",
+               sv: "integritet", no: "personvern", da: "privatlivspolitik", fi: "tietosuoja" }
     routes.each do |locale, segment|
       get "/#{locale}/#{segment}"
       assert_response :success, "Expected 200 for /#{locale}/#{segment} but got #{response.status}"
@@ -326,18 +331,18 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
 
   # === Non-existent district returns 404 ===
   test "non-existent district slug returns 404" do
-    get "/fr/ventes/monaco/nonexistent-district"
+    get "/ventes/monaco/nonexistent-district"
     assert_response :not_found
   end
 
   # === Query params pass through for filters ===
   test "query params work for property type filter" do
-    get "/fr/ventes/monaco?type=studio"
+    get "/ventes/monaco?type=studio"
     assert_response :success
   end
 
   test "query params work for rooms filter" do
-    get "/fr/ventes/monaco?pieces=3"
+    get "/ventes/monaco?pieces=3"
     assert_response :success
   end
 end

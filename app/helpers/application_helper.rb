@@ -1,37 +1,41 @@
 module ApplicationHelper
   def locale_root_path(locale = I18n.locale)
-    "/#{locale}"
+    locale.to_sym == :fr ? "/" : "/#{locale}"
+  end
+
+  def locale_prefix(locale = I18n.locale)
+    locale.to_sym == :fr ? "" : "/#{locale}"
   end
 
   def locale_sales_monaco_path(locale = I18n.locale)
     sales = I18n.t("routes.sales", locale: locale)
-    "/#{locale}/#{sales}/monaco"
+    "#{locale_prefix(locale)}/#{sales}/monaco"
   end
 
   def locale_rentals_monaco_path(locale = I18n.locale)
     rentals = I18n.t("routes.rentals", locale: locale)
-    "/#{locale}/#{rentals}/monaco"
+    "#{locale_prefix(locale)}/#{rentals}/monaco"
   end
 
   def locale_sales_france_path(locale = I18n.locale)
     sales = I18n.t("routes.sales", locale: locale)
     france = I18n.t("routes.france", locale: locale)
-    "/#{locale}/#{sales}/#{france}"
+    "#{locale_prefix(locale)}/#{sales}/#{france}"
   end
 
   def locale_articles_path(locale = I18n.locale)
     articles = I18n.t("routes.articles", locale: locale)
-    "/#{locale}/#{articles}"
+    "#{locale_prefix(locale)}/#{articles}"
   end
 
   def locale_contact_path(locale = I18n.locale)
     contact = I18n.t("routes.contact", locale: locale)
-    "/#{locale}/#{contact}"
+    "#{locale_prefix(locale)}/#{contact}"
   end
 
   def locale_privacy_path(locale = I18n.locale)
     privacy = I18n.t("routes.privacy", locale: locale)
-    "/#{locale}/#{privacy}"
+    "#{locale_prefix(locale)}/#{privacy}"
   end
 
   def switch_locale_path(locale)
@@ -51,7 +55,7 @@ module ApplicationHelper
   def locale_property_path(property, locale = I18n.locale)
     props = I18n.t("routes.properties", locale: locale)
     slug = property.title_for(locale).parameterize
-    "/#{locale}/#{props}/#{property.id}-#{slug}"
+    "#{locale_prefix(locale)}/#{props}/#{property.id}-#{slug}"
   end
 
   def listing_heading

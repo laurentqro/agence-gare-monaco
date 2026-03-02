@@ -3,6 +3,8 @@ class ArticlesController < ApplicationController
   include SeoConfigurable
   allow_unauthenticated_access
 
+  before_action :initialize_contact_submission
+
   def index
     @articles = Article.published.includes(:category).order(published_at: :desc)
     @category = nil
@@ -19,5 +21,11 @@ class ArticlesController < ApplicationController
       @article = Article.published.find_by!(slug: params[:slug])
       set_seo(page_type: :article, article: @article)
     end
+  end
+
+  private
+
+  def initialize_contact_submission
+    @submission = ContactSubmission.new
   end
 end

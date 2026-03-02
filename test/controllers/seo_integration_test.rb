@@ -47,7 +47,7 @@ class SeoIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test "homepage has hreflang tags for all locales" do
-    get "/fr"
+    get "/"
     assert_response :success
     assert_select 'link[rel="alternate"][hreflang="fr"]'
     assert_select 'link[rel="alternate"][hreflang="en"]'
@@ -118,7 +118,7 @@ class SeoIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test "property listing has hreflang tags" do
-    get "/fr/ventes/monaco"
+    get "/ventes/monaco"
     assert_response :success
     assert_select 'link[rel="alternate"][hreflang="fr"]'
     assert_select 'link[rel="alternate"][hreflang="en"]'
@@ -154,7 +154,7 @@ class SeoIntegrationTest < ActionDispatch::IntegrationTest
   test "property detail has hreflang tags with locale-specific slugs" do
     get "/en/properties/#{@property.id}-luxury-apartment"
     assert_response :success
-    assert_select "link[rel=\"alternate\"][hreflang=\"fr\"][href*=\"/fr/biens/#{@property.id}-\"]"
+    assert_select "link[rel=\"alternate\"][hreflang=\"fr\"][href*=\"/biens/#{@property.id}-\"]"
     assert_select "link[rel=\"alternate\"][hreflang=\"en\"][href*=\"/en/properties/#{@property.id}-\"]"
   end
 

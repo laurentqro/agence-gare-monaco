@@ -48,7 +48,7 @@ class ArticlesTest < ActionDispatch::IntegrationTest
   end
 
   test "GET articles index works with French locale" do
-    get "/fr/articles"
+    get "/articles"
     assert_response :success
     assert_select "a", /Marché immobilier/
   end
@@ -72,7 +72,7 @@ class ArticlesTest < ActionDispatch::IntegrationTest
   end
 
   test "GET article show displays body in French locale" do
-    get "/fr/articles/marche-immobilier"
+    get "/articles/marche-immobilier"
     assert_response :success
     assert_select "div.article-body", /Le marché est en hausse/
   end

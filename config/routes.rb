@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   end
 
   # Public site with translated route segments per locale
+  # French (default locale) uses no locale prefix in the URL
   I18n.available_locales.each do |locale|
     # Fetch translated route segments for this locale
     sales    = I18n.t("routes.sales", locale: locale)
@@ -22,7 +23,9 @@ Rails.application.routes.draw do
     privacy  = I18n.t("routes.privacy", locale: locale)
     france   = I18n.t("routes.france", locale: locale)
 
-    scope "/#{locale}", defaults: { locale: locale.to_s } do
+    prefix = locale == :fr ? "" : "/#{locale}"
+
+    scope prefix, defaults: { locale: locale.to_s } do
       # Homepage
       get "/", to: "pages#home", as: :"#{locale}_root"
 
@@ -52,9 +55,9 @@ Rails.application.routes.draw do
   end
 
   # === Legacy URL Redirects (301) ===
-  # French legacy routes
+  # French legacy routes (must come before the /fr wildcard redirect below)
   scope "/fr", defaults: { locale: "fr" } do
-    get "location/monaco", to: redirect("/fr/locations/monaco", status: 301)
+    get "location/monaco", to: redirect("/locations/monaco", status: 301)
     get "bien/:legacy_id",            to: "legacy_redirects#property"
     get "bien-off-market/:legacy_id", to: "legacy_redirects#off_market_property"
     get "pdf-download/:legacy_id",    to: "legacy_redirects#pdf_download", constraints: { legacy_id: /\d+\.pdf/ }
@@ -64,6 +67,10 @@ Rails.application.routes.draw do
     get "post/:id/:slug",             to: "legacy_redirects#article"
     get "recherche/:location",        to: "legacy_redirects#search"
   end
+
+  # Redirect /fr and any remaining /fr/* to unprefixed equivalents (301)
+  get "/fr", to: redirect("/", status: 301)
+  get "/fr/*path", to: redirect("/%{path}", status: 301)
 
   # English legacy routes
   scope "/en", defaults: { locale: "en" } do
@@ -99,6 +106,5 @@ Rails.application.routes.draw do
   match "/422", to: "errors#unprocessable_entity", via: :all
   match "/500", to: "errors#internal_server_error", via: :all
 
-  # Bare root redirects to default locale
-  root to: redirect("/fr", status: 302)
+  # Bare root is the French homepage (defined above in the locale loop)
 end

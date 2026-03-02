@@ -94,15 +94,19 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
   end
 
   test "property detail page renders in French locale" do
-    get "/fr/biens/#{@property.id}-studio-vue-mer-carre-d-or"
+    get "/biens/#{@property.id}-studio-vue-mer-carre-d-or"
     assert_response :success
   end
 
   test "property detail page renders for all 8 locales" do
     locales_with_properties = {
-      fr: "biens", en: "properties", it: "immobili", de: "immobilien",
+      en: "properties", it: "immobili", de: "immobilien",
       sv: "fastigheter", no: "eiendommer", da: "ejendomme", fi: "kiinteistot"
     }
+    # French has no locale prefix
+    get "/biens/#{@property.id}-slug"
+    assert_response :success, "Failed for locale fr"
+
     locales_with_properties.each do |locale, segment|
       get "/#{locale}/#{segment}/#{@property.id}-slug"
       assert_response :success, "Failed for locale #{locale}"
@@ -117,7 +121,7 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
   end
 
   test "displays property title in French locale" do
-    get "/fr/biens/#{@property.id}-slug"
+    get "/biens/#{@property.id}-slug"
     assert_select "[data-testid='property-title']", text: /Studio vue mer/
   end
 

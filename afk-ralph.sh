@@ -8,7 +8,7 @@ if [ -z "$1" ]; then
 fi
 
 # jq filter to extract streaming text from assistant messages
-stream_text='select(.type == "assistant").message.content[]? | select(.type == "text").text // empty | gsub("\\n"; "\\r\\n") | . + "\\r\\n\\n"'
+stream_text='select(.type == "assistant").message.content[]? | select(.type == "text").text // empty | . + "\n"'
 
 # jq filter to extract final result
 final_result='select(.type == "result").result // empty'

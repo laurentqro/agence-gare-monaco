@@ -47,7 +47,7 @@ class SeoHelperTest < ActionView::TestCase
   test "canonical_url for homepage" do
     I18n.with_locale(:fr) do
       result = canonical_url(page_type: :homepage)
-      assert_equal "https://agencegaremonaco.com/fr", result
+      assert_equal "https://agencegaremonaco.com/", result
     end
   end
 
@@ -61,7 +61,7 @@ class SeoHelperTest < ActionView::TestCase
   test "canonical_url for property listing with filters strips query params" do
     I18n.with_locale(:fr) do
       result = canonical_url(page_type: :listings, transaction_type: "sale", country: "MC")
-      assert_equal "https://agencegaremonaco.com/fr/ventes/monaco", result
+      assert_equal "https://agencegaremonaco.com/ventes/monaco", result
     end
   end
 
@@ -82,7 +82,7 @@ class SeoHelperTest < ActionView::TestCase
   test "canonical_url for articles index" do
     I18n.with_locale(:fr) do
       result = canonical_url(page_type: :articles)
-      assert_equal "https://agencegaremonaco.com/fr/articles", result
+      assert_equal "https://agencegaremonaco.com/articles", result
     end
   end
 
@@ -103,7 +103,7 @@ class SeoHelperTest < ActionView::TestCase
   test "canonical_url for privacy" do
     I18n.with_locale(:fr) do
       result = canonical_url(page_type: :privacy)
-      assert_equal "https://agencegaremonaco.com/fr/confidentialite", result
+      assert_equal "https://agencegaremonaco.com/confidentialite", result
     end
   end
 
@@ -127,14 +127,14 @@ class SeoHelperTest < ActionView::TestCase
   test "hreflang_tags x-default points to French version" do
     I18n.with_locale(:en) do
       tags = hreflang_tags(page_type: :homepage)
-      assert_includes tags, 'hreflang="x-default" href="https://agencegaremonaco.com/fr"'
+      assert_includes tags, 'hreflang="x-default" href="https://agencegaremonaco.com/"'
     end
   end
 
   test "hreflang_tags for property uses locale-specific slugs" do
     I18n.with_locale(:en) do
       tags = hreflang_tags(page_type: :property, property: @property)
-      assert_includes tags, "href=\"https://agencegaremonaco.com/fr/biens/#{@property.id}-beau-studio\""
+      assert_includes tags, "href=\"https://agencegaremonaco.com/biens/#{@property.id}-beau-studio\""
       assert_includes tags, "href=\"https://agencegaremonaco.com/en/properties/#{@property.id}-beautiful-studio\""
     end
   end

@@ -31,7 +31,7 @@ class CurrencyDisplayTest < ActionDispatch::IntegrationTest
   end
 
   test "property detail does not show converted price for French locale" do
-    get "/fr/ventes/monaco"
+    get "/ventes/monaco"
     assert_response :success
     assert_select "[data-testid='converted-price']", count: 0
   end

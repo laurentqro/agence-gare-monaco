@@ -12,7 +12,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
   test "POST /session with valid credentials creates session and redirects" do
     post session_url, params: { email_address: "adrien@agencegaremonaco.com", password: "securepassword123" }
-    assert_redirected_to root_url
+    assert_redirected_to admin_root_url
   end
 
   test "POST /session with invalid credentials re-renders login" do

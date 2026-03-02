@@ -31,6 +31,7 @@ it:
     contact_title: "Contattateci"
     carousel_title: "Monaco"
     videos_title: "Video"
+    videos_view_channel: "Guarda tutti i nostri video"
 
   listings:
     sales: "Vendite"

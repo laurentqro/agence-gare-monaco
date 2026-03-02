@@ -4,14 +4,14 @@ class LayoutTest < ActionDispatch::IntegrationTest
   # === Application Layout ===
 
   test "layout includes Montserrat font from Google Fonts" do
-    get "/fr"
+    get "/"
     assert_response :success
     assert_match "fonts.googleapis.com", response.body
     assert_match "Montserrat", response.body
   end
 
   test "html tag has lang attribute matching current locale" do
-    get "/fr"
+    get "/"
     assert_match '<html lang="fr">', response.body
 
     get "/en"
@@ -22,7 +22,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
   end
 
   test "layout includes Turbo and Stimulus" do
-    get "/fr"
+    get "/"
     assert_response :success
     assert_select "head" do
       # importmap tags are present
@@ -33,21 +33,21 @@ class LayoutTest < ActionDispatch::IntegrationTest
   # === Navbar ===
 
   test "navbar includes agency logo linking to locale root" do
-    get "/fr"
+    get "/"
     assert_select "nav" do
-      assert_select "a[href='/fr']" do
+      assert_select "a[href='/']" do
         assert_select "img[alt='Agence Immobilière de la Gare']"
       end
     end
   end
 
   test "navbar includes main navigation links for French" do
-    get "/fr"
+    get "/"
     assert_select "nav" do
-      assert_select "a[href='/fr/ventes/monaco']", text: /Ventes Monaco/
-      assert_select "a[href='/fr/locations/monaco']", text: /Location Monaco/
-      assert_select "a[href='/fr/ventes/france']", text: /France/
-      assert_select "a[href='/fr/articles']", text: /Articles/
+      assert_select "a[href='/ventes/monaco']", text: /Ventes Monaco/
+      assert_select "a[href='/locations/monaco']", text: /Location Monaco/
+      assert_select "a[href='/ventes/france']", text: /France/
+      assert_select "a[href='/articles']", text: /Articles/
     end
   end
 
@@ -72,16 +72,17 @@ class LayoutTest < ActionDispatch::IntegrationTest
   end
 
   test "navbar includes language switcher with all 8 locales" do
-    get "/fr"
+    get "/"
     assert_select "[data-controller='language-switcher']" do
-      %w[fr en it de sv no da fi].each do |locale|
+      assert_select "a[href='/']"
+      %w[en it de sv no da fi].each do |locale|
         assert_select "a[href*='/#{locale}']"
       end
     end
   end
 
   test "language switcher highlights current locale" do
-    get "/fr"
+    get "/"
     assert_select "[data-controller='language-switcher']" do
       assert_select "[data-current-locale='fr']"
     end
@@ -93,16 +94,20 @@ class LayoutTest < ActionDispatch::IntegrationTest
   end
 
   test "navbar includes mobile menu toggle button" do
-    get "/fr"
+    get "/"
     assert_select "[data-controller='mobile-menu']" do
       assert_select "button[data-action*='mobile-menu#toggle']"
     end
   end
 
   test "navbar renders on all locale homepages" do
-    %w[fr en it de sv no da fi].each do |locale|
+    get "/"
+    assert_response :success
+    assert_select "nav", { minimum: 1 }, "Expected nav element for locale fr"
+
+    %w[en it de sv no da fi].each do |locale|
       get "/#{locale}"
-      assert_response :success
+      assert_response :success, "Homepage failed for locale #{locale}"
       assert_select "nav", { minimum: 1 }, "Expected nav element for locale #{locale}"
     end
   end
@@ -110,7 +115,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
   # === Footer ===
 
   test "footer includes agency address" do
-    get "/fr"
+    get "/"
     assert_select "footer" do
       assert_match "3, Rue Langlé", response.body
       assert_match "MC 98000 Monaco", response.body
@@ -118,7 +123,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
   end
 
   test "footer includes phone and fax" do
-    get "/fr"
+    get "/"
     assert_select "footer" do
       assert_match "(+377) 93 30 22 36", response.body
       assert_match "(+377) 93 25 05 34", response.body
@@ -126,12 +131,12 @@ class LayoutTest < ActionDispatch::IntegrationTest
   end
 
   test "footer includes email link" do
-    get "/fr"
+    get "/"
     assert_select "footer a[href='mailto:info@agencegaremonaco.com']"
   end
 
   test "footer includes social media links" do
-    get "/fr"
+    get "/"
     assert_select "footer" do
       assert_select "a[href='https://www.linkedin.com/company/agence-de-la-gare-monaco']"
       assert_select "a[href='https://www.facebook.com/agencedelagaremonaco']"
@@ -141,29 +146,33 @@ class LayoutTest < ActionDispatch::IntegrationTest
   end
 
   test "footer includes copyright" do
-    get "/fr"
+    get "/"
     assert_select "footer" do
       assert_match "Agence de la Gare", response.body
     end
   end
 
   test "footer includes privacy link for current locale" do
-    get "/fr"
-    assert_select "footer a[href='/fr/confidentialite']"
+    get "/"
+    assert_select "footer a[href='/confidentialite']"
 
     get "/en"
     assert_select "footer a[href='/en/privacy']"
   end
 
-  test "footer includes CIM logo" do
-    get "/fr"
-    assert_select "footer img[alt='Chambre Immobilière Monégasque']"
+  test "layout includes CIM badge" do
+    get "/"
+    assert_select "img[alt='Membre de la Chambre Immobilière Monégasque']"
   end
 
   test "footer renders on all locale homepages" do
-    %w[fr en it de sv no da fi].each do |locale|
+    get "/"
+    assert_response :success
+    assert_select "footer", { minimum: 1 }, "Expected footer element for locale fr"
+
+    %w[en it de sv no da fi].each do |locale|
       get "/#{locale}"
-      assert_response :success
+      assert_response :success, "Homepage failed for locale #{locale}"
       assert_select "footer", { minimum: 1 }, "Expected footer element for locale #{locale}"
     end
   end

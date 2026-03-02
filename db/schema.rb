@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_28_101924) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_02_131658) do
   create_table "articles", force: :cascade do |t|
     t.json "body"
     t.integer "category_id", null: false
@@ -191,6 +191,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_28_101924) do
     t.string "password_digest", null: false
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+  end
+
+  create_table "youtube_videos", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "published_at", null: false
+    t.string "thumbnail_url"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.string "video_id", null: false
+    t.index ["video_id"], name: "index_youtube_videos_on_video_id", unique: true
   end
 
   add_foreign_key "articles", "categories"

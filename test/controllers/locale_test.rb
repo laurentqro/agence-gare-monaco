@@ -9,14 +9,14 @@ class LocaleTest < ActionDispatch::IntegrationTest
     assert_equal :fr, I18n.default_locale
   end
 
-  test "bare root redirects to default locale" do
+  test "bare root serves French homepage directly" do
     get "/"
-    assert_response :redirect
-    assert_redirected_to "/fr"
+    assert_response :success
+    assert_match "Monaco depuis 1942", response.body
   end
 
   test "locale prefix renders content in correct language" do
-    get "/fr"
+    get "/"
     assert_response :success
     assert_match "Monaco depuis 1942", response.body
 
@@ -126,14 +126,17 @@ class LocaleTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "Immobilien in Monaco seit 1942", response.body
 
-    get "/fr"
+    get "/"
     assert_response :success
     assert_match "Monaco depuis 1942", response.body
     assert_no_match(/Immobilien/, response.body)
   end
 
   test "all eight locales are routable" do
-    %w[fr en it de sv no da fi].each do |locale|
+    get "/"
+    assert_response :success, "Expected 200 for / (fr) but got #{response.status}"
+
+    %w[en it de sv no da fi].each do |locale|
       get "/#{locale}"
       assert_response :success, "Expected 200 for /#{locale} but got #{response.status}"
     end
