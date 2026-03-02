@@ -35,6 +35,7 @@
 !/app/assets/builds/.keep
 !/app/assets/builds/tailwind.css
 /public/assets
+/public/tours
 
 # Ignore CI service files.
 /.github
