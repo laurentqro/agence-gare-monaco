@@ -35,4 +35,5 @@ volumes:
 asset_path: /rails/public/assets
 
 builder:
+  remote: ssh://root@46.225.227.128
   arch: amd64

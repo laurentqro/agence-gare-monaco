@@ -53,7 +53,9 @@ COPY . .
 RUN bundle exec bootsnap precompile -j 1 app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# NOTE: The tailwindcss binary produces broken output under QEMU (amd64 emulation
+# on ARM hosts), so we skip the Tailwind build and use the pre-built CSS from the repo.
+RUN SECRET_KEY_BASE_DUMMY=1 TAILWINDCSS_SKIP_BUILD=1 ./bin/rails assets:precompile
 
 
 
