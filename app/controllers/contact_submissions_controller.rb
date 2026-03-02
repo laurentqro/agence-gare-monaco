@@ -51,9 +51,10 @@ class ContactSubmissionsController < ApplicationController
   end
 
   def load_property_data
-    @property = Property.includes(:district, :building, :property_images).find(@submission.property_id)
+    @property = Property.includes(:district, :building, :property_images, property_documents: { file_attachment: :blob }).find(@submission.property_id)
     @photos = @property.photos
     @plans = @property.plans
+    @documents = @property.property_documents.select { |d| d.file.attached? }
     @similar_properties = Property.publicly_visible
       .where(transaction_type: @property.transaction_type)
       .where.not(id: @property.id)
