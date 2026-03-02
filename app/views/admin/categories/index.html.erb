@@ -1,17 +1,17 @@
 <div class="p-8">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-[#090956]">Categories</h1>
-    <%= link_to "New Category", new_admin_category_path, class: "bg-[#090956] text-white px-4 py-2 rounded hover:bg-[#090956]/90" %>
+    <h1 class="text-2xl font-bold text-[#090956]"><%= t("admin.categories.title") %></h1>
+    <%= link_to t("admin.categories.new_action"), new_admin_category_path, class: "bg-[#090956] text-white px-4 py-2 rounded hover:bg-[#090956]/90" %>
   </div>
 
   <div class="bg-white rounded shadow overflow-hidden">
     <table class="w-full text-sm">
       <thead class="bg-gray-50 text-left">
         <tr>
-          <th class="px-4 py-3 font-medium text-gray-600">Name</th>
-          <th class="px-4 py-3 font-medium text-gray-600">Slug</th>
-          <th class="px-4 py-3 font-medium text-gray-600">Articles</th>
-          <th class="px-4 py-3 font-medium text-gray-600">Actions</th>
+          <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.categories.table.name") %></th>
+          <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.categories.table.slug") %></th>
+          <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.categories.table.articles") %></th>
+          <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.shared.actions") %></th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100">
@@ -21,8 +21,8 @@
             <td class="px-4 py-3 text-gray-500"><%= category.slug %></td>
             <td class="px-4 py-3"><%= category.articles_count %></td>
             <td class="px-4 py-3 space-x-2">
-              <%= link_to "Edit", edit_admin_category_path(category), class: "text-[#6E8297] hover:underline" %>
-              <%= link_to "Delete", admin_category_path(category), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, class: "text-red-600 hover:underline" %>
+              <%= link_to t("admin.shared.edit"), edit_admin_category_path(category), class: "text-[#6E8297] hover:underline" %>
+              <%= link_to t("admin.shared.delete"), admin_category_path(category), data: { turbo_method: :delete, turbo_confirm: t("admin.shared.confirm_delete") }, class: "text-red-600 hover:underline" %>
             </td>
           </tr>
         <% end %>

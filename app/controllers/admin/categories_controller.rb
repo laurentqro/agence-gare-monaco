@@ -17,7 +17,7 @@ module Admin
       @category = Category.new(category_params)
       generate_slug_if_blank
       if @category.save
-        redirect_to admin_categories_url, notice: "Category created."
+        redirect_to admin_categories_url, notice: t("admin.categories.flash.created")
       else
         render :new, status: :unprocessable_entity
       end
@@ -29,7 +29,7 @@ module Admin
     def update
       @category.assign_attributes(category_params)
       if @category.save
-        redirect_to admin_categories_url, notice: "Category updated."
+        redirect_to admin_categories_url, notice: t("admin.categories.flash.updated")
       else
         render :edit, status: :unprocessable_entity
       end
@@ -37,7 +37,7 @@ module Admin
 
     def destroy
       @category.destroy
-      redirect_to admin_categories_url, notice: "Category deleted."
+      redirect_to admin_categories_url, notice: t("admin.categories.flash.deleted")
     end
 
     private

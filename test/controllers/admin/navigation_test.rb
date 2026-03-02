@@ -9,23 +9,23 @@ class Admin::NavigationTest < ActionDispatch::IntegrationTest
   test "admin dashboard shows navigation links" do
     get admin_root_url
     assert_response :success
-    assert_select "a[href='#{admin_root_path}']", /Dashboard/
+    assert_select "a[href='#{admin_root_path}']", /Tableau de bord/
     assert_select "a[href='#{admin_articles_path}']", /Articles/
-    assert_select "a[href='#{admin_categories_path}']", /Categories/
+    assert_select "a[href='#{admin_categories_path}']", /Catégories/
   end
 
   test "admin articles index shows navigation links" do
     get admin_articles_url
     assert_response :success
-    assert_select "a[href='#{admin_root_path}']", /Dashboard/
+    assert_select "a[href='#{admin_root_path}']", /Tableau de bord/
     assert_select "a[href='#{admin_articles_path}']", /Articles/
-    assert_select "a[href='#{admin_categories_path}']", /Categories/
+    assert_select "a[href='#{admin_categories_path}']", /Catégories/
   end
 
   test "admin layout shows logout link" do
     get admin_root_url
     assert_response :success
-    assert_select "a", /Log out|Logout|Sign out/i
+    assert_select "a", /Déconnexion/
   end
 
   test "admin layout shows current user email" do

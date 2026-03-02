@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Admin | Agence Gare Monaco" %></title>
+    <title><%= content_for(:title) || t("admin.layout.title") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Agence Gare Monaco">
@@ -32,15 +32,15 @@
             <a href="<%= admin_root_path %>" class="text-lg font-bold">Agence de la Gare</a>
           </div>
           <nav class="flex-1 p-4 space-y-1">
-            <a href="<%= admin_root_path %>" class="block px-3 py-2 rounded hover:bg-white/10">Dashboard</a>
-            <a href="<%= admin_properties_path %>" class="block px-3 py-2 rounded hover:bg-white/10">Properties</a>
-            <a href="<%= admin_articles_path %>" class="block px-3 py-2 rounded hover:bg-white/10">Articles</a>
-            <a href="<%= admin_categories_path %>" class="block px-3 py-2 rounded hover:bg-white/10">Categories</a>
-            <a href="<%= admin_contacts_path %>" class="block px-3 py-2 rounded hover:bg-white/10">Contacts</a>
+            <a href="<%= admin_root_path %>" class="block px-3 py-2 rounded hover:bg-white/10"><%= t("admin.layout.dashboard") %></a>
+            <a href="<%= admin_properties_path %>" class="block px-3 py-2 rounded hover:bg-white/10"><%= t("admin.layout.properties") %></a>
+            <a href="<%= admin_articles_path %>" class="block px-3 py-2 rounded hover:bg-white/10"><%= t("admin.layout.articles") %></a>
+            <a href="<%= admin_categories_path %>" class="block px-3 py-2 rounded hover:bg-white/10"><%= t("admin.layout.categories") %></a>
+            <a href="<%= admin_contacts_path %>" class="block px-3 py-2 rounded hover:bg-white/10"><%= t("admin.layout.contacts") %></a>
           </nav>
           <div class="p-4 border-t border-white/10 text-sm">
             <p class="text-white/70 mb-2"><%= Current.user&.email_address %></p>
-            <%= link_to "Log out", session_path, data: { turbo_method: :delete }, class: "text-white/70 hover:text-white" %>
+            <%= link_to t("admin.layout.logout"), session_path, data: { turbo_method: :delete }, class: "text-white/70 hover:text-white" %>
           </div>
         </aside>
       <% end %>

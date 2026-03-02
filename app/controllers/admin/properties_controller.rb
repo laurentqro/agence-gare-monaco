@@ -14,7 +14,7 @@ module Admin
     def create
       @property = Property.new(property_params)
       if @property.save
-        redirect_to admin_properties_url, notice: "Property created."
+        redirect_to admin_properties_url, notice: t("admin.properties.flash.created")
       else
         render :new, status: :unprocessable_entity
       end
@@ -27,7 +27,7 @@ module Admin
       @property.assign_attributes(property_params)
       mark_manually_edited if @property.immotoolbox_id.present?
       if @property.save
-        redirect_to admin_properties_url, notice: "Property updated."
+        redirect_to admin_properties_url, notice: t("admin.properties.flash.updated")
       else
         render :edit, status: :unprocessable_entity
       end
@@ -35,7 +35,7 @@ module Admin
 
     def destroy
       @property.destroy
-      redirect_to admin_properties_url, notice: "Property deleted."
+      redirect_to admin_properties_url, notice: t("admin.properties.flash.deleted")
     end
 
     private

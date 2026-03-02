@@ -32,7 +32,7 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
   test "GET new renders contact selection form" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_select "h1", /Share Property/
+    assert_select "h1", /Partager le bien/
     assert_select "input[type='checkbox'][name='contact_ids[]']", 2
   end
 
@@ -57,7 +57,7 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
       }
     end
     assert_redirected_to admin_contacts_url
-    assert_equal "Property shared with 2 contacts.", flash[:notice]
+    assert_equal "Bien partagé avec 2 contacts.", flash[:notice]
   end
 
   test "POST create sends email to a single contact" do
@@ -74,7 +74,7 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
       post admin_property_share_url(@property), params: { contact_ids: [] }
     end
     assert_redirected_to new_admin_property_share_url(@property)
-    assert_equal "Please select at least one contact.", flash[:alert]
+    assert_equal "Veuillez sélectionner au moins un contact.", flash[:alert]
   end
 
   test "POST create without contact_ids param redirects with alert" do
@@ -82,6 +82,6 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
       post admin_property_share_url(@property)
     end
     assert_redirected_to new_admin_property_share_url(@property)
-    assert_equal "Please select at least one contact.", flash[:alert]
+    assert_equal "Veuillez sélectionner au moins un contact.", flash[:alert]
   end
 end

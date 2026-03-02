@@ -19,7 +19,7 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
     Category.create!(name: "Quartiers", slug: "quartiers")
     get admin_categories_url
     assert_response :success
-    assert_select "h1", /Categories/
+    assert_select "h1", /Catégories/
     assert_select "table tbody tr", 2
   end
 

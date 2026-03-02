@@ -21,7 +21,7 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     create_property(reference: "MC-002", title: { "fr" => "Appartement Carré d'Or" })
     get admin_properties_url
     assert_response :success
-    assert_select "h1", /Properties/
+    assert_select "h1", /Biens/
     assert_select "table tbody tr", 2
   end
 
@@ -44,8 +44,8 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     create_property(reference: "MC-001", published: true)
     create_property(reference: "MC-002", published: false)
     get admin_properties_url
-    assert_select "span", /Published/
-    assert_select "span", /Draft/
+    assert_select "span", /Publié/
+    assert_select "span", /Brouillon/
   end
 
   test "GET index shows share link for each property" do
@@ -224,9 +224,9 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   # Admin sidebar
-  test "admin sidebar shows Properties link" do
+  test "admin sidebar shows Biens link" do
     get admin_properties_url
-    assert_select "a", text: "Properties"
+    assert_select "a", text: "Biens"
   end
 
   private

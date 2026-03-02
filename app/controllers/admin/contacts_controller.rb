@@ -13,7 +13,7 @@ module Admin
     def create
       @contact = Contact.new(contact_params)
       if @contact.save
-        redirect_to admin_contacts_url, notice: "Contact created."
+        redirect_to admin_contacts_url, notice: t("admin.contacts.flash.created")
       else
         render :new, status: :unprocessable_entity
       end
@@ -25,7 +25,7 @@ module Admin
     def update
       @contact.assign_attributes(contact_params)
       if @contact.save
-        redirect_to admin_contacts_url, notice: "Contact updated."
+        redirect_to admin_contacts_url, notice: t("admin.contacts.flash.updated")
       else
         render :edit, status: :unprocessable_entity
       end
@@ -33,7 +33,7 @@ module Admin
 
     def destroy
       @contact.destroy
-      redirect_to admin_contacts_url, notice: "Contact deleted."
+      redirect_to admin_contacts_url, notice: t("admin.contacts.flash.deleted")
     end
 
     private

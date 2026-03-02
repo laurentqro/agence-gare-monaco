@@ -10,7 +10,7 @@ module Admin
       contact_ids = Array(params[:contact_ids]).reject(&:blank?)
 
       if contact_ids.empty?
-        redirect_to new_admin_property_share_url(@property), alert: "Please select at least one contact."
+        redirect_to new_admin_property_share_url(@property), alert: t("admin.property_shares.flash.no_contacts_selected")
         return
       end
 
@@ -19,7 +19,7 @@ module Admin
         PropertyMailer.share_email(@property, contact).deliver_now
       end
 
-      redirect_to admin_contacts_url, notice: "Property shared with #{contacts.size} contacts."
+      redirect_to admin_contacts_url, notice: t("admin.property_shares.flash.shared", count: contacts.size)
     end
 
     private

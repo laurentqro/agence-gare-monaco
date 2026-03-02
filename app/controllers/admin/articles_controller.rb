@@ -15,7 +15,7 @@ module Admin
       @article = Article.new(article_params)
       set_published_at
       if @article.save
-        redirect_to admin_articles_url, notice: "Article created."
+        redirect_to admin_articles_url, notice: t("admin.articles.flash.created")
       else
         render :new, status: :unprocessable_entity
       end
@@ -28,7 +28,7 @@ module Admin
       @article.assign_attributes(article_params)
       set_published_at
       if @article.save
-        redirect_to admin_articles_url, notice: "Article updated."
+        redirect_to admin_articles_url, notice: t("admin.articles.flash.updated")
       else
         render :edit, status: :unprocessable_entity
       end
@@ -36,7 +36,7 @@ module Admin
 
     def destroy
       @article.destroy
-      redirect_to admin_articles_url, notice: "Article deleted."
+      redirect_to admin_articles_url, notice: t("admin.articles.flash.deleted")
     end
 
     private
