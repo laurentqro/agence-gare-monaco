@@ -30,6 +30,9 @@
 
 /public/assets
 
+# Ignore krpano/Panotour virtual tour files (too large for git, deployed separately).
+/public/tours
+
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
