@@ -5,6 +5,7 @@ module Admin
 
     def index
       @properties = Property.includes(:district, :building).order(created_at: :desc)
+      @properties = @properties.where(off_market: true) if params[:filter] == "off_market"
     end
 
     def new

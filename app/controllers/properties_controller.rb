@@ -26,15 +26,18 @@ class PropertiesController < ApplicationController
   end
 
   def show
-    @property = Property.includes(:district, :building, :property_images).find(params[:id])
+    @property = Property.published.includes(:district, :building, :property_images, property_documents: { file_attachment: :blob }).find(params[:id])
     @photos = @property.photos
     @plans = @property.plans
+    @documents = @property.property_documents.select { |d| d.file.attached? }
 
-    @similar_properties = Property.publicly_visible
-      .where(transaction_type: @property.transaction_type)
-      .where.not(id: @property.id)
-    @similar_properties = @similar_properties.where(district: @property.district) if @property.district.present?
-    @similar_properties = @similar_properties.includes(:property_images, :district).limit(3)
+    unless @property.off_market?
+      @similar_properties = Property.publicly_visible
+        .where(transaction_type: @property.transaction_type)
+        .where.not(id: @property.id)
+      @similar_properties = @similar_properties.where(district: @property.district) if @property.district.present?
+      @similar_properties = @similar_properties.includes(:property_images, :district).limit(3)
+    end
 
     set_seo(page_type: :property, property: @property)
   end

@@ -89,6 +89,9 @@ sv:
     photo_alt: "%{title} - Foto %{number}"
     plan_alt: "Planritning - %{title}"
     exclusivity: "Exklusivitet"
+    off_market_badge: "Ej på marknaden"
+    documents: "Dokument"
+    download: "Ladda ner"
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Fastigheter i Monaco sedan 1942"

@@ -384,6 +384,74 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     assert_select "img[srcset*='photo1_large']"
   end
 
+  # === PDF document downloads ===
+
+  test "displays documents section when property has documents" do
+    doc = @property.property_documents.create!(label: "Floor Plan PDF")
+    doc.file.attach(io: StringIO.new("fake pdf"), filename: "floor_plan.pdf", content_type: "application/pdf")
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-documents']"
+  end
+
+  test "displays document download link with label" do
+    doc = @property.property_documents.create!(label: "Floor Plan PDF")
+    doc.file.attach(io: StringIO.new("fake pdf"), filename: "floor_plan.pdf", content_type: "application/pdf")
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-documents'] a", text: /Floor Plan PDF/
+  end
+
+  test "hides documents section when no documents" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-documents']", count: 0
+  end
+
+  test "displays multiple documents" do
+    doc1 = @property.property_documents.create!(label: "Floor Plan")
+    doc1.file.attach(io: StringIO.new("fake"), filename: "plan.pdf", content_type: "application/pdf")
+    doc2 = @property.property_documents.create!(label: "Brochure")
+    doc2.file.attach(io: StringIO.new("fake"), filename: "brochure.pdf", content_type: "application/pdf")
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-documents'] a", 2
+  end
+
+  # === Off-market properties ===
+
+  test "off-market property is accessible via direct URL" do
+    @property.update!(off_market: true)
+    get "/en/properties/#{@property.id}-slug"
+    assert_response :success
+  end
+
+  test "off-market property shows off-market badge" do
+    @property.update!(off_market: true)
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='off-market-badge']"
+  end
+
+  test "off-market property does not show back-to-listings link" do
+    @property.update!(off_market: true)
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='back-link']", count: 0
+  end
+
+  test "off-market property does not show similar properties section" do
+    @property.update!(off_market: true)
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='similar-properties']", count: 0
+  end
+
+  test "unpublished property returns 404 even via direct URL" do
+    @property.update!(published: false)
+    get "/en/properties/#{@property.id}-slug"
+    assert_response :not_found
+  end
+
+  test "unpublished off-market property returns 404" do
+    @property.update!(published: false, off_market: true)
+    get "/en/properties/#{@property.id}-slug"
+    assert_response :not_found
+  end
+
   # === Edge cases ===
 
   test "returns 404 for non-existent property" do

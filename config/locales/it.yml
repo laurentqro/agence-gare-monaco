@@ -89,6 +89,9 @@ it:
     photo_alt: "%{title} - Foto %{number}"
     plan_alt: "Planimetria - %{title}"
     exclusivity: "Esclusiva"
+    off_market_badge: "Fuori mercato"
+    documents: "Documenti"
+    download: "Scarica"
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Immobiliare a Monaco dal 1942"

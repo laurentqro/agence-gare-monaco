@@ -4,6 +4,13 @@
     <%= link_to t("admin.properties.new_action"), new_admin_property_path, class: "bg-[#090956] text-white px-4 py-2 rounded hover:bg-[#090956]/90" %>
   </div>
 
+  <div class="flex gap-2 mb-4">
+    <%= link_to t("admin.properties.filter_all"), admin_properties_path,
+        class: "px-3 py-1.5 text-sm rounded #{params[:filter].blank? ? 'bg-[#090956] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+    <%= link_to t("admin.properties.filter_off_market"), admin_properties_path(filter: "off_market"),
+        class: "px-3 py-1.5 text-sm rounded #{params[:filter] == 'off_market' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+  </div>
+
   <div class="bg-white rounded shadow overflow-hidden">
     <table class="w-full text-sm">
       <thead class="bg-gray-50 text-left">

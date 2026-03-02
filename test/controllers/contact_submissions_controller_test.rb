@@ -9,7 +9,8 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
       property_type: "apartment",
       country: "MC",
       city: "Monaco",
-      price: 950_000
+      price: 950_000,
+      published: true
     )
   end
 

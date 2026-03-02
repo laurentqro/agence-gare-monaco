@@ -1,24 +1,26 @@
 <% title = @property.title_for(I18n.locale) %>
 
 <div class="max-w-7xl mx-auto px-4 py-8">
-  <%# Back link %>
-  <div data-testid="back-link" class="mb-6">
-    <% if @property.transaction_type == "sale" %>
-      <% if @property.country == "MC" %>
-        <a href="<%= locale_sales_monaco_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
-          &larr; <%= t("property_detail.back_to_sales") %>
-        </a>
+  <%# Back link (hidden for off-market properties) %>
+  <% unless @property.off_market? %>
+    <div data-testid="back-link" class="mb-6">
+      <% if @property.transaction_type == "sale" %>
+        <% if @property.country == "MC" %>
+          <a href="<%= locale_sales_monaco_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
+            &larr; <%= t("property_detail.back_to_sales") %>
+          </a>
+        <% else %>
+          <a href="<%= locale_sales_france_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
+            &larr; <%= t("property_detail.back_to_sales") %>
+          </a>
+        <% end %>
       <% else %>
-        <a href="<%= locale_sales_france_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
-          &larr; <%= t("property_detail.back_to_sales") %>
+        <a href="<%= locale_rentals_monaco_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
+          &larr; <%= t("property_detail.back_to_rentals") %>
         </a>
       <% end %>
-    <% else %>
-      <a href="<%= locale_rentals_monaco_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
-        &larr; <%= t("property_detail.back_to_rentals") %>
-      </a>
-    <% end %>
-  </div>
+    </div>
+  <% end %>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <%# Left column: gallery + description %>
@@ -79,6 +81,11 @@
             <%= t("property_detail.exclusivity") %>
           </span>
         <% end %>
+        <% if @property.off_market? %>
+          <span data-testid="off-market-badge" class="bg-purple-600 text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+            <%= t("property_detail.off_market_badge") %>
+          </span>
+        <% end %>
       </div>
 
       <%# Title %>
@@ -115,6 +122,24 @@
                      class="w-full h-auto"
                      loading="lazy">
               </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Documents %>
+      <% if @documents.any? %>
+        <div data-testid="property-documents" class="mb-8">
+          <h2 class="text-lg font-bold text-[#090956] mb-4"><%= t("property_detail.documents") %></h2>
+          <div class="flex flex-col gap-2">
+            <% @documents.each do |doc| %>
+              <a href="<%= rails_blob_path(doc.file, disposition: "attachment") %>"
+                 class="inline-flex items-center gap-2 text-xs text-[#090956] hover:text-[#6E8297]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <%= doc.label.presence || doc.file.filename %>
+              </a>
             <% end %>
           </div>
         </div>
@@ -347,8 +372,8 @@
     </div>
   </div>
 
-  <%# Similar properties %>
-  <% if @similar_properties.any? %>
+  <%# Similar properties (hidden for off-market properties) %>
+  <% if !@property.off_market? && @similar_properties&.any? %>
     <div data-testid="similar-properties" class="mt-12">
       <hr class="border-gray-200 mb-8">
       <h2 class="text-lg font-bold text-[#090956] mb-6"><%= t("property_detail.similar_properties") %></h2>

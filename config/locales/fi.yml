@@ -89,6 +89,9 @@ fi:
     photo_alt: "%{title} - Kuva %{number}"
     plan_alt: "Pohjapiirros - %{title}"
     exclusivity: "Yksinoikeus"
+    off_market_badge: "Ei markkinoilla"
+    documents: "Asiakirjat"
+    download: "Lataa"
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Kiinteistöt Monacossa vuodesta 1942"

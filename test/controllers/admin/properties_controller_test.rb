@@ -223,6 +223,25 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_properties_url
   end
 
+  # OFF-MARKET FILTER
+  test "GET index with filter=off_market shows only off-market properties" do
+    on_market = create_property(reference: "MC-ON", off_market: false, published: true)
+    off_market = create_property(reference: "MC-OFF", off_market: true, published: true)
+    get admin_properties_url(filter: "off_market")
+    assert_response :success
+    assert_select "td", /MC-OFF/
+    assert_select "td", text: /MC-ON/, count: 0
+  end
+
+  test "GET index without filter shows all properties" do
+    on_market = create_property(reference: "MC-ON", off_market: false)
+    off_market = create_property(reference: "MC-OFF", off_market: true)
+    get admin_properties_url
+    assert_response :success
+    assert_select "td", /MC-ON/
+    assert_select "td", /MC-OFF/
+  end
+
   # Admin sidebar
   test "admin sidebar shows Biens link" do
     get admin_properties_url
