@@ -14,15 +14,19 @@ class ImmotoolboxSync
   def sync_districts
     stats = { created: 0, updated: 0 }
 
-    @client.fetch_districts.each do |data|
+    districts_data = @client.fetch_districts
+    # API returns a Hash keyed by ID strings; normalize to array of values
+    items = districts_data.is_a?(Hash) ? districts_data.values : districts_data
+
+    items.each do |data|
       district = District.find_or_initialize_by(immotoolbox_id: data["id"])
       is_new = district.new_record?
 
       district.assign_attributes(
         name: data["name"],
-        city: data["city"] || "Monaco",
-        latitude: data["latitude"],
-        longitude: data["longitude"]
+        city: data.dig("city", "name") || data["city"] || "Monaco",
+        latitude: data["lat"] || data["latitude"],
+        longitude: data["lng"] || data["longitude"]
       )
       # Reset slug so it regenerates from new name
       district.slug = nil if district.name_changed?
@@ -45,9 +49,9 @@ class ImmotoolboxSync
 
       building.assign_attributes(
         name: data["name"],
-        name_alt: data["nameAlt"],
+        name_alt: data["name_alt"] || data["nameAlt"],
         address: data["address"],
-        city: data["city"] || "Monaco",
+        city: data.dig("city", "name") || data["city"] || "Monaco",
         district: district
       )
       building.save!
@@ -76,22 +80,20 @@ class ImmotoolboxSync
 
       is_new = property.new_record?
 
-      # Fetch texts and images for this property
-      texts = @client.fetch_texts(property_id: data["id"])
-      images = @client.fetch_images(property_id: data["id"])
-
-      # Build multilingual title and description
+      # Build multilingual title and description from inline texts
       title = {}
       description = {}
-      texts.each do |text|
-        lang = text["language"]
-        title[lang] = text["title"] if text["title"].present?
-        description[lang] = text["description"] if text["description"].present?
+      texts = data["texts"]
+      if texts.is_a?(Hash)
+        texts.each do |lang, text_data|
+          title[lang] = text_data["title"] if text_data["title"].present?
+          description[lang] = text_data["description"] if text_data["description"].present?
+        end
       end
 
       # Resolve district and building
       district = District.find_by(immotoolbox_id: data.dig("district", "id")) if data["district"]
-      building = Building.find_by(immotoolbox_id: data.dig("building", "id")) if data["building"]
+      building = Building.find_by(immotoolbox_id: data["building_id"]) if data["building_id"]
 
       property.assign_attributes(
         reference: data["reference"],
@@ -99,41 +101,43 @@ class ImmotoolboxSync
         description: description,
         price: data["price"],
         currency: data["currency"] || "EUR",
-        service_charges: data["serviceCharges"],
-        service_charges_included: data["serviceChargesIncluded"] || false,
-        transaction_type: map_transaction_type(data["typeTransaction"]),
-        property_type: data["typeProperty"] || "apartment",
-        subtype: data["subtype"],
-        country: data.dig("country", "code") || "MC",
-        city: data.dig("city", "name") || "Monaco",
+        service_charges: data["servicecharges"] || data["serviceCharges"],
+        service_charges_included: data["serviceschargesIncluded"] || data["serviceChargesIncluded"] || false,
+        transaction_type: map_transaction_type(data["type_transaction_code"] || data["typeTransaction"]),
+        property_type: map_property_type(data["type_property"] || data["typeProperty"]),
+        subtype: data["subtype_property"] || data["subtype"],
+        country: data["country_code"] || data.dig("country", "code") || "MC",
+        city: data["city_name"] || data.dig("city", "name") || "Monaco",
         district: district,
         building: building,
         address: data["address"],
-        latitude: data["latitude"],
-        longitude: data["longitude"],
-        floor: data["floor"],
-        num_rooms: data["numRooms"],
-        num_bedrooms: data["numBedrooms"],
-        num_bathrooms: data["numBathrooms"],
-        num_parkings: data["numParkings"],
-        num_cellars: data["numCellars"],
-        living_area: data["livingArea"],
-        total_area: data["totalArea"],
-        terrace_area: data["terraceArea"],
-        land_area: data["landArea"],
-        garden_area: data["gardenArea"],
+        latitude: data["lat"] || data["latitude"],
+        longitude: data["lng"] || data["longitude"],
+        floor: parse_integer(data["floor"]),
+        num_rooms: parse_integer(data["num_rooms"] || data["numRooms"]),
+        num_bedrooms: parse_integer(data["num_bedrooms"] || data["numBedrooms"]),
+        num_bathrooms: parse_integer(data["num_bathrooms"] || data["numBathrooms"]),
+        num_parkings: parse_integer(data["num_parkings"] || data["numParkings"]),
+        num_cellars: parse_integer(data["num_cellars"] || data["numCellars"]),
+        living_area: data["living_area"] || data["livingArea"],
+        total_area: data["total_area"] || data["totalArea"],
+        terrace_area: data["terrace_area"] || data["terraceArea"],
+        land_area: data["land_area"] || data["landArea"],
+        garden_area: data["garden_area"] || data["gardenArea"],
         furnished: data["furnished"] || false,
         published: true,
         featured: data["featured"] || false,
         exclusivity: data["exclusivity"] || false,
         shared_exclusivity: data["sharedExclusivity"] || false,
-        video_url: data["videoUrl"],
-        virtual_tour_url: data["virtualTourUrl"],
+        video_url: data["urlVideo"] || data["videoUrl"],
+        virtual_tour_url: data["urlVirtual"] || data["virtualTourUrl"],
         has_360_tour: data["has360Tour"] || false,
         synced_at: Time.current
       )
       property.save!
 
+      # Sync images from inline images array
+      images = data["images"] || []
       sync_property_images(property, images)
 
       synced_ids << data["id"]
@@ -160,6 +164,22 @@ class ImmotoolboxSync
     end
   end
 
+  def map_property_type(api_type)
+    case api_type&.downcase
+    when "apartment", "appartement" then "apartment"
+    when "house", "maison", "villa" then "house"
+    when "commercial", "commerce", "bureaux", "bureau", "office" then "commercial"
+    when "parking", "parking / garage / box" then "parking"
+    when "land", "terrain" then "land"
+    else api_type&.downcase || "apartment"
+    end
+  end
+
+  def parse_integer(value)
+    return nil if value.blank?
+    Integer(value, exception: false)
+  end
+
   def sync_property_images(property, images_data)
     api_image_ids = images_data.map { |img| img["id"] }
 
@@ -168,18 +188,20 @@ class ImmotoolboxSync
             .where.not(immotoolbox_id: api_image_ids)
             .destroy_all
 
-    # Create or update images
+    # Create or update images (look up globally since images can be shared across properties)
     images_data.each do |img_data|
-      urls = img_data["urls"] || {}
+      remote_url = img_data["large"] || img_data["medium"] || img_data["small"] || img_data["thumb"] || img_data["original"]
+      next if remote_url.blank?
 
-      image = property.property_images.find_or_initialize_by(immotoolbox_id: img_data["id"])
+      image = PropertyImage.find_or_initialize_by(immotoolbox_id: img_data["id"])
       image.assign_attributes(
-        remote_url: urls["large"] || urls["medium"] || urls["small"] || urls["thumb"],
-        thumb_url: urls["thumb"],
-        small_url: urls["small"],
-        medium_url: urls["medium"],
-        large_url: urls["large"],
-        position: img_data["position"] || 0,
+        property: property,
+        remote_url: remote_url,
+        thumb_url: img_data["thumb"],
+        small_url: img_data["small"],
+        medium_url: img_data["medium"],
+        large_url: img_data["large"],
+        position: img_data["order"] || img_data["position"] || 0,
         is_plan: img_data["isPlan"] || false
       )
       image.save!

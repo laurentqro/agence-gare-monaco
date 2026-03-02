@@ -23,17 +23,17 @@ class ImmotoolboxClientTest < ActiveSupport::TestCase
       .with(headers: { "X-AUTH-TOKEN" => "test-token", "Accept" => "application/json" })
       .to_return(
         status: 200,
-        body: [
-          { "id" => 1, "name" => "Monte-Carlo", "city" => "Monaco", "latitude" => 43.7384, "longitude" => 7.4246 },
-          { "id" => 2, "name" => "Fontvieille", "city" => "Monaco", "latitude" => 43.7272, "longitude" => 7.4145 }
-        ].to_json,
+        body: {
+          "1" => { "id" => 1, "name" => "Monte-Carlo", "city" => { "id" => 4, "name" => "Monaco" }, "lat" => "43.7384", "lng" => "7.4246" },
+          "2" => { "id" => 2, "name" => "Fontvieille", "city" => { "id" => 4, "name" => "Monaco" }, "lat" => "43.7272", "lng" => "7.4145" }
+        }.to_json,
         headers: { "Content-Type" => "application/json" }
       )
 
     districts = @client.fetch_districts
     assert_equal 2, districts.size
-    assert_equal "Monte-Carlo", districts.first["name"]
-    assert_equal 1, districts.first["id"]
+    assert_equal "Monte-Carlo", districts["1"]["name"]
+    assert_equal 1, districts["1"]["id"]
   end
 
   # --- Buildings ---
