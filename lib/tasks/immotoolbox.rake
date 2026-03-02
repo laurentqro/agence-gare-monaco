@@ -1,12 +1,10 @@
 namespace :immotoolbox do
   desc "Sync districts, buildings, and properties from Immotoolbox API"
   task sync: :environment do
-    api_token = ENV.fetch("IMMOTOOLBOX_API_TOKEN") {
-      Rails.application.credentials.dig(:immotoolbox, :api_token)
-    }
+    api_token = Rails.application.credentials.dig(:immotoolbox, :api_token)
 
     if api_token.blank?
-      abort "IMMOTOOLBOX_API_TOKEN environment variable or credentials.immotoolbox.api_token is required"
+      abort "credentials.immotoolbox.api_token is required — run `rails credentials:edit` to set it"
     end
 
     sync = ImmotoolboxSync.new(api_token: api_token)

@@ -21,13 +21,23 @@ class ImmotoolboxSyncTaskTest < ActiveSupport::TestCase
   end
 
   test "immotoolbox:sync task runs sync_all" do
-    ENV["IMMOTOOLBOX_API_TOKEN"] = "test-token"
-
-    assert_nothing_raised do
-      Rake::Task["immotoolbox:sync"].invoke
+    with_credentials(immotoolbox: { api_token: "test-token" }) do
+      assert_nothing_raised do
+        Rake::Task["immotoolbox:sync"].invoke
+      end
     end
   ensure
     Rake::Task["immotoolbox:sync"].reenable
-    ENV.delete("IMMOTOOLBOX_API_TOKEN")
+  end
+
+  private
+
+  def with_credentials(hash)
+    original_credentials = Rails.application.credentials
+    fake_credentials = ActiveSupport::InheritableOptions.new(hash)
+    Rails.application.define_singleton_method(:credentials) { fake_credentials }
+    yield
+  ensure
+    Rails.application.define_singleton_method(:credentials) { original_credentials }
   end
 end

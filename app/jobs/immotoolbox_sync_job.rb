@@ -3,12 +3,10 @@ class ImmotoolboxSyncJob < ApplicationJob
   retry_on Net::OpenTimeout, wait: :polynomially_longer, attempts: 5
 
   def perform
-    api_token = ENV.fetch("IMMOTOOLBOX_API_TOKEN") {
-      Rails.application.credentials.dig(:immotoolbox, :api_token)
-    }
+    api_token = Rails.application.credentials.dig(:immotoolbox, :api_token)
 
     if api_token.blank?
-      Rails.logger.warn("[ImmotoolboxSyncJob] No API token found — skipping sync")
+      Rails.logger.warn("[ImmotoolboxSyncJob] No API token found in credentials — skipping sync")
       return
     end
 
