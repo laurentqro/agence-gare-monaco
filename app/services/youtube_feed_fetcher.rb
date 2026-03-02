@@ -1,3 +1,5 @@
+require "net/http"
+
 class YoutubeFeedFetcher
   FEED_URL = "https://www.youtube.com/feeds/videos.xml?channel_id=#{YoutubeVideo::CHANNEL_ID}".freeze
 
