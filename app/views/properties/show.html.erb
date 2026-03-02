@@ -145,16 +145,16 @@
         </div>
       <% end %>
 
-      <%# Virtual tour %>
+      <%# Virtual tour (krpano/Panotour) %>
       <% if @property.virtual_tour_url.present? %>
         <div data-testid="virtual-tour" class="mb-8">
           <h2 class="text-lg font-bold text-[#090956] mb-4"><%= t("property_detail.virtual_tour") %></h2>
-          <% if @property.virtual_tour_url.include?("matterport.com") %>
+          <% if @property.virtual_tour_url.end_with?(".html") %>
             <div class="aspect-video rounded overflow-hidden">
               <iframe src="<%= @property.virtual_tour_url %>"
                       class="w-full h-full"
                       frameborder="0"
-                      allow="fullscreen"
+                      allow="accelerometer; magnetometer; gyroscope; fullscreen"
                       allowfullscreen
                       loading="lazy"></iframe>
             </div>

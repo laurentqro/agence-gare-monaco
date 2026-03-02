@@ -30,7 +30,7 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
       published: true,
       exclusivity: true,
       video_url: "https://www.youtube.com/watch?v=abc123",
-      virtual_tour_url: "https://my.matterport.com/show/?m=abc123"
+      virtual_tour_url: "https://agencegaremonaco.com/tours/82844/360.html"
     )
 
     # Create property images (photos)
@@ -289,12 +289,12 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
 
   # === Virtual tour and video ===
 
-  test "embeds Matterport tour as iframe when URL is a Matterport URL" do
+  test "embeds krpano tour as iframe when URL ends with .html" do
     get "/en/properties/#{@property.id}-slug"
-    assert_select "[data-testid='virtual-tour'] iframe[src='https://my.matterport.com/show/?m=abc123']"
+    assert_select "[data-testid='virtual-tour'] iframe[src='https://agencegaremonaco.com/tours/82844/360.html']"
   end
 
-  test "displays virtual tour link for non-Matterport URLs" do
+  test "displays virtual tour link for non-embeddable URLs" do
     @property.update!(virtual_tour_url: "https://example.com/tour/123")
     get "/en/properties/#{@property.id}-slug"
     assert_select "[data-testid='virtual-tour'] a[href='https://example.com/tour/123']"
