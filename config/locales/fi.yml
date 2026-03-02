@@ -92,6 +92,7 @@ fi:
     off_market_badge: "Ei markkinoilla"
     documents: "Asiakirjat"
     download: "Lataa"
+    qr_code: "QR-koodi"
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Kiinteistöt Monacossa vuodesta 1942"
@@ -120,6 +121,9 @@ fi:
     success: "Viestisi on lähetetty onnistuneesti. Otamme sinuun yhteyttä mahdollisimman pian."
     enquiry_title: "Kiinteistötiedustelu"
     enquiry_reference: "Kiinteistöviite"
+    whatsapp: "WhatsApp"
+    whatsapp_message: "Hei, haluaisin tietoa kiinteistöistänne."
+    whatsapp_enquiry_message: "Hei, olen kiinnostunut kiinteistöstä %{reference}. Voisitteko lähettää lisätietoja?"
 
   routes:
     sales: "myynti"

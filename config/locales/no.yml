@@ -92,6 +92,7 @@
     off_market_badge: "Ikke på markedet"
     documents: "Dokumenter"
     download: "Last ned"
+    qr_code: "QR-kode"
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Eiendom i Monaco siden 1942"
@@ -120,6 +121,9 @@
     success: "Meldingen din er sendt. Vi kommer tilbake til deg så snart som mulig."
     enquiry_title: "Eiendomsforespørsel"
     enquiry_reference: "Eiendomsreferanse"
+    whatsapp: "WhatsApp"
+    whatsapp_message: "Hei, jeg ønsker informasjon om deres eiendommer."
+    whatsapp_enquiry_message: "Hei, jeg er interessert i eiendom %{reference}. Kan dere sende meg mer informasjon?"
 
   routes:
     sales: "salg"

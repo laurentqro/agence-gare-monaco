@@ -289,15 +289,37 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
 
   # === Virtual tour and video ===
 
-  test "displays virtual tour link when URL present" do
+  test "embeds Matterport tour as iframe when URL is a Matterport URL" do
     get "/en/properties/#{@property.id}-slug"
-    assert_select "[data-testid='virtual-tour'] a[href='https://my.matterport.com/show/?m=abc123']"
+    assert_select "[data-testid='virtual-tour'] iframe[src='https://my.matterport.com/show/?m=abc123']"
+  end
+
+  test "displays virtual tour link for non-Matterport URLs" do
+    @property.update!(virtual_tour_url: "https://example.com/tour/123")
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='virtual-tour'] a[href='https://example.com/tour/123']"
+    assert_select "[data-testid='virtual-tour'] iframe", count: 0
   end
 
   test "hides virtual tour section when no URL" do
     @property.update!(virtual_tour_url: nil)
     get "/en/properties/#{@property.id}-slug"
     assert_select "[data-testid='virtual-tour']", count: 0
+  end
+
+  # === WhatsApp button ===
+
+  test "displays WhatsApp button on property detail page" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='whatsapp-button']"
+    assert_select "a[href*='wa.me']"
+  end
+
+  test "WhatsApp link includes property reference in message" do
+    get "/en/properties/#{@property.id}-slug"
+    whatsapp_link = css_select("a[href*='wa.me']").first
+    assert whatsapp_link, "WhatsApp link not found"
+    assert_match(/MC-100/, CGI.unescape(whatsapp_link["href"]))
   end
 
   test "displays video section when video URL present" do

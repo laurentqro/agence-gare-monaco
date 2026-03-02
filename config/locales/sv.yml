@@ -92,6 +92,7 @@ sv:
     off_market_badge: "Ej på marknaden"
     documents: "Dokument"
     download: "Ladda ner"
+    qr_code: "QR-kod"
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Fastigheter i Monaco sedan 1942"
@@ -120,6 +121,9 @@ sv:
     success: "Ditt meddelande har skickats. Vi återkommer så snart som möjligt."
     enquiry_title: "Fastighetsförfrågan"
     enquiry_reference: "Fastighetsreferens"
+    whatsapp: "WhatsApp"
+    whatsapp_message: "Hej, jag vill ha information om era fastigheter."
+    whatsapp_enquiry_message: "Hej, jag är intresserad av fastigheten %{reference}. Kan ni skicka mig mer information?"
 
   routes:
     sales: "forsaljning"

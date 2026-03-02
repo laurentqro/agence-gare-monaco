@@ -92,6 +92,7 @@ it:
     off_market_badge: "Fuori mercato"
     documents: "Documenti"
     download: "Scarica"
+    qr_code: "QR Code"
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Immobiliare a Monaco dal 1942"
@@ -120,6 +121,9 @@ it:
     success: "Il vostro messaggio è stato inviato con successo. Vi risponderemo al più presto."
     enquiry_title: "Richiesta di informazioni"
     enquiry_reference: "Riferimento dell'immobile"
+    whatsapp: "WhatsApp"
+    whatsapp_message: "Buongiorno, vorrei informazioni sui vostri immobili."
+    whatsapp_enquiry_message: "Buongiorno, sono interessato/a all'immobile %{reference}. Potreste inviarmi maggiori dettagli?"
 
   routes:
     sales: "vendite"

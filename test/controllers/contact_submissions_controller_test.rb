@@ -205,4 +205,13 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-testid='enquiry-form'] input[name='website']"
   end
+
+  # === WhatsApp button ===
+
+  test "contact page displays WhatsApp button" do
+    get "/en/contact"
+    assert_response :success
+    assert_select "[data-testid='whatsapp-button']"
+    assert_select "a[href*='wa.me']"
+  end
 end
