@@ -5,7 +5,7 @@ da:
   nav:
     sales_monaco: "Salg Monaco"
     rentals_monaco: "Udlejning Monaco"
-    france: "Frankrig"
+    france: "Salg Frankrig"
     articles: "Artikler"
     contact: "Kontakt"
     privacy: "Privatlivspolitik"
@@ -15,7 +15,7 @@ da:
     hero_subtitle: "Medlem af Chambre Immobilière Monégasque"
     category_sales_monaco: "Salg Monaco"
     category_rentals_monaco: "Udlejning Monaco"
-    category_france: "Frankrig"
+    category_france: "Salg Frankrig"
     category_sales_monaco_desc: "Opdag vores ejendomme til salg i Fyrstendømmet"
     category_rentals_monaco_desc: "Find din ideelle lejebolig i Monaco"
     category_france_desc: "Vores ejendomme til salg på den franske riviera"

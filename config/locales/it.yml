@@ -5,7 +5,7 @@ it:
   nav:
     sales_monaco: "Vendite Monaco"
     rentals_monaco: "Affitti Monaco"
-    france: "Francia"
+    france: "Vendite Francia"
     articles: "Articoli"
     contact: "Contatto"
     privacy: "Privacy"
@@ -15,7 +15,7 @@ it:
     hero_subtitle: "Membro della Chambre Immobilière Monégasque"
     category_sales_monaco: "Vendite Monaco"
     category_rentals_monaco: "Affitti Monaco"
-    category_france: "Francia"
+    category_france: "Vendite Francia"
     category_sales_monaco_desc: "Scoprite i nostri immobili in vendita nel Principato"
     category_rentals_monaco_desc: "Trovate il vostro affitto ideale a Monaco"
     category_france_desc: "I nostri immobili in vendita sulla Costa Azzurra"

@@ -5,7 +5,7 @@ fr:
   nav:
     sales_monaco: "Ventes Monaco"
     rentals_monaco: "Location Monaco"
-    france: "France"
+    france: "Ventes France"
     articles: "Articles"
     contact: "Contact"
     privacy: "Confidentialité"
@@ -15,7 +15,7 @@ fr:
     hero_subtitle: "Depuis 1942"
     category_sales_monaco: "Ventes Monaco"
     category_rentals_monaco: "Location Monaco"
-    category_france: "France"
+    category_france: "Ventes France"
     category_sales_monaco_desc: "Découvrez nos biens à vendre dans la Principauté"
     category_rentals_monaco_desc: "Trouvez votre location idéale à Monaco"
     category_france_desc: "Nos propriétés en vente sur la Côte d'Azur"

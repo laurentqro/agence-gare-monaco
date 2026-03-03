@@ -5,7 +5,7 @@ fi:
   nav:
     sales_monaco: "Myynti Monaco"
     rentals_monaco: "Vuokraus Monaco"
-    france: "Ranska"
+    france: "Myynti Ranska"
     articles: "Artikkelit"
     contact: "Yhteystiedot"
     privacy: "Tietosuoja"
@@ -15,7 +15,7 @@ fi:
     hero_subtitle: "Chambre Immobilière Monégasquen jäsen"
     category_sales_monaco: "Myynti Monaco"
     category_rentals_monaco: "Vuokraus Monaco"
-    category_france: "Ranska"
+    category_france: "Myynti Ranska"
     category_sales_monaco_desc: "Tutustu myytäviin kiinteistöihimme Ruhtinaskunnassa"
     category_rentals_monaco_desc: "Löydä ihanteellinen vuokra-asuntosi Monacosta"
     category_france_desc: "Myytävät kiinteistömme Ranskan Rivieralla"

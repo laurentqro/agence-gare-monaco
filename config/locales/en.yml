@@ -5,7 +5,7 @@ en:
   nav:
     sales_monaco: "Sales Monaco"
     rentals_monaco: "Rentals Monaco"
-    france: "France"
+    france: "Sales France"
     articles: "Articles"
     contact: "Contact"
     privacy: "Privacy"
@@ -15,7 +15,7 @@ en:
     hero_subtitle: "Member of the Chambre Immobilière Monégasque"
     category_sales_monaco: "Sales Monaco"
     category_rentals_monaco: "Rentals Monaco"
-    category_france: "France"
+    category_france: "Sales France"
     category_sales_monaco_desc: "Discover our properties for sale in the Principality"
     category_rentals_monaco_desc: "Find your ideal rental in Monaco"
     category_france_desc: "Our properties for sale on the French Riviera"
