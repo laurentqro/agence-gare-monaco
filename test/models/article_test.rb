@@ -104,4 +104,33 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal 1, Article.featured.count
     assert_equal "feat", Article.featured.first.slug
   end
+
+  test "first_image_url extracts first markdown image URL" do
+    article = Article.new(
+      body: { "fr" => "Some text\n\n![Photo](https://example.com/photo.jpg)\n\nMore text" },
+      category: @category
+    )
+    assert_equal "https://example.com/photo.jpg", article.first_image_url
+  end
+
+  test "first_image_url returns nil when no image in body" do
+    article = Article.new(
+      body: { "fr" => "Just plain text, no images here" },
+      category: @category
+    )
+    assert_nil article.first_image_url
+  end
+
+  test "first_image_url returns nil when body is nil" do
+    article = Article.new(body: nil, category: @category)
+    assert_nil article.first_image_url
+  end
+
+  test "first_image_url extracts first image when multiple exist" do
+    article = Article.new(
+      body: { "fr" => "![First](https://example.com/first.jpg)\n\n![Second](https://example.com/second.jpg)" },
+      category: @category
+    )
+    assert_equal "https://example.com/first.jpg", article.first_image_url
+  end
 end

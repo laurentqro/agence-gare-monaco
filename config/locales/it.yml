@@ -95,6 +95,9 @@ it:
     qr_code: "QR Code"
     download_pdf: "Scarica la brochure PDF"
 
+  articles:
+    all: "Tutti"
+
   seo:
     homepage_title: "Agence Immobilière de la Gare | Immobiliare a Monaco dal 1942"
     homepage_description: "Membro della Chambre Immobilière Monégasque, l'Agence Immobilière de la Gare fu fondata nel 1942. Vendite, affitti e gestione immobiliare a Monaco."

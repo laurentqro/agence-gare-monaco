@@ -95,6 +95,9 @@ da:
     qr_code: "QR-kode"
     download_pdf: "Download PDF-brochure"
 
+  articles:
+    all: "Alle"
+
   seo:
     homepage_title: "Agence Immobilière de la Gare | Ejendomme i Monaco siden 1942"
     homepage_description: "Medlem af Chambre Immobilière Monégasque, Agence Immobilière de la Gare blev grundlagt i 1942. Salg, udlejning og ejendomsforvaltning i Monaco."

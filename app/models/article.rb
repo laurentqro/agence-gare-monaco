@@ -18,6 +18,14 @@ class Article < ApplicationRecord
     body[locale.to_s] || body[I18n.default_locale.to_s] || body.values.first || ""
   end
 
+  def first_image_url
+    text = body_for
+    return nil if text.blank?
+
+    match = text.match(/!\[.*?\]\((.+?)\)/)
+    match&.[](1)
+  end
+
   private
 
   def generate_slug

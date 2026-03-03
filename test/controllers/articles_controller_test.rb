@@ -69,11 +69,29 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".article-body ul li", minimum: 2
   end
 
-  test "article index strips HTML from markdown body for truncation" do
+  test "article index renders card with cover image when body has image" do
     article = Article.create!(
-      title: { "en" => "Truncated Article" },
-      body: { "en" => "**bold** and a [link](https://example.com) and some plain text to make it long enough" },
-      slug: "truncated-article",
+      title: { "en" => "Image Article" },
+      body: { "en" => "![Cover](https://example.com/cover.jpg)\n\nSome content" },
+      slug: "image-article",
+      category: @category,
+      published: true,
+      published_at: 2.days.ago
+    )
+
+    get "/en/articles"
+    assert_response :success
+
+    assert_select ".article-card img[src='https://example.com/cover.jpg']"
+    assert_select ".article-card .article-title", text: /IMAGE ARTICLE/i
+    assert_select ".article-card .article-meta", text: /Actualités/
+  end
+
+  test "article index renders card without image when body has no image" do
+    article = Article.create!(
+      title: { "en" => "Text Only" },
+      body: { "en" => "Just plain text" },
+      slug: "text-only",
       category: @category,
       published: true,
       published_at: Time.current
@@ -82,13 +100,8 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get "/en/articles"
     assert_response :success
 
-    # The truncated preview should NOT contain raw markdown syntax or HTML tags
-    assert_select ".line-clamp-3" do |elements|
-      text = elements.first.text.strip
-      assert_not_includes text, "**"
-      assert_not_includes text, "<strong>"
-      assert_not_includes text, "[link]"
-    end
+    assert_select ".article-card"
+    assert_select ".article-card img", count: 0
   end
 
   test "article show handles nil body gracefully" do

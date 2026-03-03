@@ -95,6 +95,9 @@ fi:
     qr_code: "QR-koodi"
     download_pdf: "Lataa PDF-esite"
 
+  articles:
+    all: "Kaikki"
+
   seo:
     homepage_title: "Agence Immobilière de la Gare | Kiinteistöt Monacossa vuodesta 1942"
     homepage_description: "Chambre Immobilière Monégasquen jäsen, Agence Immobilière de la Gare perustettiin vuonna 1942. Myynti, vuokraus ja kiinteistöhallinta Monacossa."

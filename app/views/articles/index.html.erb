@@ -1,5 +1,5 @@
-<div class="max-w-5xl mx-auto px-4 py-12">
-  <h1 class="text-2xl font-bold text-[#090956] mb-2">
+<div class="max-w-7xl mx-auto px-4 py-12">
+  <h1 class="text-4xl font-bold text-[#090956] mb-2">
     <% if @category %>
       <%= @category.name %>
     <% else %>
@@ -15,7 +15,7 @@
       <% articles_segment = I18n.t("routes.articles", locale: locale) %>
       <a href="/<%= locale %>/<%= articles_segment %>"
          class="px-3 py-1 text-sm rounded border <%= @category.nil? ? 'bg-[#090956] text-white border-[#090956]' : 'border-gray-300 text-gray-600 hover:border-[#090956]' %>">
-        All
+        <%= t("articles.all") %>
       </a>
       <% categories.each do |cat| %>
         <a href="/<%= locale %>/<%= articles_segment %>/<%= cat.slug %>"
@@ -31,20 +31,23 @@
       <% @articles.each do |article| %>
         <% locale = params[:locale] || I18n.locale.to_s %>
         <% articles_segment = I18n.t("routes.articles", locale: locale) %>
-        <a href="/<%= locale %>/<%= articles_segment %>/<%= article.slug %>" class="group block bg-white rounded shadow hover:shadow-md transition">
+        <a href="/<%= locale %>/<%= articles_segment %>/<%= article.slug %>" class="article-card group block bg-white rounded shadow hover:shadow-md transition">
+          <% if article.first_image_url.present? %>
+            <div class="aspect-[16/10] overflow-hidden rounded-t">
+              <img src="<%= article.first_image_url %>" alt="<%= article.title_for(I18n.locale) %>" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
+            </div>
+          <% end %>
           <div class="p-5">
-            <span class="text-xs font-medium text-[#6E8297] uppercase"><%= article.category.name %></span>
-            <h2 class="mt-1 text-base font-semibold text-[#090956] group-hover:text-[#6E8297] line-clamp-2">
+            <h2 class="article-title text-sm font-bold text-[#090956] uppercase tracking-wide group-hover:text-[#6E8297]">
               <%= article.title_for(I18n.locale) %>
             </h2>
-            <p class="mt-2 text-sm text-gray-600 line-clamp-3">
-              <%= truncate(strip_tags(render_markdown(article.body_for(I18n.locale))), length: 150) %>
+            <p class="article-meta mt-2 text-xs text-[#6E8297]">
+              <% if article.published_at %>
+                <time datetime="<%= article.published_at.iso8601 %>"><%= article.published_at.strftime("%Y-%m-%d") %></time>
+                /
+              <% end %>
+              <%= article.category.name %>
             </p>
-            <% if article.published_at %>
-              <time datetime="<%= article.published_at.iso8601 %>" class="mt-3 block text-xs text-gray-400">
-                <%= l(article.published_at.to_date, format: :long) rescue article.published_at.strftime("%d/%m/%Y") %>
-              </time>
-            <% end %>
           </div>
         </a>
       <% end %>
