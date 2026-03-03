@@ -12,13 +12,19 @@ class PropertiesController < ApplicationController
     @properties = @properties.where(transaction_type: @transaction_type) if @transaction_type.present?
     @properties = @properties.in_country(@country) if @country.present?
 
-    district_slug = params[:district_slug].presence || params[:district].presence
-    if district_slug
-      @district = District.find_by!(slug: district_slug)
+    if params[:district_slug].present?
+      @district = District.find_by!(slug: params[:district_slug])
       @properties = @properties.in_district(@district)
+    elsif params[:district].present?
+      district_slugs = Array(params[:district])
+      districts = District.where(slug: district_slugs)
+      @properties = @properties.where(district: districts) if districts.any?
     end
 
-    @properties = @properties.of_type(params[:type]) if params[:type].present?
+    if params[:type].present?
+      types = Array(params[:type])
+      @properties = @properties.of_type(types)
+    end
     @properties = @properties.includes(:property_images, :district).order(created_at: :desc)
 
     @districts = District.where(city: "Monaco").order(:name) if @country == "MC"

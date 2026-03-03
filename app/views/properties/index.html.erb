@@ -1,55 +1,107 @@
 <div class="max-w-7xl mx-auto px-4 py-8">
-  <%# Page heading %>
-  <div class="mb-6">
+  <%# Page heading & count %>
+  <% selected_types = Array(params[:type]) %>
+  <% selected_districts = Array(params[:district]) %>
+
+  <div class="flex items-baseline justify-between mb-4">
     <h1 class="text-2xl font-bold text-[#090956]"><%= listing_heading %></h1>
-    <p class="text-sm text-[#6E8297] mt-1" data-testid="property-count">
-      <%= t("listings.property_count", count: @properties.size) %>
-    </p>
   </div>
 
   <%# Filters %>
-  <div data-testid="filters" class="mb-8 bg-gray-50 rounded p-4">
-    <%= form_tag(request.path, method: :get, class: "flex flex-wrap gap-4 items-end") do %>
-      <div class="flex-1 min-w-[150px]">
-        <label for="type" class="block text-xs font-medium text-[#090956] mb-1"><%= t("listings.filter_type") %></label>
-        <select name="type" id="type" class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none focus:border-[#090956]">
-          <option value=""><%= t("listings.filter_all_types") %></option>
-          <% property_type_options.each do |type| %>
-            <option value="<%= type %>" <%= "selected" if params[:type] == type %>><%= type.capitalize %></option>
-          <% end %>
-        </select>
+  <div data-testid="filters" class="mb-6 bg-gray-50 border border-gray-200 rounded-xl px-5 py-4">
+    <%= form_tag(request.path, method: :get, class: "flex items-center gap-6", data: { turbo_frame: "property-results", turbo_action: "advance" }) do %>
+      <div class="flex items-center gap-3" data-testid="multiselect-type" data-controller="multiselect-filter">
+        <label class="text-xs font-bold uppercase tracking-wide text-[#090956] shrink-0"><%= t("listings.filter_type") %></label>
+        <div class="relative w-52">
+          <button type="button" data-action="click->multiselect-filter#toggle" data-multiselect-filter-target="button"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-left bg-white hover:border-[#090956]/40 focus:outline-none focus:border-[#090956] flex items-center justify-between transition-colors shadow-sm">
+            <span data-multiselect-filter-target="label" class="text-[#090956] font-medium">
+              <%= selected_types.any? ? t("listings.filter_selected_count", count: selected_types.size) : t("listings.filter_all_types") %>
+            </span>
+            <svg class="w-4 h-4 ml-2 flex-shrink-0 text-[#6E8297]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto py-1">
+            <% property_type_options.each do |type| %>
+              <label class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer">
+                <input type="checkbox" name="type[]" value="<%= type %>"
+                       <%= "checked" if selected_types.include?(type) %>
+                       data-action="change->multiselect-filter#changed"
+                       class="mr-2.5 h-4 w-4 rounded border-gray-300 text-[#090956] focus:ring-[#090956]">
+                <%= translated_property_type(type) %>
+              </label>
+            <% end %>
+          </div>
+        </div>
       </div>
 
       <% if @country == "MC" && !params[:district_slug] %>
-        <div class="flex-1 min-w-[150px]">
-          <label for="district" class="block text-xs font-medium text-[#090956] mb-1"><%= t("listings.filter_district") %></label>
-          <select name="district" id="district" class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none focus:border-[#090956]">
-            <option value=""><%= t("listings.filter_all_districts") %></option>
-            <% @districts&.each do |district| %>
-              <option value="<%= district.slug %>" <%= "selected" if params[:district] == district.slug %>><%= district.name %></option>
-            <% end %>
-          </select>
+        <div class="flex items-center gap-3" data-testid="multiselect-district" data-controller="multiselect-filter">
+          <label class="text-xs font-bold uppercase tracking-wide text-[#090956] shrink-0"><%= t("listings.filter_district") %></label>
+          <div class="relative w-52">
+            <button type="button" data-action="click->multiselect-filter#toggle" data-multiselect-filter-target="button"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-left bg-white hover:border-[#090956]/40 focus:outline-none focus:border-[#090956] flex items-center justify-between transition-colors shadow-sm">
+              <span data-multiselect-filter-target="label" class="text-[#090956] font-medium">
+                <%= selected_districts.any? ? t("listings.filter_selected_count", count: selected_districts.size) : t("listings.filter_all_districts") %>
+              </span>
+              <svg class="w-4 h-4 ml-2 flex-shrink-0 text-[#6E8297]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto py-1">
+              <% @districts&.each do |district| %>
+                <label class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" name="district[]" value="<%= district.slug %>"
+                         <%= "checked" if selected_districts.include?(district.slug) %>
+                         data-action="change->multiselect-filter#changed"
+                         class="mr-2.5 h-4 w-4 rounded border-gray-300 text-[#090956] focus:ring-[#090956]">
+                  <%= district.name %>
+                </label>
+              <% end %>
+            </div>
+          </div>
         </div>
       <% end %>
-
-      <div>
-        <button type="submit" class="bg-white text-[#090956] border border-[#2E4C87] rounded px-6 py-2 text-xs font-medium hover:bg-gray-50 transition-colors">
-          <%= t("listings.filter_apply") %>
-        </button>
-      </div>
     <% end %>
   </div>
 
-  <%# Property grid %>
-  <% if @properties.any? %>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <% @properties.each do |property| %>
-        <%= render "properties/property_card", property: property %>
+  <turbo-frame id="property-results">
+    <%# Active filter chips, grouped by filter type %>
+    <% chip_groups = { type: selected_types, district: selected_districts }.select { |_, v| v.any? } %>
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-8">
+      <p class="text-base font-bold text-[#090956]" data-testid="property-count">
+        <%= t("listings.property_count", count: @properties.size) %>
+      </p>
+      <% if chip_groups.any? %>
+        <span class="text-gray-300 text-lg">|</span>
+        <div data-testid="active-filters" class="contents">
+          <% chip_groups.each do |param_name, values| %>
+            <div data-testid="filter-chip-group" class="inline-flex items-center gap-1.5">
+              <span class="text-xs uppercase tracking-wider font-bold text-[#6E8297]"><%= t("listings.filter_#{param_name}") %></span>
+              <% values.each do |value| %>
+                <span data-testid="filter-chip" class="inline-flex items-center gap-1.5 bg-[#090956] text-white text-sm font-medium pl-3.5 pr-2.5 py-1.5 rounded-full">
+                  <%= filter_chip_label(param_name, value) %>
+                  <a href="<%= url_without_filter_value(param_name, value) %>" data-turbo-frame="_top" data-turbo-action="advance" class="hover:text-red-300 transition-colors"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd"/></svg></a>
+                </span>
+              <% end %>
+            </div>
+          <% end %>
+          <a href="<%= request.path %>" data-turbo-frame="_top" data-turbo-action="advance" class="inline-flex items-center gap-1.5 text-xs font-medium text-[#6E8297] hover:text-[#090956]">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h5M20 20v-5h-5M4.5 9A8 8 0 0120 12M19.5 15A8 8 0 014 12"/></svg>
+            <%= t("listings.filter_clear_all") %>
+          </a>
+        </div>
       <% end %>
     </div>
-  <% else %>
-    <div data-testid="empty-state" class="text-center py-16">
-      <p class="text-sm text-[#6E8297]"><%= t("listings.no_properties") %></p>
-    </div>
-  <% end %>
+
+    <%# Property grid %>
+    <% if @properties.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @properties.each do |property| %>
+          <%= render "properties/property_card", property: property %>
+        <% end %>
+      </div>
+    <% else %>
+      <div data-testid="empty-state" class="text-center py-16">
+        <p class="text-sm text-[#6E8297]"><%= t("listings.no_properties") %></p>
+      </div>
+    <% end %>
+  </turbo-frame>
 </div>

@@ -85,6 +85,37 @@ module ApplicationHelper
     Property.publicly_visible.distinct.pluck(:property_type).compact.sort
   end
 
+  def url_without_param(*param_names)
+    filtered = request.query_parameters.except(*param_names.map(&:to_s))
+    filtered.any? ? "#{request.path}?#{filtered.to_query}" : request.path
+  end
+
+  def url_without_filter_value(param_name, value)
+    qp = request.query_parameters.deep_dup
+    key = param_name.to_s
+    current = Array(qp[key])
+    remaining = current - [value.to_s]
+    if remaining.any?
+      qp[key] = remaining
+    else
+      qp.delete(key)
+    end
+    qp.any? ? "#{request.path}?#{qp.to_query}" : request.path
+  end
+
+  def filter_chip_label(param_name, value)
+    case param_name.to_s
+    when "type"
+      translated_property_type(value)
+    when "district"
+      District.find_by(slug: value)&.name || value
+    end
+  end
+
+  def translated_property_type(type)
+    I18n.t("listings.property_types.#{type}", default: type.capitalize)
+  end
+
   def flag_image_for(locale)
     LOCALE_FLAGS[locale.to_sym] || locale.to_s
   end

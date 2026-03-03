@@ -211,43 +211,107 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
     get "/en/sales/monaco"
     assert_response :success
     assert_select "[data-testid='filters']"
-    assert_select "select[name='type']"
+    assert_select "[data-testid='multiselect-type']"
   end
 
   test "listing page displays district filter for Monaco" do
     get "/en/sales/monaco"
     assert_response :success
-    assert_select "select[name='district']"
+    assert_select "[data-testid='multiselect-district']"
   end
 
   test "district filter not shown for France listings" do
     get "/en/sales/france"
     assert_response :success
-    assert_select "select[name='district']", count: 0
+    assert_select "[data-testid='multiselect-district']", count: 0
   end
 
   test "district filter not shown for all-sales listings" do
     get "/en/sales"
     assert_response :success
-    assert_select "select[name='district']", count: 0
+    assert_select "[data-testid='multiselect-district']", count: 0
   end
 
-  test "filtering by district via query param shows only properties in that district" do
-    get "/en/sales/monaco?district=carre-dor"
+  # === Single-value filtering (array params) ===
+
+  test "filtering by single district via query param shows only properties in that district" do
+    get "/en/sales/monaco?district[]=carre-dor"
     assert_response :success
     assert_select "[data-testid='property-card']", count: 1
     assert_select "[data-testid='property-card']", text: /Studio/
   end
 
   test "district filter remains visible when filtering by district via query param" do
-    get "/en/sales/monaco?district=carre-dor"
+    get "/en/sales/monaco?district[]=carre-dor"
     assert_response :success
-    assert_select "select[name='district']"
+    assert_select "[data-testid='multiselect-district']"
   end
 
-  test "filtering by invalid district via query param returns 404" do
-    get "/en/sales/monaco?district=nonexistent"
-    assert_response :not_found
+  test "filtering by single type via query param" do
+    get "/en/sales/monaco?type[]=apartment"
+    assert_response :success
+    assert_select "[data-testid='property-card']", { minimum: 1 }
+  end
+
+  test "filtering by single type excludes non-matching" do
+    get "/en/sales/monaco?type[]=villa"
+    assert_response :success
+    assert_select "[data-testid='property-card']", count: 0
+  end
+
+  # === Multi-select filtering ===
+
+  test "filtering by multiple types returns properties matching any selected type" do
+    villa_carre_dor = Property.create!(
+      reference: "MC-004",
+      title: { "en" => "Carré d'Or Villa" },
+      transaction_type: "sale",
+      property_type: "villa",
+      country: "MC",
+      city: "Monaco",
+      district: @carre_dor,
+      price: 5_000_000,
+      published: true
+    )
+    get "/en/sales/monaco?type[]=apartment&type[]=villa"
+    assert_response :success
+    # Should include both apartments and the villa
+    assert_select "[data-testid='property-card']", count: 3
+  end
+
+  test "filtering by multiple districts returns properties from all selected districts" do
+    get "/en/sales/monaco?district[]=carre-dor&district[]=fontvieille"
+    assert_response :success
+    assert_select "[data-testid='property-card']", count: 2
+    assert_select "[data-testid='property-card']", text: /Studio/
+    assert_select "[data-testid='property-card']", text: /Fontvieille/
+  end
+
+  test "multi-district filter silently ignores invalid district slugs" do
+    get "/en/sales/monaco?district[]=carre-dor&district[]=nonexistent"
+    assert_response :success
+    # Should still show the valid district's properties
+    assert_select "[data-testid='property-card']", count: 1
+    assert_select "[data-testid='property-card']", text: /Studio/
+  end
+
+  test "filtering by multiple types and multiple districts works together" do
+    villa_carre_dor = Property.create!(
+      reference: "MC-004",
+      title: { "en" => "Carré d'Or Villa" },
+      transaction_type: "sale",
+      property_type: "villa",
+      country: "MC",
+      city: "Monaco",
+      district: @carre_dor,
+      price: 5_000_000,
+      published: true
+    )
+    get "/en/sales/monaco?type[]=villa&district[]=carre-dor&district[]=fontvieille"
+    assert_response :success
+    # Only the villa in Carré d'Or matches both type AND district filters
+    assert_select "[data-testid='property-card']", count: 1
+    assert_select "[data-testid='property-card']", text: /Villa/
   end
 
   test "filtering by district and type via query params works together" do
@@ -262,22 +326,10 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
       price: 5_000_000,
       published: true
     )
-    get "/en/sales/monaco?district=carre-dor&type=villa"
+    get "/en/sales/monaco?district[]=carre-dor&type[]=villa"
     assert_response :success
     assert_select "[data-testid='property-card']", count: 1
     assert_select "[data-testid='property-card']", text: /Villa/
-  end
-
-  test "filtering by property type via query param" do
-    get "/en/sales/monaco?type=apartment"
-    assert_response :success
-    assert_select "[data-testid='property-card']", { minimum: 1 }
-  end
-
-  test "filtering by property type excludes non-matching" do
-    get "/en/sales/monaco?type=villa"
-    assert_response :success
-    assert_select "[data-testid='property-card']", count: 0
   end
 
   # === Page heading ===
@@ -348,6 +400,136 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
       assert_select "h1", { minimum: 1 }, "Missing h1 for locale #{locale}"
       assert_select "[data-testid='property-card']", { minimum: 1 }, "Missing property cards for locale #{locale}"
     end
+  end
+
+  # === Filter chips (multi-select, grouped) ===
+
+  test "no filter chips shown when no filters are active" do
+    get "/en/sales/monaco"
+    assert_response :success
+    assert_select "[data-testid='active-filters']", count: 0
+  end
+
+  test "type chip group appears with label and value when one type selected" do
+    get "/en/sales/monaco?type[]=apartment"
+    assert_response :success
+    assert_select "[data-testid='active-filters']"
+    assert_select "[data-testid='filter-chip-group']", count: 1
+    assert_select "[data-testid='filter-chip-group']", text: /Type/i
+    assert_select "[data-testid='filter-chip']", count: 1
+    assert_select "[data-testid='filter-chip']", text: /Apartment/
+  end
+
+  test "type chip label is translated to current locale" do
+    get "/ventes/monaco?type[]=apartment"
+    assert_response :success
+    assert_select "[data-testid='filter-chip']", text: /Appartement/
+  end
+
+  test "type chip group contains multiple chips for multiple selected types" do
+    Property.create!(
+      reference: "MC-VILLA",
+      title: { "en" => "Test Villa" },
+      transaction_type: "sale",
+      property_type: "villa",
+      country: "MC",
+      city: "Monaco",
+      price: 5_000_000,
+      published: true
+    )
+    get "/en/sales/monaco?type[]=apartment&type[]=villa"
+    assert_response :success
+    assert_select "[data-testid='filter-chip-group']", count: 1
+    assert_select "[data-testid='filter-chip']", count: 2
+    assert_select "[data-testid='filter-chip']", text: /apartment/i
+    assert_select "[data-testid='filter-chip']", text: /villa/i
+  end
+
+  test "district chip group appears with label and value when one district selected" do
+    get "/en/sales/monaco?district[]=carre-dor"
+    assert_response :success
+    assert_select "[data-testid='active-filters']"
+    assert_select "[data-testid='filter-chip-group']", count: 1
+    assert_select "[data-testid='filter-chip']", count: 1
+    assert_select "[data-testid='filter-chip']", text: /Carré d'Or/i
+  end
+
+  test "district chip group contains multiple chips for multiple selected districts" do
+    get "/en/sales/monaco?district[]=carre-dor&district[]=fontvieille"
+    assert_response :success
+    assert_select "[data-testid='filter-chip-group']", count: 1
+    assert_select "[data-testid='filter-chip']", count: 2
+  end
+
+  test "two chip groups appear when both type and district filters are applied" do
+    get "/en/sales/monaco?type[]=apartment&district[]=carre-dor"
+    assert_response :success
+    assert_select "[data-testid='active-filters']"
+    assert_select "[data-testid='filter-chip-group']", count: 2
+    assert_select "[data-testid='filter-chip']", count: 2
+  end
+
+  test "chip removal link removes only that value from the array" do
+    get "/en/sales/monaco?type[]=apartment&district[]=carre-dor"
+    assert_response :success
+    assert_select "[data-testid='filter-chip'] a" do |links|
+      type_remove_link = links.find { |l| !l["href"].include?("type") && l["href"].include?("district") }
+      assert type_remove_link, "Expected a remove link that keeps district but removes type"
+
+      district_remove_link = links.find { |l| !l["href"].include?("district") && l["href"].include?("type") }
+      assert district_remove_link, "Expected a remove link that keeps type but removes district"
+    end
+  end
+
+  test "removing one value from multi-select keeps the other values" do
+    get "/en/sales/monaco?type[]=apartment&type[]=villa"
+    assert_response :success
+    assert_select "[data-testid='filter-chip'] a" do |links|
+      # One link should remove apartment but keep villa
+      keeps_villa = links.find { |l| l["href"].include?("type%5B%5D=villa") && !l["href"].include?("type%5B%5D=apartment") }
+      assert keeps_villa, "Expected a remove link that keeps villa but removes apartment"
+      # One link should remove villa but keep apartment
+      keeps_apartment = links.find { |l| l["href"].include?("type%5B%5D=apartment") && !l["href"].include?("type%5B%5D=villa") }
+      assert keeps_apartment, "Expected a remove link that keeps apartment but removes villa"
+    end
+  end
+
+  test "clear all link removes all filters" do
+    get "/en/sales/monaco?type[]=apartment&district[]=carre-dor"
+    assert_response :success
+    assert_select "[data-testid='active-filters'] a", text: /Clear all/i do |links|
+      clear_link = links.first
+      refute_match(/type/, clear_link["href"])
+      refute_match(/district/, clear_link["href"])
+    end
+  end
+
+  # === Checkbox dropdowns ===
+
+  test "type filter uses checkboxes instead of select" do
+    get "/en/sales/monaco"
+    assert_response :success
+    assert_select "select[name='type']", count: 0
+    assert_select "input[type='checkbox'][name='type[]']", { minimum: 1 }
+  end
+
+  test "district filter uses checkboxes instead of select" do
+    get "/en/sales/monaco"
+    assert_response :success
+    assert_select "select[name='district']", count: 0
+    assert_select "input[type='checkbox'][name='district[]']", { minimum: 1 }
+  end
+
+  test "type checkboxes are checked when values are selected" do
+    get "/en/sales/monaco?type[]=apartment"
+    assert_response :success
+    assert_select "input[type='checkbox'][name='type[]'][value='apartment'][checked]"
+  end
+
+  test "district checkboxes are checked when values are selected" do
+    get "/en/sales/monaco?district[]=carre-dor"
+    assert_response :success
+    assert_select "input[type='checkbox'][name='district[]'][value='carre-dor'][checked]"
   end
 
   # === NOUVEAU badge for recent properties ===
