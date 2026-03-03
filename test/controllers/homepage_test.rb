@@ -310,6 +310,13 @@ class HomepageTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # === Team Photo ===
+
+  test "homepage displays team photo before about section" do
+    get "/"
+    assert_select "[data-testid='team-photo'] img"
+  end
+
   # === All Locales Render ===
 
   test "homepage renders successfully for all 8 locales" do
