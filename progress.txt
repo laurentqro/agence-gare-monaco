@@ -22,10 +22,10 @@
 - Uses the same `render_markdown` helper as the public site
 - Requires admin authentication (unauthenticated requests redirect to login)
 - Controller tests for auth, markdown rendering, Turbo Stream format, blank input
-- STATUS: NOT STARTED
+- STATUS: DONE
 
 ### Task 3: Markdown editor Stimulus controller with toolbar and Write/Preview toggle (#49)
-- Blocked by Task 2
+- Unblocked (Task 2 complete)
 - Create `markdown_editor_controller` Stimulus controller
 - Write/Preview tab toggle (in-place, GitHub-style — textarea and preview swap visibility)
 - Preview fetches rendered HTML from the preview endpoint via Turbo Stream
@@ -67,3 +67,4 @@
 
 ## Progress Log
 - Task 1 DONE (732 total tests): Added `commonmarker` gem, created `MarkdownHelper#render_markdown`, replaced `simple_format` with `render_markdown` in article show view, updated index and homepage truncation to strip HTML from rendered markdown. 13 helper unit tests + 7 integration tests added.
+- Task 2 DONE (740 total tests): Added `POST /admin/article_preview` route, `Admin::ArticlePreviewsController` with Turbo Stream response, view template targeting `#preview` div. 8 controller tests added (auth, markdown rendering, Turbo Stream format, headings, links, lists, blank/nil input).
