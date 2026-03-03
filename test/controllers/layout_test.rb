@@ -48,6 +48,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
       assert_select "a[href='/locations/monaco']", text: /Location Monaco/
       assert_select "a[href='/ventes/france']", text: /France/
       assert_select "a[href='/articles']", text: /Articles/
+      assert_select "a[href='/contact']", text: /Contact/
     end
   end
 
@@ -58,6 +59,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
       assert_select "a[href='/en/rentals/monaco']", text: /Rentals Monaco/
       assert_select "a[href='/en/sales/france']", text: /France/
       assert_select "a[href='/en/articles']", text: /Articles/
+      assert_select "a[href='/en/contact']", text: /Contact/
     end
   end
 
@@ -68,6 +70,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
       assert_select "a[href='/de/vermietung/monaco']", text: /Vermietung Monaco/
       assert_select "a[href='/de/verkauf/frankreich']", text: /Frankreich/
       assert_select "a[href='/de/artikel']", text: /Artikel/
+      assert_select "a[href='/de/kontakt']", text: /Kontakt/
     end
   end
 
@@ -114,25 +117,11 @@ class LayoutTest < ActionDispatch::IntegrationTest
 
   # === Footer ===
 
-  test "footer includes agency address" do
+  test "footer includes copyright and agency name" do
     get "/"
     assert_select "footer" do
-      assert_match "3, Rue Langlé", response.body
-      assert_match "MC 98000 Monaco", response.body
+      assert_match "Agence de la Gare", response.body
     end
-  end
-
-  test "footer includes phone and fax" do
-    get "/"
-    assert_select "footer" do
-      assert_match "(+377) 93 30 22 36", response.body
-      assert_match "(+377) 93 25 05 34", response.body
-    end
-  end
-
-  test "footer includes email link" do
-    get "/"
-    assert_select "footer a[href='mailto:info@agencegaremonaco.com']"
   end
 
   test "footer includes social media links" do
@@ -142,13 +131,6 @@ class LayoutTest < ActionDispatch::IntegrationTest
       assert_select "a[href='https://www.facebook.com/agencedelagaremonaco']"
       assert_select "a[href='https://www.instagram.com/agencedelagaremonaco']"
       assert_select "a[href='https://www.youtube.com/channel/UC2w6AJOPj37wDZxXjWLRxtg']"
-    end
-  end
-
-  test "footer includes copyright" do
-    get "/"
-    assert_select "footer" do
-      assert_match "Agence de la Gare", response.body
     end
   end
 

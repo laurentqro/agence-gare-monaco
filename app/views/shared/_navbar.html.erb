@@ -21,6 +21,9 @@
         <a href="<%= locale_articles_path %>" class="text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide transition-colors">
           <%= t("nav.articles") %>
         </a>
+        <a href="<%= locale_contact_path %>" class="text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide transition-colors">
+          <%= t("nav.contact") %>
+        </a>
 
         <%# Language Switcher %>
         <div data-controller="language-switcher" data-current-locale="<%= I18n.locale %>" class="relative">
@@ -63,6 +66,9 @@
       </a>
       <a href="<%= locale_articles_path %>" class="block text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide py-2">
         <%= t("nav.articles") %>
+      </a>
+      <a href="<%= locale_contact_path %>" class="block text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide py-2">
+        <%= t("nav.contact") %>
       </a>
 
       <%# Mobile Language Switcher %>
