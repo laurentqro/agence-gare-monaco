@@ -22,30 +22,39 @@
 </section>
 
 <%# === Category Cards === %>
-<section data-testid="category-cards" class="max-w-7xl mx-auto px-4 py-16 -mt-20 relative z-30">
+<section data-testid="category-cards" class="max-w-7xl mx-auto px-4 py-16">
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     <%# Sales Monaco %>
-    <a href="<%= locale_sales_monaco_path %>" class="group block bg-white rounded shadow-lg hover:shadow-xl transition-shadow p-8 text-center border border-gray-100">
-      <h3 class="text-sm font-bold uppercase tracking-wide text-[#090956] mb-2">
-        <%= t("homepage.category_sales_monaco") %>
-      </h3>
-      <p class="text-xs text-[#6E8297]"><%= t("homepage.category_sales_monaco_desc") %></p>
+    <a href="<%= locale_sales_monaco_path %>" class="group block relative rounded-lg shadow-lg hover:shadow-xl transition-shadow overflow-hidden aspect-[4/3]">
+      <img src="/images/categories/sales-monaco.jpg" alt="<%= t("homepage.category_sales_monaco") %>" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-r from-[#090956]/80 to-transparent py-4 px-5">
+        <h3 class="text-lg font-bold uppercase tracking-wide text-white mb-1">
+          <%= t("homepage.category_sales_monaco") %>
+        </h3>
+        <p class="text-xs text-white/80"><%= t("homepage.category_sales_monaco_desc") %></p>
+      </div>
     </a>
 
     <%# Rentals Monaco %>
-    <a href="<%= locale_rentals_monaco_path %>" class="group block bg-white rounded shadow-lg hover:shadow-xl transition-shadow p-8 text-center border border-gray-100">
-      <h3 class="text-sm font-bold uppercase tracking-wide text-[#090956] mb-2">
-        <%= t("homepage.category_rentals_monaco") %>
-      </h3>
-      <p class="text-xs text-[#6E8297]"><%= t("homepage.category_rentals_monaco_desc") %></p>
+    <a href="<%= locale_rentals_monaco_path %>" class="group block relative rounded-lg shadow-lg hover:shadow-xl transition-shadow overflow-hidden aspect-[4/3]">
+      <img src="/images/categories/rentals-monaco.jpg" alt="<%= t("homepage.category_rentals_monaco") %>" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-r from-[#090956]/80 to-transparent py-4 px-5">
+        <h3 class="text-lg font-bold uppercase tracking-wide text-white mb-1">
+          <%= t("homepage.category_rentals_monaco") %>
+        </h3>
+        <p class="text-xs text-white/80"><%= t("homepage.category_rentals_monaco_desc") %></p>
+      </div>
     </a>
 
     <%# France %>
-    <a href="<%= locale_sales_france_path %>" class="group block bg-white rounded shadow-lg hover:shadow-xl transition-shadow p-8 text-center border border-gray-100">
-      <h3 class="text-sm font-bold uppercase tracking-wide text-[#090956] mb-2">
-        <%= t("homepage.category_france") %>
-      </h3>
-      <p class="text-xs text-[#6E8297]"><%= t("homepage.category_france_desc") %></p>
+    <a href="<%= locale_sales_france_path %>" class="group block relative rounded-lg shadow-lg hover:shadow-xl transition-shadow overflow-hidden aspect-[4/3]">
+      <img src="/images/categories/france.jpg" alt="<%= t("homepage.category_france") %>" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-r from-[#090956]/80 to-transparent py-4 px-5">
+        <h3 class="text-lg font-bold uppercase tracking-wide text-white mb-1">
+          <%= t("homepage.category_france") %>
+        </h3>
+        <p class="text-xs text-white/80"><%= t("homepage.category_france_desc") %></p>
+      </div>
     </a>
   </div>
 </section>
@@ -67,7 +76,7 @@
             </h3>
             <p class="text-xs text-[#6E8297] mb-3">
               <%= truncate(
-                (article.body[I18n.locale.to_s] || article.body[I18n.default_locale.to_s]).to_s,
+                strip_tags(render_markdown((article.body[I18n.locale.to_s] || article.body[I18n.default_locale.to_s]).to_s)),
                 length: 120
               ) %>
             </p>
@@ -109,6 +118,11 @@
             class: "text-sm text-[#090956] font-semibold hover:underline" %>
     </div>
   <% end %>
+</section>
+
+<%# === Team Photo === %>
+<section data-testid="team-photo" class="w-full">
+  <%= image_tag "team-2026.jpg", alt: t("homepage.about_title"), class: "w-full h-[70vh] object-cover" %>
 </section>
 
 <hr class="max-w-7xl mx-auto border-gray-200">

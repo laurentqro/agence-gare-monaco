@@ -1,249 +1,69 @@
-## Phase 1: Foundation
+# Markdown Editor for Blog Articles (GitHub Issue #46)
 
-### Task 1: Core Database Schema ✅
-Created all database migrations, models, and tests for the core schema:
-- districts (name, city, lat/lng, slug, immotoolbox_id)
-- buildings (name, name_alt, address, district FK, city, immotoolbox_id)
-- properties (full schema: reference, multilingual title/description as JSON, price, transaction_type, property_type, country, city, district/building FKs, coordinates, room/area counts, boolean flags, immotoolbox sync fields)
-- property_images (property FK, remote_url + CDN size variants, position, is_plan, immotoolbox_id)
-- property_documents (property FK, label, Active Storage file)
-- categories (name, slug)
-- articles (multilingual title/body as JSON, slug, category FK, published, featured, published_at)
-- contacts (first_name, last_name, email, phone)
-- contact_submissions (form_type, name, email, phone, country, subject, message, property FK, read)
+## Tasks (in dependency order)
 
-All tables have proper indexes, foreign keys, null constraints, and unique constraints.
-74 model tests passing covering validations, associations, defaults, scopes.
-Commit: 5f9b275
+### Task 1: Markdown rendering helper + public article rendering (#47)
+- Add `commonmarker` gem to Gemfile
+- Create a `render_markdown(text)` helper method usable from views (centralized, shared by public site and admin preview)
+- Replace `simple_format` with `render_markdown` in public article show view (`articles/show.html.erb`)
+- All 8 locale body fields render as markdown on the public site
+- Article index card truncation (150 chars) must still work — strip HTML tags from rendered markdown before truncating
+- Handle nil/blank input gracefully (return empty string)
+- Unit tests for the helper covering GFM features (headings, bold, italic, links, lists, quotes, tables, images)
+- Integration tests for public article show verifying markdown renders as HTML
+- Existing article tests must continue to pass
+- STATUS: DONE
 
-### Task 2: Admin Authentication ✅
-Implemented Rails 8 built-in authentication with TDD (15 tests):
-- User model with has_secure_password, email normalization (strip + downcase), uniqueness validation
-- Session model (belongs_to user, stores ip_address and user_agent)
-- Current model (ActiveSupport::CurrentAttributes for request-scoped session/user)
-- Authentication concern (cookie-based sessions, require_authentication before_action, allow_unauthenticated_access class method)
-- SessionsController (login form, create session with rate limiting, destroy session)
-- Admin::BaseController and Admin::DashboardController (protected by authentication)
-- Login view styled with Tailwind CSS matching agency branding
-- Routes: resource :session, admin namespace with dashboard
-- Temporary root route pointing to login (until public site is built)
-- 89 total tests passing (74 existing + 15 new)
+### Task 2: Admin markdown preview endpoint (#48)
+- Unblocked (Task 1 complete)
+- Add `POST admin/articles/preview` route
+- Controller action accepts `body` parameter with raw markdown text
+- Returns a Turbo Stream response updating a `#preview` target with rendered HTML
+- Uses the same `render_markdown` helper as the public site
+- Requires admin authentication (unauthenticated requests redirect to login)
+- Controller tests for auth, markdown rendering, Turbo Stream format, blank input
+- STATUS: NOT STARTED
 
-### Task 3: i18n Setup (8 languages) ✅
-Implemented full i18n infrastructure with TDD (17 tests):
-- Configured 8 locales: FR (default), EN, IT, DE, SV, NO, DA, FI
-- Created locale files for all 8 languages with: site_name, tagline, nav translations, homepage translations, translated route segments
-- Route segment translations per PRD: ventes/sales/verkauf/vendite/forsaljning/salg/salg/myynti etc.
-- Localizable concern (around_action with I18n.with_locale, default_url_options)
-- PagesController with locale-aware homepage
-- Locale-scoped routing: /:locale prefix for public pages, constraint validates locale
-- Bare root (/) redirects to /fr (302)
-- Admin and session routes remain unaffected by locale
-- Added rails-i18n gem for complete ActiveRecord/ActionView translations in all 8 languages
-- Test helper sets English locale by default for consistent error message assertions
-- 106 total tests passing (89 existing + 17 new)
+### Task 3: Markdown editor Stimulus controller with toolbar and Write/Preview toggle (#49)
+- Blocked by Task 2
+- Create `markdown_editor_controller` Stimulus controller
+- Write/Preview tab toggle (in-place, GitHub-style — textarea and preview swap visibility)
+- Preview fetches rendered HTML from the preview endpoint via Turbo Stream
+- Toolbar buttons: Bold (**), Italic (_), H2 (##), H3 (###), Link ([text](url)), Bulleted List (- ), Numbered List (1. ), Quote (> ), Image (![alt](url) placeholder)
+- Toolbar wraps selected text when selected, inserts template at cursor when not
+- Only the FR body field gets the editor (toolbar + tabs); other 7 locales remain plain textareas
+- Toolbar buttons have `aria-label` attributes
+- Add `@rails/request.js` via importmap if needed
+- Admin article form integration tests: editor markup present for FR, absent for other locales
+- STATUS: NOT STARTED
 
-### Task 4: Translated Routes ✅
-Implemented fully translated URL segments for all 8 locales with TDD (50 tests):
-- Routes iterate over all locales, reading translated segments from i18n YAML files
-- Property listings: /{locale}/{sales|rentals}[/monaco[/{district}]] and /{locale}/{sales}/{france}
-- Property detail: /{locale}/{properties}/{id}-{slug}
-- Articles: /{locale}/{articles} (listing), /{locale}/{articles}/{slug} (category or article)
-- Contact: /{locale}/{contact}
-- Privacy: /{locale}/{privacy}
-- All segments translated per locale (e.g. /fr/ventes/monaco, /en/sales/monaco, /de/verkauf/monaco)
-- District filtering via slug param, validated against District model (404 if not found)
-- PropertiesController: index (listings with transaction_type/country/district filters), show (detail)
-- ArticlesController: index (listing), show (disambiguates category vs article by slug)
-- PagesController: home, contact, privacy actions
-- Wrong translation for locale returns 404 (e.g. /fr/sales → 404)
-- 156 total tests passing (106 existing + 50 new)
+### Task 4: Image upload via ActiveStorage Direct Upload (#50)
+- Blocked by Task 3
+- Add `aws-sdk-s3` gem to Gemfile
+- Configure ActiveStorage with Hetzner Object Storage (S3-compatible) for production in `config/storage.yml`
+- Disk service remains for development and test
+- Extend markdown_editor_controller with image upload:
+  - Toolbar image button opens file picker dialog
+  - Paste from clipboard triggers upload
+  - Drag and drop onto textarea triggers upload
+  - All use ActiveStorage DirectUpload JS class
+  - Upload progress feedback (placeholder text like `![Uploading filename...]()`)
+  - On success: insert `![filename](blob_url)` at cursor position
+- Controller tests for Direct Upload endpoint accessibility for authenticated admins
+- Uploaded images render in both admin preview and public article view
+- STATUS: NOT STARTED
 
-## Phase 2: Design
+## Implementation Notes
+- TDD required: always write failing tests first (red-green-refactor)
+- No Co-Authored-By in commit messages
+- Admin is French-only (force_french_locale)
+- Article body is JSON column with locale keys — no schema changes needed
+- Markdown gem: commonmarker (Rust-based GFM parser)
+- No HTML sanitization — admin-only input is trusted
+- Tailwind Typography `prose` classes already in articles/show.html.erb
+- Existing test patterns in: test/controllers/admin/articles_controller_test.rb, test/controllers/articles_controller_test.rb
+- `@hotwired/stimulus` already in project
+- ActiveStorage already enabled (engine loaded, storage.yml exists, image_processing gem present)
 
-### Task 5: Layout, Navbar & Footer ✅
-Implemented the full public site layout with navbar and footer using TDD (22 tests):
-- Application layout: Montserrat font (Google Fonts), `<html lang>` attribute per locale, Tailwind body styling
-- Separate admin layout: admin and session controllers use "admin" layout (no public navbar/footer)
-- Navbar partial (`shared/_navbar`): fixed top, dark navy (#090956) background, agency logo linking to locale root, 4 main nav links (Sales Monaco, Rentals Monaco, France, Articles) — all translated per locale via helper methods, language switcher dropdown with flag SVGs for all 8 locales (Stimulus controller for toggle/close-on-outside-click), responsive mobile hamburger menu (Stimulus controller for toggle), current locale highlighting
-- Footer partial (`shared/_footer`): agency address (3 Rue Langlé, MC 98000), phone/fax numbers, email link, 4 social media links (LinkedIn, Facebook, Instagram, YouTube) with inline SVG icons, CIM (Chambre Immobilière Monégasque) logo, copyright text, locale-translated privacy policy link
-- ApplicationHelper: locale-aware path helpers (locale_root_path, locale_sales_monaco_path, locale_rentals_monaco_path, locale_sales_france_path, locale_articles_path, locale_contact_path, locale_privacy_path, switch_locale_path), flag/locale name mappings
-- Stimulus controllers: mobile_menu_controller.js (toggle mobile nav), language_switcher_controller.js (toggle dropdown, close on outside click)
-- Flag SVG images for all 8 locales (fr, gb, it, de, se, no, dk, fi)
-- CIM logo (logo-cim.png) downloaded from live site
-- Added nav.privacy translation to all 8 locale files
-- 178 total tests passing (156 existing + 22 new)
-
-### Task 6: Homepage ✅
-Implemented the full homepage with all sections per PRD using TDD (24 tests):
-- Hero section: full-viewport-height hero with navy background, overlay, tagline ("L'Immobilier à Monaco depuis 1942"), and CIM membership subtitle — all translated per locale
-- Transparent navbar: navbar overlays the hero with transparent background on homepage (solid navy on all other pages), using content_for(:homepage) signaling and CSS class toggle
-- Category cards: three linked cards (Sales Monaco, Rentals Monaco, France) with translated titles and descriptions, linking to correct locale-aware listing paths
-- About section: agency founding story (1942, Pierre Maré) with translated title and text for all 8 locales
-- Image carousel: 5 slides (Port Hercule, Monte-Carlo, Le Rocher, Fontvieille, Larvotto) with Stimulus carousel_controller.js for prev/next navigation
-- Videos section: placeholder section for YouTube Data API integration (API key to be provided later)
-- Team section: Pierre Maré (Co-Gérant), Adrien Maré (Directeur/Négociateur), Josiane Alesi (Secrétariat/Gestion) — roles translated per locale
-- Featured articles section: loads published+featured articles from DB, displays title in current locale with fallback to default locale, truncated body text, and "Read more" link
-- Contact section: agency address (3 Rue Langlé, MC 98000), phone number, email link
-- i18n: added 15+ new translation keys to all 8 locale files (category labels/descriptions, about title/text, team title/roles, featured articles title, read more, contact title, carousel title, videos title)
-- Section dividers: horizontal rules between sections matching current site pattern
-- 202 total tests passing (178 existing + 24 new)
-
-### Task 7: (Merged into Task 5 — footer implemented alongside layout & navbar)
-
-## Phase 3: Properties
-### Task 8: Property Listings (sale/rental pages with filters) ✅
-Implemented property listing pages with filtering and property cards using TDD (28 tests):
-- PropertiesController#index: queries published, non-off-market properties with chainable filters (transaction_type, country, district, property_type via query param)
-- Property model: added scopes (publicly_visible, in_country, in_district, of_type), instance methods (title_for, description_for, cover_image, formatted_price, recent?)
-- Property listing view: responsive 3-column grid of property cards, page heading, property count
-- Property card partial: cover image with srcset (CDN size variants), title in current locale, European-formatted price (1.290.000 €), room/bedroom/bathroom/parking counts, living area, NOUVEAU badge for recent properties, exclusivity badge, link to property detail
-- Filter UI: property type dropdown, district dropdown (Monaco listings only), submit button, form submits via GET query params
-- Empty state: message displayed when no properties match filters
-- Page headings: dynamic translated headings per transaction type, country, and district (e.g. "Sales in Monaco — Carré d'Or")
-- i18n: added `listings` translation keys to all 8 locale files (headings, property count with pluralization, filter labels, property detail labels, badges, price on request)
-- ApplicationHelper: added locale_property_path, listing_heading, property_type_options helpers
-- 230 total tests passing (202 existing + 28 new)
-
-### Task 9: Property Detail Page (with gallery & media) ✅
-Implemented the full property detail page with photo gallery, details table, and all media sections using TDD (53 tests):
-- PropertiesController#show: loads property with eager-loaded associations (district, building, property_images), splits photos vs floor plans, queries similar properties (same district + transaction type, limit 3)
-- Property model: added `photos`, `plans`, `slug_for` methods
-- Photo gallery: Stimulus gallery_controller.js for image navigation (prev/next arrows, thumbnail click), large hero image with fade transitions, thumbnail strip with active border highlight, srcset with CDN size variants, proper alt text ("{title} - Photo {n}"), first image eager-loaded / subsequent lazy-loaded
-- Property details table: sticky sidebar with all property specs — reference, building name, district name, type/subtype, rooms, bedrooms, bathrooms, living area, total area, terrace area, land area, garden area, floor, parking, cellars, furnished status, service charges (with included indicator). All fields conditionally rendered (hidden when nil/zero)
-- Price display: European formatting (1.850.000 €), "Price on request" when nil, "/month" suffix for rentals
-- Description: locale-aware with simple_format for paragraph rendering
-- Floor plans section: separate from photo gallery, renders plan images with proper alt text ("Plan - {title}"), hidden when no plans exist
-- Virtual tour: external link to Matterport/360 tour URL, hidden when no URL
-- Video section: YouTube embed via youtube-nocookie.com iframe (extracts video ID from URL), fallback link for non-YouTube URLs, hidden when no video URL
-- Badges: NEW (recent properties), Exclusivity — displayed above title
-- Back link: context-aware (back to sales/rentals, Monaco/France)
-- Similar properties: up to 3 properties in same district + transaction type, rendered using existing property card partial
-- Page title: "{property_title} | {price} € | Agence de la Gare Monaco" (price omitted when nil)
-- i18n: added `property_detail` translation keys to all 8 locale files (30 keys each: reference, building, district, type, floor, rooms, bedrooms, bathrooms, parkings, cellars, living_area, total_area, terrace_area, land_area, garden_area, furnished, service_charges, back links, similar properties, floor plans, virtual tour, video, gallery, photo/plan alt text, exclusivity)
-- All 8 locales render correctly
-- Edge cases: no images, no building, no district all render gracefully
-- 283 total tests passing (230 existing + 53 new)
-
-### Task 10: (Merged into Task 9 — gallery & media implemented as part of property detail page)
-
-## Phase 4: Immotoolbox Sync
-### Task 11: API Client & Sync Service ✅
-Implemented the Immotoolbox API client and sync service with TDD (34 tests):
-- **ImmotoolboxClient** (`app/services/immotoolbox_client.rb`): HTTP client for Immotoolbox REST API using Net::HTTP. Auth via `X-AUTH-TOKEN` header. Methods: `fetch_districts`, `fetch_buildings`, `fetch_properties(page:)`, `fetch_all_properties` (auto-paginating), `fetch_property(id)`, `fetch_images(property_id:)`, `fetch_texts(property_id:)`. Custom `ApiError` for HTTP errors and network timeouts.
-- **ImmotoolboxSync** (`app/services/immotoolbox_sync.rb`): Sync service that imports districts, buildings, and properties from the API. Key behaviors:
-  - `sync_districts`: creates/updates districts by `immotoolbox_id`, auto-generates slugs
-  - `sync_buildings`: creates/updates buildings, links to districts via `immotoolbox_id`
-  - `sync_properties`: creates/updates properties with full field mapping (pricing, location, dimensions, media URLs), fetches multilingual texts (title/description per language), fetches and syncs property images (CDN URLs at all sizes), skips `manually_edited` properties, unpublishes synced properties no longer in API response (preserves non-synced properties)
-  - `sync_all`: runs districts → buildings → properties in order, returns summary statistics (created/updated/unpublished/skipped counts)
-- **Rake task** (`lib/tasks/immotoolbox.rake`): `immotoolbox:sync` — reads API token from `IMMOTOOLBOX_API_TOKEN` env var or Rails credentials, runs full sync, prints summary
-- Added `webmock` gem for HTTP request stubbing in tests
-- 317 total tests passing (283 existing + 34 new)
-
-### Task 12: Scheduled Sync Job ✅
-Implemented the scheduled Immotoolbox sync job with TDD (9 tests):
-- **ImmotoolboxSyncJob** (`app/jobs/immotoolbox_sync_job.rb`): ActiveJob that runs the full Immotoolbox sync. Reads API token from `IMMOTOOLBOX_API_TOKEN` env var with fallback to Rails credentials (`credentials.immotoolbox.api_token`). Logs sync results (districts/buildings/properties created/updated/unpublished/skipped). Skips gracefully with warning when no API token is available.
-- **Retry handling**: Retries on `ImmotoolboxClient::ApiError` and `Net::OpenTimeout` with polynomial backoff, up to 5 attempts each.
-- **Recurring schedule** (`config/recurring.yml`): Configured to run daily at 6am in production via Solid Queue's recurring job scheduler.
-- 326 total tests passing (317 existing + 9 new)
-
-## Phase 5: Blog + SEO
-### Task 13: Articles/Blog CRUD ✅
-Implemented full articles/blog CRUD with admin interface and public views using TDD (56 tests):
-- **Admin::ArticlesController**: full CRUD (index, new, create, edit, update, destroy). Index shows all articles ordered by most recent, with category, published/draft status badge, featured badge, and date. Create/edit form with multilingual title fields (input per locale) and multilingual body fields (textarea per locale), slug field (auto-generated from French title when blank), category select, published/featured checkboxes. Published_at auto-set when first published, preserved on subsequent edits.
-- **Admin::CategoriesController**: full CRUD (index, new, create, edit, update, destroy). Index shows categories with article count. Slug auto-generated from name when blank. Delete cascades to articles (via model `dependent: :destroy`).
-- **Admin layout with navigation**: sidebar with navy (#090956) background, links to Dashboard/Articles/Categories, current user email display, logout link. Flash notice/alert messages.
-- **Article model enhancements**: `title_for(locale)` and `body_for(locale)` with fallback to default locale (FR). `before_validation :generate_slug` auto-generates slug from French title via `parameterize` when slug is blank. Existing `published` and `featured` scopes preserved.
-- **Public ArticlesController**: index loads published articles ordered by `published_at` desc. Show disambiguates category vs article by slug — category match renders filtered index, article match renders detail. Draft articles return 404 (scoped to `Article.published`).
-- **Public article views**: index with responsive 3-column grid of article cards (category badge, title, truncated body, published date), category filter links (pills). Show with breadcrumb (Articles > Category), title, category + date, body rendered via `simple_format`. All locale-aware with translated route segments.
-- **Admin routes**: `resources :articles` and `resources :categories` in admin namespace.
-- Updated existing model test for slug validation (auto-generate changes behavior).
-- 382 total tests passing (326 existing + 56 new)
-
-### Task 14: SEO (hreflang, sitemaps, meta tags, JSON-LD) ✅
-Implemented full multilingual SEO infrastructure with TDD (76 tests):
-- **SeoHelper** (`app/helpers/seo_helper.rb`): centralized helper module providing all SEO tag generation. Methods: `canonical_url`, `hreflang_tags`, `seo_meta_description`, `seo_title`, `og_tags`, `twitter_tags`, `json_ld_organization`, `json_ld_property`, `json_ld_article`, `json_ld_breadcrumbs`, `listing_breadcrumbs`.
-- **Canonical URLs**: self-referencing `<link rel="canonical">` on every public page. Filter query params excluded from canonical (listings canonicalise to base path). Absolute URLs using `https://agencegaremonaco.com`.
-- **Hreflang tags**: all 8 locales + `x-default` (French) on every public page. Norwegian uses `nb` hreflang code with `/no` URL prefix. Property pages use locale-specific slugs in hreflang URLs.
-- **Meta descriptions**: per-page translated descriptions via i18n `seo.*` keys. Property pages use property description (truncated to 160 chars). Article pages use body text. Listing pages vary by transaction type, country, district.
-- **Page titles**: dynamic per page type. Property: `{title} | {price} € | Agence de la Gare Monaco`. Article: `{title} | Agence de la Gare Monaco`. Listings: `{heading} | {site_name}`. Homepage: translated tagline.
-- **Open Graph tags**: `og:type`, `og:site_name`, `og:locale`, `og:locale:alternate` for all other locales, `og:url`, `og:title`, `og:description`, `og:image`. Property pages use cover image. Article pages use `og:type="article"` with `article:published_time` and `article:section`.
-- **Twitter Card tags**: `summary_large_image` card type, `@agencedelagare` site handle, title, description, image.
-- **JSON-LD structured data**: `RealEstateAgent` organization on every page, `RealEstateListing` on property pages (with offers, address, geo, room counts, floor size), `Article` on article pages (with headline, dates, author, publisher, language, section), `BreadcrumbList` on listing pages.
-- **SeoConfigurable concern** (`app/controllers/concerns/seo_configurable.rb`): controller concern that provides `set_seo(page_type:, **opts)` and `seo_config` helper method. Included in PagesController, PropertiesController, ArticlesController.
-- **Layout integration**: SEO partial (`shared/_seo_tags.html.erb`) rendered in `<head>` of application layout. Dynamic title generation replaces hardcoded fallback.
-- **XML Sitemaps**: `SitemapsController` with two actions. Sitemap index at `/sitemap.xml` references 8 per-language sitemaps. Per-language sitemaps at `/sitemaps/{locale}.xml` include: homepage, all listing pages (sales/rentals × all/monaco/france), district-filtered listings (only for districts with published properties), all published property detail pages, articles index, all published articles, contact page, privacy page. Every `<url>` includes `<xhtml:link>` hreflang alternates for all 8 locales. Property and article entries include `<lastmod>`.
-- **Dynamic robots.txt**: `RobotsController` serves `/robots.txt` dynamically. Allows all crawlers, disallows `/admin/` and `/rails/`, references sitemap index URL. Removed static `public/robots.txt`.
-- **i18n translations**: added `seo.*` keys to all 8 locale files (11 keys each): homepage_title, homepage_description, articles_description, contact_description, privacy_description, listings_sales_monaco_description, listings_rentals_monaco_description, listings_sales_france_description, listings_sales_district_description, listings_rentals_district_description, listings_all_description.
-- 458 total tests passing (382 existing + 76 new: 32 helper tests + 25 integration tests + 14 sitemap tests + 5 robots tests)
-
-### Task 15: Legacy URL Redirects ✅
-Implemented all legacy URL redirects (301) for the 3 existing languages (FR, EN, IT) with TDD (32 tests):
-- **LegacyRedirectsController** (`app/controllers/legacy_redirects_controller.rb`): dedicated controller handling all legacy URL patterns. Looks up properties by `immotoolbox_id` to generate new URLs with slugs. Returns 410 Gone for missing/unpublished properties.
-- **French legacy routes**: `/fr/location/monaco` → `/fr/locations/monaco`, `/fr/bien/{id}` → `/fr/biens/{id}-{slug}`, `/fr/bien-off-market/{id}` → property detail or 410, `/fr/pdf-download/{id}.pdf` → property detail, `/fr/pdf-download-nologo/{id}.pdf` → property detail, `/fr/posts/{category}/` → `/fr/articles/{category-slug}`, `/fr/article/{id}/{slug}/` → `/fr/articles/{slug}`, `/fr/post/{id}/{slug}` → `/fr/articles/{slug}`, `/fr/recherche/{location}` → district page or `/fr/ventes/monaco`
-- **English legacy routes**: `/en/rental/monaco` → `/en/rentals/monaco`, `/en/property/{id}` → `/en/properties/{id}-{slug}`, `/en/properties-off-market/sale` → `/en/sales/monaco`, `/en/properties-off-market/rental` → `/en/rentals/monaco`, `/en/news` → `/en/articles`, `/en/article/{id}/{slug}` → `/en/articles/{slug}`
-- **Italian legacy routes**: `/it/affitto/monaco` → `/it/affitti/monaco`, `/it/immobile/{id}` → `/it/immobili/{id}-{slug}`
-- **Trailing slash handling**: `TrailingSlashRedirector` Rack middleware (`lib/trailing_slash_redirector.rb`) at top of middleware stack. All paths with trailing slashes (except root `/`) get 301 redirected to the version without trailing slash. Consistent URL format across the entire site.
-- **Edge cases**: unpublished properties return 410, missing immotoolbox_id returns 410, search with matching district slug redirects to district page, search without match redirects to sales monaco
-- 490 total tests passing (458 existing + 32 new)
-
-## Phase 6: Contacts + Polish
-### Task 16: Contact Forms (homepage + property enquiry) ✅
-Implemented both contact forms (homepage + property enquiry) with Action Mailer email delivery and honeypot spam protection using TDD (23 tests):
-- **ContactMailer** (`app/mailers/contact_mailer.rb`): two email methods. `contact_email` sends homepage contact form submissions with sender name, email, subject, and message. `enquiry_email` sends property enquiry submissions with sender details, property reference, title, price, and a link to the property page. Both emails sent to `info@agencegaremonaco.com` with reply-to set to the sender's email.
-- **ContactSubmissionsController** (`app/controllers/contact_submissions_controller.rb`): handles POST form submissions. Auto-determines `form_type` (contact vs enquiry) based on `property_id` presence. Honeypot spam protection: if hidden `website` field is filled, silently redirects as if successful (does not reveal rejection to bot). On success: saves to DB, sends email, redirects with flash notice. On validation failure: re-renders the originating page (contact page or property detail page) with errors.
-- **Homepage contact form** (`app/views/pages/contact.html.erb`): full contact page with agency details (address, phone, fax, email) on the left and contact form on the right. Fields: name, email, subject, message. Honeypot field hidden via CSS positioning. Styled with agency branding (Tailwind).
-- **Property enquiry form** (added to `app/views/properties/show.html.erb`): enquiry form section below property description, before similar properties. Shows pre-filled property reference. Fields: name, email, phone, country, message, hidden property_id. Honeypot field.
-- **Flash notices**: added flash notice/alert display to application layout (`<main>` section) with green/red styling.
-- **ApplicationMailer**: updated default `from` to `info@agencegaremonaco.com`.
-- **Email templates**: HTML emails for both contact and enquiry (`app/views/contact_mailer/`). Enquiry email includes property details table and "View Property on Website" button linking to the French property page.
-- **Routes**: `resources :contact_submissions, only: [:create]` added for POST `/contact_submissions`.
-- **PagesController**: initializes `@submission = ContactSubmission.new` for contact form.
-- **PropertiesController**: initializes `@submission = ContactSubmission.new` for enquiry form.
-- **i18n**: added `contact_form.*` translation keys to all 8 locale files (13 keys each: title, info_title, phone, fax, name, email, subject, message, country, send, success, enquiry_title, enquiry_reference).
-- 513 total tests passing (490 existing + 23 new: 12 mailer tests + 11 controller tests)
-
-### Task 17: Contacts & Property Sharing ✅
-Implemented contacts CRUD and property sharing via email with TDD (29 tests):
-- **Admin::ContactsController** (`app/controllers/admin/contacts_controller.rb`): full CRUD (index, new, create, edit, update, destroy). Index lists contacts sorted by last name, shows first name, last name, email, phone. Create/edit form with first name, last name, email, phone fields. Validation: first_name, last_name, email required; email unique.
-- **Admin::PropertySharesController** (`app/controllers/admin/property_shares_controller.rb`): property sharing workflow. `new` action renders a contact selection form with property summary and checkboxes for all contacts. `create` action sends individual HTML emails to each selected contact via `PropertyMailer.share_email`. Validates at least one contact is selected, redirects with alert if none selected.
-- **PropertyMailer** (`app/mailers/property_mailer.rb`): `share_email(property, contact)` sends a formatted HTML email to the contact. Email includes: agency branded header, personalised greeting with contact's first name, property title, up to 4 photos (medium size), details table (reference, price, type, rooms, bedrooms, living area), description, CTA button linking to the property page on agencegaremonaco.com, and agency footer with phone/fax/email.
-- **Admin views**: contacts index table (last name, first name, email, phone, edit/delete actions), new/edit forms, property share contact selection form with checkboxes.
-- **Admin layout updated**: Contacts link added to admin sidebar navigation.
-- **Routes**: `resources :contacts` and `resources :properties { resource :share }` added to admin namespace.
-- 542 total tests passing (513 existing + 29 new: 12 contacts controller tests + 8 property shares controller tests + 9 property mailer tests)
-
-### Task 18: Error Pages, Analytics, Currency Conversion ✅
-Implemented custom error pages, Plausible Analytics, and currency conversion with TDD (41 tests):
-- **Custom Error Pages**: `ErrorsController` (inherits `ActionController::Base` to bypass `allow_browser` filter) with dedicated `error` layout. Custom 404 (not found), 422 (unprocessable), and 500 (internal server error) pages — all styled with agency branding (Montserrat font, navy #090956 color, logo, noindex meta tag). 404 page includes browse suggestion links (homepage + Monaco sales). Removed static `public/404.html`, `public/422.html`, `public/500.html`, `public/400.html` — replaced by dynamic error pages via `config.exceptions_app = routes`. Kept `public/406-unsupported-browser.html` for `allow_browser` filter.
-- **Plausible Analytics**: Added `<script defer data-domain="agencegaremonaco.com" src="https://plausible.io/js/script.js">` to the public application layout. Cookie-free, GDPR-compliant, no cookie consent needed. Not present on admin pages (admin uses separate layout).
-- **Currency Conversion**: Full pipeline from API to display.
-  - `exchange_rates` table: currency (unique), rate (decimal 12,6), fetched_at.
-  - `ExchangeRate` model: validations, `locale_currency(locale)` mapping (SV→SEK, NO→NOK, DA→DKK, EN→GBP, FR/DE/IT/FI→EUR), `convert(amount_eur, target_currency)` class method.
-  - `CurrencyConverter` service: fetches latest EUR rates from Frankfurter API (`api.frankfurter.dev/v1/latest`) for SEK, NOK, DKK, GBP, CHF, USD. Creates/updates ExchangeRate records. Handles API errors and network timeouts gracefully.
-  - `ExchangeRateRefreshJob`: ActiveJob that calls `CurrencyConverter.refresh`. Scheduled daily at 7am in production via Solid Queue (`config/recurring.yml`).
-  - `CurrencyHelper`: `converted_price_tag(price_eur)` returns formatted parenthetical conversion (e.g. "~14.512.500 SEK") or nil for EUR locales / missing rates. `format_converted_price(amount)` uses European number formatting.
-  - View integration: converted price displayed below EUR price on property cards (listings) and property detail page, only when locale has a non-EUR currency and exchange rate is available. Uses `data-testid="converted-price"` for testing.
-- **Routes**: `match "/404"`, `match "/422"`, `match "/500"` added for error pages.
-- 583 total tests passing (542 existing + 41 new: 12 error page tests + 4 analytics tests + 10 exchange rate model tests + 4 currency converter service tests + 1 exchange rate refresh job test + 7 currency helper tests + 4 currency display integration tests - 1 adjustment)
-
-## Phase 7: Launch
-### Task 19: Staging Environment (noindex, robots.txt, analytics gating) ✅
-Implemented staging environment protection to prevent search engine indexing of the staging site at curau.dev using TDD (11 tests):
-- **SITE_HOST environment variable**: `SeoHelper` now reads `SITE_HOST` env var (defaults to `https://agencegaremonaco.com`). When set to a non-production host (e.g. `https://curau.dev`), the site enters "staging mode" — all SEO protections activate automatically.
-- **Noindex meta tag**: `noindex_meta_tag` helper renders `<meta name="robots" content="noindex, nofollow">` in the `<head>` of every public page when in staging mode. Returns nil on production. Added to `app/views/layouts/application.html.erb`.
-- **Robots.txt blocking**: `app/views/robots/show.text.erb` now conditionally renders `Disallow: /` (blocking all crawlers) in staging mode, or the normal production robots.txt (Allow with admin/rails exclusions and sitemap reference) on production.
-- **Plausible Analytics gating**: Plausible analytics script tag in the application layout is wrapped in `<% unless staging? %>`, preventing analytics tracking on staging.
-- **Mailer host fix**: `config/environments/production.rb` — `action_mailer.default_url_options` now derives host from `SITE_HOST` env var instead of hardcoded `curau.dev`, ensuring mailer links point to the correct domain in both staging and production.
-- **Kamal deploy config**: `config/deploy.yml` updated with `SITE_HOST: https://curau.dev` in clear env vars, so the staging deployment automatically activates staging mode.
-- **staging? helper**: `SeoHelper#staging?` returns true when `SITE_HOST` differs from `PRODUCTION_HOST`, used by views and templates.
-- 594 total tests passing (583 existing + 11 new: 4 staging guard helper tests + 7 staging environment integration tests)
-
-### Task 20: Admin Property CRUD ✅
-Implemented full admin property management (CRUD) with TDD (23 tests):
-- **Admin::PropertiesController** (`app/controllers/admin/properties_controller.rb`): full CRUD (index, new, create, edit, update, destroy). Index lists all properties ordered by most recent, with reference, French title, transaction type, property type, formatted price, published/draft/featured/off-market status badges, and actions (edit, share, delete). Create/edit form with all property fields organized in fieldsets: core details (reference, price, transaction type, property type, subtype, floor), location (country, city, district, building, address), dimensions & rooms (all area and count fields), multilingual title (input per locale), multilingual description (textarea per locale), media (video URL, virtual tour URL, 360° tour toggle), and sidebar toggles (published, featured, off-market, exclusivity, furnished, service charges).
-- **Synced property protection**: When editing a property that has an `immotoolbox_id` (synced from Immotoolbox), the controller automatically sets `manually_edited = true` to prevent the next sync from overwriting admin changes. Non-synced properties are not affected. Synced properties show an info badge with their Immotoolbox ID.
-- **Admin routes**: `resources :properties` in admin namespace (was `only: []`, now full CRUD). Share nested resource preserved.
-- **Admin layout updated**: Properties link added to admin sidebar navigation (positioned first, before Articles).
-- **Form UI**: Tailwind-styled 3-column grid layout matching existing admin patterns (articles, categories). Error display, district/building select dropdowns, checkbox toggles for boolean flags.
-- 617 total tests passing (594 existing + 23 new: 1 auth test + 5 index tests + 3 new/form tests + 4 create tests + 1 edit test + 6 update tests + 1 destroy test + 1 navigation test + 1 combined route/view test)
+## Progress Log
+- Task 1 DONE (732 total tests): Added `commonmarker` gem, created `MarkdownHelper#render_markdown`, replaced `simple_format` with `render_markdown` in article show view, updated index and homepage truncation to strip HTML from rendered markdown. 13 helper unit tests + 7 integration tests added.

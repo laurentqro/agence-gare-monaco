@@ -49,6 +49,9 @@ gem "aws-sdk-s3", require: false
 # QR code generation for property listing pages
 gem "rqrcode", "~> 2.0"
 
+# Markdown rendering for blog articles (Rust-based GFM parser)
+gem "commonmarker"
+
 # PDF generation for property brochures (Typst — fast, beautiful typography)
 gem "typst"
 

@@ -23,6 +23,6 @@
 
   <%# Article body %>
   <div class="article-body prose prose-sm max-w-none text-[#212529]">
-    <%= simple_format(@article.body_for(I18n.locale)) %>
+    <%= render_markdown(@article.body_for(I18n.locale)) %>
   </div>
 </div>

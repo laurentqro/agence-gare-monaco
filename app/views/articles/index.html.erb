@@ -38,7 +38,7 @@
               <%= article.title_for(I18n.locale) %>
             </h2>
             <p class="mt-2 text-sm text-gray-600 line-clamp-3">
-              <%= truncate(strip_tags(article.body_for(I18n.locale)), length: 150) %>
+              <%= truncate(strip_tags(render_markdown(article.body_for(I18n.locale))), length: 150) %>
             </p>
             <% if article.published_at %>
               <time datetime="<%= article.published_at.iso8601 %>" class="mt-3 block text-xs text-gray-400">
