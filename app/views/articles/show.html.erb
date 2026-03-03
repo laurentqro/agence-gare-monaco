@@ -9,7 +9,7 @@
   </div>
 
   <%# Article header %>
-  <h1 class="text-2xl font-bold text-[#090956] mb-3"><%= @article.title_for(I18n.locale) %></h1>
+  <h1 class="text-3xl font-extrabold text-[#090956] mb-3"><%= @article.title_for(I18n.locale) %></h1>
 
   <div class="flex items-center gap-3 text-sm text-gray-500 mb-8">
     <span class="text-[#6E8297] font-medium"><%= @article.category.name %></span>
@@ -22,7 +22,7 @@
   </div>
 
   <%# Article body %>
-  <div class="article-body prose prose-sm max-w-none text-[#212529]">
+  <div class="article-body max-w-none text-[#212529]">
     <%= render_markdown(@article.body_for(I18n.locale)) %>
   </div>
 </div>
