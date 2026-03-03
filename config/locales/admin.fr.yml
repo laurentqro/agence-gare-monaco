@@ -176,6 +176,17 @@ fr:
         created: "Bien créé."
         updated: "Bien mis à jour."
         deleted: "Bien supprimé."
+    property_brochures:
+      title: "Brochure PDF"
+      property_details: "Détails du bien"
+      reference: "Référence :"
+      title_label: "Titre :"
+      price: "Prix :"
+      options: "Options"
+      locale_label: "Langue"
+      include_logo: "Inclure le logo de l'agence"
+      generate: "Générer le PDF"
+      pdf: "PDF"
     property_shares:
       title: "Partager le bien"
       property_details: "Détails du bien"

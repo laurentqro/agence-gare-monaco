@@ -93,6 +93,7 @@ fi:
     documents: "Asiakirjat"
     download: "Lataa"
     qr_code: "QR-koodi"
+    download_pdf: "Lataa PDF-esite"
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Kiinteistöt Monacossa vuodesta 1942"
@@ -124,6 +125,21 @@ fi:
     whatsapp: "WhatsApp"
     whatsapp_message: "Hei, haluaisin tietoa kiinteistöistänne."
     whatsapp_enquiry_message: "Hei, olen kiinnostunut kiinteistöstä %{reference}. Voisitteko lähettää lisätietoja?"
+
+  pdf_brochure:
+    off_market_badge: "EI MARKKINOILLA"
+    exclusivity_badge: "YKSINOIKEUS"
+    price_on_request: "Hinta pyydettäessä"
+    fees_line: "Ostohinnan lisäksi: Välityspalkkio 3%+ALV - Notaarikulut 6,25%"
+    disclaimer: "Tämä asiakirja ei ole osa mitään tarjousta tai sopimusta. Kaikki mitat, pinta-alat ja etäisyydet ovat likimääräisiä. Kuvaukset ja pohjapiirrokset on annettu vain tiedoksi eikä niiden tarkkuutta taata. Valokuvat näyttävät vain tiettyjä osia kiinteistöstä. Tarjous on voimassa myyntiä, peruutusta, hinnanmuutosta tai muita ehtoja lukuun ottamatta ilman ennakkoilmoitusta."
+    agency_name: "Agence de la Gare"
+    contact_address: "3, Rue Langlé"
+    contact_city: "MC 98000 Monaco"
+    contact_phone: "(+377) 93 30 22 36"
+    contact_email: "info@agencegaremonaco.com"
+    contact_website: "agencegaremonaco.com"
+    sqm: "sqm"
+    per_month: "/kk"
 
   routes:
     sales: "myynti"

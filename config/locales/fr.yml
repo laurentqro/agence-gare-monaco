@@ -93,6 +93,7 @@ fr:
     documents: "Documents"
     download: "Télécharger"
     qr_code: "QR Code"
+    download_pdf: "Télécharger la brochure PDF"
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | L'Immobilier à Monaco depuis 1942"
@@ -124,6 +125,21 @@ fr:
     whatsapp: "WhatsApp"
     whatsapp_message: "Bonjour, je souhaiterais des informations sur vos biens immobiliers."
     whatsapp_enquiry_message: "Bonjour, je suis intéressé(e) par le bien %{reference}. Pourriez-vous m'envoyer plus de détails ?"
+
+  pdf_brochure:
+    off_market_badge: "HORS MARCHÉ"
+    exclusivity_badge: "EXCLUSIVITÉ"
+    price_on_request: "Prix sur demande"
+    fees_line: "En sus du prix d'achat : Honoraires d'agence 3%+TVA - Frais de notaire 6.25%"
+    disclaimer: "Ce document ne fait partie d'aucune offre ou contrat. Toutes mesures, surfaces et distances sont approximatives. Le descriptif et les plans ne sont donnés qu'à titre indicatif et leur exactitude n'est pas garantie. Les photographies ne montrent que certaines parties de la propriété. L'offre est valable sauf en cas de vente, retrait de vente, changement de prix ou d'autres conditions, sans préalable."
+    agency_name: "Agence de la Gare"
+    contact_address: "3, Rue Langlé"
+    contact_city: "MC 98000 Monaco"
+    contact_phone: "(+377) 93 30 22 36"
+    contact_email: "info@agencegaremonaco.com"
+    contact_website: "agencegaremonaco.com"
+    sqm: "sqm"
+    per_month: "/mois"
 
   routes:
     sales: "ventes"

@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     resources :contacts
     resources :properties do
       resource :share, only: [:new, :create], controller: "property_shares"
+      resource :brochure, only: [:new, :create], controller: "property_brochures"
     end
   end
 
@@ -41,6 +42,7 @@ Rails.application.routes.draw do
 
       # Property detail: /{properties}/{id}-{slug}
       get "/#{props}/:id", to: "properties#show", as: :"#{locale}_property"
+      get "/#{props}/:id/pdf", to: "properties#pdf", as: :"#{locale}_property_pdf"
 
       # Articles
       get "/#{articles}",      to: "articles#index", as: :"#{locale}_articles"

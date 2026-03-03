@@ -42,6 +42,16 @@ class PropertiesController < ApplicationController
     set_seo(page_type: :property, property: @property)
   end
 
+  def pdf
+    @property = Property.published.includes(:district, :building, :property_images).find(params[:id])
+    locale = params[:locale]&.to_sym || I18n.locale
+
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: locale, include_logo: true).generate
+    filename = "#{@property.reference}-#{locale}.pdf"
+
+    send_data pdf_bytes, filename: filename, type: "application/pdf", disposition: :attachment
+  end
+
   private
 
   def initialize_contact_submission

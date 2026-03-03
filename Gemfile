@@ -46,6 +46,9 @@ gem "image_processing", "~> 1.2"
 # QR code generation for property listing pages
 gem "rqrcode", "~> 2.0"
 
+# PDF generation for property brochures (Typst — fast, beautiful typography)
+gem "typst"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -72,4 +75,7 @@ group :test do
 
   # Stub HTTP requests in tests
   gem "webmock"
+
+  # Read/verify generated PDFs in tests
+  gem "pdf-reader"
 end
