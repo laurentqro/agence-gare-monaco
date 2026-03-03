@@ -235,8 +235,14 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
   test "filtering by district via query param shows only properties in that district" do
     get "/en/sales/monaco?district=carre-dor"
     assert_response :success
+    assert_select "[data-testid='property-card']", count: 1
     assert_select "[data-testid='property-card']", text: /Studio/
-    assert_no_match "Fontvieille", response.body
+  end
+
+  test "district filter remains visible when filtering by district via query param" do
+    get "/en/sales/monaco?district=carre-dor"
+    assert_response :success
+    assert_select "select[name='district']"
   end
 
   test "filtering by invalid district via query param returns 404" do

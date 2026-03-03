@@ -20,7 +20,7 @@
         </select>
       </div>
 
-      <% if @country == "MC" && !@district %>
+      <% if @country == "MC" && !params[:district_slug] %>
         <div class="flex-1 min-w-[150px]">
           <label for="district" class="block text-xs font-medium text-[#090956] mb-1"><%= t("listings.filter_district") %></label>
           <select name="district" id="district" class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none focus:border-[#090956]">
