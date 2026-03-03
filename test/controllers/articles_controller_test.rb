@@ -106,6 +106,21 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".article-body"
   end
 
+  test "article show renders markdown images" do
+    article = Article.create!(
+      title: { "en" => "Image Article" },
+      body: { "en" => "![Photo of Monaco](https://example.com/photo.jpg)" },
+      slug: "image-article",
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/en/articles/image-article"
+    assert_response :success
+    assert_select ".article-body img[src='https://example.com/photo.jpg'][alt='Photo of Monaco']"
+  end
+
   test "all 8 locales render markdown on article show" do
     article = Article.create!(
       title: { "fr" => "Article FR", "en" => "Article EN" },

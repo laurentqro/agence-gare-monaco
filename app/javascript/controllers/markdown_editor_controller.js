@@ -1,11 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
+import { DirectUpload } from "@rails/activestorage"
 
 export default class extends Controller {
   static targets = ["textarea", "preview", "writeTab", "previewTab", "toolbar", "fileInput"]
-  static values = { previewUrl: String }
+  static values = { previewUrl: String, directUploadUrl: String }
 
   connect() {
     this.showWrite()
+    this.bindDragAndDrop()
+    this.bindPaste()
+  }
+
+  disconnect() {
+    this.unbindDragAndDrop()
+    this.unbindPaste()
   }
 
   // Tab switching
@@ -103,13 +111,93 @@ export default class extends Controller {
   imageSelected() {
     const file = this.fileInputTarget.files[0]
     if (file) {
-      const textarea = this.textareaTarget
-      const pos = textarea.selectionStart
-      this.insertText(`![${file.name}](url)`, pos, pos)
-      textarea.focus()
+      this.uploadFile(file)
     }
     // Reset file input for re-selection
     this.fileInputTarget.value = ""
+  }
+
+  // Image upload via ActiveStorage Direct Upload
+  uploadFile(file) {
+    const textarea = this.textareaTarget
+    const pos = textarea.selectionStart
+    const placeholder = `![Uploading ${file.name}...]()`
+
+    // Insert placeholder at cursor
+    this.insertText(placeholder, pos, pos)
+    textarea.focus()
+
+    const upload = new DirectUpload(file, this.directUploadUrlValue)
+
+    upload.create((error, blob) => {
+      if (error) {
+        // Remove placeholder on error
+        const value = textarea.value
+        const placeholderIndex = value.indexOf(placeholder)
+        if (placeholderIndex !== -1) {
+          this.insertText("", placeholderIndex, placeholderIndex + placeholder.length)
+        }
+      } else {
+        // Replace placeholder with actual image markdown
+        const blobUrl = `/rails/active_storage/blobs/redirect/${blob.signed_id}/${blob.filename}`
+        const imageMarkdown = `![${blob.filename}](${blobUrl})`
+        const value = textarea.value
+        const placeholderIndex = value.indexOf(placeholder)
+        if (placeholderIndex !== -1) {
+          this.insertText(imageMarkdown, placeholderIndex, placeholderIndex + placeholder.length)
+        }
+      }
+    })
+  }
+
+  // Drag and drop
+  bindDragAndDrop() {
+    this._handleDragOver = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    this._handleDrop = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      const files = e.dataTransfer?.files
+      if (files && files.length > 0) {
+        const file = files[0]
+        if (file.type.startsWith("image/")) {
+          this.uploadFile(file)
+        }
+      }
+    }
+    this.textareaTarget.addEventListener("dragover", this._handleDragOver)
+    this.textareaTarget.addEventListener("drop", this._handleDrop)
+  }
+
+  unbindDragAndDrop() {
+    this.textareaTarget.removeEventListener("dragover", this._handleDragOver)
+    this.textareaTarget.removeEventListener("drop", this._handleDrop)
+  }
+
+  // Paste from clipboard
+  bindPaste() {
+    this._handlePaste = (e) => {
+      const items = e.clipboardData?.items
+      if (!items) return
+
+      for (const item of items) {
+        if (item.type.startsWith("image/")) {
+          e.preventDefault()
+          const file = item.getAsFile()
+          if (file) {
+            this.uploadFile(file)
+          }
+          break
+        }
+      }
+    }
+    this.textareaTarget.addEventListener("paste", this._handlePaste)
+  }
+
+  unbindPaste() {
+    this.textareaTarget.removeEventListener("paste", this._handlePaste)
   }
 
   // Helpers

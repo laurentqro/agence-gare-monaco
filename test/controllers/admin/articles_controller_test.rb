@@ -328,6 +328,31 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "button[data-action*='markdown-editor#link'][aria-label]"
   end
 
+  # IMAGE UPLOAD
+  test "GET new editor has direct upload URL as data attribute" do
+    get new_admin_article_url
+    assert_response :success
+    assert_select "[data-markdown-editor-direct-upload-url-value]"
+  end
+
+  test "GET new file input accepts images" do
+    get new_admin_article_url
+    assert_response :success
+    assert_select "input[type='file'][accept='image/*'][data-markdown-editor-target='fileInput']"
+  end
+
+  test "GET edit editor has direct upload URL as data attribute" do
+    article = Article.create!(
+      title: { "fr" => "Test" },
+      body: { "fr" => "Content" },
+      slug: "test-upload",
+      category: @category
+    )
+    get edit_admin_article_url(article)
+    assert_response :success
+    assert_select "[data-markdown-editor-direct-upload-url-value]"
+  end
+
   # FEATURED toggle
   test "PATCH update can toggle featured flag" do
     article = Article.create!(
