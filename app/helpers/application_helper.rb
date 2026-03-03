@@ -81,8 +81,43 @@ module ApplicationHelper
     end
   end
 
-  def property_type_options
-    Property.publicly_visible.distinct.pluck(:property_type).compact.sort
+  # Each filter option: [key, property_type, num_rooms_condition]
+  # key is used in the URL, property_type/num_rooms used for DB query
+  TYPE_FILTER_GROUPS = [
+    # Residential by room count
+    [
+      ["studio",   "apartment", 1],
+      ["2-pieces", "apartment", 2],
+      ["3-pieces", "apartment", 3],
+      ["4-pieces", "apartment", 4],
+      ["5-pieces", "apartment", 5],
+      ["5-pieces-plus", "apartment", :gt5]
+    ],
+    # Premium
+    [
+      ["penthouse", "penthouse", nil],
+      ["duplex",    "duplex",    nil]
+    ],
+    # Commercial
+    [
+      ["office",     "office",     nil],
+      ["commercial", "commercial", nil],
+      ["local",      "local",      nil],
+      ["parking",    "parking",    nil],
+      ["cave",       "cave",       nil]
+    ]
+  ].freeze
+
+  # Returns filter groups with translated labels
+  def grouped_type_filter_options
+    TYPE_FILTER_GROUPS.filter_map do |group|
+      options = group.filter_map do |key, type, rooms|
+        label = I18n.t("listings.type_filters.#{key}", default: key.capitalize)
+        localized_key = label.downcase
+        [localized_key, key, label]
+      end
+      options.presence
+    end
   end
 
   def url_without_param(*param_names)
@@ -92,7 +127,7 @@ module ApplicationHelper
 
   def url_without_filter_value(param_name, value)
     qp = request.query_parameters.deep_dup
-    key = param_name.to_s
+    key = localized_filter_param(param_name)
     current = Array(qp[key])
     remaining = current - [value.to_s]
     if remaining.any?
@@ -106,14 +141,21 @@ module ApplicationHelper
   def filter_chip_label(param_name, value)
     case param_name.to_s
     when "type"
-      translated_property_type(value)
+      # value is already the localized label (lowercase) — titlecase it
+      value.split.map(&:capitalize).join(" ")
     when "district"
       District.find_by(slug: value)&.name || value
     end
   end
 
-  def translated_property_type(type)
-    I18n.t("listings.property_types.#{type}", default: type.capitalize)
+  # Returns the localized query param name for a canonical filter (e.g. "type" -> "tipo" in Italian)
+  def localized_filter_param(canonical)
+    I18n.t("listings.filter_param_#{canonical}", default: canonical.to_s)
+  end
+
+  # Reads filter values from the localized query param name
+  def filter_values_for(canonical)
+    Array(params[localized_filter_param(canonical)])
   end
 
   def flag_image_for(locale)

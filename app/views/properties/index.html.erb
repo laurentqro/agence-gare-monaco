@@ -1,7 +1,9 @@
 <div class="max-w-7xl mx-auto px-4 py-8">
   <%# Page heading & count %>
-  <% selected_types = Array(params[:type]) %>
-  <% selected_districts = Array(params[:district]) %>
+  <% type_param = localized_filter_param(:type) %>
+  <% district_param = localized_filter_param(:district) %>
+  <% selected_types = filter_values_for(:type) %>
+  <% selected_districts = filter_values_for(:district) %>
 
   <div class="flex items-baseline justify-between mb-4">
     <h1 class="text-2xl font-bold text-[#090956]"><%= listing_heading %></h1>
@@ -20,15 +22,20 @@
             </span>
             <svg class="w-4 h-4 ml-2 flex-shrink-0 text-[#6E8297]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
-          <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto py-1">
-            <% property_type_options.each do |type| %>
-              <label class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer">
-                <input type="checkbox" name="type[]" value="<%= type %>"
-                       <%= "checked" if selected_types.include?(type) %>
-                       data-action="change->multiselect-filter#changed"
-                       class="mr-2.5 h-4 w-4 rounded border-gray-300 text-[#090956] focus:ring-[#090956]">
-                <%= translated_property_type(type) %>
-              </label>
+          <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-72 overflow-y-auto">
+            <% grouped_type_filter_options.each_with_index do |group, gi| %>
+              <% if gi > 0 %><div class="border-t border-gray-200"></div><% end %>
+              <div class="py-1">
+                <% group.each do |localized_value, _canonical_key, label| %>
+                  <label class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer">
+                    <input type="checkbox" name="<%= type_param %>[]" value="<%= localized_value %>"
+                           <%= "checked" if selected_types.include?(localized_value) %>
+                           data-action="change->multiselect-filter#changed"
+                           class="mr-2.5 h-4 w-4 rounded border-gray-300 text-[#090956] focus:ring-[#090956]">
+                    <%= label %>
+                  </label>
+                <% end %>
+              </div>
             <% end %>
           </div>
         </div>
@@ -48,7 +55,7 @@
             <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto py-1">
               <% @districts&.each do |district| %>
                 <label class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer">
-                  <input type="checkbox" name="district[]" value="<%= district.slug %>"
+                  <input type="checkbox" name="<%= district_param %>[]" value="<%= district.slug %>"
                          <%= "checked" if selected_districts.include?(district.slug) %>
                          data-action="change->multiselect-filter#changed"
                          class="mr-2.5 h-4 w-4 rounded border-gray-300 text-[#090956] focus:ring-[#090956]">
@@ -93,7 +100,7 @@
 
     <%# Property grid %>
     <% if @properties.any? %>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <% @properties.each do |property| %>
           <%= render "properties/property_card", property: property %>
         <% end %>

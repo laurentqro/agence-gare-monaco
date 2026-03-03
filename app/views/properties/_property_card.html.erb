@@ -1,14 +1,14 @@
-<div data-testid="property-card" class="bg-white rounded shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-  <a href="<%= locale_property_path(property) %>" class="block">
-    <%# Property image %>
-    <div class="relative aspect-[4/3] bg-gray-100">
+<div data-testid="property-card" class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+  <a href="<%= locale_property_path(property) %>" class="block" data-turbo-frame="_top">
+    <%# Property image with title/price overlay %>
+    <div class="relative aspect-[16/9] bg-gray-100">
       <% if property.cover_image %>
         <img src="<%= property.cover_image.medium_url || property.cover_image.remote_url %>"
              alt="<%= property.title_for(I18n.locale) %>"
              class="w-full h-full object-cover"
              loading="lazy"
              srcset="<%= property.cover_image.small_url %> 400w, <%= property.cover_image.medium_url %> 800w, <%= property.cover_image.large_url %> 1200w"
-             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw">
+             sizes="(max-width: 768px) 100vw, 50vw">
       <% else %>
         <div class="w-full h-full flex items-center justify-center text-gray-400">
           <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,57 +17,73 @@
         </div>
       <% end %>
 
-      <%# NEW badge %>
+      <%# Badges %>
       <% if property.recent? %>
         <span data-testid="new-badge" class="absolute top-2 left-2 bg-[#090956] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
           <%= t("listings.new_badge") %>
         </span>
       <% end %>
-
-      <%# Exclusivity badge %>
       <% if property.exclusivity? %>
         <span class="absolute top-2 right-2 bg-[#6E8297] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
           Exclusivité
         </span>
       <% end %>
+
+      <%# Title & price overlay with left-to-right gradient %>
+      <div class="absolute bottom-0 inset-x-0 bg-gradient-to-r from-[#090956]/90 to-transparent px-5 py-4">
+        <h3 class="text-white font-bold text-sm uppercase tracking-wide line-clamp-1">
+          <%= property.title_for(I18n.locale) %>
+        </h3>
+        <p class="mt-1">
+          <% if property.price.present? %>
+            <span class="inline-block bg-[#090956]/60 text-white text-sm font-semibold px-3 py-0.5 rounded-full backdrop-blur-sm">
+              <%= property.formatted_price %>&euro;
+              <% if property.transaction_type == "rental" %><span class="text-xs font-normal"><%= t("property_detail.per_month") %></span><% end %>
+            </span>
+            <% if (converted = converted_price_tag(property.price)) %>
+              <span data-testid="converted-price" class="text-xs text-white/70 ml-1"><%= converted %></span>
+            <% end %>
+          <% else %>
+            <span class="inline-block bg-[#090956]/60 text-white text-sm font-semibold px-3 py-0.5 rounded-full backdrop-blur-sm">
+              <%= t("listings.price_on_request") %>
+            </span>
+          <% end %>
+        </p>
+      </div>
     </div>
 
-    <%# Property info %>
-    <div class="p-4">
-      <h3 class="text-sm font-semibold text-[#090956] mb-1 line-clamp-1">
-        <%= property.title_for(I18n.locale) %>
-      </h3>
-
-      <%# Price %>
-      <p class="text-base font-bold text-[#090956] mb-2">
-        <% if property.price.present? %>
-          <%= property.formatted_price %> €
-          <% if (converted = converted_price_tag(property.price)) %>
-            <span data-testid="converted-price" class="text-xs font-normal text-[#6E8297] block"><%= converted %></span>
-          <% end %>
-        <% else %>
-          <%= t("listings.price_on_request") %>
-        <% end %>
-      </p>
-
-      <%# Property details %>
-      <div class="flex flex-wrap gap-3 text-xs text-[#6E8297]">
-        <% if property.num_rooms.present? && property.num_rooms > 0 %>
-          <span><%= property.num_rooms %> <%= t("listings.rooms") %></span>
-        <% end %>
-        <% if property.num_bedrooms.present? && property.num_bedrooms > 0 %>
-          <span><%= property.num_bedrooms %> <%= t("listings.bedrooms") %></span>
-        <% end %>
-        <% if property.num_bathrooms.present? && property.num_bathrooms > 0 %>
-          <span><%= property.num_bathrooms %> <%= t("listings.bathrooms") %></span>
-        <% end %>
-        <% if property.num_parkings.present? && property.num_parkings > 0 %>
-          <span><%= property.num_parkings %> <%= t("listings.parkings") %></span>
-        <% end %>
-        <% if property.living_area.present? && property.living_area > 0 %>
-          <span><%= property.living_area.to_i %> <%= t("listings.area") %></span>
-        <% end %>
-      </div>
+    <%# Property details footer with SVG icons %>
+    <div class="flex flex-wrap items-center gap-4 text-xs text-[#6E8297] px-5 py-3">
+      <% if property.num_rooms.present? && property.num_rooms > 0 %>
+        <span class="inline-flex items-center gap-1" title="<%= t("listings.rooms") %>">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9.3V4h-3v2.6L12 3 2 12h3v8h5v-6h4v6h5v-8h3l-3-2.7zm-9 .7c0-1.1.9-2 2-2s2 .9 2 2h-4z"/></svg>
+          <%= property.num_rooms %>
+        </span>
+      <% end %>
+      <% if property.num_bedrooms.present? && property.num_bedrooms > 0 %>
+        <span class="inline-flex items-center gap-1" title="<%= t("listings.bedrooms") %>">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V6H1v15h2v-3h18v3h2V10c0-2.21-1.79-4-4-4z"/></svg>
+          <%= property.num_bedrooms %>
+        </span>
+      <% end %>
+      <% if property.num_bathrooms.present? && property.num_bathrooms > 0 %>
+        <span class="inline-flex items-center gap-1" title="<%= t("listings.bathrooms") %>">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M7 7c0-1.1.9-2 2-2s2 .9 2 2h2c0-2.21-1.79-4-4-4S5 4.79 5 7v5H2v4c0 2.21 1.79 4 4 4h12c2.21 0 4-1.79 4-4v-4H7V7zm-2 9v-2h14v2c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2z"/></svg>
+          <%= property.num_bathrooms %>
+        </span>
+      <% end %>
+      <% if property.num_parkings.present? && property.num_parkings > 0 %>
+        <span class="inline-flex items-center gap-1" title="<%= t("listings.parkings") %>">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+          <%= property.num_parkings %>
+        </span>
+      <% end %>
+      <% if property.living_area.present? && property.living_area > 0 %>
+        <span class="inline-flex items-center gap-1" title="<%= t("listings.area") %>">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H3V8h2v4h2V8h2v4h2V8h2v4h2V8h2v4h2V8h2v4h1v2z"/></svg>
+          <%= property.living_area.to_i %> m²
+        </span>
+      <% end %>
     </div>
   </a>
 </div>

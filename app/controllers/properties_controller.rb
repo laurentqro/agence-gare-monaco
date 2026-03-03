@@ -15,15 +15,19 @@ class PropertiesController < ApplicationController
     if params[:district_slug].present?
       @district = District.find_by!(slug: params[:district_slug])
       @properties = @properties.in_district(@district)
-    elsif params[:district].present?
-      district_slugs = Array(params[:district])
-      districts = District.where(slug: district_slugs)
-      @properties = @properties.where(district: districts) if districts.any?
+    else
+      district_param = I18n.t("listings.filter_param_district", default: "district")
+      if params[district_param].present?
+        district_slugs = Array(params[district_param])
+        districts = District.where(slug: district_slugs)
+        @properties = @properties.where(district: districts) if districts.any?
+      end
     end
 
-    if params[:type].present?
-      types = Array(params[:type])
-      @properties = @properties.of_type(types)
+    type_param = I18n.t("listings.filter_param_type", default: "type")
+    if params[type_param].present?
+      localized_values = Array(params[type_param])
+      @properties = apply_type_filters(@properties, localized_values)
     end
     @properties = @properties.includes(:property_images, :district).order(created_at: :desc)
 
@@ -63,5 +67,37 @@ class PropertiesController < ApplicationController
 
   def initialize_contact_submission
     @submission = ContactSubmission.new
+  end
+
+  def apply_type_filters(scope, localized_values)
+    canonical_keys = localized_values.map { |lv| canonical_type_filter_key(lv) }
+    filter_defs = ApplicationHelper::TYPE_FILTER_GROUPS.flatten(1)
+
+    conditions = canonical_keys.filter_map do |key|
+      defn = filter_defs.find { |k, _, _| k == key }
+      next unless defn
+      _, property_type, rooms = defn
+      if rooms == :gt5
+        scope.where(property_type: property_type).where("num_rooms > 5")
+      elsif rooms
+        scope.where(property_type: property_type, num_rooms: rooms)
+      else
+        scope.where(property_type: property_type)
+      end
+    end
+
+    return scope.none if conditions.empty?
+
+    # OR all conditions together
+    combined = conditions.reduce { |result, cond| result.or(cond) }
+    combined
+  end
+
+  def canonical_type_filter_key(localized_value)
+    translations = I18n.t("listings.type_filters", default: {})
+    translations.each do |canonical, translated|
+      return canonical.to_s if translated.downcase == localized_value.downcase
+    end
+    localized_value
   end
 end
