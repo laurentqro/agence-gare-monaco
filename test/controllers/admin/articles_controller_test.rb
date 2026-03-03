@@ -238,6 +238,96 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_articles_url
   end
 
+  # MARKDOWN EDITOR
+  test "GET new shows markdown editor toolbar for FR body field" do
+    get new_admin_article_url
+    assert_response :success
+    assert_select "[data-controller='markdown-editor']"
+    assert_select "button[data-action*='markdown-editor#bold']"
+    assert_select "button[data-action*='markdown-editor#italic']"
+    assert_select "button[data-action*='markdown-editor#heading2']"
+    assert_select "button[data-action*='markdown-editor#heading3']"
+    assert_select "button[data-action*='markdown-editor#link']"
+    assert_select "button[data-action*='markdown-editor#bulletList']"
+    assert_select "button[data-action*='markdown-editor#numberedList']"
+    assert_select "button[data-action*='markdown-editor#quote']"
+    assert_select "button[data-action*='markdown-editor#image']"
+  end
+
+  test "GET new shows Write/Preview tabs for FR body field" do
+    get new_admin_article_url
+    assert_response :success
+    assert_select "[data-controller='markdown-editor']" do
+      assert_select "[data-markdown-editor-target='writeTab']"
+      assert_select "[data-markdown-editor-target='previewTab']"
+      assert_select "[data-markdown-editor-target='preview']"
+    end
+  end
+
+  test "GET new does not show markdown editor for non-FR body fields" do
+    get new_admin_article_url
+    assert_response :success
+    # EN, IT, DE etc. should be plain textareas without editor wrapper
+    assert_select "textarea[name='article[body][en]']"
+    assert_select "textarea[name='article[body][it]']"
+    # Only one markdown editor instance (the FR one)
+    assert_select "[data-controller='markdown-editor']", 1
+  end
+
+  test "GET edit shows markdown editor toolbar for FR body field" do
+    article = Article.create!(
+      title: { "fr" => "Test" },
+      body: { "fr" => "**bold content**" },
+      slug: "test-editor",
+      category: @category
+    )
+    get edit_admin_article_url(article)
+    assert_response :success
+    assert_select "[data-controller='markdown-editor']"
+    assert_select "button[data-action*='markdown-editor#bold']"
+  end
+
+  test "GET edit shows Write/Preview tabs for FR body field" do
+    article = Article.create!(
+      title: { "fr" => "Test" },
+      body: { "fr" => "Content" },
+      slug: "test-preview",
+      category: @category
+    )
+    get edit_admin_article_url(article)
+    assert_response :success
+    assert_select "[data-controller='markdown-editor']" do
+      assert_select "[data-markdown-editor-target='writeTab']"
+      assert_select "[data-markdown-editor-target='previewTab']"
+    end
+  end
+
+  test "GET edit has only one markdown editor instance" do
+    article = Article.create!(
+      title: { "fr" => "Test" },
+      body: { "fr" => "Content", "en" => "English content" },
+      slug: "test-single-editor",
+      category: @category
+    )
+    get edit_admin_article_url(article)
+    assert_response :success
+    assert_select "[data-controller='markdown-editor']", 1
+  end
+
+  test "GET new editor has preview endpoint URL as data attribute" do
+    get new_admin_article_url
+    assert_response :success
+    assert_select "[data-markdown-editor-preview-url-value]"
+  end
+
+  test "GET new toolbar buttons have aria-label attributes" do
+    get new_admin_article_url
+    assert_response :success
+    assert_select "button[data-action*='markdown-editor#bold'][aria-label]"
+    assert_select "button[data-action*='markdown-editor#italic'][aria-label]"
+    assert_select "button[data-action*='markdown-editor#link'][aria-label]"
+  end
+
   # FEATURED toggle
   test "PATCH update can toggle featured flag" do
     article = Article.create!(

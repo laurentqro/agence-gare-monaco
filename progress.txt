@@ -35,10 +35,10 @@
 - Toolbar buttons have `aria-label` attributes
 - Add `@rails/request.js` via importmap if needed
 - Admin article form integration tests: editor markup present for FR, absent for other locales
-- STATUS: NOT STARTED
+- STATUS: DONE
 
 ### Task 4: Image upload via ActiveStorage Direct Upload (#50)
-- Blocked by Task 3
+- Unblocked (Task 3 complete)
 - Add `aws-sdk-s3` gem to Gemfile
 - Configure ActiveStorage with Hetzner Object Storage (S3-compatible) for production in `config/storage.yml`
 - Disk service remains for development and test
@@ -68,3 +68,4 @@
 ## Progress Log
 - Task 1 DONE (732 total tests): Added `commonmarker` gem, created `MarkdownHelper#render_markdown`, replaced `simple_format` with `render_markdown` in article show view, updated index and homepage truncation to strip HTML from rendered markdown. 13 helper unit tests + 7 integration tests added.
 - Task 2 DONE (740 total tests): Added `POST /admin/article_preview` route, `Admin::ArticlePreviewsController` with Turbo Stream response, view template targeting `#preview` div. 8 controller tests added (auth, markdown rendering, Turbo Stream format, headings, links, lists, blank/nil input).
+- Task 3 DONE (748 total tests): Created `markdown_editor_controller.js` Stimulus controller with Write/Preview tab toggle, toolbar (Bold, Italic, H2, H3, Link, Bullet List, Numbered List, Quote, Image), text wrapping/insertion, and server-side preview via Turbo Stream fetch. Updated admin article form to show full editor for FR body field only; other 7 locales remain plain textareas. Toolbar buttons have `aria-label` attributes. Preview uses same endpoint and prose styling as public site. 8 integration tests added (toolbar, tabs, single editor instance, aria-labels, preview URL, non-FR fields).
