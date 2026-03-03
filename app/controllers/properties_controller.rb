@@ -12,8 +12,9 @@ class PropertiesController < ApplicationController
     @properties = @properties.where(transaction_type: @transaction_type) if @transaction_type.present?
     @properties = @properties.in_country(@country) if @country.present?
 
-    if params[:district_slug].present?
-      @district = District.find_by!(slug: params[:district_slug])
+    district_slug = params[:district_slug].presence || params[:district].presence
+    if district_slug
+      @district = District.find_by!(slug: district_slug)
       @properties = @properties.in_district(@district)
     end
 

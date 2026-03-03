@@ -232,6 +232,36 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
     assert_select "select[name='district']", count: 0
   end
 
+  test "filtering by district via query param shows only properties in that district" do
+    get "/en/sales/monaco?district=carre-dor"
+    assert_response :success
+    assert_select "[data-testid='property-card']", text: /Studio/
+    assert_no_match "Fontvieille", response.body
+  end
+
+  test "filtering by invalid district via query param returns 404" do
+    get "/en/sales/monaco?district=nonexistent"
+    assert_response :not_found
+  end
+
+  test "filtering by district and type via query params works together" do
+    Property.create!(
+      reference: "MC-004",
+      title: { "en" => "Carré d'Or Villa" },
+      transaction_type: "sale",
+      property_type: "villa",
+      country: "MC",
+      city: "Monaco",
+      district: @carre_dor,
+      price: 5_000_000,
+      published: true
+    )
+    get "/en/sales/monaco?district=carre-dor&type=villa"
+    assert_response :success
+    assert_select "[data-testid='property-card']", count: 1
+    assert_select "[data-testid='property-card']", text: /Villa/
+  end
+
   test "filtering by property type via query param" do
     get "/en/sales/monaco?type=apartment"
     assert_response :success
