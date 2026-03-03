@@ -40,3 +40,6 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 !/app/assets/builds/tailwind.css
+
+# Progress tracking (local only)
+/progress.txt
