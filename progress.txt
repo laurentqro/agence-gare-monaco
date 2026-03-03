@@ -51,7 +51,7 @@
   - On success: insert `![filename](blob_url)` at cursor position
 - Controller tests for Direct Upload endpoint accessibility for authenticated admins
 - Uploaded images render in both admin preview and public article view
-- STATUS: NOT STARTED
+- STATUS: DONE
 
 ## Implementation Notes
 - TDD required: always write failing tests first (red-green-refactor)
@@ -69,3 +69,4 @@
 - Task 1 DONE (732 total tests): Added `commonmarker` gem, created `MarkdownHelper#render_markdown`, replaced `simple_format` with `render_markdown` in article show view, updated index and homepage truncation to strip HTML from rendered markdown. 13 helper unit tests + 7 integration tests added.
 - Task 2 DONE (740 total tests): Added `POST /admin/article_preview` route, `Admin::ArticlePreviewsController` with Turbo Stream response, view template targeting `#preview` div. 8 controller tests added (auth, markdown rendering, Turbo Stream format, headings, links, lists, blank/nil input).
 - Task 3 DONE (748 total tests): Created `markdown_editor_controller.js` Stimulus controller with Write/Preview tab toggle, toolbar (Bold, Italic, H2, H3, Link, Bullet List, Numbered List, Quote, Image), text wrapping/insertion, and server-side preview via Turbo Stream fetch. Updated admin article form to show full editor for FR body field only; other 7 locales remain plain textareas. Toolbar buttons have `aria-label` attributes. Preview uses same endpoint and prose styling as public site. 8 integration tests added (toolbar, tabs, single editor instance, aria-labels, preview URL, non-FR fields).
+- Task 4 DONE (758 total tests): Extended `markdown_editor_controller.js` with ActiveStorage Direct Upload for image upload via three triggers: toolbar image button (file picker), paste from clipboard, and drag-and-drop onto textarea. Pinned `@rails/activestorage` via importmap. Added `directUploadUrl` Stimulus value passed from form. Upload shows placeholder `![Uploading filename...]()` during upload, replaced with `![filename](blob_url)` on success. Protected Direct Upload endpoint with session-based authentication via `config/initializers/active_storage.rb`. 6 new tests added: 3 admin form tests (direct upload URL data attribute on new/edit, file input accepts images), 2 direct upload endpoint tests (authenticated access, unauthenticated rejection), 1 public article image rendering test.
