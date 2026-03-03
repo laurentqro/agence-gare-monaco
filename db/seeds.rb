@@ -34,6 +34,8 @@ Dir.glob(Rails.root.join("articles/*.md")).each do |file|
   title = content.match(/^# (.+)$/)[1]
   date = content.match(/\*\*Date:\*\* (.+)$/)[1].strip
   category_label = content.match(/\*\*Catégorie:\*\* (.+)$/)[1].strip
+  image_match = content.match(/\*\*Image:\*\* (.+)$/)
+  image_url = image_match ? image_match[1].strip : nil
 
   # Body is everything after the --- separator
   body = content.split("---\n", 2).last.strip
@@ -43,12 +45,18 @@ Dir.glob(Rails.root.join("articles/*.md")).each do |file|
 
   slug = title.parameterize
 
-  Article.find_or_create_by!(slug: slug) do |article|
-    article.title = { "fr" => title }
-    article.body = { "fr" => body }
-    article.category = category
-    article.published = true
-    article.featured = false
-    article.published_at = Date.parse(date)
+  article = Article.find_or_create_by!(slug: slug) do |a|
+    a.title = { "fr" => title }
+    a.body = { "fr" => body }
+    a.category = category
+    a.published = true
+    a.featured = false
+    a.published_at = Date.parse(date)
+    a.cover_image_url = image_url
+  end
+
+  # Update cover_image_url if not yet set (for idempotency on re-seed)
+  if image_url.present? && article.cover_image_url.blank?
+    article.update!(cover_image_url: image_url)
   end
 end

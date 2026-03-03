@@ -32,9 +32,9 @@
         <% locale = params[:locale] || I18n.locale.to_s %>
         <% articles_segment = I18n.t("routes.articles", locale: locale) %>
         <a href="/<%= locale %>/<%= articles_segment %>/<%= article.slug %>" class="article-card group block bg-white rounded shadow hover:shadow-md transition">
-          <% if article.first_image_url.present? %>
+          <% if article.cover_image_display_url.present? %>
             <div class="aspect-[16/10] overflow-hidden rounded-t">
-              <img src="<%= article.first_image_url %>" alt="<%= article.title_for(I18n.locale) %>" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
+              <img src="<%= article.cover_image_display_url %>" alt="<%= article.title_for(I18n.locale) %>" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
             </div>
           <% end %>
           <div class="p-5">

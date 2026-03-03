@@ -134,6 +134,71 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".article-body img[src='https://example.com/photo.jpg'][alt='Photo of Monaco']"
   end
 
+  # Cover image on index
+  test "article index prefers cover_image_url over first_image_url" do
+    Article.create!(
+      title: { "en" => "Cover Test" },
+      body: { "en" => "![Body](https://example.com/body.jpg)\n\nContent" },
+      slug: "cover-index-test",
+      category: @category,
+      published: true,
+      published_at: Time.current,
+      cover_image_url: "https://example.com/cover.jpg"
+    )
+
+    get "/en/articles"
+    assert_response :success
+    assert_select ".article-card img[src='https://example.com/cover.jpg']"
+  end
+
+  test "article index falls back to first_image_url when no cover_image_url" do
+    Article.create!(
+      title: { "en" => "Fallback Test" },
+      body: { "en" => "![Body](https://example.com/body.jpg)\n\nContent" },
+      slug: "fallback-test",
+      category: @category,
+      published: true,
+      published_at: Time.current,
+      cover_image_url: nil
+    )
+
+    get "/en/articles"
+    assert_response :success
+    assert_select ".article-card img[src='https://example.com/body.jpg']"
+  end
+
+  # Cover image on show (hero)
+  test "article show displays cover image as hero when present" do
+    Article.create!(
+      title: { "en" => "Hero Test" },
+      body: { "en" => "Some content" },
+      slug: "hero-test",
+      category: @category,
+      published: true,
+      published_at: Time.current,
+      cover_image_url: "https://example.com/hero.jpg"
+    )
+
+    get "/en/articles/hero-test"
+    assert_response :success
+    assert_select "img.article-cover-image[src='https://example.com/hero.jpg']"
+  end
+
+  test "article show does not display hero image when no cover image" do
+    Article.create!(
+      title: { "en" => "No Hero" },
+      body: { "en" => "Content without images" },
+      slug: "no-hero",
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/en/articles/no-hero"
+    assert_response :success
+    assert_select "img.article-cover-image", count: 0
+  end
+
   test "all 8 locales render markdown on article show" do
     article = Article.create!(
       title: { "fr" => "Article FR", "en" => "Article EN" },

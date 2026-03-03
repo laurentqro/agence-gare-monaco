@@ -393,7 +393,7 @@ module SeoHelper
     when :homepage, :listings, :articles, :contact, :privacy
       "#{SITE_HOST}/images/og-default.jpg"
     when :article
-      nil # No hero image implementation yet
+      opts[:article]&.cover_image_display_url
     end
   end
 

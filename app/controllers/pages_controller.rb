@@ -4,7 +4,7 @@ class PagesController < ApplicationController
   allow_unauthenticated_access
 
   def home
-    @featured_articles = Article.published.featured.order(published_at: :desc).limit(3)
+    @latest_articles = Article.published.order(published_at: :desc).limit(4)
     @youtube_videos = YoutubeVideo.latest
     @submission = ContactSubmission.new
     set_seo(page_type: :homepage)

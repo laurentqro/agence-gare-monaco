@@ -51,7 +51,7 @@ module Admin
 
     def article_params
       params.require(:article).permit(
-        :slug, :category_id, :published, :featured,
+        :slug, :category_id, :published, :featured, :cover_image_url,
         title: I18n.available_locales.map(&:to_s),
         body: I18n.available_locales.map(&:to_s)
       )

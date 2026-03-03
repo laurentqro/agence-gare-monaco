@@ -21,6 +21,13 @@
     <% end %>
   </div>
 
+  <%# Cover image %>
+  <% if @article.cover_image_display_url.present? %>
+    <div class="mb-8">
+      <img src="<%= @article.cover_image_display_url %>" alt="<%= @article.title_for(I18n.locale) %>" class="article-cover-image w-full rounded-lg object-cover" loading="eager">
+    </div>
+  <% end %>
+
   <%# Article body %>
   <div class="article-body max-w-none text-[#212529]">
     <%= render_markdown(@article.body_for(I18n.locale)) %>

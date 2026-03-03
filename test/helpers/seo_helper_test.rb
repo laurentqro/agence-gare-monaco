@@ -251,6 +251,33 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
+  test "og_tags for article includes cover image" do
+    @article.update!(cover_image_url: "https://example.com/cover.jpg")
+    I18n.with_locale(:en) do
+      tags = og_tags(page_type: :article, article: @article)
+      assert_includes tags, 'property="og:image" content="https://example.com/cover.jpg"'
+    end
+  end
+
+  test "og_tags for article falls back to first_image_url" do
+    @article.update!(
+      cover_image_url: nil,
+      body: { "fr" => "![Photo](https://example.com/body.jpg)", "en" => "![Photo](https://example.com/body.jpg)" }
+    )
+    I18n.with_locale(:en) do
+      tags = og_tags(page_type: :article, article: @article)
+      assert_includes tags, 'property="og:image" content="https://example.com/body.jpg"'
+    end
+  end
+
+  test "og_tags for article without images has no og:image" do
+    @article.update!(cover_image_url: nil, body: { "fr" => "Text only", "en" => "Text only" })
+    I18n.with_locale(:en) do
+      tags = og_tags(page_type: :article, article: @article)
+      refute_includes tags, 'og:image'
+    end
+  end
+
   test "og_tags includes alternate locales" do
     I18n.with_locale(:fr) do
       tags = og_tags(page_type: :homepage)

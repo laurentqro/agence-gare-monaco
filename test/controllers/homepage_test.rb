@@ -175,7 +175,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
     assert_no_match "Article brouillon", response.body
   end
 
-  test "homepage does not show non-featured articles" do
+  test "homepage shows non-featured published articles" do
     category = Category.create!(name: "Actualités", slug: "actualites")
     Article.create!(
       title: { "fr" => "Article normal" },
@@ -189,8 +189,56 @@ class HomepageTest < ActionDispatch::IntegrationTest
 
     get "/"
     assert_select "[data-testid='featured-articles']" do
-      assert_no_match "Article normal", response.body
+      assert_match "Article normal", response.body
     end
+  end
+
+  test "homepage shows at most 4 latest articles in 2-column grid" do
+    category = Category.create!(name: "Actualités", slug: "actualites")
+    5.times do |i|
+      Article.create!(
+        title: { "fr" => "Article #{i}" },
+        body: { "fr" => "Contenu #{i}" },
+        slug: "article-#{i}",
+        category: category,
+        published: true,
+        published_at: i.days.ago
+      )
+    end
+
+    get "/"
+    assert_select "[data-testid='featured-articles'] .article-card", 4
+  end
+
+  test "homepage article cards show cover image when present" do
+    category = Category.create!(name: "Actualités", slug: "actualites")
+    Article.create!(
+      title: { "fr" => "Avec image" },
+      body: { "fr" => "![Photo](https://example.com/photo.jpg)\n\nContenu" },
+      slug: "avec-image",
+      category: category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/"
+    assert_select "[data-testid='featured-articles'] .article-card img[src='https://example.com/photo.jpg']"
+  end
+
+  test "homepage article cards prefer cover_image_url over body image" do
+    category = Category.create!(name: "Actualités", slug: "actualites")
+    Article.create!(
+      title: { "fr" => "Cover URL" },
+      body: { "fr" => "![Photo](https://example.com/body.jpg)\n\nContenu" },
+      slug: "cover-url-test",
+      category: category,
+      published: true,
+      published_at: Time.current,
+      cover_image_url: "https://example.com/cover.jpg"
+    )
+
+    get "/"
+    assert_select "[data-testid='featured-articles'] .article-card img[src='https://example.com/cover.jpg']"
   end
 
   # === Contact Section ===
@@ -290,7 +338,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   test "homepage renders when @youtube_videos is nil" do
     PagesController.class_eval do
       def home
-        @featured_articles = Article.published.featured.order(published_at: :desc).limit(3)
+        @latest_articles = Article.published.order(published_at: :desc).limit(4)
         @youtube_videos = nil
         @submission = ContactSubmission.new
         set_seo(page_type: :homepage)
@@ -302,7 +350,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   ensure
     PagesController.class_eval do
       def home
-        @featured_articles = Article.published.featured.order(published_at: :desc).limit(3)
+        @latest_articles = Article.published.order(published_at: :desc).limit(4)
         @youtube_videos = YoutubeVideo.latest
         @submission = ContactSubmission.new
         set_seo(page_type: :homepage)

@@ -26,6 +26,17 @@ class Article < ApplicationRecord
     match&.[](1)
   end
 
+  def cover_image_display_url
+    cover_image_url.presence || first_image_url
+  end
+
+  def body_image_urls
+    text = body_for
+    return [] if text.blank?
+
+    text.scan(/!\[.*?\]\((.+?)\)/).flatten
+  end
+
   private
 
   def generate_slug

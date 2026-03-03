@@ -165,7 +165,7 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
   test "contact page renders contact form" do
     get "/en/contact"
     assert_response :success
-    assert_select "form[action^='/contact_submissions']"
+    assert_select "[data-testid='contact-form'] form[action^='/contact_submissions']"
     assert_select "input[name='contact_submission[name]']"
     assert_select "input[name='contact_submission[email]']"
     assert_select "input[name='contact_submission[subject]']"
@@ -176,6 +176,69 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
     get "/en/contact"
     assert_response :success
     assert_select "input[name='website']"
+  end
+
+  # === Contact page team section ===
+
+  test "contact page displays team section with three members" do
+    get "/en/contact"
+    assert_response :success
+    assert_select "[data-testid='contact-team-section']" do
+      assert_select "[data-testid='contact-team-pierre']"
+      assert_select "[data-testid='contact-team-adrien']"
+      assert_select "[data-testid='contact-team-josiane']"
+    end
+  end
+
+  test "contact page team section shows names and translated roles" do
+    get "/en/contact"
+    assert_response :success
+    assert_select "[data-testid='contact-team-section']" do
+      assert_match "Pierre Maré", response.body
+      assert_match "Adrien Maré", response.body
+      assert_match "Josiane Alesi", response.body
+      assert_match I18n.t("homepage.team.pierre_role", locale: :en), response.body
+      assert_match I18n.t("homepage.team.adrien_role", locale: :en), response.body
+      assert_match I18n.t("homepage.team.josiane_role", locale: :en), response.body
+    end
+  end
+
+  test "contact page team member email buttons link to mailto" do
+    get "/en/contact"
+    assert_response :success
+    assert_select "[data-testid='contact-team-pierre'] a[href^='mailto:']"
+    assert_select "[data-testid='contact-team-adrien'] a[href^='mailto:']"
+    assert_select "[data-testid='contact-team-josiane'] a[href^='mailto:']"
+  end
+
+  # === Contact page info section ===
+
+  test "contact page displays agency info" do
+    get "/en/contact"
+    assert_response :success
+    assert_select "[data-testid='contact-info']" do
+      assert_match "3, Rue Langlé", response.body
+      assert_match "MC 98000", response.body
+      assert_match "(+377) 93 30 22 36", response.body
+      assert_match "(+377) 93 25 05 34", response.body
+    end
+  end
+
+  test "contact page displays social media links" do
+    get "/en/contact"
+    assert_response :success
+    assert_select "[data-testid='contact-social-links']" do
+      assert_select "a[href*='linkedin.com']"
+      assert_select "a[href*='facebook.com']"
+      assert_select "a[href*='instagram.com']"
+      assert_select "a[href*='youtube.com']"
+    end
+  end
+
+  test "contact page displays email link" do
+    get "/en/contact"
+    assert_response :success
+    assert_select "[data-testid='contact-info'] a[href='mailto:info@agencegaremonaco.com']"
   end
 
   # === Property page renders the enquiry form ===
@@ -206,12 +269,4 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='enquiry-form'] input[name='website']"
   end
 
-  # === WhatsApp button ===
-
-  test "contact page displays WhatsApp button" do
-    get "/en/contact"
-    assert_response :success
-    assert_select "[data-testid='whatsapp-button']"
-    assert_select "a[href*='wa.me']"
-  end
 end

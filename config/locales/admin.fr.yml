@@ -51,6 +51,7 @@ fr:
         select_category: "Sélectionner une catégorie"
         published: "Publié"
         featured: "À la une"
+        cover_image: "Image de couverture"
         create: "Créer l'article"
         update: "Mettre à jour l'article"
       flash:

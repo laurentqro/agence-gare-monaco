@@ -133,4 +133,49 @@ class ArticleTest < ActiveSupport::TestCase
     )
     assert_equal "https://example.com/first.jpg", article.first_image_url
   end
+
+  # cover_image_display_url
+  test "cover_image_display_url returns cover_image_url when set" do
+    article = Article.new(
+      body: { "fr" => "![Photo](https://example.com/body.jpg)" },
+      cover_image_url: "https://example.com/cover.jpg",
+      category: @category
+    )
+    assert_equal "https://example.com/cover.jpg", article.cover_image_display_url
+  end
+
+  test "cover_image_display_url falls back to first_image_url when cover_image_url blank" do
+    article = Article.new(
+      body: { "fr" => "![Photo](https://example.com/body.jpg)" },
+      cover_image_url: nil,
+      category: @category
+    )
+    assert_equal "https://example.com/body.jpg", article.cover_image_display_url
+  end
+
+  test "cover_image_display_url returns nil when no images at all" do
+    article = Article.new(
+      body: { "fr" => "No images here" },
+      cover_image_url: nil,
+      category: @category
+    )
+    assert_nil article.cover_image_display_url
+  end
+
+  # body_image_urls
+  test "body_image_urls returns all image URLs from body" do
+    article = Article.new(
+      body: { "fr" => "![First](https://example.com/a.jpg)\n\ntext\n\n![Second](https://example.com/b.jpg)" },
+      category: @category
+    )
+    assert_equal ["https://example.com/a.jpg", "https://example.com/b.jpg"], article.body_image_urls
+  end
+
+  test "body_image_urls returns empty array when no images" do
+    article = Article.new(
+      body: { "fr" => "Just text" },
+      category: @category
+    )
+    assert_equal [], article.body_image_urls
+  end
 end

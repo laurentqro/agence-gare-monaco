@@ -353,6 +353,63 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-markdown-editor-direct-upload-url-value]"
   end
 
+  # COVER IMAGE URL
+  test "POST create saves cover_image_url" do
+    post admin_articles_url, params: {
+      article: {
+        title: { fr: "Cover Test" },
+        body: { fr: "![Photo](https://example.com/photo.jpg)\n\nContent" },
+        slug: "cover-test",
+        category_id: @category.id,
+        cover_image_url: "https://example.com/photo.jpg"
+      }
+    }
+    article = Article.find_by(slug: "cover-test")
+    assert_equal "https://example.com/photo.jpg", article.cover_image_url
+  end
+
+  test "PATCH update saves cover_image_url" do
+    article = Article.create!(
+      title: { "fr" => "Test" },
+      body: { "fr" => "![Photo](https://example.com/photo.jpg)" },
+      slug: "cover-update",
+      category: @category
+    )
+    patch admin_article_url(article), params: {
+      article: { cover_image_url: "https://example.com/photo.jpg" }
+    }
+    article.reload
+    assert_equal "https://example.com/photo.jpg", article.cover_image_url
+  end
+
+  test "PATCH update clears cover_image_url when set to blank" do
+    article = Article.create!(
+      title: { "fr" => "Test" },
+      body: { "fr" => "Content" },
+      slug: "cover-clear",
+      category: @category,
+      cover_image_url: "https://example.com/old.jpg"
+    )
+    patch admin_article_url(article), params: {
+      article: { cover_image_url: "" }
+    }
+    article.reload
+    assert article.cover_image_url.blank?
+  end
+
+  test "GET edit shows cover image selector when body has images" do
+    article = Article.create!(
+      title: { "fr" => "Test" },
+      body: { "fr" => "![Photo](https://example.com/photo.jpg)\n\n![Other](https://example.com/other.jpg)" },
+      slug: "cover-selector",
+      category: @category
+    )
+    get edit_admin_article_url(article)
+    assert_response :success
+    assert_select ".cover-image-selector"
+    assert_select "input[type='radio'][name='article[cover_image_url]']", 2
+  end
+
   # FEATURED toggle
   test "PATCH update can toggle featured flag" do
     article = Article.create!(

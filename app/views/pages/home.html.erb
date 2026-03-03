@@ -66,21 +66,26 @@
   <h2 class="text-2xl font-bold text-[#090956] text-center mb-8">
     <%= t("homepage.featured_articles_title") %>
   </h2>
-  <% if @featured_articles.any? %>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <% @featured_articles.each do |article| %>
-        <a href="<%= locale_articles_path %>/<%=article.slug %>" class="group block bg-white rounded shadow hover:shadow-lg transition-shadow border border-gray-100">
-          <div class="p-6">
-            <h3 class="text-sm font-bold text-[#090956] group-hover:text-[#6E8297] transition-colors mb-2">
-              <%= article.title[I18n.locale.to_s] || article.title[I18n.default_locale.to_s] %>
+  <% if @latest_articles.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <% @latest_articles.each do |article| %>
+        <a href="<%= locale_articles_path %>/<%= article.slug %>" class="article-card group block bg-white rounded shadow hover:shadow-md transition">
+          <% if article.cover_image_display_url.present? %>
+            <div class="aspect-[16/10] overflow-hidden rounded-t">
+              <img src="<%= article.cover_image_display_url %>" alt="<%= article.title_for(I18n.locale) %>" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
+            </div>
+          <% end %>
+          <div class="p-5">
+            <h3 class="article-title text-sm font-bold text-[#090956] uppercase tracking-wide group-hover:text-[#6E8297]">
+              <%= article.title_for(I18n.locale) %>
             </h3>
-            <p class="text-xs text-[#6E8297] mb-3">
-              <%= truncate(
-                strip_tags(render_markdown((article.body[I18n.locale.to_s] || article.body[I18n.default_locale.to_s]).to_s)),
-                length: 120
-              ) %>
+            <p class="article-meta mt-2 text-xs text-[#6E8297]">
+              <% if article.published_at %>
+                <time datetime="<%= article.published_at.iso8601 %>"><%= article.published_at.strftime("%Y-%m-%d") %></time>
+                /
+              <% end %>
+              <%= article.category.name %>
             </p>
-            <span class="text-xs font-medium text-[#090956] uppercase tracking-wide"><%= t("homepage.read_more") %> &rarr;</span>
           </div>
         </a>
       <% end %>
