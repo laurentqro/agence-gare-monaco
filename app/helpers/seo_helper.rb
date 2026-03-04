@@ -125,7 +125,11 @@ module SeoHelper
 
     # Image
     image_url = og_image_for(page_type, opts)
-    tags << tag(:meta, property: "og:image", content: image_url) if image_url.present?
+    if image_url.present?
+      tags << tag(:meta, property: "og:image", content: image_url)
+      tags << tag(:meta, property: "og:image:width", content: "1200")
+      tags << tag(:meta, property: "og:image:height", content: "630")
+    end
 
     # Article-specific
     if page_type == :article && opts[:article]&.published_at

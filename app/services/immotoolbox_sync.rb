@@ -1,4 +1,6 @@
 class ImmotoolboxSync
+  include ActionView::Helpers::SanitizeHelper
+
   def initialize(api_token:)
     @client = ImmotoolboxClient.new(api_token: api_token)
   end
@@ -87,7 +89,7 @@ class ImmotoolboxSync
       if texts.is_a?(Hash)
         texts.each do |lang, text_data|
           title[lang] = text_data["title"] if text_data["title"].present?
-          description[lang] = text_data["description"] if text_data["description"].present?
+          description[lang] = strip_tags(text_data["description"]) if text_data["description"].present?
         end
       end
 

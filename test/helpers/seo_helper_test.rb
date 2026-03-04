@@ -164,6 +164,7 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
+
   test "seo_meta_description for article uses body text" do
     I18n.with_locale(:en) do
       result = seo_meta_description(page_type: :article, article: @article)
@@ -235,11 +236,21 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
-  test "og_tags for property includes image" do
+  test "og_tags for property includes image with dimensions" do
     I18n.with_locale(:en) do
       tags = og_tags(page_type: :property, property: @property)
       assert_includes tags, 'property="og:image"'
       assert_includes tags, @image.large_url
+      assert_includes tags, 'property="og:image:width" content="1200"'
+      assert_includes tags, 'property="og:image:height" content="630"'
+    end
+  end
+
+  test "og_tags for homepage includes image dimensions" do
+    I18n.with_locale(:en) do
+      tags = og_tags(page_type: :homepage)
+      assert_includes tags, 'property="og:image:width" content="1200"'
+      assert_includes tags, 'property="og:image:height" content="630"'
     end
   end
 
