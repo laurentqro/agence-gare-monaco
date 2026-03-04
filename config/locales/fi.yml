@@ -159,7 +159,7 @@ fi:
     enquiry_reference: "Kiinteistöviite"
     whatsapp: "WhatsApp"
     whatsapp_message: "Hei, haluaisin tietoa kiinteistöistänne."
-    whatsapp_enquiry_message: "Hei, olen kiinnostunut kiinteistöstä %{reference}. Voisitteko lähettää lisätietoja?"
+    whatsapp_enquiry_message: "Hello, I am interested in property %{reference}. Could you send me more details? %{url}"
 
   pdf_brochure:
     off_market_badge: "EI MARKKINOILLA"

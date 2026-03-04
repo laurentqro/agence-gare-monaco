@@ -159,7 +159,7 @@ sv:
     enquiry_reference: "Fastighetsreferens"
     whatsapp: "WhatsApp"
     whatsapp_message: "Hej, jag vill ha information om era fastigheter."
-    whatsapp_enquiry_message: "Hej, jag är intresserad av fastigheten %{reference}. Kan ni skicka mig mer information?"
+    whatsapp_enquiry_message: "Hello, I am interested in property %{reference}. Could you send me more details? %{url}"
 
   pdf_brochure:
     off_market_badge: "EJ PÅ MARKNADEN"

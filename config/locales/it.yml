@@ -159,7 +159,7 @@ it:
     enquiry_reference: "Riferimento dell'immobile"
     whatsapp: "WhatsApp"
     whatsapp_message: "Buongiorno, vorrei informazioni sui vostri immobili."
-    whatsapp_enquiry_message: "Buongiorno, sono interessato/a all'immobile %{reference}. Potreste inviarmi maggiori dettagli?"
+    whatsapp_enquiry_message: "Hello, I am interested in property %{reference}. Could you send me more details? %{url}"
 
   pdf_brochure:
     off_market_badge: "FUORI MERCATO"

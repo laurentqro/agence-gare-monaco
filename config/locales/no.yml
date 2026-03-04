@@ -159,7 +159,7 @@
     enquiry_reference: "Eiendomsreferanse"
     whatsapp: "WhatsApp"
     whatsapp_message: "Hei, jeg ønsker informasjon om deres eiendommer."
-    whatsapp_enquiry_message: "Hei, jeg er interessert i eiendom %{reference}. Kan dere sende meg mer informasjon?"
+    whatsapp_enquiry_message: "Hello, I am interested in property %{reference}. Could you send me more details? %{url}"
 
   pdf_brochure:
     off_market_badge: "IKKE PÅ MARKEDET"

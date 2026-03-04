@@ -159,7 +159,7 @@ en:
     enquiry_reference: "Property reference"
     whatsapp: "WhatsApp"
     whatsapp_message: "Hello, I would like information about your properties."
-    whatsapp_enquiry_message: "Hello, I am interested in property %{reference}. Could you send me more details?"
+    whatsapp_enquiry_message: "Hello, I am interested in property %{reference}. Could you send me more details? %{url}"
 
   pdf_brochure:
     off_market_badge: "OFF MARKET"
