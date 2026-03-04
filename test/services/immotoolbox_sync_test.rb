@@ -155,6 +155,43 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     assert_includes property.description["en"], "Beautiful studio"
   end
 
+  test "sync strips HTML entities from titles and descriptions" do
+    setup_districts_and_buildings
+
+    WebMock.reset!
+    html_property = property_data(
+      "texts" => {
+        "fr" => { "id" => 300, "title" => "Studio&nbsp;Monte-Carlo", "description" => "Situé&nbsp;au c&oelig;ur de <b>Monaco</b>,&nbsp;proche du port", "languageCode" => "FR" },
+        "en" => { "id" => 301, "title" => "Studio Monte-Carlo EN", "description" => "Located&nbsp;in the&nbsp;heart of Monaco", "languageCode" => "EN" }
+      }
+    )
+    stub_request(:get, "#{@base_url}/properties")
+      .with(query: { "status" => "published", "page" => "1" })
+      .to_return(
+        status: 200,
+        body: [html_property].to_json,
+        headers: { "Content-Type" => "application/json" }
+      )
+    stub_request(:get, "#{@base_url}/properties")
+      .with(query: { "status" => "published", "page" => "2" })
+      .to_return(
+        status: 200,
+        body: [].to_json,
+        headers: { "Content-Type" => "application/json" }
+      )
+
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+
+    property = Property.find_by(immotoolbox_id: 100)
+    assert_equal "Studio Monte-Carlo", property.title["fr"]
+    refute_includes property.description["fr"], "&nbsp;"
+    refute_includes property.description["fr"], "<b>"
+    assert_includes property.description["fr"], "Situé au"
+    assert_includes property.description["fr"], "proche du port"
+    refute_includes property.description["en"], "&nbsp;"
+    assert_equal "Located in the heart of Monaco", property.description["en"]
+  end
+
   test "sync creates property images from inline images" do
     setup_districts_and_buildings
 

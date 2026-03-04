@@ -165,6 +165,26 @@ class SeoHelperTest < ActionView::TestCase
   end
 
 
+  test "seo_meta_description for property strips HTML tags and entities" do
+    @property.update!(description: { "en" => "Located&nbsp;in the heart&nbsp;of <b>Monaco</b>, near the port." })
+    I18n.with_locale(:en) do
+      result = seo_meta_description(page_type: :property, property: @property)
+      assert_not_includes result, "&nbsp;"
+      assert_not_includes result, "<b>"
+      assert_includes result, "Located in the heart of Monaco, near the port."
+    end
+  end
+
+  test "seo_meta_description for article strips HTML tags and entities" do
+    @article.update!(body: { "en" => "Great&nbsp;article about <em>real estate</em> in Monaco." })
+    I18n.with_locale(:en) do
+      result = seo_meta_description(page_type: :article, article: @article)
+      assert_not_includes result, "&nbsp;"
+      assert_not_includes result, "<em>"
+      assert_includes result, "Great article about real estate in Monaco."
+    end
+  end
+
   test "seo_meta_description for article uses body text" do
     I18n.with_locale(:en) do
       result = seo_meta_description(page_type: :article, article: @article)

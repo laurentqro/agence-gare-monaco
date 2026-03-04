@@ -88,8 +88,8 @@ class ImmotoolboxSync
       texts = data["texts"]
       if texts.is_a?(Hash)
         texts.each do |lang, text_data|
-          title[lang] = text_data["title"] if text_data["title"].present?
-          description[lang] = strip_tags(text_data["description"]) if text_data["description"].present?
+          title[lang] = sanitize_html(text_data["title"]) if text_data["title"].present?
+          description[lang] = sanitize_html(text_data["description"]) if text_data["description"].present?
         end
       end
 
@@ -175,6 +175,10 @@ class ImmotoolboxSync
     when "land", "terrain" then "land"
     else api_type&.downcase || "apartment"
     end
+  end
+
+  def sanitize_html(text)
+    Nokogiri::HTML.fragment(text).text.gsub("\u00A0", " ").squish
   end
 
   def parse_integer(value)

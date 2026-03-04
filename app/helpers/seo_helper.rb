@@ -54,9 +54,9 @@ module SeoHelper
     when :homepage
       t("seo.homepage_description")
     when :property
-      opts[:property]&.description_for(I18n.locale)
+      Nokogiri::HTML.fragment(opts[:property]&.description_for(I18n.locale).to_s).text
     when :article
-      strip_tags(opts[:article]&.body_for(I18n.locale))
+      Nokogiri::HTML.fragment(opts[:article]&.body_for(I18n.locale).to_s).text
     when :listings
       seo_listings_description(opts)
     when :articles
@@ -67,7 +67,7 @@ module SeoHelper
       t("seo.privacy_description")
     end
 
-    truncate(desc.to_s, length: 160, omission: "...")
+    truncate(desc.to_s.gsub("\u00A0", " ").squish, length: 160, omission: "...")
   end
 
   # --- Page title ---
