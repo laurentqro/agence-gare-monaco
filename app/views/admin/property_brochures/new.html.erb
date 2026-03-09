@@ -1,8 +1,8 @@
 <div class="p-8">
-  <h1 class="text-2xl font-bold text-[#090956] mb-6"><%= t("admin.property_brochures.title") %></h1>
+  <h1 class="text-2xl font-bold text-navy mb-6"><%= t("admin.property_brochures.title") %></h1>
 
   <div class="bg-white rounded shadow p-6 mb-6">
-    <h2 class="text-lg font-semibold text-[#090956] mb-3"><%= t("admin.property_brochures.property_details") %></h2>
+    <h2 class="text-lg font-semibold text-navy mb-3"><%= t("admin.property_brochures.property_details") %></h2>
     <table class="text-sm">
       <tr>
         <td class="font-medium text-gray-600 pr-4 py-1"><%= t("admin.property_brochures.reference") %></td>
@@ -23,12 +23,12 @@
 
   <%= form_with(url: admin_property_brochure_path(@property), method: :post, class: "space-y-6") do |f| %>
     <div class="bg-white rounded shadow p-6">
-      <h2 class="text-lg font-semibold text-[#090956] mb-3"><%= t("admin.property_brochures.options") %></h2>
+      <h2 class="text-lg font-semibold text-navy mb-3"><%= t("admin.property_brochures.options") %></h2>
 
       <div class="space-y-4">
         <div>
           <label for="locale" class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.property_brochures.locale_label") %></label>
-          <select name="locale" id="locale" class="border border-gray-300 rounded px-3 py-2 text-sm w-full max-w-xs focus:ring-[#090956] focus:border-[#090956]">
+          <select name="locale" id="locale" class="border border-gray-300 rounded px-3 py-2 text-sm w-full max-w-xs focus:ring-navy focus:border-navy">
             <% I18n.available_locales.each do |loc| %>
               <option value="<%= loc %>" <%= "selected" if loc == :fr %>><%= locale_name_for(loc) %> (<%= loc %>)</option>
             <% end %>
@@ -37,14 +37,14 @@
 
         <label class="flex items-center gap-3 cursor-pointer">
           <input type="hidden" name="include_logo" value="0">
-          <input type="checkbox" name="include_logo" value="1" checked class="rounded border-gray-300 text-[#090956] focus:ring-[#090956]">
+          <input type="checkbox" name="include_logo" value="1" checked class="rounded border-gray-300 text-navy focus:ring-navy">
           <span class="text-sm"><%= t("admin.property_brochures.include_logo") %></span>
         </label>
       </div>
     </div>
 
     <div class="flex gap-3">
-      <%= f.submit t("admin.property_brochures.generate"), class: "bg-[#090956] text-white px-4 py-2 rounded hover:bg-[#090956]/90 cursor-pointer" %>
+      <%= f.submit t("admin.property_brochures.generate"), class: "bg-navy text-white px-4 py-2 rounded hover:bg-navy/90 cursor-pointer" %>
       <%= link_to t("admin.shared.cancel"), admin_properties_path, class: "px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50" %>
     </div>
   <% end %>

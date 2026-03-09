@@ -6,16 +6,16 @@
     <div data-testid="back-link" class="mb-6">
       <% if @property.transaction_type == "sale" %>
         <% if @property.country == "MC" %>
-          <a href="<%= locale_sales_monaco_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
+          <a href="<%= locale_sales_monaco_path %>" class="text-accent hover:text-navy text-xs">
             &larr; <%= t("property_detail.back_to_sales") %>
           </a>
         <% else %>
-          <a href="<%= locale_sales_france_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
+          <a href="<%= locale_sales_france_path %>" class="text-accent hover:text-navy text-xs">
             &larr; <%= t("property_detail.back_to_sales") %>
           </a>
         <% end %>
       <% else %>
-        <a href="<%= locale_rentals_monaco_path %>" class="text-[#6E8297] hover:text-[#090956] text-xs">
+        <a href="<%= locale_rentals_monaco_path %>" class="text-accent hover:text-navy text-xs">
           &larr; <%= t("property_detail.back_to_rentals") %>
         </a>
       <% end %>
@@ -44,10 +44,10 @@
 
             <%# Navigation arrows %>
             <% if @photos.size > 1 %>
-              <button data-action="gallery#prev" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center text-[#090956] shadow">
+              <button data-action="gallery#prev" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center text-navy shadow">
                 &lsaquo;
               </button>
-              <button data-action="gallery#next" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center text-[#090956] shadow">
+              <button data-action="gallery#next" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full w-8 h-8 flex items-center justify-center text-navy shadow">
                 &rsaquo;
               </button>
             <% end %>
@@ -57,7 +57,7 @@
           <div data-testid="gallery-thumbnails" class="flex gap-2 overflow-x-auto">
             <% @photos.each_with_index do |photo, index| %>
               <button data-action="gallery#goTo" data-gallery-index-param="<%= index %>"
-                      class="flex-shrink-0 w-16 h-12 rounded overflow-hidden border-2 <%= index == 0 ? 'border-[#090956]' : 'border-transparent' %>"
+                      class="flex-shrink-0 w-16 h-12 rounded overflow-hidden border-2 <%= index == 0 ? 'border-navy' : 'border-transparent' %>"
                       data-gallery-target="thumbnail">
                 <img src="<%= photo.thumb_url || photo.small_url || photo.remote_url %>"
                      alt="<%= t('property_detail.photo_alt', title: title, number: index + 1) %>"
@@ -72,12 +72,12 @@
       <%# Badges %>
       <div class="flex gap-2 mb-4">
         <% if @property.recent? %>
-          <span data-testid="new-badge" class="bg-[#090956] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+          <span data-testid="new-badge" class="bg-navy text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
             <%= t("listings.new_badge") %>
           </span>
         <% end %>
         <% if @property.exclusivity? %>
-          <span data-testid="exclusivity-badge" class="bg-[#6E8297] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+          <span data-testid="exclusivity-badge" class="bg-accent text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
             <%= t("property_detail.exclusivity") %>
           </span>
         <% end %>
@@ -89,14 +89,14 @@
       </div>
 
       <%# Title %>
-      <h1 data-testid="property-title" class="text-2xl font-bold text-[#090956] mb-2"><%= title %></h1>
+      <h1 data-testid="property-title" class="text-2xl font-bold text-navy mb-2"><%= title %></h1>
 
       <%# Price %>
-      <p data-testid="property-price" class="text-xl font-bold text-[#090956] mb-6">
+      <p data-testid="property-price" class="text-xl font-bold text-navy mb-6">
         <% if @property.price.present? %>
           <%= @property.formatted_price %> €<%= @property.transaction_type == "rental" ? t("property_detail.per_month") : "" %>
           <% if (converted = converted_price_tag(@property.price)) %>
-            <span data-testid="converted-price" class="text-sm font-normal text-[#6E8297]"><%= converted %></span>
+            <span data-testid="converted-price" class="text-sm font-normal text-accent"><%= converted %></span>
           <% end %>
         <% else %>
           <%= t("listings.price_on_request") %>
@@ -106,14 +106,14 @@
       <hr class="border-gray-200 mb-6">
 
       <%# Description %>
-      <div data-testid="property-description" class="text-xs text-[#212529] leading-relaxed mb-8">
+      <div data-testid="property-description" class="text-xs text-dark leading-relaxed mb-8">
         <%= simple_format(@property.description_for(I18n.locale)) %>
       </div>
 
       <%# Floor plans %>
       <% if @plans.any? %>
         <div data-testid="floor-plans" class="mb-8">
-          <h2 class="text-lg font-bold text-[#090956] mb-4"><%= t("property_detail.floor_plans") %></h2>
+          <h2 class="text-lg font-bold text-navy mb-4"><%= t("property_detail.floor_plans") %></h2>
           <div class="grid grid-cols-1 gap-4">
             <% @plans.each_with_index do |plan, index| %>
               <div class="bg-gray-50 rounded p-2">
@@ -130,11 +130,11 @@
       <%# Documents %>
       <% if @documents.any? %>
         <div data-testid="property-documents" class="mb-8">
-          <h2 class="text-lg font-bold text-[#090956] mb-4"><%= t("property_detail.documents") %></h2>
+          <h2 class="text-lg font-bold text-navy mb-4"><%= t("property_detail.documents") %></h2>
           <div class="flex flex-col gap-2">
             <% @documents.each do |doc| %>
               <a href="<%= rails_blob_path(doc.file, disposition: "attachment") %>"
-                 class="inline-flex items-center gap-2 text-xs text-[#090956] hover:text-[#6E8297]">
+                 class="inline-flex items-center gap-2 text-xs text-navy hover:text-accent">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -148,7 +148,7 @@
       <%# Virtual tour (krpano/Panotour) %>
       <% if @property.virtual_tour_url.present? %>
         <div data-testid="virtual-tour" class="mb-8">
-          <h2 class="text-lg font-bold text-[#090956] mb-4"><%= t("property_detail.virtual_tour") %></h2>
+          <h2 class="text-lg font-bold text-navy mb-4"><%= t("property_detail.virtual_tour") %></h2>
           <% if @property.virtual_tour_url.end_with?(".html") %>
             <div class="aspect-video rounded overflow-hidden">
               <iframe src="<%= @property.virtual_tour_url %>"
@@ -160,7 +160,7 @@
             </div>
           <% else %>
             <a href="<%= @property.virtual_tour_url %>" target="_blank" rel="noopener noreferrer"
-               class="inline-flex items-center gap-2 bg-white border border-[#2E4C87] text-[#090956] px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
+               class="inline-flex items-center gap-2 bg-white border border-[#2E4C87] text-navy px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
               <%= t("property_detail.view_virtual_tour") %>
             </a>
           <% end %>
@@ -170,7 +170,7 @@
       <%# Video %>
       <% if @property.video_url.present? %>
         <div data-testid="property-video" class="mb-8">
-          <h2 class="text-lg font-bold text-[#090956] mb-4"><%= t("property_detail.video") %></h2>
+          <h2 class="text-lg font-bold text-navy mb-4"><%= t("property_detail.video") %></h2>
           <% youtube_id = @property.video_url[/(?:v=|\/embed\/|youtu\.be\/)([^&?\/]+)/, 1] %>
           <% if youtube_id %>
             <div class="aspect-video rounded overflow-hidden">
@@ -183,7 +183,7 @@
             </div>
           <% else %>
             <a href="<%= @property.video_url %>" target="_blank" rel="noopener noreferrer"
-               class="inline-flex items-center gap-2 bg-white border border-[#2E4C87] text-[#090956] px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
+               class="inline-flex items-center gap-2 bg-white border border-[#2E4C87] text-navy px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
               <%= t("property_detail.video") %>
             </a>
           <% end %>
@@ -194,108 +194,108 @@
     <%# Right column: details table %>
     <div>
       <div data-testid="property-details" class="bg-gray-50 rounded p-6 sticky top-20">
-        <h2 class="text-lg font-bold text-[#090956] mb-4"><%= title %></h2>
+        <h2 class="text-lg font-bold text-navy mb-4"><%= title %></h2>
         <table class="w-full text-xs">
           <tbody>
             <tr class="border-b border-gray-200">
-              <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.reference") %></td>
-              <td class="py-2 text-[#212529] text-right"><%= @property.reference %></td>
+              <td class="py-2 text-accent font-medium"><%= t("property_detail.reference") %></td>
+              <td class="py-2 text-dark text-right"><%= @property.reference %></td>
             </tr>
             <% if @property.building.present? %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.building") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.building.name %></td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.building") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.building.name %></td>
               </tr>
             <% end %>
             <% if @property.district.present? %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.district") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.district.name %></td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.district") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.district.name %></td>
               </tr>
             <% end %>
             <tr class="border-b border-gray-200">
-              <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.type") %></td>
-              <td class="py-2 text-[#212529] text-right capitalize"><%= @property.property_type %><%= @property.subtype.present? ? " (#{@property.subtype})" : "" %></td>
+              <td class="py-2 text-accent font-medium"><%= t("property_detail.type") %></td>
+              <td class="py-2 text-dark text-right capitalize"><%= @property.property_type %><%= @property.subtype.present? ? " (#{@property.subtype})" : "" %></td>
             </tr>
             <% if @property.num_rooms.present? && @property.num_rooms > 0 %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.rooms") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.num_rooms %></td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.rooms") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.num_rooms %></td>
               </tr>
             <% end %>
             <% if @property.num_bedrooms.present? && @property.num_bedrooms > 0 %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.bedrooms") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.num_bedrooms %></td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.bedrooms") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.num_bedrooms %></td>
               </tr>
             <% end %>
             <% if @property.num_bathrooms.present? && @property.num_bathrooms > 0 %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.bathrooms") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.num_bathrooms %></td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.bathrooms") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.num_bathrooms %></td>
               </tr>
             <% end %>
             <% if @property.living_area.present? && @property.living_area > 0 %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.living_area") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.living_area.to_i %> m²</td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.living_area") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.living_area.to_i %> m²</td>
               </tr>
             <% end %>
             <% if @property.total_area.present? && @property.total_area > 0 %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.total_area") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.total_area.to_i %> m²</td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.total_area") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.total_area.to_i %> m²</td>
               </tr>
             <% end %>
             <% if @property.terrace_area.present? && @property.terrace_area > 0 %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.terrace_area") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.terrace_area.to_i %> m²</td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.terrace_area") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.terrace_area.to_i %> m²</td>
               </tr>
             <% end %>
             <% if @property.land_area.present? && @property.land_area > 0 %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.land_area") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.land_area.to_i %> m²</td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.land_area") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.land_area.to_i %> m²</td>
               </tr>
             <% end %>
             <% if @property.garden_area.present? && @property.garden_area > 0 %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.garden_area") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.garden_area.to_i %> m²</td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.garden_area") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.garden_area.to_i %> m²</td>
               </tr>
             <% end %>
             <% if @property.floor.present? %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.floor") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.floor %></td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.floor") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.floor %></td>
               </tr>
             <% end %>
             <% if @property.num_parkings.present? && @property.num_parkings > 0 %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.parkings") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.num_parkings %></td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.parkings") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.num_parkings %></td>
               </tr>
             <% end %>
             <% if @property.num_cellars.present? && @property.num_cellars > 0 %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.cellars") %></td>
-                <td class="py-2 text-[#212529] text-right"><%= @property.num_cellars %></td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.cellars") %></td>
+                <td class="py-2 text-dark text-right"><%= @property.num_cellars %></td>
               </tr>
             <% end %>
             <% if @property.furnished? %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.furnished") %></td>
-                <td class="py-2 text-[#212529] text-right">&#10003;</td>
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.furnished") %></td>
+                <td class="py-2 text-dark text-right">&#10003;</td>
               </tr>
             <% end %>
             <% if @property.service_charges.present? && @property.service_charges > 0 %>
               <tr class="border-b border-gray-200">
-                <td class="py-2 text-[#6E8297] font-medium"><%= t("property_detail.service_charges") %></td>
-                <td class="py-2 text-[#212529] text-right">
+                <td class="py-2 text-accent font-medium"><%= t("property_detail.service_charges") %></td>
+                <td class="py-2 text-dark text-right">
                   <%= @property.service_charges %> €
                   <% if @property.service_charges_included? %>
-                    <span class="text-[#6E8297]"><%= t("property_detail.service_charges_included") %></span>
+                    <span class="text-accent"><%= t("property_detail.service_charges_included") %></span>
                   <% end %>
                 </td>
               </tr>
@@ -307,7 +307,7 @@
         <div class="mt-4 pt-4 border-t border-gray-200">
           <a href="<%= locale_property_path(@property) %>/pdf"
              data-testid="pdf-download-link"
-             class="inline-flex items-center gap-2 w-full justify-center bg-white border border-[#090956] text-[#090956] px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
+             class="inline-flex items-center gap-2 w-full justify-center bg-white border border-navy text-navy px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -335,12 +335,12 @@
   <%# Enquiry form %>
   <div data-testid="enquiry-form" class="mt-12">
     <hr class="border-gray-200 mb-8">
-    <h2 class="text-lg font-bold text-[#090956] mb-6"><%= t("contact_form.enquiry_title") %></h2>
+    <h2 class="text-lg font-bold text-navy mb-6"><%= t("contact_form.enquiry_title") %></h2>
 
     <div class="max-w-xl">
-      <p class="text-xs text-[#6E8297] mb-4">
+      <p class="text-xs text-accent mb-4">
         <%= t("contact_form.enquiry_reference") %>:
-        <span class="font-semibold text-[#212529]"><%= @property.reference %></span>
+        <span class="font-semibold text-dark"><%= @property.reference %></span>
       </p>
 
       <% enquiry = @submission || ContactSubmission.new %>
@@ -365,45 +365,45 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label for="contact_submission_name" class="block text-xs font-medium text-[#212529] mb-1">
+            <label for="contact_submission_name" class="block text-xs font-medium text-dark mb-1">
               <%= t("contact_form.name") %> *
             </label>
-            <%= f.text_field :name, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#090956] focus:outline-none", required: true %>
+            <%= f.text_field :name, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-navy focus:outline-none", required: true %>
           </div>
 
           <div>
-            <label for="contact_submission_email" class="block text-xs font-medium text-[#212529] mb-1">
+            <label for="contact_submission_email" class="block text-xs font-medium text-dark mb-1">
               <%= t("contact_form.email") %> *
             </label>
-            <%= f.email_field :email, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#090956] focus:outline-none", required: true %>
+            <%= f.email_field :email, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-navy focus:outline-none", required: true %>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label for="contact_submission_phone" class="block text-xs font-medium text-[#212529] mb-1">
+            <label for="contact_submission_phone" class="block text-xs font-medium text-dark mb-1">
               <%= t("contact_form.phone") %>
             </label>
-            <%= f.telephone_field :phone, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#090956] focus:outline-none" %>
+            <%= f.telephone_field :phone, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-navy focus:outline-none" %>
           </div>
 
           <div>
-            <label for="contact_submission_country" class="block text-xs font-medium text-[#212529] mb-1">
+            <label for="contact_submission_country" class="block text-xs font-medium text-dark mb-1">
               <%= t("contact_form.country") %>
             </label>
-            <%= f.text_field :country, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#090956] focus:outline-none" %>
+            <%= f.text_field :country, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-navy focus:outline-none" %>
           </div>
         </div>
 
         <div>
-          <label for="contact_submission_message" class="block text-xs font-medium text-[#212529] mb-1">
+          <label for="contact_submission_message" class="block text-xs font-medium text-dark mb-1">
             <%= t("contact_form.message") %> *
           </label>
-          <%= f.text_area :message, rows: 5, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#090956] focus:outline-none", required: true %>
+          <%= f.text_area :message, rows: 5, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-navy focus:outline-none", required: true %>
         </div>
 
         <div>
-          <%= f.submit t("contact_form.send"), class: "bg-white border border-[#2E4C87] text-[#090956] px-6 py-2 rounded text-xs font-semibold hover:bg-gray-50 cursor-pointer" %>
+          <%= f.submit t("contact_form.send"), class: "bg-white border border-[#2E4C87] text-navy px-6 py-2 rounded text-xs font-semibold hover:bg-gray-50 cursor-pointer" %>
         </div>
       <% end %>
     </div>
@@ -413,7 +413,7 @@
   <% if !@property.off_market? && @similar_properties&.any? %>
     <div data-testid="similar-properties" class="mt-12">
       <hr class="border-gray-200 mb-8">
-      <h2 class="text-lg font-bold text-[#090956] mb-6"><%= t("property_detail.similar_properties") %></h2>
+      <h2 class="text-lg font-bold text-navy mb-6"><%= t("property_detail.similar_properties") %></h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <% @similar_properties.each do |property| %>
           <%= render "properties/property_card", property: property %>

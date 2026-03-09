@@ -1,12 +1,12 @@
 <div class="p-8">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-[#090956]"><%= t("admin.properties.title") %></h1>
-    <%= link_to t("admin.properties.new_action"), new_admin_property_path, class: "bg-[#090956] text-white px-4 py-2 rounded hover:bg-[#090956]/90" %>
+    <h1 class="text-2xl font-bold text-navy"><%= t("admin.properties.title") %></h1>
+    <%= link_to t("admin.properties.new_action"), new_admin_property_path, class: "bg-navy text-white px-4 py-2 rounded hover:bg-navy/90" %>
   </div>
 
   <div class="flex gap-2 mb-4">
     <%= link_to t("admin.properties.filter_all"), admin_properties_path,
-        class: "px-3 py-1.5 text-sm rounded #{params[:filter].blank? ? 'bg-[#090956] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+        class: "px-3 py-1.5 text-sm rounded #{params[:filter].blank? ? 'bg-navy text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
     <%= link_to t("admin.properties.filter_off_market"), admin_properties_path(filter: "off_market"),
         class: "px-3 py-1.5 text-sm rounded #{params[:filter] == 'off_market' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
   </div>
@@ -44,9 +44,9 @@
               <% end %>
             </td>
             <td class="px-4 py-3 space-x-2">
-              <%= link_to t("admin.shared.edit"), edit_admin_property_path(property), class: "text-[#6E8297] hover:underline" %>
-              <%= link_to t("admin.property_brochures.pdf"), new_admin_property_brochure_path(property), class: "text-[#6E8297] hover:underline" %>
-              <%= link_to t("admin.properties.share"), new_admin_property_share_path(property), class: "text-[#6E8297] hover:underline" %>
+              <%= link_to t("admin.shared.edit"), edit_admin_property_path(property), class: "text-accent hover:underline" %>
+              <%= link_to t("admin.property_brochures.pdf"), new_admin_property_brochure_path(property), class: "text-accent hover:underline" %>
+              <%= link_to t("admin.properties.share"), new_admin_property_share_path(property), class: "text-accent hover:underline" %>
               <%= link_to t("admin.shared.delete"), admin_property_path(property), data: { turbo_method: :delete, turbo_confirm: t("admin.shared.confirm_delete") }, class: "text-red-600 hover:underline" %>
             </td>
           </tr>

@@ -9,37 +9,37 @@
 
       <%# Desktop Navigation %>
       <div class="hidden lg:flex items-center space-x-6">
-        <a href="<%= locale_sales_monaco_path %>" class="text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_sales_monaco_path %>" class="text-navy hover:text-accent text-xs font-medium uppercase tracking-wide transition-colors">
           <%= t("nav.buy") %>
         </a>
-        <a href="<%= locale_rentals_monaco_path %>" class="text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_rentals_monaco_path %>" class="text-navy hover:text-accent text-xs font-medium uppercase tracking-wide transition-colors">
           <%= t("nav.rent") %>
         </a>
-        <a href="<%= locale_contact_path %>" class="text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_contact_path %>" class="text-navy hover:text-accent text-xs font-medium uppercase tracking-wide transition-colors">
           <%= t("nav.offmarket") %>
         </a>
-        <a href="<%= locale_contact_path %>" class="text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_contact_path %>" class="text-navy hover:text-accent text-xs font-medium uppercase tracking-wide transition-colors">
           <%= t("nav.sell") %>
         </a>
-        <a href="<%= locale_contact_path %>" class="text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_contact_path %>" class="text-navy hover:text-accent text-xs font-medium uppercase tracking-wide transition-colors">
           <%= t("nav.management") %>
         </a>
-        <a href="<%= locale_articles_path %>" class="text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_articles_path %>" class="text-navy hover:text-accent text-xs font-medium uppercase tracking-wide transition-colors">
           <%= t("nav.articles") %>
         </a>
-        <a href="<%= locale_contact_path %>" class="text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_contact_path %>" class="bg-gold text-white text-xs font-medium uppercase tracking-wide px-4 py-2 rounded hover:bg-gold/85 transition-colors">
           <%= t("nav.contact") %>
         </a>
 
         <%# Language Switcher %>
         <div data-controller="language-switcher" data-current-locale="<%= I18n.locale %>" class="relative">
-          <button data-action="language-switcher#toggle" class="flex items-center text-[#090956] hover:text-[#6E8297] transition-colors">
+          <button data-action="language-switcher#toggle" class="flex items-center text-navy hover:text-accent transition-colors">
             <%= image_tag "flags/#{flag_image_for(I18n.locale)}.svg", alt: locale_name_for(I18n.locale), class: "w-5 h-4 rounded-sm" %>
           </button>
           <div data-language-switcher-target="menu" class="hidden absolute right-0 mt-2 bg-white rounded shadow-lg py-1 min-w-[120px]">
             <% I18n.available_locales.each do |locale| %>
               <a href="<%= switch_locale_path(locale) %>"
-                 class="flex items-center px-3 py-1.5 text-xs text-[#212529] hover:bg-gray-50 <%= 'font-bold' if locale == I18n.locale %>">
+                 class="flex items-center px-3 py-1.5 text-xs text-dark hover:bg-gray-50 <%= 'font-bold' if locale == I18n.locale %>">
                 <%= image_tag "flags/#{flag_image_for(locale)}.svg", alt: locale_name_for(locale), class: "w-5 h-4 rounded-sm mr-2" %>
                 <%= locale_name_for(locale) %>
               </a>
@@ -49,7 +49,7 @@
       </div>
 
       <%# Mobile Menu Button %>
-      <button data-action="mobile-menu#toggle" class="lg:hidden text-[#090956] p-2" aria-label="Menu">
+      <button data-action="mobile-menu#toggle" class="lg:hidden text-navy p-2" aria-label="Menu">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path data-mobile-menu-target="openIcon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           <path data-mobile-menu-target="closeIcon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -61,25 +61,25 @@
   <%# Mobile Menu %>
   <div data-mobile-menu-target="menu" class="hidden lg:hidden bg-white border-t border-gray-200">
     <div class="px-4 py-3 space-y-2">
-      <a href="<%= locale_sales_monaco_path %>" class="block text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_sales_monaco_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
         <%= t("nav.buy") %>
       </a>
-      <a href="<%= locale_rentals_monaco_path %>" class="block text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_rentals_monaco_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
         <%= t("nav.rent") %>
       </a>
-      <a href="<%= locale_contact_path %>" class="block text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_contact_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
         <%= t("nav.offmarket") %>
       </a>
-      <a href="<%= locale_contact_path %>" class="block text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_contact_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
         <%= t("nav.sell") %>
       </a>
-      <a href="<%= locale_contact_path %>" class="block text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_contact_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
         <%= t("nav.management") %>
       </a>
-      <a href="<%= locale_articles_path %>" class="block text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_articles_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
         <%= t("nav.articles") %>
       </a>
-      <a href="<%= locale_contact_path %>" class="block text-[#090956] hover:text-[#6E8297] text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_contact_path %>" class="inline-block bg-gold text-white text-xs font-medium uppercase tracking-wide px-4 py-2 rounded hover:bg-gold/85 transition-colors mt-2">
         <%= t("nav.contact") %>
       </a>
 
@@ -88,7 +88,7 @@
         <div class="flex flex-wrap gap-2">
           <% I18n.available_locales.each do |locale| %>
             <a href="<%= switch_locale_path(locale) %>"
-               class="flex items-center px-2 py-1 rounded text-xs text-[#090956] hover:bg-gray-100 <%= 'bg-gray-200' if locale == I18n.locale %>">
+               class="flex items-center px-2 py-1 rounded text-xs text-navy hover:bg-gray-100 <%= 'bg-gray-200' if locale == I18n.locale %>">
               <%= image_tag "flags/#{flag_image_for(locale)}.svg", alt: locale_name_for(locale), class: "w-5 h-4 rounded-sm" %>
             </a>
           <% end %>

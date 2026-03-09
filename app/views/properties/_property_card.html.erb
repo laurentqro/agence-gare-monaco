@@ -19,24 +19,24 @@
 
       <%# Badges %>
       <% if property.recent? %>
-        <span data-testid="new-badge" class="absolute top-2 left-2 bg-[#090956] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+        <span data-testid="new-badge" class="absolute top-2 left-2 bg-navy text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
           <%= t("listings.new_badge") %>
         </span>
       <% end %>
       <% if property.exclusivity? %>
-        <span class="absolute top-2 right-2 bg-[#6E8297] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
+        <span class="absolute top-2 right-2 bg-accent text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
           Exclusivité
         </span>
       <% end %>
 
       <%# Title & price overlay with left-to-right gradient %>
-      <div class="absolute bottom-0 inset-x-0 bg-gradient-to-r from-[#090956]/90 to-transparent px-5 py-4">
+      <div class="absolute bottom-0 inset-x-0 bg-gradient-to-r from-navy/90 to-transparent px-5 py-4">
         <h3 class="text-white font-bold text-sm uppercase tracking-wide line-clamp-1">
           <%= property.title_for(I18n.locale) %>
         </h3>
         <p class="mt-1">
           <% if property.price.present? %>
-            <span class="inline-block bg-[#090956]/60 text-white text-sm font-semibold px-3 py-0.5 rounded-full backdrop-blur-sm">
+            <span class="inline-block bg-navy/60 text-white text-sm font-semibold px-3 py-0.5 rounded-full backdrop-blur-sm">
               <%= property.formatted_price %>&euro;
               <% if property.transaction_type == "rental" %><span class="text-xs font-normal"><%= t("property_detail.per_month") %></span><% end %>
             </span>
@@ -44,7 +44,7 @@
               <span data-testid="converted-price" class="text-xs text-white/70 ml-1"><%= converted %></span>
             <% end %>
           <% else %>
-            <span class="inline-block bg-[#090956]/60 text-white text-sm font-semibold px-3 py-0.5 rounded-full backdrop-blur-sm">
+            <span class="inline-block bg-navy/60 text-white text-sm font-semibold px-3 py-0.5 rounded-full backdrop-blur-sm">
               <%= t("listings.price_on_request") %>
             </span>
           <% end %>
@@ -53,7 +53,7 @@
     </div>
 
     <%# Property details footer with SVG icons %>
-    <div class="flex flex-wrap items-center gap-4 text-xs text-[#6E8297] px-5 py-3">
+    <div class="flex flex-wrap items-center gap-4 text-xs text-accent px-5 py-3">
       <% if property.num_rooms.present? && property.num_rooms > 0 %>
         <span class="inline-flex items-center gap-1" title="<%= t("listings.rooms") %>">
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9.3V4h-3v2.6L12 3 2 12h3v8h5v-6h4v6h5v-8h3l-3-2.7zm-9 .7c0-1.1.9-2 2-2s2 .9 2 2h-4z"/></svg>

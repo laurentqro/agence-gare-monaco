@@ -23,11 +23,11 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="font-['Montserrat',Helvetica,Arial,Verdana,sans-serif] text-[#212529] bg-gray-50">
+  <body class="font-['Montserrat',Helvetica,Arial,Verdana,sans-serif] text-dark bg-gray-50">
     <div class="flex min-h-screen">
       <%# Sidebar navigation %>
       <% if authenticated? %>
-        <aside class="w-64 bg-[#090956] text-white flex flex-col flex-shrink-0">
+        <aside class="w-64 bg-navy text-white flex flex-col flex-shrink-0">
           <div class="p-4 border-b border-white/10">
             <a href="<%= admin_root_path %>" class="text-lg font-bold">Agence de la Gare</a>
           </div>

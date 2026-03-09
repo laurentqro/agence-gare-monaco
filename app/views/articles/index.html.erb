@@ -1,5 +1,5 @@
 <div class="max-w-7xl mx-auto px-4 py-12">
-  <h1 class="text-4xl font-bold text-[#090956] mb-2">
+  <h1 class="text-4xl font-bold text-navy mb-2">
     <% if @category %>
       <%= @category.name %>
     <% else %>
@@ -14,12 +14,12 @@
       <% locale = params[:locale] || I18n.locale.to_s %>
       <% articles_segment = I18n.t("routes.articles", locale: locale) %>
       <a href="/<%= locale %>/<%= articles_segment %>"
-         class="px-3 py-1 text-sm rounded border <%= @category.nil? ? 'bg-[#090956] text-white border-[#090956]' : 'border-gray-300 text-gray-600 hover:border-[#090956]' %>">
+         class="px-3 py-1 text-sm rounded border <%= @category.nil? ? 'bg-navy text-white border-navy' : 'border-gray-300 text-gray-600 hover:border-navy' %>">
         <%= t("articles.all") %>
       </a>
       <% categories.each do |cat| %>
         <a href="/<%= locale %>/<%= articles_segment %>/<%= cat.slug %>"
-           class="px-3 py-1 text-sm rounded border <%= @category&.id == cat.id ? 'bg-[#090956] text-white border-[#090956]' : 'border-gray-300 text-gray-600 hover:border-[#090956]' %>">
+           class="px-3 py-1 text-sm rounded border <%= @category&.id == cat.id ? 'bg-navy text-white border-navy' : 'border-gray-300 text-gray-600 hover:border-navy' %>">
           <%= cat.name %>
         </a>
       <% end %>
@@ -38,10 +38,10 @@
             </div>
           <% end %>
           <div class="p-5">
-            <h2 class="article-title text-sm font-bold text-[#090956] uppercase tracking-wide group-hover:text-[#6E8297]">
+            <h2 class="article-title text-sm font-bold text-navy uppercase tracking-wide group-hover:text-accent">
               <%= article.title_for(I18n.locale) %>
             </h2>
-            <p class="article-meta mt-2 text-xs text-[#6E8297]">
+            <p class="article-meta mt-2 text-xs text-accent">
               <% if article.published_at %>
                 <time datetime="<%= article.published_at.iso8601 %>"><%= article.published_at.strftime("%Y-%m-%d") %></time>
                 /

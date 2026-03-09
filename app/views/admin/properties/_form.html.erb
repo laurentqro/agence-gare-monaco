@@ -15,21 +15,21 @@
     <div class="lg:col-span-2 space-y-6">
       <%# Core details %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-[#090956] mb-4"><%= t("admin.properties.form.details") %></legend>
+        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.details") %></legend>
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.reference") %></label>
             <input type="text" name="property[reference]" value="<%= property.reference %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.price") %></label>
             <input type="number" name="property[price]" value="<%= property.price %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.transaction_type") %></label>
-            <select name="property[transaction_type]" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+            <select name="property[transaction_type]" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
               <option value=""><%= t("admin.shared.select") %></option>
               <option value="sale" <%= "selected" if property.transaction_type == "sale" %>><%= t("admin.properties.form.sale") %></option>
               <option value="rental" <%= "selected" if property.transaction_type == "rental" %>><%= t("admin.properties.form.rental") %></option>
@@ -37,7 +37,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.property_type") %></label>
-            <select name="property[property_type]" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+            <select name="property[property_type]" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
               <option value=""><%= t("admin.shared.select") %></option>
               <% %w[studio apartment penthouse villa house office commercial parking cellar].each do |type| %>
                 <option value="<%= type %>" <%= "selected" if property.property_type == type %>><%= t("admin.properties.form.property_types.#{type}") %></option>
@@ -47,23 +47,23 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.subtype") %></label>
             <input type="text" name="property[subtype]" value="<%= property.subtype %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.floor") %></label>
             <input type="number" name="property[floor]" value="<%= property.floor %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
         </div>
       </fieldset>
 
       <%# Location %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-[#090956] mb-4"><%= t("admin.properties.form.location") %></legend>
+        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.location") %></legend>
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.country") %></label>
-            <select name="property[country]" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+            <select name="property[country]" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
               <option value=""><%= t("admin.shared.select") %></option>
               <option value="MC" <%= "selected" if property.country == "MC" %>><%= t("admin.properties.form.monaco") %></option>
               <option value="FR" <%= "selected" if property.country == "FR" %>><%= t("admin.properties.form.france") %></option>
@@ -72,94 +72,94 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.city") %></label>
             <input type="text" name="property[city]" value="<%= property.city %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.district") %></label>
             <%= f.select :district_id, @districts.map { |d| [d.name, d.id] },
                          { include_blank: t("admin.shared.none") },
-                         class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]" %>
+                         class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy" %>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.building") %></label>
             <%= f.select :building_id, @buildings.map { |b| [b.name, b.id] },
                          { include_blank: t("admin.shared.none") },
-                         class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]" %>
+                         class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy" %>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.address") %></label>
             <input type="text" name="property[address]" value="<%= property.address %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
         </div>
       </fieldset>
 
       <%# Dimensions %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-[#090956] mb-4"><%= t("admin.properties.form.dimensions") %></legend>
+        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.dimensions") %></legend>
         <div class="grid grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.rooms") %></label>
             <input type="number" name="property[num_rooms]" value="<%= property.num_rooms %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.bedrooms") %></label>
             <input type="number" name="property[num_bedrooms]" value="<%= property.num_bedrooms %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.bathrooms") %></label>
             <input type="number" name="property[num_bathrooms]" value="<%= property.num_bathrooms %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.parkings") %></label>
             <input type="number" name="property[num_parkings]" value="<%= property.num_parkings %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.cellars") %></label>
             <input type="number" name="property[num_cellars]" value="<%= property.num_cellars %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.living_area") %></label>
             <input type="number" step="0.01" name="property[living_area]" value="<%= property.living_area %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.total_area") %></label>
             <input type="number" step="0.01" name="property[total_area]" value="<%= property.total_area %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.terrace_area") %></label>
             <input type="number" step="0.01" name="property[terrace_area]" value="<%= property.terrace_area %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.land_area") %></label>
             <input type="number" step="0.01" name="property[land_area]" value="<%= property.land_area %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.garden_area") %></label>
             <input type="number" step="0.01" name="property[garden_area]" value="<%= property.garden_area %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
         </div>
       </fieldset>
 
       <%# Multilingual titles %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-[#090956] mb-4"><%= t("admin.properties.form.title_legend") %></legend>
+        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.title_legend") %></legend>
         <div class="space-y-4">
           <% I18n.available_locales.each do |locale| %>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1"><%= locale.to_s.upcase %></label>
               <input type="text" name="property[title][<%= locale %>]" value="<%= property.title&.dig(locale.to_s) %>"
-                     class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                     class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
             </div>
           <% end %>
         </div>
@@ -167,13 +167,13 @@
 
       <%# Multilingual descriptions %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-[#090956] mb-4"><%= t("admin.properties.form.description_legend") %></legend>
+        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.description_legend") %></legend>
         <div class="space-y-4">
           <% I18n.available_locales.each do |locale| %>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1"><%= locale.to_s.upcase %></label>
               <textarea name="property[description][<%= locale %>]" rows="6"
-                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]"><%= property.description&.dig(locale.to_s) %></textarea>
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy"><%= property.description&.dig(locale.to_s) %></textarea>
             </div>
           <% end %>
         </div>
@@ -181,20 +181,20 @@
 
       <%# Media %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-[#090956] mb-4"><%= t("admin.properties.form.media") %></legend>
+        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.media") %></legend>
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.video_url") %></label>
             <input type="url" name="property[video_url]" value="<%= property.video_url %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div class="col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.virtual_tour_url") %></label>
             <input type="url" name="property[virtual_tour_url]" value="<%= property.virtual_tour_url %>"
-                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
           </div>
           <div class="flex items-center gap-2">
-            <%= f.check_box :has_360_tour, class: "rounded border-gray-300 text-[#090956] focus:ring-[#090956]" %>
+            <%= f.check_box :has_360_tour, class: "rounded border-gray-300 text-navy focus:ring-navy" %>
             <label class="text-sm font-medium text-gray-700"><%= t("admin.properties.form.tour_360") %></label>
           </div>
         </div>
@@ -205,38 +205,38 @@
     <div class="space-y-6">
       <div class="bg-white rounded shadow p-6 space-y-4">
         <div class="flex items-center gap-2">
-          <%= f.check_box :published, class: "rounded border-gray-300 text-[#090956] focus:ring-[#090956]" %>
+          <%= f.check_box :published, class: "rounded border-gray-300 text-navy focus:ring-navy" %>
           <label class="text-sm font-medium text-gray-700"><%= t("admin.properties.form.published") %></label>
         </div>
 
         <div class="flex items-center gap-2">
-          <%= f.check_box :featured, class: "rounded border-gray-300 text-[#090956] focus:ring-[#090956]" %>
+          <%= f.check_box :featured, class: "rounded border-gray-300 text-navy focus:ring-navy" %>
           <label class="text-sm font-medium text-gray-700"><%= t("admin.properties.form.featured") %></label>
         </div>
 
         <div class="flex items-center gap-2">
-          <%= f.check_box :off_market, class: "rounded border-gray-300 text-[#090956] focus:ring-[#090956]" %>
+          <%= f.check_box :off_market, class: "rounded border-gray-300 text-navy focus:ring-navy" %>
           <label class="text-sm font-medium text-gray-700"><%= t("admin.properties.form.off_market") %></label>
         </div>
 
         <div class="flex items-center gap-2">
-          <%= f.check_box :exclusivity, class: "rounded border-gray-300 text-[#090956] focus:ring-[#090956]" %>
+          <%= f.check_box :exclusivity, class: "rounded border-gray-300 text-navy focus:ring-navy" %>
           <label class="text-sm font-medium text-gray-700"><%= t("admin.properties.form.exclusivity") %></label>
         </div>
 
         <div class="flex items-center gap-2">
-          <%= f.check_box :furnished, class: "rounded border-gray-300 text-[#090956] focus:ring-[#090956]" %>
+          <%= f.check_box :furnished, class: "rounded border-gray-300 text-navy focus:ring-navy" %>
           <label class="text-sm font-medium text-gray-700"><%= t("admin.properties.form.furnished") %></label>
         </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.service_charges") %></label>
           <input type="number" name="property[service_charges]" value="<%= property.service_charges %>"
-                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-[#090956] focus:border-[#090956]">
+                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
         </div>
 
         <div class="flex items-center gap-2">
-          <%= f.check_box :service_charges_included, class: "rounded border-gray-300 text-[#090956] focus:ring-[#090956]" %>
+          <%= f.check_box :service_charges_included, class: "rounded border-gray-300 text-navy focus:ring-navy" %>
           <label class="text-sm font-medium text-gray-700"><%= t("admin.properties.form.service_charges_included") %></label>
         </div>
 
@@ -252,7 +252,7 @@
 
       <div class="flex gap-3">
         <%= f.submit property.persisted? ? t("admin.properties.form.update") : t("admin.properties.form.create"),
-                     class: "bg-[#090956] text-white px-4 py-2 rounded hover:bg-[#090956]/90 cursor-pointer" %>
+                     class: "bg-navy text-white px-4 py-2 rounded hover:bg-navy/90 cursor-pointer" %>
         <%= link_to t("admin.shared.cancel"), admin_properties_path, class: "px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50" %>
       </div>
     </div>

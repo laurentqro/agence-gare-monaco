@@ -2,3 +2,10 @@
 @source "../../views";
 @source "../../helpers";
 @source "../../../lib";
+
+@theme {
+  --color-navy: #090956;
+  --color-gold: #C5A355;
+  --color-accent: #6E8297;
+  --color-dark: #212529;
+}
