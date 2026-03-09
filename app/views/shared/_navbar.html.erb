@@ -9,22 +9,22 @@
 
       <%# Desktop Navigation %>
       <div class="hidden lg:flex items-center space-x-6">
-        <a href="<%= locale_sales_monaco_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_sales_monaco_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_sales_monaco_path) %>">
           <%= t("nav.buy") %>
         </a>
-        <a href="<%= locale_rentals_monaco_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_rentals_monaco_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_rentals_monaco_path) %>">
           <%= t("nav.rent") %>
         </a>
-        <a href="<%= locale_offmarket_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_offmarket_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_offmarket_path) %>">
           <%= t("nav.offmarket") %>
         </a>
-        <a href="<%= locale_contact_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_contact_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_contact_path) %>">
           <%= t("nav.sell") %>
         </a>
-        <a href="<%= locale_contact_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_contact_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_contact_path) %>">
           <%= t("nav.management") %>
         </a>
-        <a href="<%= locale_articles_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors">
+        <a href="<%= locale_articles_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_articles_path) %>">
           <%= t("nav.articles") %>
         </a>
         <a href="<%= locale_contact_path %>" class="bg-gold text-white text-sm font-medium uppercase tracking-wide px-5 py-2.5 rounded hover:bg-gold/85 transition-colors">
@@ -61,22 +61,22 @@
   <%# Mobile Menu %>
   <div data-mobile-menu-target="menu" class="hidden lg:hidden bg-white border-t border-gray-200">
     <div class="px-4 py-3 space-y-2">
-      <a href="<%= locale_sales_monaco_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_sales_monaco_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2 <%= nav_active_class(locale_sales_monaco_path) %>">
         <%= t("nav.buy") %>
       </a>
-      <a href="<%= locale_rentals_monaco_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_rentals_monaco_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2 <%= nav_active_class(locale_rentals_monaco_path) %>">
         <%= t("nav.rent") %>
       </a>
-      <a href="<%= locale_offmarket_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_offmarket_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2 <%= nav_active_class(locale_offmarket_path) %>">
         <%= t("nav.offmarket") %>
       </a>
-      <a href="<%= locale_contact_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_contact_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2 <%= nav_active_class(locale_contact_path) %>">
         <%= t("nav.sell") %>
       </a>
-      <a href="<%= locale_contact_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_contact_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2 <%= nav_active_class(locale_contact_path) %>">
         <%= t("nav.management") %>
       </a>
-      <a href="<%= locale_articles_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2">
+      <a href="<%= locale_articles_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2 <%= nav_active_class(locale_articles_path) %>">
         <%= t("nav.articles") %>
       </a>
       <a href="<%= locale_contact_path %>" class="inline-block bg-gold text-white text-xs font-medium uppercase tracking-wide px-4 py-2 rounded hover:bg-gold/85 transition-colors mt-2">

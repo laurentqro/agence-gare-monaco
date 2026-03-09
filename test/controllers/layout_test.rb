@@ -243,6 +243,43 @@ class LayoutTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # === Active Nav Indicator ===
+
+  test "buy nav link has active indicator on sales listing page" do
+    get "/ventes/monaco"
+    assert_select "nav a.nav-active[href='/ventes/monaco']"
+  end
+
+  test "rent nav link has active indicator on rentals listing page" do
+    get "/locations/monaco"
+    assert_select "nav a.nav-active[href='/locations/monaco']"
+  end
+
+  test "off-market nav link has active indicator on off-market page" do
+    get "/off-market"
+    assert_select "nav a.nav-active[href='/off-market']"
+  end
+
+  test "articles nav link has active indicator on articles page" do
+    get "/articles"
+    assert_select "nav a.nav-active[href='/articles']"
+  end
+
+  test "no nav link is active on homepage" do
+    get "/"
+    assert_select "nav a.nav-active", count: 0
+  end
+
+  test "active nav indicator works for English locale" do
+    get "/en/sales/monaco"
+    assert_select "nav a.nav-active[href='/en/sales/monaco']"
+  end
+
+  test "only one desktop nav link is active at a time" do
+    get "/ventes/monaco"
+    assert_select ".lg\\:flex a.nav-active", count: 1
+  end
+
   test "layout does not include navbar on admin pages" do
     user = User.create!(email_address: "admin@test.com", password: "password123")
     post session_url, params: { email_address: "admin@test.com", password: "password123" }

@@ -170,4 +170,8 @@ module ApplicationHelper
   def locale_name_for(locale)
     LOCALE_NAMES[locale.to_sym] || locale.to_s
   end
+
+  def nav_active_class(nav_path)
+    request.path.start_with?(nav_path) ? "nav-active" : ""
+  end
 end
