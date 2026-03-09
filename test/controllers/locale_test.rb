@@ -42,9 +42,11 @@ class LocaleTest < ActionDispatch::IntegrationTest
 
   test "each locale file has nav translations" do
     I18n.available_locales.each do |locale|
-      assert I18n.exists?("nav.sales_monaco", locale), "Missing nav.sales_monaco for locale #{locale}"
-      assert I18n.exists?("nav.rentals_monaco", locale), "Missing nav.rentals_monaco for locale #{locale}"
-      assert I18n.exists?("nav.france", locale), "Missing nav.france for locale #{locale}"
+      assert I18n.exists?("nav.buy", locale), "Missing nav.buy for locale #{locale}"
+      assert I18n.exists?("nav.rent", locale), "Missing nav.rent for locale #{locale}"
+      assert I18n.exists?("nav.offmarket", locale), "Missing nav.offmarket for locale #{locale}"
+      assert I18n.exists?("nav.sell", locale), "Missing nav.sell for locale #{locale}"
+      assert I18n.exists?("nav.management", locale), "Missing nav.management for locale #{locale}"
       assert I18n.exists?("nav.articles", locale), "Missing nav.articles for locale #{locale}"
       assert I18n.exists?("nav.contact", locale), "Missing nav.contact for locale #{locale}"
     end

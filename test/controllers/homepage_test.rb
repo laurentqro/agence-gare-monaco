@@ -45,24 +45,56 @@ class HomepageTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # === Category Cards ===
+  # === Hero Service Cards ===
 
-  test "homepage displays three category cards" do
+  test "homepage hero displays five service cards" do
     get "/"
-    assert_select "[data-testid='category-cards']" do
-      assert_select "a[href='/ventes/monaco']", text: /Ventes Monaco/i
-      assert_select "a[href='/locations/monaco']", text: /Location Monaco/i
-      assert_select "a[href='/ventes/france']", text: /France/i
+    assert_select "[data-testid='hero-cards'] a.hero-card", 5
+  end
+
+  test "hero cards link to correct paths for French" do
+    get "/"
+    assert_select "[data-testid='hero-cards']" do
+      assert_select "a[href='/ventes/monaco']", 1
+      assert_select "a[href='/locations/monaco']", 1
+      assert_select "a[href='/contact']", 3
     end
   end
 
-  test "category cards link to correct locale-translated paths" do
+  test "hero cards link to correct paths for English" do
     get "/en"
-    assert_select "[data-testid='category-cards']" do
-      assert_select "a[href='/en/sales/monaco']"
-      assert_select "a[href='/en/rentals/monaco']"
-      assert_select "a[href='/en/sales/france']"
+    assert_select "[data-testid='hero-cards']" do
+      assert_select "a[href='/en/sales/monaco']", 1
+      assert_select "a[href='/en/rentals/monaco']", 1
+      assert_select "a[href='/en/contact']", 3
     end
+  end
+
+  test "hero cards display translated labels for French" do
+    get "/"
+    assert_select "[data-testid='hero-cards']" do
+      assert_select "a", text: /Acheter/
+      assert_select "a", text: /Louer/
+      assert_select "a", text: /Off-market/
+      assert_select "a", text: /Vendre/
+      assert_select "a", text: /Gestion/
+    end
+  end
+
+  test "hero cards display translated labels for English" do
+    get "/en"
+    assert_select "[data-testid='hero-cards']" do
+      assert_select "a", text: /Buy/
+      assert_select "a", text: /Rent/
+      assert_select "a", text: /Off-market/
+      assert_select "a", text: /Sell/
+      assert_select "a", text: /Management/
+    end
+  end
+
+  test "hero cards contain SVG icons" do
+    get "/"
+    assert_select "[data-testid='hero-cards'] svg", 5
   end
 
   # === About Section ===
@@ -376,7 +408,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
       get "/#{locale}"
       assert_response :success, "Homepage failed for locale #{locale}"
       assert_select "[data-testid='hero']", { minimum: 1 }, "Missing hero for locale #{locale}"
-      assert_select "[data-testid='category-cards']", { minimum: 1 }, "Missing category cards for locale #{locale}"
+      assert_select "[data-testid='hero-cards']", { minimum: 1 }, "Missing hero cards for locale #{locale}"
       assert_select "[data-testid='about']", { minimum: 1 }, "Missing about section for locale #{locale}"
       assert_select "[data-testid='team']", { minimum: 1 }, "Missing team section for locale #{locale}"
     end
