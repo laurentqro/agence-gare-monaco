@@ -123,11 +123,18 @@ class LayoutTest < ActionDispatch::IntegrationTest
 
   # === Footer ===
 
-  test "footer includes copyright and agency name" do
+  # -- Brand column --
+
+  test "footer includes agency logo linking to locale root" do
     get "/"
-    assert_select "footer" do
-      assert_match "Agence de la Gare", response.body
+    assert_select "footer a[href='/']" do
+      assert_select "img[alt='Agence Immobilière de la Gare']"
     end
+  end
+
+  test "footer includes tagline" do
+    get "/"
+    assert_select "footer", text: /partenaire immobilier/i
   end
 
   test "footer includes social media links" do
@@ -140,17 +147,76 @@ class LayoutTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # -- Navigation column --
+
+  test "footer includes navigation links for French" do
+    get "/"
+    assert_select "footer" do
+      assert_select "a[href='/ventes/monaco']", text: /Acheter/
+      assert_select "a[href='/locations/monaco']", text: /Louer/
+      assert_select "a[href='/off-market']", text: /Off-market/
+      assert_select "a[href='/contact']", text: /Vendre/
+      assert_select "a[href='/contact']", text: /Gestion/
+      assert_select "a[href='/articles']", text: /Articles/
+    end
+  end
+
+  test "footer includes navigation links for English" do
+    get "/en"
+    assert_select "footer" do
+      assert_select "a[href='/en/sales/monaco']", text: /Buy/
+      assert_select "a[href='/en/rentals/monaco']", text: /Rent/
+      assert_select "a[href='/en/off-market']", text: /Off-market/
+      assert_select "a[href='/en/contact']", text: /Sell/
+      assert_select "a[href='/en/contact']", text: /Management/
+      assert_select "a[href='/en/articles']", text: /Articles/
+    end
+  end
+
+  test "footer includes gold contact button" do
+    get "/"
+    assert_select "footer a.bg-gold[href='/contact']", text: /Nous contacter/
+
+    get "/en"
+    assert_select "footer a.bg-gold[href='/en/contact']", text: /Contact/
+  end
+
+  # -- Contact column --
+
+  test "footer includes address" do
+    get "/"
+    assert_select "footer", text: /3, Rue Langl/
+    assert_select "footer", text: /MC 98000 Monaco/
+  end
+
+  test "footer includes phone number" do
+    get "/"
+    assert_select "footer a[href='tel:+37793302236']", text: /93 30 22 36/
+  end
+
+  test "footer includes email" do
+    get "/"
+    assert_select "footer a[href='mailto:info@agencegaremonaco.com']", text: /info@agencegaremonaco\.com/
+  end
+
+  test "footer includes CIM badge" do
+    get "/"
+    assert_select "footer img[alt='Membre de la Chambre Immobilière Monégasque']"
+  end
+
+  # -- Bottom bar --
+
+  test "footer includes copyright and agency name" do
+    get "/"
+    assert_select "footer", text: /Agence de la Gare/
+  end
+
   test "footer includes privacy link for current locale" do
     get "/"
     assert_select "footer a[href='/confidentialite']"
 
     get "/en"
     assert_select "footer a[href='/en/privacy']"
-  end
-
-  test "layout includes CIM badge" do
-    get "/"
-    assert_select "img[alt='Membre de la Chambre Immobilière Monégasque']"
   end
 
   test "footer renders on all locale homepages" do

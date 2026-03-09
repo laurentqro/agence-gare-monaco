@@ -12,6 +12,10 @@ fr:
     contact: "Nous contacter"
     privacy: "Confidentialité"
 
+  footer:
+    navigation: "Navigation"
+    tagline: "Votre partenaire immobilier à Monaco depuis 1942."
+
   homepage:
     hero_title: "Votre partenaire immobilier à Monaco"
     hero_subtitle: "Depuis 1942"

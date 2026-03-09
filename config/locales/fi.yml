@@ -12,6 +12,10 @@ fi:
     contact: "Yhteystiedot"
     privacy: "Tietosuoja"
 
+  footer:
+    navigation: "Navigointi"
+    tagline: "Kiinteistökumppanisi Monacossa vuodesta 1942."
+
   homepage:
     hero_title: "Kiinteistöt Monacossa vuodesta 1942"
     hero_subtitle: "Chambre Immobilière Monégasquen jäsen"

@@ -275,26 +275,12 @@ class HomepageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='featured-articles'] .article-card img[src='https://example.com/cover.jpg']"
   end
 
-  # === Contact Section ===
+  # === Contact Section Removed (form lives on dedicated contact page) ===
 
-  test "homepage displays contact section with agency address" do
+  test "homepage does not include a contact form" do
     get "/"
-    assert_select "[data-testid='contact-section']" do
-      assert_match "3, Rue Langlé", response.body
-      assert_match "MC 98000", response.body
-    end
-  end
-
-  test "homepage contact section includes phone number" do
-    get "/"
-    assert_select "[data-testid='contact-section']" do
-      assert_match "(+377) 93 30 22 36", response.body
-    end
-  end
-
-  test "homepage contact section includes email" do
-    get "/"
-    assert_select "[data-testid='contact-section'] a[href='mailto:info@agencegaremonaco.com']"
+    assert_select "[data-testid='contact-section']", count: 0
+    assert_select "form[action*='contact_submissions']", count: 0
   end
 
   # === Image Carousel ===
@@ -374,7 +360,6 @@ class HomepageTest < ActionDispatch::IntegrationTest
       def home
         @latest_articles = Article.published.order(published_at: :desc).limit(4)
         @youtube_videos = nil
-        @submission = ContactSubmission.new
         set_seo(page_type: :homepage)
       end
     end
@@ -386,7 +371,6 @@ class HomepageTest < ActionDispatch::IntegrationTest
       def home
         @latest_articles = Article.published.order(published_at: :desc).limit(4)
         @youtube_videos = YoutubeVideo.latest
-        @submission = ContactSubmission.new
         set_seo(page_type: :homepage)
       end
     end

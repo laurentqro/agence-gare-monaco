@@ -12,6 +12,10 @@ sv:
     contact: "Kontakt"
     privacy: "Integritet"
 
+  footer:
+    navigation: "Navigering"
+    tagline: "Er fastighetspartner i Monaco sedan 1942."
+
   homepage:
     hero_title: "Fastigheter i Monaco sedan 1942"
     hero_subtitle: "Medlem i Chambre Immobilière Monégasque"

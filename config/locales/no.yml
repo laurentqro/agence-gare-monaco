@@ -12,6 +12,10 @@
     contact: "Kontakt"
     privacy: "Personvern"
 
+  footer:
+    navigation: "Navigasjon"
+    tagline: "Din eiendomspartner i Monaco siden 1942."
+
   homepage:
     hero_title: "Eiendom i Monaco siden 1942"
     hero_subtitle: "Medlem av Chambre Immobilière Monégasque"

@@ -12,6 +12,10 @@ de:
     contact: "Kontakt"
     privacy: "Datenschutz"
 
+  footer:
+    navigation: "Navigation"
+    tagline: "Ihr Immobilienpartner in Monaco seit 1942."
+
   homepage:
     hero_title: "Immobilien in Monaco seit 1942"
     hero_subtitle: "Mitglied der Chambre Immobilière Monégasque"

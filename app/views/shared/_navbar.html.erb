@@ -1,10 +1,10 @@
 <% homepage = local_assigns.fetch(:homepage, false) %>
 <nav class="fixed top-0 left-0 right-0 z-50 bg-white shadow" data-controller="mobile-menu">
   <div class="max-w-7xl mx-auto px-4">
-    <div class="flex items-center justify-between h-20">
+    <div class="flex items-center justify-between h-24">
       <%# Logo %>
       <a href="<%= locale_root_path %>" class="flex-shrink-0">
-        <%= image_tag "logo.png", alt: "Agence Immobilière de la Gare", class: "h-12" %>
+        <%= image_tag "logo.png", alt: "Agence Immobilière de la Gare", class: "h-16" %>
       </a>
 
       <%# Desktop Navigation %>
@@ -100,5 +100,5 @@
 
 <%# Spacer to push content below fixed navbar (not on homepage — hero is full-height) %>
 <% unless homepage %>
-  <div class="h-20"></div>
+  <div class="h-24"></div>
 <% end %>
