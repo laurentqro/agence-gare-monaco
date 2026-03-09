@@ -45,6 +45,10 @@
     property_count:
       one: "%{count} eiendom"
       other: "%{count} eiendommer"
+    offmarket_title: "Off-market"
+    offmarket_sales: "Salg"
+    offmarket_rentals: "Utleie"
+    offmarket_empty: "Ingen off-market-eiendommer tilgjengelig for øyeblikket."
     no_properties: "Ingen eiendommer funnet som passer kriteriene dine."
     filter_type: "Type"
     filter_district: "Bydel"
@@ -143,6 +147,7 @@
     listings_sales_district_description: "Eiendommer til salgs i %{district}, Monaco."
     listings_rentals_district_description: "Utleieeiendommer i %{district}, Monaco."
     listings_all_description: "Oppdag alle våre eiendommer i Monaco og Frankrike."
+    offmarket_description: "Oppdag våre off-market-eiendommer i Monaco. Eksklusive eiendommer tilgjengelig på forespørsel."
 
   contact_form:
     title: "Kontakt"
@@ -185,3 +190,4 @@
     contact: "kontakt"
     privacy: "personvern"
     france: "frankrike"
+    offmarket: "off-market"

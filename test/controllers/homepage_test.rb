@@ -57,7 +57,8 @@ class HomepageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='hero-cards']" do
       assert_select "a[href='/ventes/monaco']", 1
       assert_select "a[href='/locations/monaco']", 1
-      assert_select "a[href='/contact']", 3
+      assert_select "a[href='/off-market']", 1
+      assert_select "a[href='/contact']", 2
     end
   end
 
@@ -66,7 +67,8 @@ class HomepageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='hero-cards']" do
       assert_select "a[href='/en/sales/monaco']", 1
       assert_select "a[href='/en/rentals/monaco']", 1
-      assert_select "a[href='/en/contact']", 3
+      assert_select "a[href='/en/off-market']", 1
+      assert_select "a[href='/en/contact']", 2
     end
   end
 

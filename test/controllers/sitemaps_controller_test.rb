@@ -141,6 +141,11 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "/en/privacy"
   end
 
+  test "language sitemap includes off-market page" do
+    get "/sitemaps/en.xml"
+    assert_includes response.body, "/en/off-market"
+  end
+
   test "French sitemap uses translated segments" do
     get "/sitemaps/fr.xml"
     assert_includes response.body, "/fr/ventes/monaco"

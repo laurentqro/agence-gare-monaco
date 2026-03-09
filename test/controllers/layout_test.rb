@@ -46,11 +46,11 @@ class LayoutTest < ActionDispatch::IntegrationTest
     assert_select "nav" do
       assert_select "a[href='/ventes/monaco']", text: /Acheter/
       assert_select "a[href='/locations/monaco']", text: /Louer/
-      assert_select "a[href='/contact']", text: /Off-market/
+      assert_select "a[href='/off-market']", text: /Off-market/
       assert_select "a[href='/contact']", text: /Vendre/
       assert_select "a[href='/contact']", text: /Gestion/
       assert_select "a[href='/articles']", text: /Articles/
-      assert_select "a[href='/contact']", text: /Contact/
+      assert_select "a[href='/contact']", text: /contacter/i
     end
   end
 
@@ -59,7 +59,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
     assert_select "nav" do
       assert_select "a[href='/en/sales/monaco']", text: /Buy/
       assert_select "a[href='/en/rentals/monaco']", text: /Rent/
-      assert_select "a[href='/en/contact']", text: /Off-market/
+      assert_select "a[href='/en/off-market']", text: /Off-market/
       assert_select "a[href='/en/contact']", text: /Sell/
       assert_select "a[href='/en/contact']", text: /Management/
       assert_select "a[href='/en/articles']", text: /Articles/
@@ -72,7 +72,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
     assert_select "nav" do
       assert_select "a[href='/de/verkauf/monaco']", text: /Kaufen/
       assert_select "a[href='/de/vermietung/monaco']", text: /Mieten/
-      assert_select "a[href='/de/kontakt']", text: /Off-market/
+      assert_select "a[href='/de/off-market']", text: /Off-market/
       assert_select "a[href='/de/kontakt']", text: /Verkaufen/
       assert_select "a[href='/de/kontakt']", text: /Verwaltung/
       assert_select "a[href='/de/artikel']", text: /Artikel/

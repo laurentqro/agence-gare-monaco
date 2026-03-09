@@ -53,6 +53,14 @@ class PropertiesController < ApplicationController
     set_seo(page_type: :property, property: @property)
   end
 
+  def off_market
+    @sales = Property.published.where(off_market: true).for_sale
+      .includes(:property_images, :district).order(created_at: :desc)
+    @rentals = Property.published.where(off_market: true).for_rental
+      .includes(:property_images, :district).order(created_at: :desc)
+    set_seo(page_type: :offmarket)
+  end
+
   def pdf
     @property = Property.published.includes(:district, :building, :property_images).find(params[:id])
     locale = params[:locale]&.to_sym || I18n.locale

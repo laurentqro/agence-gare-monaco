@@ -45,6 +45,10 @@ sv:
     property_count:
       one: "%{count} fastighet"
       other: "%{count} fastigheter"
+    offmarket_title: "Off-market"
+    offmarket_sales: "Försäljning"
+    offmarket_rentals: "Uthyrning"
+    offmarket_empty: "Inga off-market-fastigheter tillgängliga för tillfället."
     no_properties: "Inga fastigheter hittades som matchar dina kriterier."
     filter_type: "Typ"
     filter_district: "Stadsdel"
@@ -143,6 +147,7 @@ sv:
     listings_sales_district_description: "Fastigheter till salu i %{district}, Monaco."
     listings_rentals_district_description: "Hyresfastigheter i %{district}, Monaco."
     listings_all_description: "Upptäck alla våra fastigheter i Monaco och Frankrike."
+    offmarket_description: "Upptäck våra off-market-fastigheter i Monaco. Exklusiva fastigheter tillgängliga på begäran."
 
   contact_form:
     title: "Kontakt"
@@ -185,3 +190,4 @@ sv:
     contact: "kontakt"
     privacy: "integritet"
     france: "frankrike"
+    offmarket: "off-market"

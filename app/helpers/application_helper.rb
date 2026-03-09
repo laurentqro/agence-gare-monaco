@@ -38,6 +38,11 @@ module ApplicationHelper
     "#{locale_prefix(locale)}/#{privacy}"
   end
 
+  def locale_offmarket_path(locale = I18n.locale)
+    offmarket = I18n.t("routes.offmarket", locale: locale)
+    "#{locale_prefix(locale)}/#{offmarket}"
+  end
+
   def switch_locale_path(locale)
     locale_root_path(locale)
   end

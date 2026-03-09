@@ -91,6 +91,16 @@
 </url>
 <% end %>
 
+<%# Off-market page %>
+<% offmarket_segment = I18n.t("routes.offmarket", locale: @locale) %>
+<url>
+  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{offmarket_segment}" %></loc>
+  <% I18n.available_locales.each do |alt_locale| %>
+  <% alt_offmarket = I18n.t("routes.offmarket", locale: alt_locale) %>
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_offmarket}" %>" />
+  <% end %>
+</url>
+
 <%# Contact page %>
 <% contact_segment = I18n.t("routes.contact", locale: @locale) %>
 <url>

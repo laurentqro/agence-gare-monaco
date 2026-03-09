@@ -45,6 +45,10 @@ de:
     property_count:
       one: "%{count} Immobilie"
       other: "%{count} Immobilien"
+    offmarket_title: "Off-market"
+    offmarket_sales: "Verkauf"
+    offmarket_rentals: "Vermietung"
+    offmarket_empty: "Derzeit sind keine Off-market-Immobilien verfügbar."
     no_properties: "Keine Immobilien gefunden, die Ihren Kriterien entsprechen."
     filter_type: "Typ"
     filter_district: "Stadtteil"
@@ -143,6 +147,7 @@ de:
     listings_sales_district_description: "Immobilien zum Verkauf im Stadtteil %{district} in Monaco."
     listings_rentals_district_description: "Mietimmobilien im Stadtteil %{district} in Monaco."
     listings_all_description: "Entdecken Sie alle unsere Immobilien in Monaco und Frankreich."
+    offmarket_description: "Entdecken Sie unsere Off-market-Immobilien in Monaco. Exklusive Immobilien auf Anfrage verfügbar."
 
   contact_form:
     title: "Kontakt"
@@ -185,3 +190,4 @@ de:
     contact: "kontakt"
     privacy: "datenschutz"
     france: "frankreich"
+    offmarket: "off-market"

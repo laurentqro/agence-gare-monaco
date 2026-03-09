@@ -45,6 +45,10 @@ fi:
     property_count:
       one: "%{count} kiinteistö"
       other: "%{count} kiinteistöä"
+    offmarket_title: "Off-market"
+    offmarket_sales: "Myynti"
+    offmarket_rentals: "Vuokraus"
+    offmarket_empty: "Ei off-market-kiinteistöjä saatavilla tällä hetkellä."
     no_properties: "Kriteereitäsi vastaavia kiinteistöjä ei löytynyt."
     filter_type: "Tyyppi"
     filter_district: "Kaupunginosa"
@@ -143,6 +147,7 @@ fi:
     listings_sales_district_description: "Myytävät kiinteistöt kaupunginosassa %{district}, Monaco."
     listings_rentals_district_description: "Vuokrakiinteistöt kaupunginosassa %{district}, Monaco."
     listings_all_description: "Tutustu kaikkiin kiinteistöihimme Monacossa ja Ranskassa."
+    offmarket_description: "Tutustu off-market-kiinteistöihimme Monacossa. Eksklusiivisia kiinteistöjä saatavilla pyynnöstä."
 
   contact_form:
     title: "Yhteystiedot"
@@ -185,3 +190,4 @@ fi:
     contact: "yhteystiedot"
     privacy: "tietosuoja"
     france: "ranska"
+    offmarket: "off-market"

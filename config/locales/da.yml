@@ -45,6 +45,10 @@ da:
     property_count:
       one: "%{count} ejendom"
       other: "%{count} ejendomme"
+    offmarket_title: "Off-market"
+    offmarket_sales: "Salg"
+    offmarket_rentals: "Udlejning"
+    offmarket_empty: "Ingen off-market-ejendomme tilgængelige i øjeblikket."
     no_properties: "Ingen ejendomme fundet, der matcher dine kriterier."
     filter_type: "Type"
     filter_district: "Kvarter"
@@ -143,6 +147,7 @@ da:
     listings_sales_district_description: "Ejendomme til salg i %{district}, Monaco."
     listings_rentals_district_description: "Udlejningsejendomme i %{district}, Monaco."
     listings_all_description: "Opdag alle vores ejendomme i Monaco og Frankrig."
+    offmarket_description: "Opdag vores off-market-ejendomme i Monaco. Eksklusive ejendomme tilgængelige efter forespørgsel."
 
   contact_form:
     title: "Kontakt"
@@ -185,3 +190,4 @@ da:
     contact: "kontakt"
     privacy: "privatlivspolitik"
     france: "frankrig"
+    offmarket: "off-market"

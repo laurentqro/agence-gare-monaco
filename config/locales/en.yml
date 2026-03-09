@@ -45,6 +45,10 @@ en:
     property_count:
       one: "%{count} property"
       other: "%{count} properties"
+    offmarket_title: "Off-market"
+    offmarket_sales: "Sales"
+    offmarket_rentals: "Rentals"
+    offmarket_empty: "No off-market properties available at the moment."
     no_properties: "No properties found matching your criteria."
     filter_type: "Type"
     filter_district: "District"
@@ -143,6 +147,7 @@ en:
     listings_sales_district_description: "Properties for sale in %{district}, Monaco."
     listings_rentals_district_description: "Rental properties in %{district}, Monaco."
     listings_all_description: "Discover all our properties in Monaco and France."
+    offmarket_description: "Discover our off-market properties in Monaco. Exclusive properties available on request."
 
   contact_form:
     title: "Contact"
@@ -185,3 +190,4 @@ en:
     contact: "contact"
     privacy: "privacy"
     france: "france"
+    offmarket: "off-market"

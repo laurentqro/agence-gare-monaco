@@ -65,6 +65,8 @@ module SeoHelper
       t("seo.contact_description")
     when :privacy
       t("seo.privacy_description")
+    when :offmarket
+      t("seo.offmarket_description")
     end
 
     truncate(desc.to_s.gsub("\u00A0", " ").squish, length: 160, omission: "...")
@@ -94,6 +96,8 @@ module SeoHelper
       "#{t('nav.contact')} | #{t('site_name')}"
     when :privacy
       "#{t('nav.privacy')} | #{t('site_name')}"
+    when :offmarket
+      "Off-market | #{t('site_name')}"
     end
   end
 
@@ -321,6 +325,8 @@ module SeoHelper
       locale_contact_path(locale)
     when :privacy
       locale_privacy_path(locale)
+    when :offmarket
+      locale_offmarket_path(locale)
     end
   end
 
@@ -394,7 +400,7 @@ module SeoHelper
     when :property
       img = opts[:property]&.cover_image
       img&.large_url || img&.remote_url
-    when :homepage, :listings, :articles, :contact, :privacy
+    when :homepage, :listings, :articles, :contact, :privacy, :offmarket
       "#{SITE_HOST}/images/og-default.jpg"
     when :article
       opts[:article]&.cover_image_display_url
