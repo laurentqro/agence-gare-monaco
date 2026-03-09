@@ -6,7 +6,7 @@ module Admin
       @categories = Category.left_joins(:articles)
         .select("categories.*, COUNT(articles.id) AS articles_count")
         .group("categories.id")
-        .order(:name)
+        .order(:slug)
     end
 
     def new
@@ -47,12 +47,13 @@ module Admin
     end
 
     def category_params
-      params.require(:category).permit(:name, :slug)
+      params.require(:category).permit(:slug, name: I18n.available_locales.map(&:to_s))
     end
 
     def generate_slug_if_blank
-      if @category.slug.blank? && @category.name.present?
-        @category.slug = @category.name.parameterize
+      if @category.slug.blank? && @category.name.is_a?(Hash)
+        fr_name = @category.name["fr"].presence || @category.name.values.first
+        @category.slug = fr_name.parameterize if fr_name.present?
       end
     end
   end

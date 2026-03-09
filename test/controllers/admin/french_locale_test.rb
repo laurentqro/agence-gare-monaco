@@ -51,7 +51,7 @@ class Admin::FrenchLocaleTest < ActionDispatch::IntegrationTest
 
   test "articles index renders in French" do
     post session_url, params: { email_address: "adrien@agencegaremonaco.com", password: "securepassword123" }
-    category = Category.create!(name: "Test", slug: "test")
+    category = Category.create!(name: { "fr" => "Test" }, slug: "test")
     Article.create!(title: { "fr" => "Mon article" }, body: { "fr" => "Contenu" }, slug: "mon-article", category: category, published: true)
     get admin_articles_url
     assert_response :success

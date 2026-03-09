@@ -2,7 +2,7 @@ require "test_helper"
 
 class ArticlesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @category = Category.create!(name: "Actualités", slug: "actualites")
+    @category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
   end
 
   test "article show renders markdown body as HTML" do

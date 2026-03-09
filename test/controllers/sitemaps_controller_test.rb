@@ -40,7 +40,7 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
       published: true,
       off_market: true
     )
-    @category = Category.create!(name: "News", slug: "news")
+    @category = Category.create!(name: { "fr" => "News" }, slug: "news")
     @article = Article.create!(
       title: { "en" => "Test Article", "fr" => "Article Test" },
       body: { "en" => "Body", "fr" => "Corps" },

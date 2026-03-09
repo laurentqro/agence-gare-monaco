@@ -12,7 +12,7 @@ class ArticlesController < ApplicationController
   end
 
   def show
-    @category = Category.find_by(slug: params[:slug])
+    @category = Category.find_by_localized_slug(params[:slug], I18n.locale)
     if @category
       @articles = @category.articles.published.order(published_at: :desc)
       set_seo(page_type: :articles)

@@ -17,7 +17,7 @@
       <tbody class="divide-y divide-gray-100">
         <% @categories.each do |category| %>
           <tr class="hover:bg-gray-50">
-            <td class="px-4 py-3 font-medium"><%= category.name %></td>
+            <td class="px-4 py-3 font-medium"><%= category.name_for(:fr) %></td>
             <td class="px-4 py-3 text-gray-500"><%= category.slug %></td>
             <td class="px-4 py-3"><%= category.articles_count %></td>
             <td class="px-4 py-3 space-x-2">

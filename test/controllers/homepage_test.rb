@@ -158,7 +158,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   end
 
   test "homepage shows featured articles when they exist" do
-    category = Category.create!(name: "Actualités", slug: "actualites")
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     article = Article.create!(
       title: { "fr" => "Monaco en 2025", "en" => "Monaco in 2025" },
       body: { "fr" => "Les tendances du marché immobilier.", "en" => "Real estate market trends." },
@@ -176,7 +176,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   end
 
   test "homepage shows article title in current locale" do
-    category = Category.create!(name: "Actualités", slug: "actualites")
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     Article.create!(
       title: { "fr" => "Titre Français", "en" => "English Title" },
       body: { "fr" => "Contenu en français.", "en" => "English content." },
@@ -194,7 +194,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   end
 
   test "homepage does not show unpublished articles" do
-    category = Category.create!(name: "Actualités", slug: "actualites")
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     Article.create!(
       title: { "fr" => "Article brouillon" },
       body: { "fr" => "Pas encore publié." },
@@ -210,7 +210,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   end
 
   test "homepage shows non-featured published articles" do
-    category = Category.create!(name: "Actualités", slug: "actualites")
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     Article.create!(
       title: { "fr" => "Article normal" },
       body: { "fr" => "Contenu normal." },
@@ -228,7 +228,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   end
 
   test "homepage shows at most 4 latest articles in 2-column grid" do
-    category = Category.create!(name: "Actualités", slug: "actualites")
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     5.times do |i|
       Article.create!(
         title: { "fr" => "Article #{i}" },
@@ -245,7 +245,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   end
 
   test "homepage article cards show cover image when present" do
-    category = Category.create!(name: "Actualités", slug: "actualites")
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     Article.create!(
       title: { "fr" => "Avec image" },
       body: { "fr" => "![Photo](https://example.com/photo.jpg)\n\nContenu" },
@@ -260,7 +260,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   end
 
   test "homepage article cards prefer cover_image_url over body image" do
-    category = Category.create!(name: "Actualités", slug: "actualites")
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     Article.create!(
       title: { "fr" => "Cover URL" },
       body: { "fr" => "![Photo](https://example.com/body.jpg)\n\nContenu" },

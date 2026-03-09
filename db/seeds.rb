@@ -1,12 +1,96 @@
 # Categories
 [
-  { name: "Marché immobilier", slug: "marche-immobilier" },
-  { name: "Guides pratiques", slug: "guides-pratiques" },
-  { name: "Quartiers de Monaco", slug: "quartiers-de-monaco" },
-  { name: "Projets & Nouveautés", slug: "projets-et-nouveautes" },
-  { name: "Art de vivre à Monaco", slug: "art-de-vivre-a-monaco" },
-  { name: "Décoration & Architecture", slug: "decoration-et-architecture" },
-  { name: "Actualités", slug: "actualites" }
+  {
+    slug: "marche-immobilier",
+    name: {
+      "fr" => "Marché immobilier",
+      "en" => "Real Estate Market",
+      "it" => "Mercato immobiliare",
+      "de" => "Immobilienmarkt",
+      "sv" => "Fastighetsmarknad",
+      "no" => "Eiendomsmarked",
+      "da" => "Ejendomsmarked",
+      "fi" => "Kiinteistömarkkina"
+    }
+  },
+  {
+    slug: "guides-pratiques",
+    name: {
+      "fr" => "Guides pratiques",
+      "en" => "Practical Guides",
+      "it" => "Guide pratiche",
+      "de" => "Praktische Ratgeber",
+      "sv" => "Praktiska guider",
+      "no" => "Praktiske guider",
+      "da" => "Praktiske guider",
+      "fi" => "Käytännön oppaat"
+    }
+  },
+  {
+    slug: "quartiers-de-monaco",
+    name: {
+      "fr" => "Quartiers de Monaco",
+      "en" => "Monaco Districts",
+      "it" => "Quartieri di Monaco",
+      "de" => "Stadtviertel von Monaco",
+      "sv" => "Monacos stadsdelar",
+      "no" => "Monacos bydeler",
+      "da" => "Monacos kvarterer",
+      "fi" => "Monacon kaupunginosat"
+    }
+  },
+  {
+    slug: "projets-et-nouveautes",
+    name: {
+      "fr" => "Projets & Nouveautés",
+      "en" => "Projects & News",
+      "it" => "Progetti & Novità",
+      "de" => "Projekte & Neuigkeiten",
+      "sv" => "Projekt & nyheter",
+      "no" => "Prosjekter & nyheter",
+      "da" => "Projekter & nyheder",
+      "fi" => "Projektit & uutiset"
+    }
+  },
+  {
+    slug: "art-de-vivre-a-monaco",
+    name: {
+      "fr" => "Art de vivre à Monaco",
+      "en" => "Living in Monaco",
+      "it" => "Vivere a Monaco",
+      "de" => "Leben in Monaco",
+      "sv" => "Livet i Monaco",
+      "no" => "Livet i Monaco",
+      "da" => "Livet i Monaco",
+      "fi" => "Elämä Monacossa"
+    }
+  },
+  {
+    slug: "decoration-et-architecture",
+    name: {
+      "fr" => "Décoration & Architecture",
+      "en" => "Interior Design & Architecture",
+      "it" => "Decorazione & Architettura",
+      "de" => "Dekoration & Architektur",
+      "sv" => "Inredning & arkitektur",
+      "no" => "Interiør & arkitektur",
+      "da" => "Indretning & arkitektur",
+      "fi" => "Sisustus & arkkitehtuuri"
+    }
+  },
+  {
+    slug: "actualites",
+    name: {
+      "fr" => "Actualités",
+      "en" => "News",
+      "it" => "Attualità",
+      "de" => "Aktuelles",
+      "sv" => "Nyheter",
+      "no" => "Nyheter",
+      "da" => "Nyheder",
+      "fi" => "Ajankohtaista"
+    }
+  }
 ].each do |attrs|
   Category.find_or_create_by!(slug: attrs[:slug]) do |category|
     category.name = attrs[:name]

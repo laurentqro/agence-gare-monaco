@@ -27,7 +27,7 @@ class SeoIntegrationTest < ActionDispatch::IntegrationTest
       large_url: "https://cdn.example.com/apt1_large.jpg",
       position: 1
     )
-    @category = Category.create!(name: "Actualités", slug: "actualites")
+    @category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     @article = Article.create!(
       title: { "en" => "Market Trends 2025", "fr" => "Tendances du Marché 2025" },
       body: { "en" => "The real estate market in Monaco.", "fr" => "Le marché immobilier à Monaco." },

@@ -2,7 +2,7 @@ require "test_helper"
 
 class ArticlesTest < ActionDispatch::IntegrationTest
   setup do
-    @category = Category.create!(name: "Actualités", slug: "actualites")
+    @category = Category.create!(name: { "fr" => "Actualités", "en" => "News" }, slug: "actualites")
     @published_article = Article.create!(
       title: { "fr" => "Marché immobilier", "en" => "Real estate market" },
       body: { "fr" => "Le marché est en hausse.", "en" => "The market is rising." },
@@ -34,10 +34,10 @@ class ArticlesTest < ActionDispatch::IntegrationTest
     assert_select "a", text: /Brouillon/, count: 0
   end
 
-  test "GET articles index shows article category" do
+  test "GET articles index shows article category in current locale" do
     get "/en/articles"
     assert_response :success
-    assert_select ".article-meta", /Actualités/
+    assert_select ".article-meta", /News/
   end
 
   test "GET articles index shows article date" do
@@ -87,10 +87,10 @@ class ArticlesTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "GET article show displays category name" do
+  test "GET article show displays category name in current locale" do
     get "/en/articles/marche-immobilier"
     assert_response :success
-    assert_select "a", /Actualités/
+    assert_select "a", /News/
   end
 
   test "GET article show displays published date" do
@@ -100,8 +100,8 @@ class ArticlesTest < ActionDispatch::IntegrationTest
   end
 
   # SHOW - category filtering
-  test "GET articles with category slug shows category articles" do
-    other_cat = Category.create!(name: "Quartiers", slug: "quartiers")
+  test "GET articles with localized category slug shows category articles" do
+    other_cat = Category.create!(name: { "fr" => "Quartiers", "en" => "Districts" }, slug: "quartiers")
     Article.create!(
       title: { "en" => "Quartier article" },
       body: { "en" => "About quartiers" },
@@ -110,14 +110,20 @@ class ArticlesTest < ActionDispatch::IntegrationTest
       published: true,
       published_at: Time.current
     )
-    get "/en/articles/actualites"
+    get "/en/articles/news"
     assert_response :success
     assert_select "a", /Real estate market/
     assert_select "a", text: /Quartier article/, count: 0
   end
 
-  test "GET articles with category slug shows category name in heading" do
-    get "/en/articles/actualites"
+  test "GET articles with localized category slug shows category name in heading" do
+    get "/en/articles/news"
+    assert_response :success
+    assert_select "h1", /News/
+  end
+
+  test "GET articles with French category slug works without prefix" do
+    get "/articles/actualites"
     assert_response :success
     assert_select "h1", /Actualités/
   end

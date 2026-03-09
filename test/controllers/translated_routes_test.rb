@@ -194,20 +194,20 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
 
   # Articles by category
   test "FR articles by category route" do
-    category = Category.create!(name: "Actualités", slug: "actualites")
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     get "/articles/actualites"
     assert_response :success
   end
 
   test "EN articles by category route" do
-    category = Category.create!(name: "Actualités", slug: "actualites")
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     get "/en/articles/actualites"
     assert_response :success
   end
 
   # Single article
   test "FR single article route" do
-    category = Category.create!(name: "Actualités", slug: "actualites")
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     article = Article.create!(
       title: { "fr" => "Mon article" },
       body: { "fr" => "Contenu" },

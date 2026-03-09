@@ -3,7 +3,7 @@ require "test_helper"
 class LegacyRedirectsTest < ActionDispatch::IntegrationTest
   setup do
     @district = District.create!(name: "Carré d'Or", city: "Monaco", slug: "carre-dor")
-    @category = Category.create!(name: "Actualités", slug: "actualites")
+    @category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     @property = Property.create!(
       reference: "REF-LEGACY",
       title: { "fr" => "Studio Carré d'Or", "en" => "Studio Carré d'Or", "it" => "Studio Carré d'Or" },

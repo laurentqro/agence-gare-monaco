@@ -2,7 +2,7 @@ require "test_helper"
 
 class ArticleTest < ActiveSupport::TestCase
   setup do
-    @category = Category.create!(name: "Actualités", slug: "actualites")
+    @category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
   end
 
   test "valid article" do

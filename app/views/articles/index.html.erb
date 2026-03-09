@@ -1,7 +1,7 @@
 <div class="max-w-7xl mx-auto px-4 py-12">
   <h1 class="text-4xl font-bold text-navy mb-2">
     <% if @category %>
-      <%= @category.name %>
+      <%= @category.name_for %>
     <% else %>
       <%= t("nav.articles") %>
     <% end %>
@@ -9,7 +9,7 @@
 
   <%# Category filter links %>
   <div class="flex flex-wrap gap-2 mb-8">
-    <% categories = Category.joins(:articles).where(articles: { published: true }).distinct.order(:name) %>
+    <% categories = Category.joins(:articles).where(articles: { published: true }).distinct.order(:slug) %>
     <% if categories.any? %>
       <% locale = params[:locale] || I18n.locale.to_s %>
       <% articles_segment = I18n.t("routes.articles", locale: locale) %>
@@ -18,9 +18,9 @@
         <%= t("articles.all") %>
       </a>
       <% categories.each do |cat| %>
-        <a href="/<%= locale %>/<%= articles_segment %>/<%= cat.slug %>"
+        <a href="/<%= locale %>/<%= articles_segment %>/<%= cat.slug_for %>"
            class="px-3 py-1 text-sm rounded border <%= @category&.id == cat.id ? 'bg-navy text-white border-navy' : 'border-gray-300 text-gray-600 hover:border-navy' %>">
-          <%= cat.name %>
+          <%= cat.name_for %>
         </a>
       <% end %>
     <% end %>
@@ -46,7 +46,7 @@
                 <time datetime="<%= article.published_at.iso8601 %>"><%= article.published_at.strftime("%Y-%m-%d") %></time>
                 /
               <% end %>
-              <%= article.category.name %>
+              <%= article.category.name_for %>
             </p>
           </div>
         </a>

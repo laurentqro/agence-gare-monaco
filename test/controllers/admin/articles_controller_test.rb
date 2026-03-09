@@ -4,7 +4,7 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = User.create!(email_address: "adrien@agencegaremonaco.com", password: "securepassword123")
     post session_url, params: { email_address: "adrien@agencegaremonaco.com", password: "securepassword123" }
-    @category = Category.create!(name: "Actualités", slug: "actualites")
+    @category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
   end
 
   # Authentication

@@ -30,7 +30,7 @@ class SeoHelperTest < ActionView::TestCase
       large_url: "https://cdn.example.com/photo1_large.jpg",
       position: 1
     )
-    @category = Category.create!(name: "Actualités", slug: "actualites")
+    @category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     @article = Article.create!(
       title: { "en" => "Monaco Market Update", "fr" => "Mise à jour du marché monégasque" },
       body: { "en" => "The Monaco real estate market continues to grow strongly in 2025.", "fr" => "Le marché immobilier monégasque continue de croître fortement en 2025." },

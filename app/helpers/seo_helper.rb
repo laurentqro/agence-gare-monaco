@@ -138,7 +138,7 @@ module SeoHelper
     # Article-specific
     if page_type == :article && opts[:article]&.published_at
       tags << tag(:meta, property: "article:published_time", content: opts[:article].published_at.iso8601)
-      tags << tag(:meta, property: "article:section", content: opts[:article].category.name) if opts[:article].category
+      tags << tag(:meta, property: "article:section", content: opts[:article].category.name_for) if opts[:article].category
     end
 
     safe_join(tags, "\n")
@@ -263,7 +263,7 @@ module SeoHelper
       },
       "inLanguage" => locale.to_s
     }
-    data["articleSection"] = article.category.name if article.category
+    data["articleSection"] = article.category.name_for if article.category
     json_ld_script_tag(data)
   end
 
