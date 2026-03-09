@@ -162,6 +162,44 @@ class ArticleTest < ActiveSupport::TestCase
     assert_nil article.cover_image_display_url
   end
 
+  # title_for falls back past empty strings
+  test "title_for skips empty string and falls back to French" do
+    article = Article.new(
+      title: { "fr" => "Titre français", "it" => "" },
+      body: { "fr" => "Contenu" },
+      category: @category
+    )
+    assert_equal "Titre français", article.title_for(:it)
+  end
+
+  test "title_for skips whitespace-only string and falls back to French" do
+    article = Article.new(
+      title: { "fr" => "Titre français", "it" => "   " },
+      body: { "fr" => "Contenu" },
+      category: @category
+    )
+    assert_equal "Titre français", article.title_for(:it)
+  end
+
+  # body_for falls back past empty strings
+  test "body_for skips empty string and falls back to French" do
+    article = Article.new(
+      title: { "fr" => "Titre" },
+      body: { "fr" => "Contenu français", "it" => "" },
+      category: @category
+    )
+    assert_equal "Contenu français", article.body_for(:it)
+  end
+
+  test "body_for skips whitespace-only string and falls back to French" do
+    article = Article.new(
+      title: { "fr" => "Titre" },
+      body: { "fr" => "Contenu français", "it" => "   " },
+      category: @category
+    )
+    assert_equal "Contenu français", article.body_for(:it)
+  end
+
   # body_image_urls
   test "body_image_urls returns all image URLs from body" do
     article = Article.new(

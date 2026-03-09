@@ -10,12 +10,12 @@ class Article < ApplicationRecord
 
   def title_for(locale = I18n.locale)
     return "" unless title.is_a?(Hash)
-    title[locale.to_s] || title[I18n.default_locale.to_s] || title.values.first || ""
+    title[locale.to_s].presence || title[I18n.default_locale.to_s].presence || title.values.first || ""
   end
 
   def body_for(locale = I18n.locale)
     return "" unless body.is_a?(Hash)
-    body[locale.to_s] || body[I18n.default_locale.to_s] || body.values.first || ""
+    body[locale.to_s].presence || body[I18n.default_locale.to_s].presence || body.values.first || ""
   end
 
   def first_image_url

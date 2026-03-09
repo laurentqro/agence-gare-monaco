@@ -196,6 +196,23 @@ class PropertyTest < ActiveSupport::TestCase
     assert_equal "MC-SALE", Property.for_sale.first.reference
   end
 
+  test "title_for skips empty string and falls back to French" do
+    property = Property.new(
+      reference: "MC-T1", transaction_type: "sale", property_type: "apartment", country: "MC", city: "Monaco",
+      title: { "fr" => "Studio Monaco", "it" => "" }
+    )
+    assert_equal "Studio Monaco", property.title_for(:it)
+  end
+
+  test "description_for skips empty string and falls back to French" do
+    property = Property.new(
+      reference: "MC-T2", transaction_type: "sale", property_type: "apartment", country: "MC", city: "Monaco",
+      title: { "fr" => "Studio" },
+      description: { "fr" => "Beau studio", "it" => "" }
+    )
+    assert_equal "Beau studio", property.description_for(:it)
+  end
+
   test "scope for_rental returns rental properties" do
     Property.create!(reference: "MC-SALE", transaction_type: "sale", property_type: "apartment", country: "MC", city: "Monaco")
     Property.create!(reference: "MC-RENT", transaction_type: "rental", property_type: "apartment", country: "MC", city: "Monaco")

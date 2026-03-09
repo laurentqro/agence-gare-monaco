@@ -21,11 +21,11 @@ class Property < ApplicationRecord
   scope :of_type, ->(type) { where(property_type: type) }
 
   def title_for(locale)
-    title&.dig(locale.to_s) || title&.dig(I18n.default_locale.to_s) || ""
+    title&.dig(locale.to_s).presence || title&.dig(I18n.default_locale.to_s).presence || ""
   end
 
   def description_for(locale)
-    description&.dig(locale.to_s) || description&.dig(I18n.default_locale.to_s) || ""
+    description&.dig(locale.to_s).presence || description&.dig(I18n.default_locale.to_s).presence || ""
   end
 
   def cover_image
