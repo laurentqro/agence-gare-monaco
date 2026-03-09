@@ -92,9 +92,9 @@
     }
   }
 ].each do |attrs|
-  Category.find_or_create_by!(slug: attrs[:slug]) do |category|
-    category.name = attrs[:name]
-  end
+  category = Category.find_or_initialize_by(slug: attrs[:slug])
+  category.name = attrs[:name]
+  category.save!
 end
 
 # Articles from markdown files

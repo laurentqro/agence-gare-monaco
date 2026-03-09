@@ -108,4 +108,19 @@ class SeedsTest < ActiveSupport::TestCase
     assert_equal 7, Category.count
     assert_equal 10, Article.count
   end
+
+  test "seeds update category names when re-run" do
+    load Rails.root.join("db/seeds.rb")
+
+    # Simulate a category whose name was changed (e.g. missing locale)
+    category = Category.find_by!(slug: "marche-immobilier")
+    category.update!(name: { "fr" => "Old French Name" })
+
+    # Re-run seeds should update the name
+    load Rails.root.join("db/seeds.rb")
+
+    category.reload
+    assert_equal "Marché immobilier", category.name_for(:fr)
+    assert_equal 8, category.name.keys.size, "Expected all 8 locale keys to be restored"
+  end
 end
