@@ -15,7 +15,7 @@
     <div class="lg:col-span-2 space-y-6">
       <%# Core details %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.details") %></legend>
+        <legend class="heading-section mb-4"><%= t("admin.properties.form.details") %></legend>
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.reference") %></label>
@@ -59,7 +59,7 @@
 
       <%# Location %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.location") %></legend>
+        <legend class="heading-section mb-4"><%= t("admin.properties.form.location") %></legend>
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.country") %></label>
@@ -96,7 +96,7 @@
 
       <%# Dimensions %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.dimensions") %></legend>
+        <legend class="heading-section mb-4"><%= t("admin.properties.form.dimensions") %></legend>
         <div class="grid grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.rooms") %></label>
@@ -153,7 +153,7 @@
 
       <%# Multilingual titles %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.title_legend") %></legend>
+        <legend class="heading-section mb-4"><%= t("admin.properties.form.title_legend") %></legend>
         <div class="space-y-4">
           <% I18n.available_locales.each do |locale| %>
             <div>
@@ -167,7 +167,7 @@
 
       <%# Multilingual descriptions %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.description_legend") %></legend>
+        <legend class="heading-section mb-4"><%= t("admin.properties.form.description_legend") %></legend>
         <div class="space-y-4">
           <% I18n.available_locales.each do |locale| %>
             <div>
@@ -181,7 +181,7 @@
 
       <%# Media %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.properties.form.media") %></legend>
+        <legend class="heading-section mb-4"><%= t("admin.properties.form.media") %></legend>
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.properties.form.video_url") %></label>

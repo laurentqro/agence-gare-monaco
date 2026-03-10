@@ -19,37 +19,12 @@
 
 /* H1 — page titles */
 .heading-page {
-  @apply text-2xl font-bold text-navy;
+  @apply text-3xl font-bold text-navy;
 }
 
 /* H2 — section headings */
 .heading-section {
   @apply text-xl font-bold text-navy;
-}
-
-/* H2 — centered section headings (homepage) */
-.heading-section-centered {
-  @apply text-xl font-bold text-navy text-center;
-}
-
-/* H2 — section headings on dark backgrounds */
-.heading-section-dark {
-  @apply text-xl font-bold text-white text-center uppercase tracking-wide;
-}
-
-/* H3 — subsection headings */
-.heading-subsection {
-  @apply text-base font-bold text-navy;
-}
-
-/* H3 — subsection headings (smaller, e.g. mandate types) */
-.heading-subsection-sm {
-  @apply text-sm font-semibold text-navy;
-}
-
-/* H2 — property detail sub-sections (floor plans, documents, etc.) */
-.heading-detail {
-  @apply text-lg font-bold text-navy;
 }
 
 /* Body text — standard content paragraphs */

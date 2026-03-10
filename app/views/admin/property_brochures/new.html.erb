@@ -1,8 +1,8 @@
 <div class="p-8">
-  <h1 class="text-2xl font-bold text-navy mb-6"><%= t("admin.property_brochures.title") %></h1>
+  <h1 class="heading-page mb-6"><%= t("admin.property_brochures.title") %></h1>
 
   <div class="bg-white rounded shadow p-6 mb-6">
-    <h2 class="text-lg font-semibold text-navy mb-3"><%= t("admin.property_brochures.property_details") %></h2>
+    <h2 class="heading-section mb-3"><%= t("admin.property_brochures.property_details") %></h2>
     <table class="text-sm">
       <tr>
         <td class="font-medium text-gray-600 pr-4 py-1"><%= t("admin.property_brochures.reference") %></td>
@@ -23,7 +23,7 @@
 
   <%= form_with(url: admin_property_brochure_path(@property), method: :post, class: "space-y-6") do |f| %>
     <div class="bg-white rounded shadow p-6">
-      <h2 class="text-lg font-semibold text-navy mb-3"><%= t("admin.property_brochures.options") %></h2>
+      <h2 class="heading-section mb-3"><%= t("admin.property_brochures.options") %></h2>
 
       <div class="space-y-4">
         <div>

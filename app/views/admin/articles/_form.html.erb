@@ -15,7 +15,7 @@
     <div class="lg:col-span-2 space-y-6">
       <%# Multilingual titles %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.articles.form.title_legend") %></legend>
+        <legend class="heading-section mb-4"><%= t("admin.articles.form.title_legend") %></legend>
         <div class="space-y-4">
           <% I18n.available_locales.each do |locale| %>
             <div>
@@ -29,7 +29,7 @@
 
       <%# Multilingual body %>
       <fieldset class="bg-white rounded shadow p-6">
-        <legend class="text-lg font-semibold text-navy mb-4"><%= t("admin.articles.form.body_legend") %></legend>
+        <legend class="heading-section mb-4"><%= t("admin.articles.form.body_legend") %></legend>
         <div class="space-y-4">
           <% I18n.available_locales.each do |locale| %>
             <% if locale == :fr %>
