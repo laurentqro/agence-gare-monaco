@@ -114,7 +114,7 @@ class OffMarketPageTest < ActionDispatch::IntegrationTest
   test "property card without images shows agency logo placeholder" do
     get "/off-market"
     assert_select "[data-testid='property-card']" do
-      assert_select "[data-testid='no-image-placeholder'] img[src*='logo']"
+      assert_select "[data-testid='no-image-placeholder'] img[src*='logo-monogram']"
     end
   end
 

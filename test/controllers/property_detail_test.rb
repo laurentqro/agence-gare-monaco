@@ -505,6 +505,6 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     @property.property_images.destroy_all
     get "/biens/#{@property.id}-slug"
     assert_response :success
-    assert_select "[data-testid='no-image-placeholder'] img[src*='logo']"
+    assert_select "[data-testid='no-image-placeholder'] img[src*='logo-monogram']"
   end
 end
