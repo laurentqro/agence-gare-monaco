@@ -35,14 +35,14 @@
     <%# Content area %>
     <div class="px-5 pt-4 pb-3">
       <%# Title %>
-      <h3 class="text-navy font-bold text-sm uppercase tracking-wide leading-snug line-clamp-2 mb-2">
+      <h3 class="text-navy font-bold text-lg uppercase tracking-wide leading-snug line-clamp-2 mb-2">
         <%= property.title_for(I18n.locale) %>
       </h3>
 
       <%# Price %>
       <div class="mb-3">
         <% if property.price.present? %>
-          <span class="text-navy text-lg font-bold tracking-tight">
+          <span class="text-accent text-sm font-semibold">
             <%= property.formatted_price %>&euro;
           </span>
           <% if property.transaction_type == "rental" %>
@@ -52,42 +52,42 @@
             <span data-testid="converted-price" class="text-xs text-accent ml-1.5"><%= converted %></span>
           <% end %>
         <% else %>
-          <span class="text-navy text-sm font-semibold italic">
+          <span class="text-accent text-sm font-semibold italic">
             <%= t("listings.price_on_request") %>
           </span>
         <% end %>
       </div>
     </div>
 
-    <%# Property stats footer %>
-    <div class="flex items-center gap-3 text-xs text-accent border-t border-gray-100 px-5 py-3">
+    <%# Property stats footer — Lucide icons (stroke-based) %>
+    <div class="flex items-center gap-4 text-sm text-accent border-t border-gray-100 px-5 py-3.5">
       <% if property.num_rooms.present? && property.num_rooms > 0 %>
-        <span class="inline-flex items-center gap-1" title="<%= t("listings.rooms") %>">
-          <svg class="w-3.5 h-3.5 text-navy/40" fill="currentColor" viewBox="0 0 24 24"><path d="M19 9.3V4h-3v2.6L12 3 2 12h3v8h5v-6h4v6h5v-8h3l-3-2.7zm-9 .7c0-1.1.9-2 2-2s2 .9 2 2h-4z"/></svg>
+        <span class="inline-flex items-center gap-1.5" title="<%= t("listings.rooms") %>">
+          <svg class="w-4.5 h-4.5 text-navy/40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
           <span class="font-semibold text-navy/70"><%= property.num_rooms %></span>
         </span>
       <% end %>
       <% if property.num_bedrooms.present? && property.num_bedrooms > 0 %>
-        <span class="inline-flex items-center gap-1" title="<%= t("listings.bedrooms") %>">
-          <svg class="w-3.5 h-3.5 text-navy/40" fill="currentColor" viewBox="0 0 24 24"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V6H1v15h2v-3h18v3h2V10c0-2.21-1.79-4-4-4z"/></svg>
+        <span class="inline-flex items-center gap-1.5" title="<%= t("listings.bedrooms") %>">
+          <svg class="w-4.5 h-4.5 text-navy/40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>
           <span class="font-semibold text-navy/70"><%= property.num_bedrooms %></span>
         </span>
       <% end %>
       <% if property.num_bathrooms.present? && property.num_bathrooms > 0 %>
-        <span class="inline-flex items-center gap-1" title="<%= t("listings.bathrooms") %>">
-          <svg class="w-3.5 h-3.5 text-navy/40" fill="currentColor" viewBox="0 0 24 24"><path d="M7 7c0-1.1.9-2 2-2s2 .9 2 2h2c0-2.21-1.79-4-4-4S5 4.79 5 7v5H2v4c0 2.21 1.79 4 4 4h12c2.21 0 4-1.79 4-4v-4H7V7zm-2 9v-2h14v2c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2z"/></svg>
+        <span class="inline-flex items-center gap-1.5" title="<%= t("listings.bathrooms") %>">
+          <svg class="w-4.5 h-4.5 text-navy/40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.683 3 4 3.683 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="10" x2="8" y1="5" y2="7"/><line x1="2" x2="22" y1="12" y2="12"/><line x1="7" x2="7" y1="19" y2="21"/><line x1="17" x2="17" y1="19" y2="21"/></svg>
           <span class="font-semibold text-navy/70"><%= property.num_bathrooms %></span>
         </span>
       <% end %>
       <% if property.num_parkings.present? && property.num_parkings > 0 %>
-        <span class="inline-flex items-center gap-1" title="<%= t("listings.parkings") %>">
-          <svg class="w-3.5 h-3.5 text-navy/40" fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+        <span class="inline-flex items-center gap-1.5" title="<%= t("listings.parkings") %>">
+          <svg class="w-4.5 h-4.5 text-navy/40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
           <span class="font-semibold text-navy/70"><%= property.num_parkings %></span>
         </span>
       <% end %>
       <% if property.living_area.present? && property.living_area > 0 %>
-        <span class="inline-flex items-center gap-1" title="<%= t("listings.area") %>">
-          <svg class="w-3.5 h-3.5 text-navy/40" fill="currentColor" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H3V8h2v4h2V8h2v4h2V8h2v4h2V8h2v4h2V8h2v4h1v2z"/></svg>
+        <span class="inline-flex items-center gap-1.5" title="<%= t("listings.area") %>">
+          <svg class="w-4.5 h-4.5 text-navy/40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
           <span class="font-semibold text-navy/70"><%= property.living_area.to_i %> m²</span>
         </span>
       <% end %>
