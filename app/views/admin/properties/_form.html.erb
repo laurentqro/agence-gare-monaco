@@ -154,28 +154,18 @@
       <%# Multilingual titles %>
       <fieldset class="bg-white rounded shadow p-6">
         <legend class="heading-section mb-4"><%= t("admin.properties.form.title_legend") %></legend>
-        <div class="space-y-4">
-          <% I18n.available_locales.each do |locale| %>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"><%= locale.to_s.upcase %></label>
-              <input type="text" name="property[title][<%= locale %>]" value="<%= property.title&.dig(locale.to_s) %>"
-                     class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
-            </div>
-          <% end %>
+        <div>
+          <input type="text" name="property[title][fr]" value="<%= property.title&.dig("fr") %>"
+                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
         </div>
       </fieldset>
 
       <%# Multilingual descriptions %>
       <fieldset class="bg-white rounded shadow p-6">
         <legend class="heading-section mb-4"><%= t("admin.properties.form.description_legend") %></legend>
-        <div class="space-y-4">
-          <% I18n.available_locales.each do |locale| %>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"><%= locale.to_s.upcase %></label>
-              <textarea name="property[description][<%= locale %>]" rows="6"
-                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy"><%= property.description&.dig(locale.to_s) %></textarea>
-            </div>
-          <% end %>
+        <div>
+          <textarea name="property[description][fr]" rows="6"
+                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy"><%= property.description&.dig("fr") %></textarea>
         </div>
       </fieldset>
 

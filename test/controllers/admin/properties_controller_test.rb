@@ -71,16 +71,16 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name='property[property_type]']"
   end
 
-  test "GET new shows multilingual title fields" do
+  test "GET new shows only FR title field" do
     get new_admin_property_url
     assert_select "input[name='property[title][fr]']"
-    assert_select "input[name='property[title][en]']"
+    assert_select "input[name='property[title][en]']", false
   end
 
-  test "GET new shows multilingual description fields" do
+  test "GET new shows only FR description field" do
     get new_admin_property_url
     assert_select "textarea[name='property[description][fr]']"
-    assert_select "textarea[name='property[description][en]']"
+    assert_select "textarea[name='property[description][en]']", false
   end
 
   # CREATE
@@ -93,7 +93,7 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     prop = Property.last
     assert_equal "MC-100", prop.reference
     assert_equal "Studio neuf", prop.title["fr"]
-    assert_equal "New studio", prop.title["en"]
+    assert_nil prop.title["en"]
     assert_equal 850_000, prop.price
     assert_equal "sale", prop.transaction_type
     assert_equal "studio", prop.property_type
@@ -142,7 +142,7 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "input[name='property[reference]'][value='MC-001']"
     assert_select "input[name='property[title][fr]'][value='Studio existant']"
-    assert_select "input[name='property[title][en]'][value='Existing studio']"
+    assert_select "input[name='property[title][en]']", false
   end
 
   # UPDATE
@@ -253,8 +253,8 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
   def property_params
     {
       reference: "MC-100",
-      title: { fr: "Studio neuf", en: "New studio" },
-      description: { fr: "Beau studio", en: "Beautiful studio" },
+      title: { fr: "Studio neuf" },
+      description: { fr: "Beau studio" },
       price: 850_000,
       transaction_type: "sale",
       property_type: "studio",

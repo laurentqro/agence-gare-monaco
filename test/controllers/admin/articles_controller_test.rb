@@ -49,18 +49,18 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name='article[category_id]']"
   end
 
-  test "GET new shows multilingual title fields" do
+  test "GET new shows only FR title field" do
     get new_admin_article_url
     assert_response :success
     assert_select "input[name='article[title][fr]']"
-    assert_select "input[name='article[title][en]']"
+    assert_select "input[name='article[title][en]']", false
   end
 
-  test "GET new shows multilingual body fields" do
+  test "GET new shows only FR body field" do
     get new_admin_article_url
     assert_response :success
     assert_select "textarea[name='article[body][fr]']"
-    assert_select "textarea[name='article[body][en]']"
+    assert_select "textarea[name='article[body][en]']", false
   end
 
   # CREATE
@@ -68,8 +68,8 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_difference "Article.count", 1 do
       post admin_articles_url, params: {
         article: {
-          title: { fr: "Nouveau titre", en: "New title" },
-          body: { fr: "Contenu", en: "Content" },
+          title: { fr: "Nouveau titre" },
+          body: { fr: "Contenu" },
           slug: "nouveau-titre",
           category_id: @category.id,
           published: "1"
@@ -78,7 +78,7 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     end
     article = Article.last
     assert_equal "Nouveau titre", article.title["fr"]
-    assert_equal "New title", article.title["en"]
+    assert_nil article.title["en"]
     assert_equal "nouveau-titre", article.slug
     assert article.published
     assert_redirected_to admin_articles_url
@@ -150,7 +150,7 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     get edit_admin_article_url(article)
     assert_response :success
     assert_select "input[name='article[title][fr]'][value='Titre existant']"
-    assert_select "input[name='article[title][en]'][value='Existing title']"
+    assert_select "input[name='article[title][en]']", false
   end
 
   # UPDATE
@@ -264,13 +264,11 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "GET new does not show markdown editor for non-FR body fields" do
+  test "GET new shows only FR body field with markdown editor" do
     get new_admin_article_url
     assert_response :success
-    # EN, IT, DE etc. should be plain textareas without editor wrapper
-    assert_select "textarea[name='article[body][en]']"
-    assert_select "textarea[name='article[body][it]']"
-    # Only one markdown editor instance (the FR one)
+    assert_select "textarea[name='article[body][fr]']"
+    assert_select "textarea[name='article[body][en]']", false
     assert_select "[data-controller='markdown-editor']", 1
   end
 

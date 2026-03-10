@@ -10,16 +10,11 @@
     </div>
   <% end %>
 
-  <fieldset class="space-y-4">
-    <legend class="text-sm font-medium text-gray-700 mb-1"><%= t("admin.categories.form.name") %></legend>
-    <% I18n.available_locales.each do |locale| %>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1"><%= locale.to_s.upcase %></label>
-        <input type="text" name="category[name][<%= locale %>]" value="<%= category.name&.dig(locale.to_s) %>"
-               class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
-      </div>
-    <% end %>
-  </fieldset>
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.categories.form.name") %></label>
+    <input type="text" name="category[name][fr]" value="<%= category.name&.dig("fr") %>"
+           class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
+  </div>
 
   <div>
     <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.categories.form.slug") %></label>

@@ -13,81 +13,62 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <%# Main content column %>
     <div class="lg:col-span-2 space-y-6">
-      <%# Multilingual titles %>
+      <%# Title (FR) %>
       <fieldset class="bg-white rounded shadow p-6">
         <legend class="heading-section mb-4"><%= t("admin.articles.form.title_legend") %></legend>
-        <div class="space-y-4">
-          <% I18n.available_locales.each do |locale| %>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"><%= locale.to_s.upcase %></label>
-              <input type="text" name="article[title][<%= locale %>]" value="<%= article.title&.dig(locale.to_s) %>"
-                     class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
-            </div>
-          <% end %>
+        <div>
+          <input type="text" name="article[title][fr]" value="<%= article.title&.dig("fr") %>"
+                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy">
         </div>
       </fieldset>
 
       <%# Multilingual body %>
       <fieldset class="bg-white rounded shadow p-6">
         <legend class="heading-section mb-4"><%= t("admin.articles.form.body_legend") %></legend>
-        <div class="space-y-4">
-          <% I18n.available_locales.each do |locale| %>
-            <% if locale == :fr %>
-              <%# French body field with markdown editor %>
-              <div data-controller="markdown-editor" data-markdown-editor-preview-url-value="<%= admin_article_preview_path %>" data-markdown-editor-direct-upload-url-value="<%= rails_direct_uploads_url %>">
-                <label class="block text-sm font-medium text-gray-700 mb-1">FR</label>
+        <%# French body field with markdown editor %>
+        <div data-controller="markdown-editor" data-markdown-editor-preview-url-value="<%= admin_article_preview_path %>" data-markdown-editor-direct-upload-url-value="<%= rails_direct_uploads_url %>">
+          <%# Write/Preview tabs %>
+          <div class="flex border-b border-gray-200 mb-2">
+            <button type="button"
+                    data-markdown-editor-target="writeTab"
+                    data-action="click->markdown-editor#showWrite"
+                    class="px-3 py-1.5 text-sm font-medium border-b-2 border-navy text-navy">
+              Écrire
+            </button>
+            <button type="button"
+                    data-markdown-editor-target="previewTab"
+                    data-action="click->markdown-editor#showPreview"
+                    class="px-3 py-1.5 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+              Aperçu
+            </button>
+          </div>
 
-                <%# Write/Preview tabs %>
-                <div class="flex border-b border-gray-200 mb-2">
-                  <button type="button"
-                          data-markdown-editor-target="writeTab"
-                          data-action="click->markdown-editor#showWrite"
-                          class="px-3 py-1.5 text-sm font-medium border-b-2 border-navy text-navy">
-                    Écrire
-                  </button>
-                  <button type="button"
-                          data-markdown-editor-target="previewTab"
-                          data-action="click->markdown-editor#showPreview"
-                          class="px-3 py-1.5 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
-                    Aperçu
-                  </button>
-                </div>
+          <%# Toolbar %>
+          <div class="flex flex-wrap gap-1 mb-2" data-markdown-editor-target="toolbar">
+            <button type="button" data-action="click->markdown-editor#bold" aria-label="Gras" class="px-2 py-1 text-sm font-bold border border-gray-300 rounded hover:bg-gray-100" title="Gras">B</button>
+            <button type="button" data-action="click->markdown-editor#italic" aria-label="Italique" class="px-2 py-1 text-sm italic border border-gray-300 rounded hover:bg-gray-100" title="Italique">I</button>
+            <button type="button" data-action="click->markdown-editor#heading2" aria-label="Titre H2" class="px-2 py-1 text-sm font-semibold border border-gray-300 rounded hover:bg-gray-100" title="Titre H2">H2</button>
+            <button type="button" data-action="click->markdown-editor#heading3" aria-label="Titre H3" class="px-2 py-1 text-sm font-semibold border border-gray-300 rounded hover:bg-gray-100" title="Titre H3">H3</button>
+            <span class="border-l border-gray-300 mx-1"></span>
+            <button type="button" data-action="click->markdown-editor#link" aria-label="Lien" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" title="Lien">🔗</button>
+            <button type="button" data-action="click->markdown-editor#bulletList" aria-label="Liste à puces" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" title="Liste à puces">• Liste</button>
+            <button type="button" data-action="click->markdown-editor#numberedList" aria-label="Liste numérotée" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" title="Liste numérotée">1. Liste</button>
+            <button type="button" data-action="click->markdown-editor#quote" aria-label="Citation" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" title="Citation">❝ Citation</button>
+            <span class="border-l border-gray-300 mx-1"></span>
+            <button type="button" data-action="click->markdown-editor#image" aria-label="Image" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" title="Image">🖼 Image</button>
+            <input type="file" accept="image/*" class="hidden" data-markdown-editor-target="fileInput" data-action="change->markdown-editor#imageSelected">
+          </div>
 
-                <%# Toolbar %>
-                <div class="flex flex-wrap gap-1 mb-2" data-markdown-editor-target="toolbar">
-                  <button type="button" data-action="click->markdown-editor#bold" aria-label="Gras" class="px-2 py-1 text-sm font-bold border border-gray-300 rounded hover:bg-gray-100" title="Gras">B</button>
-                  <button type="button" data-action="click->markdown-editor#italic" aria-label="Italique" class="px-2 py-1 text-sm italic border border-gray-300 rounded hover:bg-gray-100" title="Italique">I</button>
-                  <button type="button" data-action="click->markdown-editor#heading2" aria-label="Titre H2" class="px-2 py-1 text-sm font-semibold border border-gray-300 rounded hover:bg-gray-100" title="Titre H2">H2</button>
-                  <button type="button" data-action="click->markdown-editor#heading3" aria-label="Titre H3" class="px-2 py-1 text-sm font-semibold border border-gray-300 rounded hover:bg-gray-100" title="Titre H3">H3</button>
-                  <span class="border-l border-gray-300 mx-1"></span>
-                  <button type="button" data-action="click->markdown-editor#link" aria-label="Lien" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" title="Lien">🔗</button>
-                  <button type="button" data-action="click->markdown-editor#bulletList" aria-label="Liste à puces" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" title="Liste à puces">• Liste</button>
-                  <button type="button" data-action="click->markdown-editor#numberedList" aria-label="Liste numérotée" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" title="Liste numérotée">1. Liste</button>
-                  <button type="button" data-action="click->markdown-editor#quote" aria-label="Citation" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" title="Citation">❝ Citation</button>
-                  <span class="border-l border-gray-300 mx-1"></span>
-                  <button type="button" data-action="click->markdown-editor#image" aria-label="Image" class="px-2 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100" title="Image">🖼 Image</button>
-                  <input type="file" accept="image/*" class="hidden" data-markdown-editor-target="fileInput" data-action="change->markdown-editor#imageSelected">
-                </div>
+          <%# Textarea (Write mode) %>
+          <textarea name="article[body][fr]" rows="12"
+                    data-markdown-editor-target="textarea"
+                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm font-mono focus:ring-navy focus:border-navy"><%= article.body&.dig("fr") %></textarea>
 
-                <%# Textarea (Write mode) %>
-                <textarea name="article[body][fr]" rows="12"
-                          data-markdown-editor-target="textarea"
-                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm font-mono focus:ring-navy focus:border-navy"><%= article.body&.dig("fr") %></textarea>
-
-                <%# Preview area %>
-                <div id="preview"
-                     data-markdown-editor-target="preview"
-                     class="hidden w-full border border-gray-300 rounded px-3 py-2 text-sm min-h-[12rem] article-body">
-                </div>
-              </div>
-            <% else %>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1"><%= locale.to_s.upcase %></label>
-                <textarea name="article[body][<%= locale %>]" rows="8"
-                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy"><%= article.body&.dig(locale.to_s) %></textarea>
-              </div>
-            <% end %>
-          <% end %>
+          <%# Preview area %>
+          <div id="preview"
+               data-markdown-editor-target="preview"
+               class="hidden w-full border border-gray-300 rounded px-3 py-2 text-sm min-h-[12rem] article-body">
+          </div>
         </div>
       </fieldset>
     </div>
