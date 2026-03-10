@@ -3,11 +3,11 @@ require "test_helper"
 class LayoutTest < ActionDispatch::IntegrationTest
   # === Application Layout ===
 
-  test "layout includes Montserrat font from Google Fonts" do
+  test "layout includes Domine font from Google Fonts" do
     get "/"
     assert_response :success
     assert_match "fonts.googleapis.com", response.body
-    assert_match "Montserrat", response.body
+    assert_match "Domine", response.body
   end
 
   test "html tag has lang attribute matching current locale" do
@@ -99,6 +99,20 @@ class LayoutTest < ActionDispatch::IntegrationTest
     get "/en"
     assert_select "[data-controller='language-switcher']" do
       assert_select "[data-current-locale='en']"
+    end
+  end
+
+  test "navbar includes WhatsApp link" do
+    get "/"
+    assert_select "nav a[href*='wa.me']" do |links|
+      assert links.any? { |link| link["href"].include?("33662392065") }
+    end
+  end
+
+  test "navbar includes WhatsApp link in mobile menu" do
+    get "/"
+    assert_select "[data-mobile-menu-target='menu'] a[href*='wa.me']" do |links|
+      assert links.any? { |link| link["href"].include?("33662392065") }
     end
   end
 

@@ -39,10 +39,10 @@ class ErrorsControllerTest < ActionDispatch::IntegrationTest
     assert_select "meta[name='robots'][content='noindex']"
   end
 
-  test "404 page uses agency-branded layout with Montserrat font" do
+  test "404 page uses agency-branded layout with Domine font" do
     get "/404"
     assert_response :not_found
-    assert_select "body[class*='Montserrat']"
+    assert_select "body[class*='Domine']"
   end
 
   # === 422 Page ===
