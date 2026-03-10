@@ -13,6 +13,7 @@ fi:
     privacy: "Tietosuoja"
 
   footer:
+    contact: "Yhteystiedot"
     navigation: "Navigointi"
     tagline: "Kiinteistökumppanisi Monacossa vuodesta 1942."
 
