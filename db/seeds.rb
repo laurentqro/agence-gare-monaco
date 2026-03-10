@@ -144,3 +144,8 @@ Dir.glob(Rails.root.join("articles/*.md")).each do |file|
     article.update!(cover_image_url: image_url)
   end
 end
+
+# Apply article translations from runner scripts (idempotent)
+Dir.glob(Rails.root.join("lib/tasks/translate_article_*.rb")).sort.each do |file|
+  load file
+end
