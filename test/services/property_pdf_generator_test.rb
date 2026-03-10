@@ -183,6 +183,23 @@ class PropertyPdfGeneratorTest < ActiveSupport::TestCase
     end
   end
 
+  test "uses localized labels for every locale" do
+    I18n.available_locales.each do |locale|
+      pdf_bytes = PropertyPdfGenerator.new(@property, locale: locale).generate
+      text = extract_text(pdf_bytes)
+
+      # Price label must be in the correct locale, not French
+      price_label = I18n.t("pdf_brochure.price_label", locale: locale)
+      assert_includes text, price_label,
+        "PDF for locale #{locale} should contain '#{price_label}' but got:\n#{text}"
+
+      # Detail labels should be localized too
+      rooms_label = I18n.t("property_detail.rooms", locale: locale)
+      assert_includes text, rooms_label,
+        "PDF for locale #{locale} should contain '#{rooms_label}'"
+    end
+  end
+
   private
 
   def extract_text(pdf_bytes)

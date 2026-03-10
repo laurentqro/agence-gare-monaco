@@ -258,6 +258,7 @@ it:
     contact_email: "info@agencegaremonaco.com"
     contact_website: "agencegaremonaco.com"
     sqm: "sqm"
+    price_label: "Prezzo"
     per_month: "/mese"
 
   routes:

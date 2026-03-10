@@ -293,9 +293,9 @@ class PropertyPdfGenerator
     if @property.price.present?
       price_text = "#{@property.formatted_price} \u20AC"
       price_text += t("pdf_brochure.per_month") if @property.transaction_type == "rental"
-      rows << [ t("admin.properties.table.price"), price_text ]
+      rows << [ t("pdf_brochure.price_label"), price_text ]
     else
-      rows << [ t("admin.properties.table.price"), t("pdf_brochure.price_on_request") ]
+      rows << [ t("pdf_brochure.price_label"), t("pdf_brochure.price_on_request") ]
     end
 
     rows

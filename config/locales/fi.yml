@@ -258,6 +258,7 @@ fi:
     contact_email: "info@agencegaremonaco.com"
     contact_website: "agencegaremonaco.com"
     sqm: "sqm"
+    price_label: "Hinta"
     per_month: "/kk"
 
   routes:
