@@ -222,6 +222,8 @@ fr:
     funds_title: "Le versement des fonds"
     funds_text_1: "Après la signature de l'acte authentique, le notaire procède au versement des fonds. Le prix de vente, déduction faite des frais et éventuels remboursements d'emprunts, vous est versé dans les jours qui suivent la signature."
     funds_text_2: "Notre équipe reste disponible après la vente pour répondre à toutes vos questions et vous accompagner dans vos projets futurs."
+    cta_title: "Un projet de vente ?"
+    cta_text: "Vous souhaitez nous confier la vente de votre bien ? Remplissez le formulaire ci-dessous et l'un de nos conseillers en transaction immobilière vous recontactera dans les meilleurs délais."
 
   contact_form:
     title: "Contact"

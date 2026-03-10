@@ -222,6 +222,8 @@ fi:
     funds_title: "Varojen maksaminen"
     funds_text_1: "Notaarin vahvistaman kauppakirjan allekirjoituksen jälkeen notaari suorittaa varojen maksun. Myyntihinta, vähennettynä palkkioilla ja mahdollisilla lainan takaisinmaksuilla, maksetaan sinulle päivien kuluessa allekirjoituksesta."
     funds_text_2: "Tiimimme pysyy käytettävissäsi myynnin jälkeen vastatakseen kaikkiin kysymyksiisi ja tukeakseen sinua tulevissa projekteissasi."
+    cta_title: "Suunnitteletko myyntiä?"
+    cta_text: "Haluatko antaa kiinteistösi myynnin meille? Täytä alla oleva lomake, niin yksi kiinteistöneuvojistamme ottaa sinuun yhteyttä mahdollisimman pian."
 
   contact_form:
     title: "Yhteystiedot"

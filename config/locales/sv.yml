@@ -222,6 +222,8 @@ sv:
     funds_title: "Utbetalning av medel"
     funds_text_1: "Efter undertecknandet av det notariella köpebrevet genomför notarien utbetalningen av medel. Försäljningspriset, efter avdrag för avgifter och eventuella låneåterbetalningar, betalas ut till dig inom dagar efter undertecknandet."
     funds_text_2: "Vårt team förblir tillgängligt efter försäljningen för att svara på alla dina frågor och stödja dig i dina framtida projekt."
+    cta_title: "Planerar du att sälja?"
+    cta_text: "Vill du anförtro oss försäljningen av din fastighet? Fyll i formuläret nedan så kontaktar en av våra fastighetsmäklare dig så snart som möjligt."
 
   contact_form:
     title: "Kontakt"

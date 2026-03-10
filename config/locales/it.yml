@@ -222,6 +222,8 @@ it:
     funds_title: "Il versamento dei fondi"
     funds_text_1: "Dopo la firma dell'atto notarile, il notaio procede al versamento dei fondi. Il prezzo di vendita, al netto delle spese ed eventuali rimborsi di prestiti, vi viene versato nei giorni successivi alla firma."
     funds_text_2: "Il nostro team resta disponibile dopo la vendita per rispondere a tutte le vostre domande e accompagnarvi nei vostri progetti futuri."
+    cta_title: "Un progetto di vendita?"
+    cta_text: "Desiderate affidarci la vendita del vostro immobile? Compilate il modulo qui sotto e uno dei nostri consulenti in transazioni immobiliari vi ricontatterà al più presto."
 
   contact_form:
     title: "Contatto"

@@ -126,6 +126,22 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='inline-contact-form']"
   end
 
+  # === Vendre page CTA section ===
+
+  test "vendre page has CTA heading before contact form" do
+    get "/vendre"
+    assert_response :success
+    assert_select "[data-testid='vendre-cta']"
+    assert_select "[data-testid='vendre-cta'] h2"
+    assert_select "[data-testid='vendre-cta'] p"
+  end
+
+  test "EN vendre page has translated CTA text" do
+    get "/en/sell"
+    assert_response :success
+    assert_select "[data-testid='vendre-cta'] h2", text: /selling/i
+  end
+
   # === Localized pages ===
 
   test "EN gestion page renders contact form" do

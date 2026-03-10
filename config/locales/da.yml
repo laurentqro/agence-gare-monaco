@@ -222,6 +222,8 @@ da:
     funds_title: "Udbetaling af midler"
     funds_text_1: "Efter underskriften af den notarielle bekræftelse foretager notaren udbetalingen af midler. Salgsprisen, fratrukket gebyrer og eventuelle tilbagebetalinger af lån, udbetales til dig inden for dage efter underskriften."
     funds_text_2: "Vores team forbliver tilgængeligt efter salget for at besvare alle dine spørgsmål og støtte dig i dine fremtidige projekter."
+    cta_title: "Planlægger du at sælge?"
+    cta_text: "Ønsker du at betro os salget af din ejendom? Udfyld formularen nedenfor, og en af vores ejendomsrådgivere vil kontakte dig hurtigst muligt."
 
   contact_form:
     title: "Kontakt"

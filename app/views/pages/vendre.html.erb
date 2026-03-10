@@ -70,8 +70,16 @@
     </div>
   </div>
 
-  <div class="mt-16 pt-12 border-t border-gray-200">
-    <h2 class="heading-section mb-6"><%= t("contact_form.title") %></h2>
+  <div class="relative mt-16 overflow-hidden rounded-lg" data-testid="vendre-cta">
+    <%= image_tag "monaco-panorama.jpg", alt: "", class: "absolute inset-0 w-full h-full object-cover", "aria-hidden": "true" %>
+    <div class="absolute inset-0 bg-navy/70"></div>
+    <div class="relative z-10 px-8 py-16 text-center">
+      <h2 class="text-3xl md:text-4xl font-light text-white mb-4"><%= t("vendre.cta_title") %></h2>
+      <p class="text-sm md:text-base text-white/80 max-w-2xl mx-auto"><%= t("vendre.cta_text") %></p>
+    </div>
+  </div>
+
+  <div class="mt-10">
     <%= render "shared/contact_form", submission: @submission, return_to: "vendre" %>
   </div>
 </div>
