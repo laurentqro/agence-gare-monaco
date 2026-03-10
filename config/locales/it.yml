@@ -92,7 +92,6 @@ it:
     filter_clear_all: "Cancella tutto"
     filter_param_type: "tipo"
     filter_param_district: "quartiere"
-    new_badge: "NUOVO"
     rooms: "locali"
     bedrooms: "cam."
     bathrooms: "bagni"

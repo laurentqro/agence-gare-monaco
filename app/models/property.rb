@@ -48,8 +48,4 @@ class Property < ApplicationRecord
     return nil if price.blank?
     price.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1.').reverse
   end
-
-  def recent?
-    created_at >= 30.days.ago
-  end
 end

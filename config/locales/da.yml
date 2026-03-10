@@ -92,7 +92,6 @@ da:
     filter_clear_all: "Ryd alle"
     filter_param_type: "type"
     filter_param_district: "kvarter"
-    new_badge: "NY"
     rooms: "værelser"
     bedrooms: "sover."
     bathrooms: "bade."

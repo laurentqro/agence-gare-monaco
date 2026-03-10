@@ -92,7 +92,6 @@
     filter_clear_all: "Fjern alle"
     filter_param_type: "type"
     filter_param_district: "bydel"
-    new_badge: "NY"
     rooms: "rom"
     bedrooms: "sover."
     bathrooms: "bad"

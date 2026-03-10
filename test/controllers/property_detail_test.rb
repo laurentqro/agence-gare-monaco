@@ -346,9 +346,9 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='exclusivity-badge']", count: 0
   end
 
-  test "displays NEW badge for recent properties" do
+  test "does not display new badge" do
     get "/en/properties/#{@property.id}-slug"
-    assert_select "[data-testid='new-badge']"
+    assert_select "[data-testid='new-badge']", count: 0
   end
 
   # === Back to listings link ===

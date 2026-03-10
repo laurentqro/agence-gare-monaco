@@ -92,7 +92,6 @@ fi:
     filter_clear_all: "Tyhjennä kaikki"
     filter_param_type: "tyyppi"
     filter_param_district: "kaupunginosa"
-    new_badge: "UUSI"
     rooms: "huonetta"
     bedrooms: "makuuh."
     bathrooms: "kylpyh."

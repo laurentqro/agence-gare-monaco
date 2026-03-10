@@ -92,7 +92,6 @@ fr:
     filter_clear_all: "Réinitialiser"
     filter_param_type: "type"
     filter_param_district: "quartier"
-    new_badge: "NOUVEAU"
     rooms: "pièces"
     bedrooms: "ch."
     bathrooms: "sdb."

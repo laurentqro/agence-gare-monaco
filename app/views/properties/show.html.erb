@@ -76,11 +76,6 @@
 
       <%# Badges %>
       <div class="flex gap-2 mb-4">
-        <% if @property.recent? %>
-          <span data-testid="new-badge" class="bg-navy text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
-            <%= t("listings.new_badge") %>
-          </span>
-        <% end %>
         <% if @property.exclusivity? %>
           <span data-testid="exclusivity-badge" class="bg-accent text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded">
             <%= t("property_detail.exclusivity") %>

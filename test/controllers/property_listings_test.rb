@@ -548,11 +548,11 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='multiselect-type'] .border-t", { minimum: 1 }
   end
 
-  # === NOUVEAU badge for recent properties ===
+  # === NOUVEAU badge removed ===
 
-  test "recently created properties show NOUVEAU badge" do
+  test "property cards do not show new badge" do
     get "/en/sales"
     assert_response :success
-    assert_select "[data-testid='new-badge']", { minimum: 1 }
+    assert_select "[data-testid='new-badge']", count: 0
   end
 end

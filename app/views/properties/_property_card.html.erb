@@ -26,11 +26,6 @@
 
       <%# Badges %>
       <div class="absolute top-3 left-3 flex items-center gap-2">
-        <% if property.recent? %>
-          <span data-testid="new-badge" class="bg-navy text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm">
-            <%= t("listings.new_badge") %>
-          </span>
-        <% end %>
         <% if property.exclusivity? %>
           <span class="bg-gold text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-sm">
             Exclusivit&eacute;

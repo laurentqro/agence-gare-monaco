@@ -92,7 +92,6 @@ sv:
     filter_clear_all: "Rensa alla"
     filter_param_type: "typ"
     filter_param_district: "stadsdel"
-    new_badge: "NY"
     rooms: "rum"
     bedrooms: "sovr."
     bathrooms: "badr."
