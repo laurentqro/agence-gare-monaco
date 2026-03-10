@@ -25,6 +25,7 @@ Rails.application.routes.draw do
     privacy  = I18n.t("routes.privacy", locale: locale)
     france   = I18n.t("routes.france", locale: locale)
     offmarket = I18n.t("routes.offmarket", locale: locale)
+    gestion  = I18n.t("routes.gestion", locale: locale)
 
     prefix = locale == :fr ? "" : "/#{locale}"
 
@@ -58,6 +59,9 @@ Rails.application.routes.draw do
 
       # Off-market
       get "/#{offmarket}", to: "properties#off_market", as: :"#{locale}_offmarket"
+
+      # Gestion (property management)
+      get "/#{gestion}", to: "pages#gestion", as: :"#{locale}_gestion"
     end
   end
 

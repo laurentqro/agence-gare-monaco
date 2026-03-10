@@ -111,6 +111,16 @@
   <% end %>
 </url>
 
+<%# Gestion (property management) page %>
+<% gestion_segment = I18n.t("routes.gestion", locale: @locale) %>
+<url>
+  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{gestion_segment}" %></loc>
+  <% I18n.available_locales.each do |alt_locale| %>
+  <% alt_gestion = I18n.t("routes.gestion", locale: alt_locale) %>
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_gestion}" %>" />
+  <% end %>
+</url>
+
 <%# Privacy page %>
 <% privacy_segment = I18n.t("routes.privacy", locale: @locale) %>
 <url>

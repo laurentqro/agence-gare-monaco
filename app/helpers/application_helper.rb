@@ -43,6 +43,11 @@ module ApplicationHelper
     "#{locale_prefix(locale)}/#{offmarket}"
   end
 
+  def locale_gestion_path(locale = I18n.locale)
+    gestion = I18n.t("routes.gestion", locale: locale)
+    "#{locale_prefix(locale)}/#{gestion}"
+  end
+
   def switch_locale_path(locale)
     controller_name = params[:controller]
     action_name = params[:action]
@@ -64,6 +69,8 @@ module ApplicationHelper
       locale_contact_path(locale)
     when "pages#privacy"
       locale_privacy_path(locale)
+    when "pages#gestion"
+      locale_gestion_path(locale)
     else
       locale_root_path(locale)
     end

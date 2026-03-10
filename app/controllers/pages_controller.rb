@@ -17,4 +17,8 @@ class PagesController < ApplicationController
   def privacy
     set_seo(page_type: :privacy)
   end
+
+  def gestion
+    set_seo(page_type: :gestion)
+  end
 end
