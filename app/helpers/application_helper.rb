@@ -44,7 +44,29 @@ module ApplicationHelper
   end
 
   def switch_locale_path(locale)
-    locale_root_path(locale)
+    controller_name = params[:controller]
+    action_name = params[:action]
+
+    case "#{controller_name}##{action_name}"
+    when "pages#home"
+      locale_root_path(locale)
+    when "properties#index"
+      switch_locale_listings_path(locale)
+    when "properties#show"
+      locale_property_path_for_switch(locale)
+    when "properties#off_market"
+      locale_offmarket_path(locale)
+    when "articles#index"
+      locale_articles_path(locale)
+    when "articles#show"
+      switch_locale_article_path(locale)
+    when "pages#contact"
+      locale_contact_path(locale)
+    when "pages#privacy"
+      locale_privacy_path(locale)
+    else
+      locale_root_path(locale)
+    end
   end
 
   LOCALE_FLAGS = {
@@ -173,5 +195,37 @@ module ApplicationHelper
 
   def nav_active_class(nav_path)
     request.path.start_with?(nav_path) ? "nav-active" : ""
+  end
+
+  private
+
+  def switch_locale_listings_path(locale)
+    transaction = params[:transaction_type]
+    country = params[:country]
+    district_slug = params[:district_slug]
+    prefix = locale_prefix(locale)
+    segment = transaction == "sale" ? I18n.t("routes.sales", locale: locale) : I18n.t("routes.rentals", locale: locale)
+
+    if district_slug.present?
+      "#{prefix}/#{segment}/monaco/#{district_slug}"
+    elsif country == "MC"
+      "#{prefix}/#{segment}/monaco"
+    elsif country == "FR"
+      france = I18n.t("routes.france", locale: locale)
+      "#{prefix}/#{segment}/#{france}"
+    else
+      "#{prefix}/#{segment}"
+    end
+  end
+
+  def locale_property_path_for_switch(locale)
+    property = @property || Property.find(params[:id].to_i)
+    locale_property_path(property, locale)
+  end
+
+  def switch_locale_article_path(locale)
+    slug = params[:slug]
+    articles_segment = I18n.t("routes.articles", locale: locale)
+    "#{locale_prefix(locale)}/#{articles_segment}/#{slug}"
   end
 end
