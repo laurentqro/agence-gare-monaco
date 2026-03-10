@@ -145,16 +145,22 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
 
   # === Property card content ===
 
-  test "property card displays title in current locale" do
+  test "property card displays location as main heading" do
     get "/en/sales"
     assert_response :success
-    assert_select "[data-testid='property-card']", text: /Studio/
+    assert_select "[data-testid='property-card'] [data-testid='card-location']", text: /Monaco/
+  end
+
+  test "property card displays title as tagline" do
+    get "/en/sales"
+    assert_response :success
+    assert_select "[data-testid='property-card'] [data-testid='card-tagline']", text: /Studio/
   end
 
   test "property card displays title in French locale" do
     get "/ventes"
     assert_response :success
-    assert_select "[data-testid='property-card']", text: /Studio/
+    assert_select "[data-testid='property-card'] [data-testid='card-tagline']", text: /Studio/
   end
 
   test "property card displays price with European formatting" do
@@ -169,10 +175,45 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='property-card'] img[src*='immotoolbox']"
   end
 
-  test "property card displays room count" do
+  test "property card displays property type in specs line" do
     get "/en/sales"
     assert_response :success
-    assert_select "[data-testid='property-card']", text: /32/
+    assert_select "[data-testid='property-card'] [data-testid='card-specs']", text: /Apartment/
+  end
+
+  test "property card displays living area in specs line" do
+    get "/en/sales"
+    assert_response :success
+    assert_select "[data-testid='property-card'] [data-testid='card-specs']", text: /32/
+  end
+
+  test "property card displays bedroom count with icon in specs line" do
+    get "/en/sales"
+    assert_response :success
+    # Studio has 0 bedrooms, check the 3-room Fontvieille (2 bedrooms)
+    assert_select "[data-testid='property-card'] [data-testid='card-specs']", text: /2/
+  end
+
+  test "property card has carousel arrows when multiple images" do
+    # Add a second image to the studio
+    @studio_carre_dor.property_images.create!(
+      remote_url: "https://cdn.immotoolbox.com/images/studio2.jpg",
+      position: 1
+    )
+    get "/en/sales"
+    assert_response :success
+    assert_select "[data-testid='property-card'] [data-testid='carousel-prev']"
+    assert_select "[data-testid='property-card'] [data-testid='carousel-next']"
+  end
+
+  test "property card hides carousel arrows with single image" do
+    get "/en/sales"
+    assert_response :success
+    # Find the studio card (has only 1 image) — no arrows
+    cards = css_select("[data-testid='property-card']")
+    studio_card = cards.find { |c| c.to_s.include?("studio1") }
+    assert studio_card, "Studio card with image should be present"
+    assert_no_match(/carousel-prev/, studio_card.to_s)
   end
 
   test "property card links to property detail page" do
