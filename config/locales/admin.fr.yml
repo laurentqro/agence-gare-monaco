@@ -18,6 +18,13 @@ fr:
     dashboard:
       title: "Tableau de bord"
       welcome: "Bienvenue, %{email}"
+      quick_links:
+        title: "Actions rapides"
+        new_article: "Rédiger un article"
+        new_off_market_property: "Ajouter un bien off market"
+        new_contact: "Ajouter un contact"
+        all_properties: "Voir tous les biens"
+        all_contacts: "Voir tous les contacts"
     shared:
       edit: "Modifier"
       delete: "Supprimer"
