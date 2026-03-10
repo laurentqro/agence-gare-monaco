@@ -48,6 +48,11 @@ module ApplicationHelper
     "#{locale_prefix(locale)}/#{gestion}"
   end
 
+  def locale_vendre_path(locale = I18n.locale)
+    vendre = I18n.t("routes.vendre", locale: locale)
+    "#{locale_prefix(locale)}/#{vendre}"
+  end
+
   def switch_locale_path(locale)
     controller_name = params[:controller]
     action_name = params[:action]
@@ -71,6 +76,8 @@ module ApplicationHelper
       locale_privacy_path(locale)
     when "pages#gestion"
       locale_gestion_path(locale)
+    when "pages#vendre"
+      locale_vendre_path(locale)
     else
       locale_root_path(locale)
     end

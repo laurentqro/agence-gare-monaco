@@ -26,6 +26,7 @@ Rails.application.routes.draw do
     france   = I18n.t("routes.france", locale: locale)
     offmarket = I18n.t("routes.offmarket", locale: locale)
     gestion  = I18n.t("routes.gestion", locale: locale)
+    vendre   = I18n.t("routes.vendre", locale: locale)
 
     prefix = locale == :fr ? "" : "/#{locale}"
 
@@ -62,6 +63,9 @@ Rails.application.routes.draw do
 
       # Gestion (property management)
       get "/#{gestion}", to: "pages#gestion", as: :"#{locale}_gestion"
+
+      # Vendre (selling guide)
+      get "/#{vendre}", to: "pages#vendre", as: :"#{locale}_vendre"
     end
   end
 

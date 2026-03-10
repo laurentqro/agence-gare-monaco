@@ -111,6 +111,16 @@
   <% end %>
 </url>
 
+<%# Vendre (selling guide) page %>
+<% vendre_segment = I18n.t("routes.vendre", locale: @locale) %>
+<url>
+  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{vendre_segment}" %></loc>
+  <% I18n.available_locales.each do |alt_locale| %>
+  <% alt_vendre = I18n.t("routes.vendre", locale: alt_locale) %>
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_vendre}" %>" />
+  <% end %>
+</url>
+
 <%# Gestion (property management) page %>
 <% gestion_segment = I18n.t("routes.gestion", locale: @locale) %>
 <url>

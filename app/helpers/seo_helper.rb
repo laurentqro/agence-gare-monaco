@@ -69,6 +69,8 @@ module SeoHelper
       t("seo.offmarket_description")
     when :gestion
       t("seo.gestion_description")
+    when :vendre
+      t("seo.vendre_description")
     end
 
     truncate(desc.to_s.gsub("\u00A0", " ").squish, length: 160, omission: "...")
@@ -102,6 +104,8 @@ module SeoHelper
       "Off-market | #{t('site_name')}"
     when :gestion
       "#{t('nav.management')} | #{t('site_name')}"
+    when :vendre
+      "#{t('nav.sell')} | #{t('site_name')}"
     end
   end
 
@@ -333,6 +337,8 @@ module SeoHelper
       locale_offmarket_path(locale)
     when :gestion
       locale_gestion_path(locale)
+    when :vendre
+      locale_vendre_path(locale)
     end
   end
 
@@ -406,7 +412,7 @@ module SeoHelper
     when :property
       img = opts[:property]&.cover_image
       img&.large_url || img&.remote_url
-    when :homepage, :listings, :articles, :contact, :privacy, :offmarket, :gestion
+    when :homepage, :listings, :articles, :contact, :privacy, :offmarket, :gestion, :vendre
       "#{SITE_HOST}/images/og-default.jpg"
     when :article
       opts[:article]&.cover_image_display_url

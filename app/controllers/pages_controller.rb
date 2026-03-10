@@ -21,4 +21,8 @@ class PagesController < ApplicationController
   def gestion
     set_seo(page_type: :gestion)
   end
+
+  def vendre
+    set_seo(page_type: :vendre)
+  end
 end
