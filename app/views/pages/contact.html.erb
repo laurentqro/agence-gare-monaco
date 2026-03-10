@@ -74,48 +74,7 @@
 
       <%# Right: Contact form %>
       <div data-testid="contact-form">
-        <% submission = @submission || ContactSubmission.new %>
-        <% if submission.errors.any? %>
-          <div data-testid="form-errors" class="bg-red-900/50 border border-red-400/30 rounded p-4 mb-6">
-            <ul class="text-xs text-red-200 space-y-1">
-              <% submission.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
-        <%= form_with(model: submission, url: contact_submissions_path, method: :post, local: true, class: "space-y-4") do |f| %>
-          <%# Honeypot field %>
-          <div class="absolute -left-[9999px]">
-            <label for="website">Website</label>
-            <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
-          </div>
-
-          <div>
-            <label class="block text-sm font-bold text-white mb-1"><%= t("contact_form.name") %></label>
-            <%= f.text_field :name, class: "w-full bg-white/20 border-0 text-white placeholder-white/50 px-3 py-2 text-sm focus:ring-1 focus:ring-white/40 focus:outline-none", required: true %>
-          </div>
-
-          <div>
-            <label class="block text-sm font-bold text-white mb-1"><%= t("contact_form.email") %></label>
-            <%= f.email_field :email, class: "w-full bg-white/20 border-0 text-white placeholder-white/50 px-3 py-2 text-sm focus:ring-1 focus:ring-white/40 focus:outline-none", required: true %>
-          </div>
-
-          <div>
-            <label class="block text-sm font-bold text-white mb-1"><%= t("contact_form.subject") %></label>
-            <%= f.text_field :subject, class: "w-full bg-white/20 border-0 text-white placeholder-white/50 px-3 py-2 text-sm focus:ring-1 focus:ring-white/40 focus:outline-none" %>
-          </div>
-
-          <div>
-            <label class="block text-sm font-bold text-white mb-1"><%= t("contact_form.message") %></label>
-            <%= f.text_area :message, rows: 5, class: "w-full bg-white/20 border-0 text-white placeholder-white/50 px-3 py-2 text-sm focus:ring-1 focus:ring-white/40 focus:outline-none", required: true %>
-          </div>
-
-          <div>
-            <%= f.submit t("contact_form.send"), class: "border border-white/40 text-white text-sm px-6 py-2 hover:bg-white/10 transition-colors cursor-pointer" %>
-          </div>
-        <% end %>
+        <%= render "shared/contact_form", submission: @submission, dark: true %>
       </div>
     </div>
   </div>

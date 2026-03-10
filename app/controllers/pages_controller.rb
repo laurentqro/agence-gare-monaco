@@ -19,10 +19,12 @@ class PagesController < ApplicationController
   end
 
   def gestion
+    @submission = ContactSubmission.new
     set_seo(page_type: :gestion)
   end
 
   def vendre
+    @submission = ContactSubmission.new
     set_seo(page_type: :vendre)
   end
 end

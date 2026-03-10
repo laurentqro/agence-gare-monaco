@@ -20,6 +20,9 @@ class ContactSubmissionsController < ApplicationController
       if @submission.property_id.present?
         load_property_data
         render "properties/show", status: :unprocessable_entity
+      elsif params[:return_to].in?(%w[gestion vendre])
+        set_seo(page_type: params[:return_to].to_sym)
+        render "pages/#{params[:return_to]}", status: :unprocessable_entity
       else
         set_seo(page_type: :contact)
         render "pages/contact", status: :unprocessable_entity
@@ -37,6 +40,10 @@ class ContactSubmissionsController < ApplicationController
     if @submission&.property_id.present? || params.dig(:contact_submission, :property_id).present?
       property = @submission&.property || Property.find_by(id: params.dig(:contact_submission, :property_id))
       helpers.locale_property_path(property) if property
+    elsif params[:return_to] == "gestion"
+      helpers.locale_gestion_path
+    elsif params[:return_to] == "vendre"
+      helpers.locale_vendre_path
     else
       helpers.locale_contact_path
     end

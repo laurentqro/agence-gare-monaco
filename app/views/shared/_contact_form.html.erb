@@ -1,0 +1,58 @@
+<%# Reusable contact form partial
+     Locals: submission (ContactSubmission), return_to (String, optional), dark (Boolean, optional)
+%>
+<% submission ||= ContactSubmission.new %>
+<% dark = local_assigns.fetch(:dark, false) %>
+<% return_to_value = local_assigns[:return_to] %>
+
+<% label_class = dark ? "block text-sm font-bold text-white mb-1" : "block text-sm font-bold text-navy mb-1" %>
+<% input_class = dark ? "w-full bg-white/20 border-0 text-white placeholder-white/50 px-3 py-2 text-sm focus:ring-1 focus:ring-white/40 focus:outline-none" : "w-full bg-gray-100 border border-gray-200 text-navy px-3 py-2 text-sm focus:ring-1 focus:ring-navy/40 focus:outline-none" %>
+<% submit_class = dark ? "border border-white/40 text-white text-sm px-6 py-2 hover:bg-white/10 transition-colors cursor-pointer" : "bg-navy text-white text-sm px-6 py-2 hover:bg-navy/90 transition-colors cursor-pointer" %>
+
+<div data-testid="inline-contact-form">
+  <% if submission.errors.any? %>
+    <div data-testid="form-errors" class="<%= dark ? 'bg-red-900/50 border border-red-400/30' : 'bg-red-50 border border-red-200' %> rounded p-4 mb-6">
+      <ul class="<%= dark ? 'text-xs text-red-200' : 'text-xs text-red-600' %> space-y-1">
+        <% submission.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with(model: submission, url: contact_submissions_path, method: :post, local: true, class: "space-y-4") do |f| %>
+    <%# Honeypot field %>
+    <div class="absolute -left-[9999px]">
+      <label for="website">Website</label>
+      <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+    </div>
+
+    <% if return_to_value %>
+      <input type="hidden" name="return_to" value="<%= return_to_value %>">
+    <% end %>
+
+    <div>
+      <label class="<%= label_class %>"><%= t("contact_form.name") %></label>
+      <%= f.text_field :name, class: input_class, required: true %>
+    </div>
+
+    <div>
+      <label class="<%= label_class %>"><%= t("contact_form.email") %></label>
+      <%= f.email_field :email, class: input_class, required: true %>
+    </div>
+
+    <div>
+      <label class="<%= label_class %>"><%= t("contact_form.subject") %></label>
+      <%= f.text_field :subject, class: input_class %>
+    </div>
+
+    <div>
+      <label class="<%= label_class %>"><%= t("contact_form.message") %></label>
+      <%= f.text_area :message, rows: 5, class: input_class, required: true %>
+    </div>
+
+    <div>
+      <%= f.submit t("contact_form.send"), class: submit_class %>
+    </div>
+  <% end %>
+</div>

@@ -47,4 +47,9 @@
       <p><%= t("gestion.funds_text_2") %></p>
     </div>
   </div>
+
+  <div class="mt-16 pt-12 border-t border-gray-200">
+    <h2 class="heading-section mb-6"><%= t("contact_form.title") %></h2>
+    <%= render "shared/contact_form", submission: @submission, return_to: "gestion" %>
+  </div>
 </div>
