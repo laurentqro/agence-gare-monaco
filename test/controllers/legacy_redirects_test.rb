@@ -28,10 +28,10 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
 
   # === French Legacy Routes ===
 
-  test "FR legacy /fr/location/monaco redirects to /locations/monaco" do
+  test "FR legacy /fr/location/monaco redirects to /locations" do
     get "/fr/location/monaco"
     assert_response :moved_permanently
-    assert_redirected_to "/locations/monaco"
+    assert_redirected_to "/locations"
   end
 
   test "FR legacy /fr/bien/{id} redirects to property detail" do
@@ -92,24 +92,24 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
     assert_redirected_to "/fr/articles/mon-article-test"
   end
 
-  test "FR legacy /fr/recherche/{location} redirects to district when match" do
+  test "FR legacy /fr/recherche/{location} redirects to sales" do
     get "/fr/recherche/carre-dor"
     assert_response :moved_permanently
-    assert_redirected_to "/fr/ventes/monaco/carre-dor"
+    assert_redirected_to "/fr/ventes"
   end
 
-  test "FR legacy /fr/recherche/{location} redirects to sales monaco when no district match" do
+  test "FR legacy /fr/recherche/{location} redirects to sales when no district match" do
     get "/fr/recherche/unknown-area"
     assert_response :moved_permanently
-    assert_redirected_to "/fr/ventes/monaco"
+    assert_redirected_to "/fr/ventes"
   end
 
   # === English Legacy Routes ===
 
-  test "EN legacy /en/rental/monaco redirects to /en/rentals/monaco" do
+  test "EN legacy /en/rental/monaco redirects to /en/rentals" do
     get "/en/rental/monaco"
     assert_response :moved_permanently
-    assert_redirected_to "/en/rentals/monaco"
+    assert_redirected_to "/en/rentals"
   end
 
   test "EN legacy /en/property/{id} redirects to property detail" do
@@ -123,16 +123,16 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
     assert_response :gone
   end
 
-  test "EN legacy /en/properties-off-market/sale redirects to sales monaco" do
+  test "EN legacy /en/properties-off-market/sale redirects to sales" do
     get "/en/properties-off-market/sale"
     assert_response :moved_permanently
-    assert_redirected_to "/en/sales/monaco"
+    assert_redirected_to "/en/sales"
   end
 
-  test "EN legacy /en/properties-off-market/rental redirects to rentals monaco" do
+  test "EN legacy /en/properties-off-market/rental redirects to rentals" do
     get "/en/properties-off-market/rental"
     assert_response :moved_permanently
-    assert_redirected_to "/en/rentals/monaco"
+    assert_redirected_to "/en/rentals"
   end
 
   test "EN legacy /en/news redirects to /en/articles" do
@@ -149,10 +149,10 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
 
   # === Italian Legacy Routes ===
 
-  test "IT legacy /it/affitto/monaco redirects to /it/affitti/monaco" do
+  test "IT legacy /it/affitto/monaco redirects to /it/affitti" do
     get "/it/affitto/monaco"
     assert_response :moved_permanently
-    assert_redirected_to "/it/affitti/monaco"
+    assert_redirected_to "/it/affitti"
   end
 
   test "IT legacy /it/immobile/{id} redirects to property detail" do
@@ -188,10 +188,10 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
     assert_redirected_to "/fr/ventes"
   end
 
-  test "trailing slash on sales monaco route redirects without slash" do
-    get "/fr/ventes/monaco/"
+  test "trailing slash on sales route redirects without slash via trailing slash middleware" do
+    get "/fr/ventes/"
     assert_response :moved_permanently
-    assert_redirected_to "/fr/ventes/monaco"
+    assert_redirected_to "/fr/ventes"
   end
 
   test "trailing slash on property detail route redirects without slash" do
@@ -218,7 +218,7 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
     District.create!(name: "Fontvieille", city: "Monaco", slug: "fontvieille")
     get "/fr/recherche/fontvieille"
     assert_response :moved_permanently
-    assert_redirected_to "/fr/ventes/monaco/fontvieille"
+    assert_redirected_to "/fr/ventes"
   end
 
   test "FR legacy /fr/posts/{category}/ without trailing slash also redirects" do

@@ -58,16 +58,11 @@ class LegacyRedirectsController < ApplicationController
     redirect_to "/#{locale}/#{articles_segment}/#{params[:category_slug]}", status: :moved_permanently
   end
 
-  # FR: /fr/recherche/{location} → /fr/ventes/monaco/{district} or /fr/ventes/monaco
+  # FR: /fr/recherche/{location} → /fr/ventes
   def search
     locale = params[:locale]
     sales_segment = I18n.t("routes.sales", locale: locale)
-    district = District.find_by(slug: params[:location])
-    if district
-      redirect_to "/#{locale}/#{sales_segment}/monaco/#{district.slug}", status: :moved_permanently
-    else
-      redirect_to "/#{locale}/#{sales_segment}/monaco", status: :moved_permanently
-    end
+    redirect_to "/#{locale}/#{sales_segment}", status: :moved_permanently
   end
 
   # EN: /en/news → /en/articles
@@ -77,16 +72,16 @@ class LegacyRedirectsController < ApplicationController
     redirect_to "/#{locale}/#{articles_segment}", status: :moved_permanently
   end
 
-  # EN: /en/properties-off-market/sale → /en/sales/monaco
-  # EN: /en/properties-off-market/rental → /en/rentals/monaco
+  # EN: /en/properties-off-market/sale → /en/sales
+  # EN: /en/properties-off-market/rental → /en/rentals
   def off_market_listing
     locale = params[:locale]
     if params[:transaction] == "rental"
       rentals_segment = I18n.t("routes.rentals", locale: locale)
-      redirect_to "/#{locale}/#{rentals_segment}/monaco", status: :moved_permanently
+      redirect_to "/#{locale}/#{rentals_segment}", status: :moved_permanently
     else
       sales_segment = I18n.t("routes.sales", locale: locale)
-      redirect_to "/#{locale}/#{sales_segment}/monaco", status: :moved_permanently
+      redirect_to "/#{locale}/#{sales_segment}", status: :moved_permanently
     end
   end
 end

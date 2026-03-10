@@ -106,19 +106,13 @@ class SeoIntegrationTest < ActionDispatch::IntegrationTest
   # --- Property listing SEO ---
 
   test "property listing has canonical URL without query params" do
-    get "/en/sales/monaco"
+    get "/en/sales"
     assert_response :success
-    assert_select 'link[rel="canonical"][href="https://agencegaremonaco.com/en/sales/monaco"]'
-  end
-
-  test "property listing with district has canonical" do
-    get "/en/sales/monaco/carre-dor"
-    assert_response :success
-    assert_select 'link[rel="canonical"][href="https://agencegaremonaco.com/en/sales/monaco/carre-dor"]'
+    assert_select 'link[rel="canonical"][href="https://agencegaremonaco.com/en/sales"]'
   end
 
   test "property listing has hreflang tags" do
-    get "/ventes/monaco"
+    get "/ventes"
     assert_response :success
     assert_select 'link[rel="alternate"][hreflang="fr"]'
     assert_select 'link[rel="alternate"][hreflang="en"]'
@@ -126,7 +120,7 @@ class SeoIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test "property listing has meta description" do
-    get "/en/sales/monaco"
+    get "/en/sales"
     assert_response :success
     assert_select 'meta[name="description"]' do |elements|
       assert elements.first["content"].present?
@@ -134,7 +128,7 @@ class SeoIntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test "property listing has breadcrumb JSON-LD" do
-    get "/en/sales/monaco"
+    get "/en/sales"
     assert_response :success
     scripts = css_select('script[type="application/ld+json"]')
     json_contents = scripts.map { |s| JSON.parse(s.text) }

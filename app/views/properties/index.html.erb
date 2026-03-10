@@ -41,7 +41,7 @@
         </div>
       </div>
 
-      <% if @country == "MC" && !params[:district_slug] %>
+      <% if @districts&.any? %>
         <div class="flex items-center gap-3" data-testid="multiselect-district" data-controller="multiselect-filter">
           <label class="text-xs font-bold uppercase tracking-wide text-navy shrink-0"><%= t("listings.filter_district") %></label>
           <div class="relative w-52">

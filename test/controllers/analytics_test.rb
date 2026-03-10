@@ -12,7 +12,7 @@ class AnalyticsTest < ActionDispatch::IntegrationTest
       reference: "PLAUS-001", title: { "en" => "Test" }, transaction_type: "sale",
       property_type: "apartment", country: "MC", city: "Monaco", published: true, off_market: false
     )
-    get "/en/sales/monaco"
+    get "/en/sales"
     assert_response :success
     assert_select "script[data-domain='agencegaremonaco.com']"
   end

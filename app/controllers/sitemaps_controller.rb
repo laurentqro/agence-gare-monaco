@@ -18,12 +18,6 @@ class SitemapsController < ApplicationController
 
     @properties = Property.publicly_visible.includes(:district, :property_images).order(:id)
     @articles = Article.published.order(:id)
-    @districts_with_sales = District.joins(:properties)
-      .merge(Property.publicly_visible.where(transaction_type: "sale"))
-      .where(city: "Monaco").distinct
-    @districts_with_rentals = District.joins(:properties)
-      .merge(Property.publicly_visible.where(transaction_type: "rental"))
-      .where(city: "Monaco").distinct
 
     respond_to do |format|
       format.xml

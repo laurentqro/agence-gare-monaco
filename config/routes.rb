@@ -29,20 +29,23 @@ Rails.application.routes.draw do
     vendre   = I18n.t("routes.vendre", locale: locale)
 
     prefix = locale == :fr ? "" : "/#{locale}"
+    sales_target = "#{prefix}/#{sales}"
+    rentals_target = "#{prefix}/#{rentals}"
 
     scope prefix, defaults: { locale: locale.to_s } do
       # Homepage
       get "/", to: "pages#home", as: :"#{locale}_root"
 
-      # Property listings: /{transaction}[/{country}[/{district}]]
-      get "/#{sales}",                       to: "properties#index", defaults: { transaction_type: "sale" }, as: :"#{locale}_sales"
-      get "/#{sales}/monaco",                to: "properties#index", defaults: { transaction_type: "sale", country: "MC" }, as: :"#{locale}_sales_monaco"
-      get "/#{sales}/monaco/:district_slug", to: "properties#index", defaults: { transaction_type: "sale", country: "MC" }, as: :"#{locale}_sales_monaco_district"
-      get "/#{sales}/#{france}",             to: "properties#index", defaults: { transaction_type: "sale", country: "FR" }, as: :"#{locale}_sales_france"
+      # Property listings: single page per transaction type
+      get "/#{sales}",   to: "properties#index", defaults: { transaction_type: "sale" },   as: :"#{locale}_sales"
+      get "/#{rentals}", to: "properties#index", defaults: { transaction_type: "rental" }, as: :"#{locale}_rentals"
 
-      get "/#{rentals}",                       to: "properties#index", defaults: { transaction_type: "rental" }, as: :"#{locale}_rentals"
-      get "/#{rentals}/monaco",                to: "properties#index", defaults: { transaction_type: "rental", country: "MC" }, as: :"#{locale}_rentals_monaco"
-      get "/#{rentals}/monaco/:district_slug", to: "properties#index", defaults: { transaction_type: "rental", country: "MC" }, as: :"#{locale}_rentals_monaco_district"
+      # Legacy country/district routes → redirect to simplified listings
+      get "/#{sales}/monaco",                to: redirect(sales_target, status: 301)
+      get "/#{sales}/monaco/:district_slug", to: redirect(sales_target, status: 301)
+      get "/#{sales}/#{france}",             to: redirect(sales_target, status: 301)
+      get "/#{rentals}/monaco",              to: redirect(rentals_target, status: 301)
+      get "/#{rentals}/monaco/:district_slug", to: redirect(rentals_target, status: 301)
 
       # Property detail: /{properties}/{id}-{slug}
       get "/#{props}/:id", to: "properties#show", as: :"#{locale}_property"
@@ -72,7 +75,7 @@ Rails.application.routes.draw do
   # === Legacy URL Redirects (301) ===
   # French legacy routes (must come before the /fr wildcard redirect below)
   scope "/fr", defaults: { locale: "fr" } do
-    get "location/monaco", to: redirect("/locations/monaco", status: 301)
+    get "location/monaco", to: redirect("/locations", status: 301)
     get "bien/:legacy_id",            to: "legacy_redirects#property"
     get "bien-off-market/:legacy_id", to: "legacy_redirects#off_market_property"
     get "pdf-download/:legacy_id",    to: "legacy_redirects#pdf_download", constraints: { legacy_id: /\d+\.pdf/ }
@@ -89,7 +92,7 @@ Rails.application.routes.draw do
 
   # English legacy routes
   scope "/en", defaults: { locale: "en" } do
-    get "rental/monaco", to: redirect("/en/rentals/monaco", status: 301)
+    get "rental/monaco", to: redirect("/en/rentals", status: 301)
     get "property/:legacy_id",                to: "legacy_redirects#property"
     get "properties-off-market/:transaction", to: "legacy_redirects#off_market_listing"
     get "news",                               to: "legacy_redirects#news"
@@ -98,7 +101,7 @@ Rails.application.routes.draw do
 
   # Italian legacy routes
   scope "/it", defaults: { locale: "it" } do
-    get "affitto/monaco", to: redirect("/it/affitti/monaco", status: 301)
+    get "affitto/monaco", to: redirect("/it/affitti", status: 301)
     get "immobile/:legacy_id", to: "legacy_redirects#property"
   end
 

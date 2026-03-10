@@ -55,8 +55,8 @@ class HomepageTest < ActionDispatch::IntegrationTest
   test "hero cards link to correct paths for French" do
     get "/"
     assert_select "[data-testid='hero-cards']" do
-      assert_select "a[href='/ventes/monaco']", 1
-      assert_select "a[href='/locations/monaco']", 1
+      assert_select "a[href='/ventes']", 1
+      assert_select "a[href='/locations']", 1
       assert_select "a[href='/off-market']", 1
       assert_select "a[href='/vendre']", 1
       assert_select "a[href='/gestion']", 1
@@ -66,8 +66,8 @@ class HomepageTest < ActionDispatch::IntegrationTest
   test "hero cards link to correct paths for English" do
     get "/en"
     assert_select "[data-testid='hero-cards']" do
-      assert_select "a[href='/en/sales/monaco']", 1
-      assert_select "a[href='/en/rentals/monaco']", 1
+      assert_select "a[href='/en/sales']", 1
+      assert_select "a[href='/en/rentals']", 1
       assert_select "a[href='/en/off-market']", 1
       assert_select "a[href='/en/sell']", 1
       assert_select "a[href='/en/management']", 1

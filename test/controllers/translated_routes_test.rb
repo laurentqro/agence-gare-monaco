@@ -2,9 +2,9 @@ require "test_helper"
 
 class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   # === Property Listings Routes ===
-  # Pattern: /{locale}/{transaction}[/{country}[/{district}]]
-  # French uses no locale prefix — routes are at root level
+  # Pattern: /{locale}/{transaction} — single page per transaction type, no country/district in URL
 
+  # Sales (all 8 locales)
   test "FR sales listing route" do
     get "/ventes"
     assert_response :success
@@ -61,72 +61,68 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  # Sales with country filter
-  test "FR sales Monaco route" do
+  # === Old country/district routes now redirect 301 to simplified routes ===
+  test "FR sales monaco redirects to sales" do
     get "/ventes/monaco"
-    assert_response :success
+    assert_response :moved_permanently
+    assert_redirected_to "/ventes"
   end
 
-  test "EN sales Monaco route" do
+  test "EN sales monaco redirects to sales" do
     get "/en/sales/monaco"
-    assert_response :success
+    assert_response :moved_permanently
+    assert_redirected_to "/en/sales"
   end
 
-  test "DE sales Monaco route" do
-    get "/de/verkauf/monaco"
-    assert_response :success
-  end
-
-  test "FR sales France route" do
+  test "FR sales france redirects to sales" do
     get "/ventes/france"
-    assert_response :success
+    assert_response :moved_permanently
+    assert_redirected_to "/ventes"
   end
 
-  test "EN sales France route" do
+  test "EN sales france redirects to sales" do
     get "/en/sales/france"
-    assert_response :success
+    assert_response :moved_permanently
+    assert_redirected_to "/en/sales"
   end
 
-  test "DE sales France route" do
+  test "DE sales france redirects to sales" do
     get "/de/verkauf/frankreich"
-    assert_response :success
+    assert_response :moved_permanently
+    assert_redirected_to "/de/verkauf"
   end
 
-  # Rentals with country filter
-  test "FR rentals Monaco route" do
+  test "FR rentals monaco redirects to rentals" do
     get "/locations/monaco"
-    assert_response :success
+    assert_response :moved_permanently
+    assert_redirected_to "/locations"
   end
 
-  test "EN rentals Monaco route" do
+  test "EN rentals monaco redirects to rentals" do
     get "/en/rentals/monaco"
-    assert_response :success
+    assert_response :moved_permanently
+    assert_redirected_to "/en/rentals"
   end
 
-  # Sales with district filter
-  test "FR sales Monaco district route" do
-    district = District.create!(name: "Carré d'Or", city: "Monaco", slug: "carre-dor")
+  test "FR sales monaco district redirects to sales" do
+    District.create!(name: "Carré d'Or", city: "Monaco", slug: "carre-dor")
     get "/ventes/monaco/carre-dor"
-    assert_response :success
+    assert_response :moved_permanently
+    assert_redirected_to "/ventes"
   end
 
-  test "EN sales Monaco district route" do
-    district = District.create!(name: "Carré d'Or", city: "Monaco", slug: "carre-dor")
+  test "EN sales monaco district redirects to sales" do
+    District.create!(name: "Carré d'Or", city: "Monaco", slug: "carre-dor")
     get "/en/sales/monaco/carre-dor"
-    assert_response :success
+    assert_response :moved_permanently
+    assert_redirected_to "/en/sales"
   end
 
-  test "DE sales Monaco district route" do
-    district = District.create!(name: "Fontvieille", city: "Monaco", slug: "fontvieille")
-    get "/de/verkauf/monaco/fontvieille"
-    assert_response :success
-  end
-
-  # Rentals with district filter
-  test "FR rentals Monaco district route" do
-    district = District.create!(name: "Monte-Carlo", city: "Monaco", slug: "monte-carlo")
+  test "FR rentals monaco district redirects to rentals" do
+    District.create!(name: "Monte-Carlo", city: "Monaco", slug: "monte-carlo")
     get "/locations/monaco/monte-carlo"
-    assert_response :success
+    assert_response :moved_permanently
+    assert_redirected_to "/locations"
   end
 
   # === Property Detail Routes ===
@@ -175,8 +171,6 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   end
 
   # === Articles Routes ===
-  # Pattern: /{locale}/{articles}
-
   test "FR articles listing route" do
     get "/articles"
     assert_response :success
@@ -192,7 +186,6 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  # Articles by category
   test "FR articles by category route" do
     category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     get "/articles/actualites"
@@ -205,7 +198,6 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  # Single article
   test "FR single article route" do
     category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     article = Article.create!(
@@ -256,7 +248,6 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   test "translated routes set correct locale for FR" do
     get "/ventes"
     assert_response :success
-    # The controller should render in French
   end
 
   test "translated routes set correct locale for EN" do
@@ -271,7 +262,7 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
 
   # === Invalid translated segments return 404 ===
   test "wrong translation for locale returns 404" do
-    get "/fr/sales"  # /fr now redirects, but /fr/sales should 301 to /sales (which is not found)
+    get "/fr/sales"
     assert_response :moved_permanently
   end
 
@@ -329,20 +320,23 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # === Non-existent district returns 404 ===
-  test "non-existent district slug returns 404" do
-    get "/ventes/monaco/nonexistent-district"
-    assert_response :not_found
-  end
-
-  # === Query params pass through for filters ===
-  test "query params work for property type filter" do
-    get "/ventes/monaco?type=studio"
+  # === Query params work for filters ===
+  test "query params work for property type filter on sales" do
+    get "/ventes?type=studio"
     assert_response :success
   end
 
-  test "query params work for rooms filter" do
-    get "/ventes/monaco?pieces=3"
+  test "query params work for district filter on sales" do
+    district = District.create!(name: "Monte-Carlo", city: "Monaco", slug: "monte-carlo")
+    get "/ventes?quartier=monte-carlo"
     assert_response :success
+  end
+
+  # === Legacy redirect for old search URLs now points to simplified sales ===
+  test "legacy search redirect points to sales without country" do
+    district = District.create!(name: "Monte-Carlo", city: "Monaco", slug: "monte-carlo")
+    get "/fr/recherche/monte-carlo"
+    assert_response :moved_permanently
+    assert_redirected_to "/fr/ventes"
   end
 end

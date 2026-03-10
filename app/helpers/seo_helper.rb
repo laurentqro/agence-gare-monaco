@@ -297,18 +297,10 @@ module SeoHelper
     crumbs = [{ name: I18n.t("homepage.hero_title"), url: "#{SITE_HOST}#{home_path}" }]
 
     transaction = seo_opts[:transaction_type]
-    country = seo_opts[:country]
-    district = seo_opts[:district]
 
     if transaction.present?
-      label = seo_listings_title(transaction_type: transaction, country: country)
-      url = SITE_HOST + listing_path_for(locale, transaction_type: transaction, country: country)
-      crumbs << { name: label, url: url }
-    end
-
-    if district.present?
-      label = seo_listings_title(transaction_type: transaction, country: country, district: district)
-      url = SITE_HOST + listing_path_for(locale, transaction_type: transaction, country: country, district: district)
+      label = seo_listings_title(transaction_type: transaction)
+      url = SITE_HOST + listing_path_for(locale, transaction_type: transaction)
       crumbs << { name: label, url: url }
     end
 
@@ -343,45 +335,14 @@ module SeoHelper
   end
 
   def listing_path_for(locale, opts)
-    sales = I18n.t("routes.sales", locale: locale)
-    rentals = I18n.t("routes.rentals", locale: locale)
-    france = I18n.t("routes.france", locale: locale)
-
     transaction = opts[:transaction_type]
-    country = opts[:country]
-    district = opts[:district]
-
-    base = transaction == "rental" ? rentals : sales
-    prefix = locale.to_sym == :fr ? "" : "/#{locale}"
-    path = "#{prefix}/#{base}"
-
-    if country == "MC"
-      path += "/monaco"
-      path += "/#{district.slug}" if district.present?
-    elsif country == "FR"
-      path += "/#{france}"
-    end
-
-    path
+    transaction == "rental" ? locale_rentals_path(locale) : locale_sales_path(locale)
   end
 
   def seo_listings_title(opts)
     transaction = opts[:transaction_type]
-    country = opts[:country]
-    district = opts[:district]
 
-    if district.present?
-      key = transaction == "rental" ? "listings.rentals_in_district" : "listings.sales_in_district"
-      I18n.t(key, district: district.name)
-    elsif country == "MC" && transaction == "sale"
-      I18n.t("listings.sales_monaco")
-    elsif country == "MC" && transaction == "rental"
-      I18n.t("listings.rentals_monaco")
-    elsif country == "FR"
-      I18n.t("listings.sales_france")
-    elsif transaction == "sale"
-      I18n.t("listings.sales")
-    elsif transaction == "rental"
+    if transaction == "rental"
       I18n.t("listings.rentals")
     else
       I18n.t("listings.sales")
@@ -390,20 +351,11 @@ module SeoHelper
 
   def seo_listings_description(opts)
     transaction = opts[:transaction_type]
-    country = opts[:country]
-    district = opts[:district]
 
-    if district.present?
-      key = transaction == "rental" ? "seo.listings_rentals_district_description" : "seo.listings_sales_district_description"
-      I18n.t(key, district: district.name)
-    elsif country == "MC" && transaction == "sale"
-      I18n.t("seo.listings_sales_monaco_description")
-    elsif country == "MC" && transaction == "rental"
-      I18n.t("seo.listings_rentals_monaco_description")
-    elsif country == "FR"
-      I18n.t("seo.listings_sales_france_description")
+    if transaction == "rental"
+      I18n.t("seo.listings_rentals_description", default: I18n.t("seo.listings_all_description"))
     else
-      I18n.t("seo.listings_all_description")
+      I18n.t("seo.listings_sales_description", default: I18n.t("seo.listings_all_description"))
     end
   end
 

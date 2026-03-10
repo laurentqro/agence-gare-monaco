@@ -7,20 +7,14 @@ module ApplicationHelper
     locale.to_sym == :fr ? "" : "/#{locale}"
   end
 
-  def locale_sales_monaco_path(locale = I18n.locale)
+  def locale_sales_path(locale = I18n.locale)
     sales = I18n.t("routes.sales", locale: locale)
-    "#{locale_prefix(locale)}/#{sales}/monaco"
+    "#{locale_prefix(locale)}/#{sales}"
   end
 
-  def locale_rentals_monaco_path(locale = I18n.locale)
+  def locale_rentals_path(locale = I18n.locale)
     rentals = I18n.t("routes.rentals", locale: locale)
-    "#{locale_prefix(locale)}/#{rentals}/monaco"
-  end
-
-  def locale_sales_france_path(locale = I18n.locale)
-    sales = I18n.t("routes.sales", locale: locale)
-    france = I18n.t("routes.france", locale: locale)
-    "#{locale_prefix(locale)}/#{sales}/#{france}"
+    "#{locale_prefix(locale)}/#{rentals}"
   end
 
   def locale_articles_path(locale = I18n.locale)
@@ -101,19 +95,8 @@ module ApplicationHelper
 
   def listing_heading
     transaction = params[:transaction_type]
-    country = params[:country]
-    district = @district if defined?(@district)
 
-    if district
-      key = transaction == "sale" ? "listings.sales_in_district" : "listings.rentals_in_district"
-      t(key, district: district.name)
-    elsif country == "MC" && transaction == "sale"
-      t("listings.sales_monaco")
-    elsif country == "MC" && transaction == "rental"
-      t("listings.rentals_monaco")
-    elsif country == "FR"
-      t("listings.sales_france")
-    elsif transaction == "sale"
+    if transaction == "sale"
       t("listings.sales")
     elsif transaction == "rental"
       t("listings.rentals")
@@ -215,21 +198,7 @@ module ApplicationHelper
 
   def switch_locale_listings_path(locale)
     transaction = params[:transaction_type]
-    country = params[:country]
-    district_slug = params[:district_slug]
-    prefix = locale_prefix(locale)
-    segment = transaction == "sale" ? I18n.t("routes.sales", locale: locale) : I18n.t("routes.rentals", locale: locale)
-
-    if district_slug.present?
-      "#{prefix}/#{segment}/monaco/#{district_slug}"
-    elsif country == "MC"
-      "#{prefix}/#{segment}/monaco"
-    elsif country == "FR"
-      france = I18n.t("routes.france", locale: locale)
-      "#{prefix}/#{segment}/#{france}"
-    else
-      "#{prefix}/#{segment}"
-    end
+    transaction == "sale" ? locale_sales_path(locale) : locale_rentals_path(locale)
   end
 
   def locale_property_path_for_switch(locale)

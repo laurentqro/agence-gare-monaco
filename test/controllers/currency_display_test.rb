@@ -25,26 +25,26 @@ class CurrencyDisplayTest < ActionDispatch::IntegrationTest
 
   test "property detail shows converted price for Swedish locale when rate available" do
     ExchangeRate.create!(currency: "SEK", rate: 11.25, fetched_at: Time.current)
-    get "/sv/forsaljning/monaco"
+    get "/sv/forsaljning"
     assert_response :success
     assert_select "[data-testid='converted-price']"
   end
 
   test "property detail does not show converted price for French locale" do
-    get "/ventes/monaco"
+    get "/ventes"
     assert_response :success
     assert_select "[data-testid='converted-price']", count: 0
   end
 
   test "property detail does not show converted price when no rate available" do
-    get "/sv/forsaljning/monaco"
+    get "/sv/forsaljning"
     assert_response :success
     assert_select "[data-testid='converted-price']", count: 0
   end
 
   test "property card shows converted price on listings page" do
     ExchangeRate.create!(currency: "SEK", rate: 11.25, fetched_at: Time.current)
-    get "/sv/forsaljning/monaco"
+    get "/sv/forsaljning"
     assert_response :success
     assert_select "[data-testid='converted-price']"
   end

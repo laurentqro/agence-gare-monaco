@@ -58,17 +58,17 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
-  test "canonical_url for property listing with filters strips query params" do
+  test "canonical_url for property listing" do
     I18n.with_locale(:fr) do
-      result = canonical_url(page_type: :listings, transaction_type: "sale", country: "MC")
-      assert_equal "https://agencegaremonaco.com/ventes/monaco", result
+      result = canonical_url(page_type: :listings, transaction_type: "sale")
+      assert_equal "https://agencegaremonaco.com/ventes", result
     end
   end
 
-  test "canonical_url for property listing with district" do
+  test "canonical_url for property listing in English" do
     I18n.with_locale(:en) do
-      result = canonical_url(page_type: :listings, transaction_type: "sale", country: "MC", district: @district)
-      assert_equal "https://agencegaremonaco.com/en/sales/monaco/carre-dor", result
+      result = canonical_url(page_type: :listings, transaction_type: "sale")
+      assert_equal "https://agencegaremonaco.com/en/sales", result
     end
   end
 
@@ -231,16 +231,15 @@ class SeoHelperTest < ActionView::TestCase
 
   test "seo_title for listings" do
     I18n.with_locale(:en) do
-      result = seo_title(page_type: :listings, transaction_type: "sale", country: "MC")
+      result = seo_title(page_type: :listings, transaction_type: "sale")
       assert_includes result, "Sales"
-      assert_includes result, "Monaco"
     end
   end
 
-  test "seo_title for listings with district" do
+  test "seo_title for rentals listings" do
     I18n.with_locale(:en) do
-      result = seo_title(page_type: :listings, transaction_type: "sale", country: "MC", district: @district)
-      assert_includes result, "Carré d'Or"
+      result = seo_title(page_type: :listings, transaction_type: "rental")
+      assert_includes result, "Rentals"
     end
   end
 

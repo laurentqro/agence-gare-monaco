@@ -9,10 +9,10 @@
 
       <%# Desktop Navigation %>
       <div class="hidden lg:flex items-center space-x-6">
-        <a href="<%= locale_sales_monaco_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_sales_monaco_path) %>">
+        <a href="<%= locale_sales_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_sales_path) %>">
           <%= t("nav.buy") %>
         </a>
-        <a href="<%= locale_rentals_monaco_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_rentals_monaco_path) %>">
+        <a href="<%= locale_rentals_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_rentals_path) %>">
           <%= t("nav.rent") %>
         </a>
         <a href="<%= locale_offmarket_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_offmarket_path) %>">
@@ -65,10 +65,10 @@
   <%# Mobile Menu %>
   <div data-mobile-menu-target="menu" class="hidden lg:hidden bg-white border-t border-gray-200">
     <div class="px-4 py-3 space-y-2">
-      <a href="<%= locale_sales_monaco_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2 <%= nav_active_class(locale_sales_monaco_path) %>">
+      <a href="<%= locale_sales_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2 <%= nav_active_class(locale_sales_path) %>">
         <%= t("nav.buy") %>
       </a>
-      <a href="<%= locale_rentals_monaco_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2 <%= nav_active_class(locale_rentals_monaco_path) %>">
+      <a href="<%= locale_rentals_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2 <%= nav_active_class(locale_rentals_path) %>">
         <%= t("nav.rent") %>
       </a>
       <a href="<%= locale_offmarket_path %>" class="block text-navy hover:text-accent text-xs font-medium uppercase tracking-wide py-2 <%= nav_active_class(locale_offmarket_path) %>">

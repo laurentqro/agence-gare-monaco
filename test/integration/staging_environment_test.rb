@@ -65,7 +65,7 @@ class StagingEnvironmentTest < ActionDispatch::IntegrationTest
     )
 
     with_staging_host do
-      get "/en/sales/monaco"
+      get "/en/sales"
       assert_response :success
       assert_select 'meta[name="robots"][content="noindex, nofollow"]'
     end

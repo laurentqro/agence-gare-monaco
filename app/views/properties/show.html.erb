@@ -5,17 +5,11 @@
   <% unless @property.off_market? %>
     <div data-testid="back-link" class="mb-6">
       <% if @property.transaction_type == "sale" %>
-        <% if @property.country == "MC" %>
-          <a href="<%= locale_sales_monaco_path %>" class="text-accent hover:text-navy text-xs">
-            &larr; <%= t("property_detail.back_to_sales") %>
-          </a>
-        <% else %>
-          <a href="<%= locale_sales_france_path %>" class="text-accent hover:text-navy text-xs">
-            &larr; <%= t("property_detail.back_to_sales") %>
-          </a>
-        <% end %>
+        <a href="<%= locale_sales_path %>" class="text-accent hover:text-navy text-xs">
+          &larr; <%= t("property_detail.back_to_sales") %>
+        </a>
       <% else %>
-        <a href="<%= locale_rentals_monaco_path %>" class="text-accent hover:text-navy text-xs">
+        <a href="<%= locale_rentals_path %>" class="text-accent hover:text-navy text-xs">
           &larr; <%= t("property_detail.back_to_rentals") %>
         </a>
       <% end %>

@@ -70,48 +70,24 @@ class SwitchLocaleTest < ActionDispatch::IntegrationTest
 
   # === Sales listings ===
 
-  test "switching locale from EN sales monaco goes to translated sales monaco" do
-    get "/en/sales/monaco"
+  test "switching locale from EN sales goes to translated sales" do
+    get "/en/sales"
     assert_response :success
     # French
-    assert_select "a[href='/ventes/monaco']"
+    assert_select "a[href='/ventes']"
     # Italian
-    assert_select "a[href='/it/vendite/monaco']"
-  end
-
-  # === Sales with district ===
-
-  test "switching locale from sales monaco district preserves district slug" do
-    district = District.create!(name: "Monte-Carlo", city: "Monaco", immotoolbox_id: 999)
-
-    get "/en/sales/monaco/#{district.slug}"
-    assert_response :success
-    # French
-    assert_select "a[href='/ventes/monaco/#{district.slug}']"
-    # Italian
-    assert_select "a[href='/it/vendite/monaco/#{district.slug}']"
+    assert_select "a[href='/it/vendite']"
   end
 
   # === Rentals ===
 
-  test "switching locale from EN rentals monaco goes to translated rentals" do
-    get "/en/rentals/monaco"
+  test "switching locale from EN rentals goes to translated rentals" do
+    get "/en/rentals"
     assert_response :success
     # French
-    assert_select "a[href='/locations/monaco']"
+    assert_select "a[href='/locations']"
     # Italian
-    assert_select "a[href='/it/affitti/monaco']"
-  end
-
-  # === Sales France ===
-
-  test "switching locale from EN sales france goes to translated path" do
-    get "/en/sales/france"
-    assert_response :success
-    # French
-    assert_select "a[href='/ventes/france']"
-    # German
-    assert_select "a[href='/de/verkauf/frankreich']"
+    assert_select "a[href='/it/affitti']"
   end
 
   # === Property detail ===

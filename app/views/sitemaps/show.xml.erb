@@ -10,7 +10,7 @@
   <xhtml:link rel="alternate" hreflang="x-default" href="https://agencegaremonaco.com/fr" />
 </url>
 
-<%# Listing pages: all sales, all rentals %>
+<%# Listing pages: sales and rentals %>
 <% %w[sale rental].each do |transaction| %>
 <% segment = transaction == "sale" ? I18n.t("routes.sales", locale: @locale) : I18n.t("routes.rentals", locale: @locale) %>
 <url>
@@ -20,40 +20,7 @@
   <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_segment}" %>" />
   <% end %>
 </url>
-
-<%# Monaco listings %>
-<url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{segment}/monaco" %></loc>
-  <% I18n.available_locales.each do |alt_locale| %>
-  <% alt_segment = transaction == "sale" ? I18n.t("routes.sales", locale: alt_locale) : I18n.t("routes.rentals", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_segment}/monaco" %>" />
-  <% end %>
-</url>
-
-<%# District pages %>
-<% districts = transaction == "sale" ? @districts_with_sales : @districts_with_rentals %>
-<% districts.each do |district| %>
-<url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{segment}/monaco/#{district.slug}" %></loc>
-  <% I18n.available_locales.each do |alt_locale| %>
-  <% alt_segment = transaction == "sale" ? I18n.t("routes.sales", locale: alt_locale) : I18n.t("routes.rentals", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_segment}/monaco/#{district.slug}" %>" />
-  <% end %>
-</url>
 <% end %>
-<% end %>
-
-<%# France sales %>
-<% france_segment = I18n.t("routes.france", locale: @locale) %>
-<% sales_segment = I18n.t("routes.sales", locale: @locale) %>
-<url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{sales_segment}/#{france_segment}" %></loc>
-  <% I18n.available_locales.each do |alt_locale| %>
-  <% alt_sales = I18n.t("routes.sales", locale: alt_locale) %>
-  <% alt_france = I18n.t("routes.france", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_sales}/#{alt_france}" %>" />
-  <% end %>
-</url>
 
 <%# Property detail pages %>
 <% @properties.each do |property| %>

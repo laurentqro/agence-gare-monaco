@@ -6,22 +6,15 @@ class PropertiesController < ApplicationController
 
   def index
     @transaction_type = params[:transaction_type]
-    @country = params[:country]
 
     @properties = Property.publicly_visible
     @properties = @properties.where(transaction_type: @transaction_type) if @transaction_type.present?
-    @properties = @properties.in_country(@country) if @country.present?
 
-    if params[:district_slug].present?
-      @district = District.find_by!(slug: params[:district_slug])
-      @properties = @properties.in_district(@district)
-    else
-      district_param = I18n.t("listings.filter_param_district", default: "district")
-      if params[district_param].present?
-        district_slugs = Array(params[district_param])
-        districts = District.where(slug: district_slugs)
-        @properties = @properties.where(district: districts) if districts.any?
-      end
+    district_param = I18n.t("listings.filter_param_district", default: "district")
+    if params[district_param].present?
+      district_slugs = Array(params[district_param])
+      districts = District.where(slug: district_slugs)
+      @properties = @properties.where(district: districts) if districts.any?
     end
 
     type_param = I18n.t("listings.filter_param_type", default: "type")
@@ -31,9 +24,9 @@ class PropertiesController < ApplicationController
     end
     @properties = @properties.includes(:property_images, :district).order(created_at: :desc)
 
-    @districts = District.where(city: "Monaco").order(:name) if @country == "MC"
+    @districts = District.where(city: "Monaco").order(:name)
 
-    set_seo(page_type: :listings, transaction_type: @transaction_type, country: @country, district: @district)
+    set_seo(page_type: :listings, transaction_type: @transaction_type)
   end
 
   def show

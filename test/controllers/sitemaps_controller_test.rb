@@ -94,13 +94,7 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
   test "language sitemap includes listing pages" do
     get "/sitemaps/en.xml"
     assert_includes response.body, "/en/sales"
-    assert_includes response.body, "/en/sales/monaco"
-    assert_includes response.body, "/en/rentals/monaco"
-  end
-
-  test "language sitemap includes district pages with published properties" do
-    get "/sitemaps/en.xml"
-    assert_includes response.body, "/en/sales/monaco/carre-dor"
+    assert_includes response.body, "/en/rentals"
   end
 
   test "language sitemap includes published property pages" do
@@ -148,8 +142,8 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
 
   test "French sitemap uses translated segments" do
     get "/sitemaps/fr.xml"
-    assert_includes response.body, "/fr/ventes/monaco"
-    assert_includes response.body, "/fr/biens/#{@property.id}-"
-    assert_includes response.body, "/fr/articles/test-article"
+    assert_includes response.body, "/ventes"
+    assert_includes response.body, "/biens/#{@property.id}-"
+    assert_includes response.body, "/articles/test-article"
   end
 end

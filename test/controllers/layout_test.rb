@@ -44,8 +44,8 @@ class LayoutTest < ActionDispatch::IntegrationTest
   test "navbar includes main navigation links for French" do
     get "/"
     assert_select "nav" do
-      assert_select "a[href='/ventes/monaco']", text: /Acheter/
-      assert_select "a[href='/locations/monaco']", text: /Louer/
+      assert_select "a[href='/ventes']", text: /Acheter/
+      assert_select "a[href='/locations']", text: /Louer/
       assert_select "a[href='/off-market']", text: /Off-market/
       assert_select "a[href='/vendre']", text: /Vendre/
       assert_select "a[href='/gestion']", text: /Gestion/
@@ -57,8 +57,8 @@ class LayoutTest < ActionDispatch::IntegrationTest
   test "navbar includes main navigation links for English" do
     get "/en"
     assert_select "nav" do
-      assert_select "a[href='/en/sales/monaco']", text: /Buy/
-      assert_select "a[href='/en/rentals/monaco']", text: /Rent/
+      assert_select "a[href='/en/sales']", text: /Buy/
+      assert_select "a[href='/en/rentals']", text: /Rent/
       assert_select "a[href='/en/off-market']", text: /Off-market/
       assert_select "a[href='/en/sell']", text: /Sell/
       assert_select "a[href='/en/management']", text: /Management/
@@ -70,8 +70,8 @@ class LayoutTest < ActionDispatch::IntegrationTest
   test "navbar includes main navigation links for German" do
     get "/de"
     assert_select "nav" do
-      assert_select "a[href='/de/verkauf/monaco']", text: /Kaufen/
-      assert_select "a[href='/de/vermietung/monaco']", text: /Mieten/
+      assert_select "a[href='/de/verkauf']", text: /Kaufen/
+      assert_select "a[href='/de/vermietung']", text: /Mieten/
       assert_select "a[href='/de/off-market']", text: /Off-market/
       assert_select "a[href='/de/verkaufen']", text: /Verkaufen/
       assert_select "a[href='/de/verwaltung']", text: /Verwaltung/
@@ -152,8 +152,8 @@ class LayoutTest < ActionDispatch::IntegrationTest
   test "footer includes navigation links for French" do
     get "/"
     assert_select "footer" do
-      assert_select "a[href='/ventes/monaco']", text: /Acheter/
-      assert_select "a[href='/locations/monaco']", text: /Louer/
+      assert_select "a[href='/ventes']", text: /Acheter/
+      assert_select "a[href='/locations']", text: /Louer/
       assert_select "a[href='/off-market']", text: /Off-market/
       assert_select "a[href='/vendre']", text: /Vendre/
       assert_select "a[href='/gestion']", text: /Gestion/
@@ -164,8 +164,8 @@ class LayoutTest < ActionDispatch::IntegrationTest
   test "footer includes navigation links for English" do
     get "/en"
     assert_select "footer" do
-      assert_select "a[href='/en/sales/monaco']", text: /Buy/
-      assert_select "a[href='/en/rentals/monaco']", text: /Rent/
+      assert_select "a[href='/en/sales']", text: /Buy/
+      assert_select "a[href='/en/rentals']", text: /Rent/
       assert_select "a[href='/en/off-market']", text: /Off-market/
       assert_select "a[href='/en/sell']", text: /Sell/
       assert_select "a[href='/en/management']", text: /Management/
@@ -182,6 +182,14 @@ class LayoutTest < ActionDispatch::IntegrationTest
   end
 
   # -- Contact column --
+
+  test "footer contact column title is localised" do
+    get "/"
+    assert_select "footer h3", text: /Contact/
+
+    get "/fi"
+    assert_select "footer h3", text: /Yhteystiedot/
+  end
 
   test "footer includes address" do
     get "/"
@@ -236,8 +244,8 @@ class LayoutTest < ActionDispatch::IntegrationTest
   test "navigation links use translated route segments" do
     get "/it"
     assert_select "nav" do
-      assert_select "a[href='/it/vendite/monaco']"
-      assert_select "a[href='/it/affitti/monaco']"
+      assert_select "a[href='/it/vendite']"
+      assert_select "a[href='/it/affitti']"
       assert_select "a[href='/it/articoli']"
       assert_select "a[href='/it/contatto']"
     end
@@ -246,13 +254,13 @@ class LayoutTest < ActionDispatch::IntegrationTest
   # === Active Nav Indicator ===
 
   test "buy nav link has active indicator on sales listing page" do
-    get "/ventes/monaco"
-    assert_select "nav a.nav-active[href='/ventes/monaco']"
+    get "/ventes"
+    assert_select "nav a.nav-active[href='/ventes']"
   end
 
   test "rent nav link has active indicator on rentals listing page" do
-    get "/locations/monaco"
-    assert_select "nav a.nav-active[href='/locations/monaco']"
+    get "/locations"
+    assert_select "nav a.nav-active[href='/locations']"
   end
 
   test "off-market nav link has active indicator on off-market page" do
@@ -271,12 +279,12 @@ class LayoutTest < ActionDispatch::IntegrationTest
   end
 
   test "active nav indicator works for English locale" do
-    get "/en/sales/monaco"
-    assert_select "nav a.nav-active[href='/en/sales/monaco']"
+    get "/en/sales"
+    assert_select "nav a.nav-active[href='/en/sales']"
   end
 
   test "only one desktop nav link is active at a time" do
-    get "/ventes/monaco"
+    get "/ventes"
     assert_select ".lg\\:flex a.nav-active", count: 1
   end
 
