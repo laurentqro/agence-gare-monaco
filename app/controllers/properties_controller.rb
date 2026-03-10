@@ -26,6 +26,8 @@ class PropertiesController < ApplicationController
 
     @districts = District.where(city: "Monaco").order(:name)
 
+    compute_filter_counts
+
     set_seo(page_type: :listings, transaction_type: @transaction_type)
   end
 
@@ -92,6 +94,50 @@ class PropertiesController < ApplicationController
     # OR all conditions together
     combined = conditions.reduce { |result, cond| result.or(cond) }
     combined
+  end
+
+  def compute_filter_counts
+    # Base query: transaction type + visibility (before any type/district filters)
+    base = Property.publicly_visible
+    base = base.where(transaction_type: @transaction_type) if @transaction_type.present?
+
+    # For type counts, apply district filter (so counts reflect cross-filter)
+    type_count_base = base
+    district_param = I18n.t("listings.filter_param_district", default: "district")
+    if params[district_param].present?
+      district_slugs = Array(params[district_param])
+      districts = District.where(slug: district_slugs)
+      type_count_base = type_count_base.where(district: districts) if districts.any?
+    end
+
+    # For district counts, apply type filter (so counts reflect cross-filter)
+    district_count_base = base
+    type_param = I18n.t("listings.filter_param_type", default: "type")
+    if params[type_param].present?
+      localized_values = Array(params[type_param])
+      district_count_base = apply_type_filters(district_count_base, localized_values)
+    end
+
+    # Compute type filter counts
+    @type_filter_counts = {}
+    filter_defs = ApplicationHelper::TYPE_FILTER_GROUPS.flatten(1)
+    filter_defs.each do |key, property_type, rooms|
+      count = if rooms == :gt5
+        type_count_base.where(property_type: property_type).where("num_rooms > 5").count
+      elsif rooms
+        type_count_base.where(property_type: property_type, num_rooms: rooms).count
+      else
+        type_count_base.where(property_type: property_type).count
+      end
+      @type_filter_counts[key] = count
+    end
+
+    # Compute district counts
+    @district_filter_counts = {}
+    district_counts = district_count_base.where(district: @districts).group(:district_id).count
+    @districts&.each do |district|
+      @district_filter_counts[district.slug] = district_counts[district.id] || 0
+    end
   end
 
   def canonical_type_filter_key(localized_value)

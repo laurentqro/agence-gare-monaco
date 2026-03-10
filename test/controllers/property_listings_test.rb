@@ -596,4 +596,48 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-testid='new-badge']", count: 0
   end
+
+  # === Filter counts ===
+
+  test "type filter options show count of matching properties" do
+    get "/en/sales"
+    assert_response :success
+    # Studio has 1 sale property (studio_carre_dor), 3 Rooms has 1 (apt_fontvieille)
+    assert_select "[data-testid='multiselect-type'] label", text: /Studio.*\(1\)/
+    assert_select "[data-testid='multiselect-type'] label", text: /3 Rooms.*\(1\)/
+    # Penthouse has 0 — should show (0)
+    assert_select "[data-testid='multiselect-type'] label", text: /Penthouse.*\(0\)/
+  end
+
+  test "district filter options show count of matching properties" do
+    get "/en/sales"
+    assert_response :success
+    # Carré d'Or has 1 sale (studio_carre_dor), Fontvieille has 1 (apt_fontvieille)
+    assert_select "[data-testid='multiselect-district'] label", text: /Carré d'Or.*\(1\)/
+    assert_select "[data-testid='multiselect-district'] label", text: /Fontvieille.*\(1\)/
+  end
+
+  test "type filter counts reflect district filter when applied" do
+    get "/en/sales?district[]=carre-dor"
+    assert_response :success
+    # Only Carré d'Or properties: studio (1 room apt), no 3-room
+    assert_select "[data-testid='multiselect-type'] label", text: /Studio.*\(1\)/
+    assert_select "[data-testid='multiselect-type'] label", text: /3 Rooms.*\(0\)/
+  end
+
+  test "district filter counts reflect type filter when applied" do
+    get "/en/sales?type[]=studio"
+    assert_response :success
+    # Only studios: Carré d'Or has 1, Fontvieille has 0
+    assert_select "[data-testid='multiselect-district'] label", text: /Carré d'Or.*\(1\)/
+    assert_select "[data-testid='multiselect-district'] label", text: /Fontvieille.*\(0\)/
+  end
+
+  test "rentals page type filter counts only rental properties" do
+    get "/en/rentals"
+    assert_response :success
+    # rental_mc is a 2-room apartment
+    assert_select "[data-testid='multiselect-type'] label", text: /2 Rooms.*\(1\)/
+    assert_select "[data-testid='multiselect-type'] label", text: /Studio.*\(0\)/
+  end
 end

@@ -22,17 +22,17 @@
             </span>
             <svg class="w-4 h-4 ml-2 flex-shrink-0 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
-          <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-72 overflow-y-auto">
+          <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-max min-w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-72 overflow-y-auto">
             <% grouped_type_filter_options.each_with_index do |group, gi| %>
               <% if gi > 0 %><div class="border-t border-gray-200"></div><% end %>
               <div class="py-1">
                 <% group.each do |localized_value, _canonical_key, label| %>
-                  <label class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer">
+                  <label class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer whitespace-nowrap">
                     <input type="checkbox" name="<%= type_param %>[]" value="<%= localized_value %>"
                            <%= "checked" if selected_types.include?(localized_value) %>
                            data-action="change->multiselect-filter#changed"
                            class="mr-2.5 h-4 w-4 rounded border-gray-300 text-navy focus:ring-navy">
-                    <%= label %>
+                    <%= label %> <span class="ml-1 text-accent">(<%= @type_filter_counts[_canonical_key] || 0 %>)</span>
                   </label>
                 <% end %>
               </div>
@@ -52,14 +52,14 @@
               </span>
               <svg class="w-4 h-4 ml-2 flex-shrink-0 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
-            <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto py-1">
+            <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-max min-w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto py-1">
               <% @districts&.each do |district| %>
-                <label class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer">
+                <label class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer whitespace-nowrap">
                   <input type="checkbox" name="<%= district_param %>[]" value="<%= district.slug %>"
                          <%= "checked" if selected_districts.include?(district.slug) %>
                          data-action="change->multiselect-filter#changed"
                          class="mr-2.5 h-4 w-4 rounded border-gray-300 text-navy focus:ring-navy">
-                  <%= district.name %>
+                  <%= district.name %> <span class="ml-1 text-accent">(<%= @district_filter_counts[district.slug] || 0 %>)</span>
                 </label>
               <% end %>
             </div>
