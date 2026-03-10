@@ -111,6 +111,13 @@ class OffMarketPageTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "property card without images shows agency logo placeholder" do
+    get "/off-market"
+    assert_select "[data-testid='property-card']" do
+      assert_select "[data-testid='no-image-placeholder'] img[src*='logo']"
+    end
+  end
+
   test "navbar links to off-market page" do
     get "/"
     assert_select "nav a[href='/off-market']", minimum: 1

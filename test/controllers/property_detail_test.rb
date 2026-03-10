@@ -500,4 +500,11 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     get "/en/properties/#{@property.id}-slug"
     assert_response :success
   end
+
+  test "shows agency logo placeholder when property has no photos" do
+    @property.property_images.destroy_all
+    get "/biens/#{@property.id}-slug"
+    assert_response :success
+    assert_select "[data-testid='no-image-placeholder'] img[src*='logo']"
+  end
 end
