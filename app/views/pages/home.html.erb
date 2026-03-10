@@ -88,29 +88,18 @@
     <%= t("homepage.featured_articles_title") %>
   </h2>
   <% if @latest_articles.any? %>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <% @latest_articles.each do |article| %>
-        <a href="<%= locale_articles_path %>/<%= article.slug %>" class="article-card group block bg-white rounded shadow hover:shadow-md transition">
-          <% if article.cover_image_display_url.present? %>
-            <div class="aspect-[16/10] overflow-hidden rounded-t">
-              <img src="<%= article.cover_image_display_url %>" alt="<%= article.title_for(I18n.locale) %>" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
-            </div>
-          <% end %>
-          <div class="p-5">
-            <h3 class="article-title heading-section group-hover:text-accent transition-colors">
-              <%= article.title_for(I18n.locale) %>
-            </h3>
-            <p class="article-meta mt-2 text-xs text-accent">
-              <% if article.published_at %>
-                <time datetime="<%= article.published_at.iso8601 %>"><%= article.published_at.strftime("%Y-%m-%d") %></time>
-                /
-              <% end %>
-              <%= article.category.name_for %>
-            </p>
-          </div>
-        </a>
-      <% end %>
-    </div>
+    <% featured = @latest_articles.first %>
+    <% rest = @latest_articles[1..] %>
+
+    <%= render "shared/article_card_featured", article: featured, article_path: "#{locale_articles_path}/#{featured.slug}" %>
+
+    <% if rest&.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <% rest.each do |article| %>
+          <%= render "shared/article_card", article: article, article_path: "#{locale_articles_path}/#{article.slug}" %>
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
 </section>
 

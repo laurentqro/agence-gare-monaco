@@ -82,9 +82,9 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get "/en/articles"
     assert_response :success
 
-    assert_select ".article-card img[src='https://example.com/cover.jpg']"
-    assert_select ".article-card .article-title", text: /IMAGE ARTICLE/i
-    assert_select ".article-card .article-meta", text: /Actualités/
+    assert_select ".article-card-featured img[src='https://example.com/cover.jpg']"
+    assert_select ".article-card-featured .article-title", text: /Image Article/i
+    assert_select ".article-card-featured .article-category-badge", text: /Actualités/
   end
 
   test "article index renders card without image when body has no image" do
@@ -100,8 +100,8 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get "/en/articles"
     assert_response :success
 
-    assert_select ".article-card"
-    assert_select ".article-card img", count: 0
+    assert_select ".article-card-featured"
+    assert_select ".article-card-featured img", count: 0
   end
 
   test "article show handles nil body gracefully" do
@@ -148,7 +148,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
     get "/en/articles"
     assert_response :success
-    assert_select ".article-card img[src='https://example.com/cover.jpg']"
+    assert_select ".article-card-featured img[src='https://example.com/cover.jpg']"
   end
 
   test "article index falls back to first_image_url when no cover_image_url" do
@@ -164,7 +164,95 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
     get "/en/articles"
     assert_response :success
-    assert_select ".article-card img[src='https://example.com/body.jpg']"
+    assert_select ".article-card-featured img[src='https://example.com/body.jpg']"
+  end
+
+  # Featured (latest) article card
+  test "article index renders latest article as featured full-width card" do
+    older = Article.create!(
+      title: { "en" => "Older Article" },
+      body: { "en" => "Old content" },
+      slug: "older-article",
+      category: @category,
+      published: true,
+      published_at: 5.days.ago,
+      cover_image_url: "https://example.com/old.jpg"
+    )
+    latest = Article.create!(
+      title: { "en" => "Latest Article" },
+      body: { "en" => "New content" },
+      slug: "latest-article",
+      category: @category,
+      published: true,
+      published_at: 1.day.ago,
+      cover_image_url: "https://example.com/new.jpg"
+    )
+
+    get "/en/articles"
+    assert_response :success
+
+    # Featured card is full-width and contains the latest article
+    assert_select ".article-card-featured", count: 1
+    assert_select ".article-card-featured .article-title", text: /Latest Article/i
+    assert_select ".article-card-featured img[src='https://example.com/new.jpg']"
+
+    # The remaining articles are in the regular grid
+    assert_select ".article-card", count: 1
+    assert_select ".article-card .article-title", text: /Older Article/i
+  end
+
+  test "article index renders category badge on cards" do
+    Article.create!(
+      title: { "en" => "Badge Test" },
+      body: { "en" => "Content" },
+      slug: "badge-test",
+      category: @category,
+      published: true,
+      published_at: Time.current,
+      cover_image_url: "https://example.com/img.jpg"
+    )
+
+    get "/en/articles"
+    assert_response :success
+
+    assert_select ".article-category-badge", text: /Actualités/
+  end
+
+  test "article index renders human-friendly date format" do
+    Article.create!(
+      title: { "en" => "Date Test" },
+      body: { "en" => "Content" },
+      slug: "date-test",
+      category: @category,
+      published: true,
+      published_at: Date.new(2024, 3, 15),
+      cover_image_url: "https://example.com/img.jpg"
+    )
+
+    get "/en/articles"
+    assert_response :success
+
+    # Should show localized long date, not YYYY-MM-DD
+    assert_select "time", text: /March/i
+    assert_select "time", { text: /2024-03-15/, count: 0 }
+  end
+
+  test "article index with single article shows only featured card, no grid" do
+    Article.create!(
+      title: { "en" => "Only Article" },
+      body: { "en" => "Solo" },
+      slug: "only-article",
+      category: @category,
+      published: true,
+      published_at: Time.current,
+      cover_image_url: "https://example.com/solo.jpg"
+    )
+
+    get "/en/articles"
+    assert_response :success
+
+    assert_select ".article-card-featured", count: 1
+    assert_select ".article-card", count: 0
   end
 
   # Cover image on show (hero)

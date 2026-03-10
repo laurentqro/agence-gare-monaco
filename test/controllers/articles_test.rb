@@ -37,7 +37,7 @@ class ArticlesTest < ActionDispatch::IntegrationTest
   test "GET articles index shows article category in current locale" do
     get "/en/articles"
     assert_response :success
-    assert_select ".article-meta", /News/
+    assert_select ".article-category-badge", /News/
   end
 
   test "GET articles index shows article date" do

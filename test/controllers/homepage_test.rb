@@ -243,7 +243,8 @@ class HomepageTest < ActionDispatch::IntegrationTest
     end
 
     get "/"
-    assert_select "[data-testid='featured-articles'] .article-card", 4
+    assert_select "[data-testid='featured-articles'] .article-card-featured", 1
+    assert_select "[data-testid='featured-articles'] .article-card", 3
   end
 
   test "homepage article cards show cover image when present" do
@@ -258,7 +259,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
     )
 
     get "/"
-    assert_select "[data-testid='featured-articles'] .article-card img[src='https://example.com/photo.jpg']"
+    assert_select "[data-testid='featured-articles'] .article-card-featured img[src='https://example.com/photo.jpg']"
   end
 
   test "homepage article cards prefer cover_image_url over body image" do
@@ -274,7 +275,67 @@ class HomepageTest < ActionDispatch::IntegrationTest
     )
 
     get "/"
-    assert_select "[data-testid='featured-articles'] .article-card img[src='https://example.com/cover.jpg']"
+    assert_select "[data-testid='featured-articles'] .article-card-featured img[src='https://example.com/cover.jpg']"
+  end
+
+  test "homepage renders latest article as featured full-width card" do
+    category = Category.create!(name: { "fr" => "Actualités", "en" => "News" }, slug: "actualites")
+    older = Article.create!(
+      title: { "fr" => "Ancien article" },
+      body: { "fr" => "Contenu ancien" },
+      slug: "ancien",
+      category: category,
+      published: true,
+      published_at: 3.days.ago,
+      cover_image_url: "https://example.com/old.jpg"
+    )
+    latest = Article.create!(
+      title: { "fr" => "Dernier article" },
+      body: { "fr" => "Contenu récent" },
+      slug: "dernier",
+      category: category,
+      published: true,
+      published_at: 1.day.ago,
+      cover_image_url: "https://example.com/new.jpg"
+    )
+
+    get "/"
+
+    assert_select "[data-testid='featured-articles'] .article-card-featured", count: 1
+    assert_select "[data-testid='featured-articles'] .article-card-featured img[src='https://example.com/new.jpg']"
+    assert_select "[data-testid='featured-articles'] .article-card", count: 1
+  end
+
+  test "homepage article cards show category badge" do
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
+    Article.create!(
+      title: { "fr" => "Badge test" },
+      body: { "fr" => "Contenu" },
+      slug: "badge-test",
+      category: category,
+      published: true,
+      published_at: Time.current,
+      cover_image_url: "https://example.com/img.jpg"
+    )
+
+    get "/"
+    assert_select "[data-testid='featured-articles'] .article-category-badge", text: /Actualités/
+  end
+
+  test "homepage article cards show localized date format" do
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
+    Article.create!(
+      title: { "fr" => "Date test" },
+      body: { "fr" => "Contenu" },
+      slug: "date-test",
+      category: category,
+      published: true,
+      published_at: Date.new(2024, 6, 15),
+      cover_image_url: "https://example.com/img.jpg"
+    )
+
+    get "/"
+    assert_select "[data-testid='featured-articles'] time", text: /juin 2024/i
   end
 
   # === Contact Section Removed (form lives on dedicated contact page) ===

@@ -1,0 +1,30 @@
+<%# Regular article card for grid layout %>
+<% article = local_assigns[:article] %>
+<% article_path = local_assigns[:article_path] %>
+<a href="<%= article_path %>" class="article-card group block bg-white rounded-lg shadow hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+  <% if article.cover_image_display_url.present? %>
+    <div class="relative aspect-[16/10] overflow-hidden">
+      <img src="<%= article.cover_image_display_url %>" alt="<%= article.title_for(I18n.locale) %>" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+      <span class="article-category-badge absolute top-4 left-4 px-3 py-1 text-xs font-semibold rounded bg-navy/90 text-white backdrop-blur-sm">
+        <%= article.category.name_for %>
+      </span>
+    </div>
+  <% else %>
+    <div class="aspect-[16/10] bg-gradient-to-br from-navy/10 to-accent/10 flex items-center justify-center">
+      <span class="article-category-badge px-3 py-1 text-xs font-semibold rounded bg-navy/90 text-white">
+        <%= article.category.name_for %>
+      </span>
+    </div>
+  <% end %>
+  <div class="p-5">
+    <h3 class="article-title heading-section group-hover:text-accent transition-colors">
+      <%= article.title_for(I18n.locale) %>
+    </h3>
+    <p class="article-meta mt-2 text-xs text-accent">
+      <% if article.published_at %>
+        <time datetime="<%= article.published_at.iso8601 %>"><%= I18n.l(article.published_at.to_date, format: :long) %></time>
+      <% end %>
+    </p>
+  </div>
+</a>
