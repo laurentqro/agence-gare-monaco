@@ -84,7 +84,7 @@
 
 <%# === Featured Articles === %>
 <section data-testid="featured-articles" class="max-w-7xl mx-auto px-4 py-16">
-  <h2 class="text-2xl font-bold text-navy text-center mb-8">
+  <h2 class="heading-section-centered mb-8">
     <%= t("homepage.featured_articles_title") %>
   </h2>
   <% if @latest_articles.any? %>
@@ -118,7 +118,7 @@
 
 <%# === Videos Section === %>
 <section data-testid="videos" class="max-w-7xl mx-auto px-4 py-16">
-  <h2 class="text-2xl font-bold text-navy text-center mb-8">
+  <h2 class="heading-section-centered mb-8">
     <%= t("homepage.videos_title") %>
   </h2>
   <% if @youtube_videos&.any? %>
@@ -155,10 +155,10 @@
 
 <%# === About Section === %>
 <section data-testid="about" class="max-w-7xl mx-auto px-4 py-16">
-  <h2 class="text-2xl font-bold text-navy text-center mb-8">
+  <h2 class="heading-section-centered mb-8">
     <%= t("homepage.about_title") %>
   </h2>
-  <div class="text-sm leading-relaxed text-dark text-justify space-y-4">
+  <div class="text-body text-justify space-y-4">
     <%= simple_format(t("homepage.about_text"), {}, wrapper_tag: "p") %>
   </div>
 </section>
@@ -205,7 +205,7 @@
   <div class="relative z-10 max-w-7xl mx-auto px-4 py-16">
     <%# Team %>
     <div data-testid="team">
-      <h2 class="text-2xl font-bold text-white text-center mb-12 uppercase tracking-wide">
+      <h2 class="heading-section-dark mb-12">
         <%= t("homepage.team_title") %>
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">

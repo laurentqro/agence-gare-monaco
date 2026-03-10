@@ -83,7 +83,7 @@
       </div>
 
       <%# Title %>
-      <h1 data-testid="property-title" class="text-2xl font-bold text-navy mb-2"><%= title %></h1>
+      <h1 data-testid="property-title" class="heading-page mb-2"><%= title %></h1>
 
       <%# Price %>
       <p data-testid="property-price" class="text-xl font-bold text-navy mb-6">
@@ -100,14 +100,14 @@
       <hr class="border-gray-200 mb-6">
 
       <%# Description %>
-      <div data-testid="property-description" class="text-xs text-dark leading-relaxed mb-8">
+      <div data-testid="property-description" class="text-body mb-8">
         <%= simple_format(@property.description_for(I18n.locale)) %>
       </div>
 
       <%# Floor plans %>
       <% if @plans.any? %>
         <div data-testid="floor-plans" class="mb-8">
-          <h2 class="text-lg font-bold text-navy mb-4"><%= t("property_detail.floor_plans") %></h2>
+          <h2 class="heading-detail mb-4"><%= t("property_detail.floor_plans") %></h2>
           <div class="grid grid-cols-1 gap-4">
             <% @plans.each_with_index do |plan, index| %>
               <div class="bg-gray-50 rounded p-2">
@@ -124,7 +124,7 @@
       <%# Documents %>
       <% if @documents.any? %>
         <div data-testid="property-documents" class="mb-8">
-          <h2 class="text-lg font-bold text-navy mb-4"><%= t("property_detail.documents") %></h2>
+          <h2 class="heading-detail mb-4"><%= t("property_detail.documents") %></h2>
           <div class="flex flex-col gap-2">
             <% @documents.each do |doc| %>
               <a href="<%= rails_blob_path(doc.file, disposition: "attachment") %>"
@@ -142,7 +142,7 @@
       <%# Virtual tour (krpano/Panotour) %>
       <% if @property.virtual_tour_url.present? %>
         <div data-testid="virtual-tour" class="mb-8">
-          <h2 class="text-lg font-bold text-navy mb-4"><%= t("property_detail.virtual_tour") %></h2>
+          <h2 class="heading-detail mb-4"><%= t("property_detail.virtual_tour") %></h2>
           <% if @property.virtual_tour_url.end_with?(".html") %>
             <div class="aspect-video rounded overflow-hidden">
               <iframe src="<%= @property.virtual_tour_url %>"
@@ -154,7 +154,7 @@
             </div>
           <% else %>
             <a href="<%= @property.virtual_tour_url %>" target="_blank" rel="noopener noreferrer"
-               class="inline-flex items-center gap-2 bg-white border border-[#2E4C87] text-navy px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
+               class="inline-flex items-center gap-2 bg-white border border-navy text-navy px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
               <%= t("property_detail.view_virtual_tour") %>
             </a>
           <% end %>
@@ -164,7 +164,7 @@
       <%# Video %>
       <% if @property.video_url.present? %>
         <div data-testid="property-video" class="mb-8">
-          <h2 class="text-lg font-bold text-navy mb-4"><%= t("property_detail.video") %></h2>
+          <h2 class="heading-detail mb-4"><%= t("property_detail.video") %></h2>
           <% youtube_id = @property.video_url[/(?:v=|\/embed\/|youtu\.be\/)([^&?\/]+)/, 1] %>
           <% if youtube_id %>
             <div class="aspect-video rounded overflow-hidden">
@@ -177,7 +177,7 @@
             </div>
           <% else %>
             <a href="<%= @property.video_url %>" target="_blank" rel="noopener noreferrer"
-               class="inline-flex items-center gap-2 bg-white border border-[#2E4C87] text-navy px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
+               class="inline-flex items-center gap-2 bg-white border border-navy text-navy px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
               <%= t("property_detail.video") %>
             </a>
           <% end %>
@@ -188,7 +188,7 @@
     <%# Right column: details table %>
     <div>
       <div data-testid="property-details" class="bg-gray-50 rounded p-6 sticky top-20">
-        <h2 class="text-lg font-bold text-navy mb-4"><%= title %></h2>
+        <h2 class="heading-detail mb-4"><%= title %></h2>
         <table class="w-full text-xs">
           <tbody>
             <tr class="border-b border-gray-200">
@@ -329,7 +329,7 @@
   <%# Enquiry form %>
   <div data-testid="enquiry-form" class="mt-12">
     <hr class="border-gray-200 mb-8">
-    <h2 class="text-lg font-bold text-navy mb-6"><%= t("contact_form.enquiry_title") %></h2>
+    <h2 class="heading-detail mb-6"><%= t("contact_form.enquiry_title") %></h2>
 
     <div class="max-w-xl">
       <p class="text-xs text-accent mb-4">
@@ -397,7 +397,7 @@
         </div>
 
         <div>
-          <%= f.submit t("contact_form.send"), class: "bg-white border border-[#2E4C87] text-navy px-6 py-2 rounded text-xs font-semibold hover:bg-gray-50 cursor-pointer" %>
+          <%= f.submit t("contact_form.send"), class: "bg-white border border-navy text-navy px-6 py-2 rounded text-xs font-semibold hover:bg-gray-50 cursor-pointer" %>
         </div>
       <% end %>
     </div>
@@ -407,7 +407,7 @@
   <% if !@property.off_market? && @similar_properties&.any? %>
     <div data-testid="similar-properties" class="mt-12">
       <hr class="border-gray-200 mb-8">
-      <h2 class="text-lg font-bold text-navy mb-6"><%= t("property_detail.similar_properties") %></h2>
+      <h2 class="heading-detail mb-6"><%= t("property_detail.similar_properties") %></h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <% @similar_properties.each do |property| %>
           <%= render "properties/property_card", property: property %>

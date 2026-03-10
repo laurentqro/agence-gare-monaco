@@ -9,7 +9,7 @@
   </div>
 
   <%# Article header %>
-  <h1 class="text-3xl font-extrabold text-navy mb-3"><%= @article.title_for(I18n.locale) %></h1>
+  <h1 class="heading-page mb-3"><%= @article.title_for(I18n.locale) %></h1>
 
   <div class="flex items-center gap-3 text-sm text-gray-500 mb-8">
     <span class="text-accent font-medium"><%= @article.category.name_for %></span>
