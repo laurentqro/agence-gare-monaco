@@ -149,3 +149,77 @@ end
 Dir.glob(Rails.root.join("lib/tasks/translate_article_*.rb")).sort.each do |file|
   load file
 end
+
+# Off-market properties for sale
+[
+  {
+    reference: "AG00016",
+    title: { "fr" => "Magnifique duplex / penthouse rénové !" },
+    description: { "fr" => "Idéalement situé à quelques minutes à pied de la place du Casino ainsi que du port Hercule, superbe appartement d'architecte luxueusement rénové et meublé !" },
+    property_type: "Appartement",
+    transaction_type: "sale",
+    price: 9_950_000,
+    num_rooms: 5,
+    num_bedrooms: 4,
+    num_bathrooms: 4,
+    living_area: 223,
+    terrace_area: 4,
+    country: "monaco",
+    city: "Monaco",
+    off_market: true,
+    published: true,
+    manually_edited: true
+  },
+  {
+    reference: "AG00015",
+    title: { "fr" => "Superbe appartement de maître avec vue exceptionnelle !" },
+    description: { "fr" => " " },
+    property_type: "Appartement",
+    transaction_type: "sale",
+    price: 22_000_000,
+    num_rooms: 7,
+    num_bedrooms: 4,
+    num_bathrooms: 4,
+    living_area: 278,
+    terrace_area: 60,
+    country: "monaco",
+    city: "Monaco",
+    off_market: true,
+    published: true,
+    manually_edited: true,
+    image_urls: ["https://www.agencegaremonaco.com/uploads/properties/15/VktDYfMir/VktDYfMir-1920-1200.jpg"]
+  },
+  {
+    reference: "AG00002",
+    title: { "fr" => "Appartement Familial Quartier Condamine" },
+    description: { "fr" => "En plein cœur du quartier de la contamine, magnifique appartement familiale aux prestations luxueuses et modernes !" },
+    property_type: "Appartement",
+    transaction_type: "sale",
+    price: 15_000_000,
+    num_rooms: 5,
+    num_bedrooms: 3,
+    num_bathrooms: 3,
+    num_parkings: 2,
+    num_cellars: 1,
+    living_area: 200,
+    terrace_area: 13,
+    country: "monaco",
+    city: "Monaco",
+    off_market: true,
+    published: true,
+    manually_edited: true,
+    image_urls: ["https://www.agencegaremonaco.com/uploads/properties/2/7Q0DXBhuA/7Q0DXBhuA-1920-1200.jpg"]
+  }
+].each do |attrs|
+  image_urls = attrs.delete(:image_urls) || []
+  property = Property.find_or_initialize_by(reference: attrs[:reference])
+  property.assign_attributes(attrs)
+  property.save!
+
+  image_urls.each_with_index do |url, i|
+    property.property_images.find_or_create_by!(remote_url: url) do |img|
+      img.position = i + 1
+      img.is_plan = false
+    end
+  end
+end
