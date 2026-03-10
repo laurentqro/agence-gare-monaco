@@ -3,12 +3,21 @@
     <%# Property image %>
     <div class="relative aspect-[4/3] bg-gray-100 overflow-hidden">
       <% if property.cover_image %>
-        <img src="<%= property.cover_image.medium_url || property.cover_image.remote_url %>"
+        <% cover = property.cover_image %>
+        <% src_url = cover.medium_url || cover.remote_url %>
+        <% srcset_parts = [
+          ("#{cover.small_url} 400w" if cover.small_url.present?),
+          ("#{cover.medium_url} 800w" if cover.medium_url.present?),
+          ("#{cover.large_url} 1200w" if cover.large_url.present?)
+        ].compact %>
+        <img src="<%= src_url %>"
              alt="<%= property.title_for(I18n.locale) %>"
              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
              loading="lazy"
-             srcset="<%= property.cover_image.small_url %> 400w, <%= property.cover_image.medium_url %> 800w, <%= property.cover_image.large_url %> 1200w"
-             sizes="(max-width: 768px) 100vw, 50vw">
+             <% if srcset_parts.any? %>
+             srcset="<%= srcset_parts.join(", ") %>"
+             sizes="(max-width: 768px) 100vw, 50vw"
+             <% end %>>
       <% else %>
         <div class="w-full h-full flex items-center justify-center text-gray-300">
           <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">

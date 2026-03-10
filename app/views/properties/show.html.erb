@@ -25,6 +25,11 @@
           <%# Main image %>
           <div class="relative aspect-[4/3] bg-gray-100 rounded overflow-hidden mb-3">
             <% @photos.each_with_index do |photo, index| %>
+              <% srcset_parts = [
+                ("#{photo.small_url} 400w" if photo.small_url.present?),
+                ("#{photo.medium_url} 800w" if photo.medium_url.present?),
+                ("#{photo.large_url} 1200w" if photo.large_url.present?)
+              ].compact %>
               <img src="<%= photo.large_url || photo.remote_url %>"
                    alt="<%= t('property_detail.photo_alt', title: title, number: index + 1) %>"
                    class="w-full h-full object-cover absolute inset-0 transition-opacity duration-300 <%= index == 0 ? 'opacity-100' : 'opacity-0' %>"
@@ -32,8 +37,10 @@
                    data-gallery-photo
                    data-gallery-target="photo"
                    data-index="<%= index %>"
-                   srcset="<%= photo.small_url %> 400w, <%= photo.medium_url %> 800w, <%= photo.large_url %> 1200w"
-                   sizes="(max-width: 768px) 100vw, 66vw">
+                   <% if srcset_parts.any? %>
+                   srcset="<%= srcset_parts.join(", ") %>"
+                   sizes="(max-width: 768px) 100vw, 66vw"
+                   <% end %>>
             <% end %>
 
             <%# Navigation arrows %>
