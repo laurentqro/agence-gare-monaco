@@ -182,6 +182,8 @@ fi:
     funds_title: "Varainhallinta"
     funds_text_1: "Agence de la Gare vastaa hallinnoijana vuokrien perinnästä. Varmistamme, että vuokralainen maksaa varat ilman laiminlyöntejä tai myöhästymisiä. Olipa kyse varojen pyynnöistä, vuokrakuittien lähettämisestä tai vastikkeiden oikeudenmukaisesta tasauksesta, hallinnoija seuraa kaikkia kiinteistöönne liittyviä taloudellisia liikkeitä."
     funds_text_2: "Agence de la Gare on hallinnoinut useiden vuosikymmenten ajan useita kiinteistöportfolioita Monacossa. Meillä on asiantuntijatiimi ja kaikki tarvittava osaaminen kiinteistöjenne tehokkaaseen ja huolelliseen hallintaan."
+    cta_title: "Haluatko hyödyntää kiinteistönhallintapalveluamme?"
+    cta_text: "Ota meihin yhteyttä keskustellaksesi erikoistuneen vuokrahallintaosastomme kanssa ja saadaksesi lisätietoja palveluistamme."
 
   vendre:
     title: "Kuinka myydä kiinteistösi Monacossa?"
