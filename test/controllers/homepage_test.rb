@@ -459,6 +459,26 @@ class HomepageTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # === WebSite JSON-LD ===
+
+  test "homepage includes WebSite JSON-LD schema" do
+    get "/"
+    assert_select "script[type='application/ld+json']" do |scripts|
+      website_script = scripts.find { |s| s.text.include?('"WebSite"') }
+      assert website_script, "Expected WebSite JSON-LD on homepage"
+      parsed = JSON.parse(website_script.text)
+      assert_equal "WebSite", parsed["@type"]
+      assert_equal "https://agencegaremonaco.com", parsed["url"]
+    end
+  end
+
+  test "non-homepage pages do not include WebSite JSON-LD" do
+    get "/en/contact"
+    scripts = css_select("script[type='application/ld+json']")
+    website_script = scripts.find { |s| s.text.include?('"WebSite"') }
+    assert_nil website_script, "WebSite JSON-LD should only appear on homepage"
+  end
+
   # === Navbar Transparency on Homepage ===
 
   test "homepage navbar has white background" do

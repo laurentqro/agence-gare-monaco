@@ -5,6 +5,9 @@
 <%= og_tags(**seo_config) %>
 <%= twitter_tags(**seo_config) %>
 <%= json_ld_organization %>
+<% if seo_config[:page_type] == :homepage %>
+<%= json_ld_website %>
+<% end %>
 <% if seo_config[:page_type] == :property && seo_config[:property] %>
 <%= json_ld_property(seo_config[:property]) %>
 <% elsif seo_config[:page_type] == :article && seo_config[:article] %>
