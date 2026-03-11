@@ -343,6 +343,31 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     assert_nil property.num_bathrooms
   end
 
+  test "sync merges translations, preserving locales not in API" do
+    setup_districts_and_buildings
+    # Property already has translations in 4 locales; API only provides fr and en
+    property = Property.create!(
+      reference: "AG-001", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", immotoolbox_id: 100,
+      title: { "fr" => "Old FR", "en" => "Old EN", "it" => "Titolo italiano", "de" => "Deutscher Titel" },
+      description: { "fr" => "Old FR desc", "en" => "Old EN desc", "it" => "Descrizione", "de" => "Beschreibung" }
+    )
+
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+
+    property.reload
+    # API locales should be updated
+    assert_equal "Studio Monte-Carlo", property.title["fr"]
+    assert_equal "Studio Monte-Carlo EN", property.title["en"]
+    assert_equal "Magnifique studio", property.description["fr"]
+    assert_equal "Beautiful studio", property.description["en"]
+    # Non-API locales should be preserved
+    assert_equal "Titolo italiano", property.title["it"]
+    assert_equal "Deutscher Titel", property.title["de"]
+    assert_equal "Descrizione", property.description["it"]
+    assert_equal "Beschreibung", property.description["de"]
+  end
+
   test "sync handles shared images across properties" do
     setup_districts_and_buildings
 

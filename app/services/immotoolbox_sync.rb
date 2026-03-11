@@ -82,9 +82,10 @@ class ImmotoolboxSync
 
       is_new = property.new_record?
 
-      # Build multilingual title and description from inline texts
-      title = {}
-      description = {}
+      # Build multilingual title and description from inline texts,
+      # merging with existing translations to preserve locales not in API
+      title = property.title.is_a?(Hash) ? property.title.dup : {}
+      description = property.description.is_a?(Hash) ? property.description.dup : {}
       texts = data["texts"]
       if texts.is_a?(Hash)
         texts.each do |lang, text_data|
