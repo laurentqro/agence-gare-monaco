@@ -27,4 +27,8 @@ class PagesController < ApplicationController
     @submission = ContactSubmission.new
     set_seo(page_type: :vendre)
   end
+
+  def faq
+    set_seo(page_type: :faq)
+  end
 end

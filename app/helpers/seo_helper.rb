@@ -71,6 +71,8 @@ module SeoHelper
       t("seo.gestion_description")
     when :vendre
       t("seo.vendre_description")
+    when :faq
+      t("seo.faq_description")
     end
 
     truncate(desc.to_s.gsub("\u00A0", " ").squish, length: 160, omission: "...")
@@ -106,6 +108,8 @@ module SeoHelper
       "#{t('nav.management')} | #{t('site_name')}"
     when :vendre
       "#{t('nav.sell')} | #{t('site_name')}"
+    when :faq
+      t("seo.faq_title")
     end
   end
 
@@ -372,6 +376,8 @@ module SeoHelper
       locale_gestion_path(locale)
     when :vendre
       locale_vendre_path(locale)
+    when :faq
+      locale_faq_path(locale)
     end
   end
 
@@ -405,7 +411,7 @@ module SeoHelper
     when :property
       img = opts[:property]&.cover_image
       img&.large_url || img&.remote_url
-    when :homepage, :listings, :articles, :contact, :privacy, :offmarket, :gestion, :vendre
+    when :homepage, :listings, :articles, :contact, :privacy, :offmarket, :gestion, :vendre, :faq
       "#{SITE_HOST}/images/og-default.jpg"
     when :article
       opts[:article]&.cover_image_display_url

@@ -170,6 +170,8 @@ sv:
     offmarket_description: "Upptäck våra off-market-fastigheter i Monaco. Exklusiva fastigheter tillgängliga på begäran."
     gestion_description: "Fastighetsförvaltning i Monaco av Agence Immobilière de la Gare, oberoende familjebyrå sedan 1942. Omfattande förvaltning av hyresportfölj."
     vendre_description: "Sälj din fastighet i Monaco med Agence Immobilière de la Gare, oberoende byrå sedan 1942. Värdering, mandat, förhandsavtal och notariellt köpebrev."
+    faq_title: "FAQ | Agence Immobilière de la Gare"
+    faq_description: "Vanliga frågor om fastigheter i Monaco. Agence Immobilière de la Gare, oberoende familjebyrå sedan 1942, svarar på dina frågor."
 
   gestion:
     title: "Fastighetsförvaltning i Monaco"
@@ -288,3 +290,4 @@ sv:
     offmarket: "off-market"
     gestion: "forvaltning"
     vendre: "salja"
+    faq: "faq"
