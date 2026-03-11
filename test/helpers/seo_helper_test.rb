@@ -216,7 +216,7 @@ class SeoHelperTest < ActionView::TestCase
     I18n.with_locale(:en) do
       result = seo_title(page_type: :property, property: @property)
       assert_includes result, "Beautiful Studio"
-      assert_equal "Beautiful Studio | Agence de la Gare Monaco", result
+      assert_equal "Beautiful Studio | Agence Immobilière de la Gare", result
       refute_includes result, "\u20AC"  # no euro sign when price is nil
     end
   end
