@@ -19,12 +19,12 @@
 
 /* H1 — page titles */
 .heading-page {
-  @apply text-3xl font-bold text-navy;
+  @apply text-2xl md:text-3xl font-extrabold text-navy;
 }
 
 /* H2 — section headings */
 .heading-section {
-  @apply text-3xl md:text-4xl font-extrabold text-navy;
+  @apply text-xl md:text-2xl font-bold text-navy;
 }
 
 /* Body text — standard content paragraphs */
