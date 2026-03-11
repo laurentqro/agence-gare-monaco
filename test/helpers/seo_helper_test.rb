@@ -360,6 +360,15 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
+  test "json_ld_property does not use InStock availability" do
+    I18n.with_locale(:en) do
+      result = json_ld_property(@property)
+      parsed = JSON.parse(result.match(/<script[^>]*>(.*)<\/script>/m)[1])
+      refute_equal "https://schema.org/InStock", parsed.dig("offers", "availability"),
+        "RealEstateListing should not use InStock availability"
+    end
+  end
+
   test "json_ld_property omits offers when price is nil" do
     @property.update!(price: nil)
     I18n.with_locale(:en) do
