@@ -11,11 +11,11 @@ class VendrePageTest < ActionDispatch::IntegrationTest
   test "vendre page includes key sections" do
     get "/vendre"
     assert_response :success
-    assert_select "h2", text: /Estimez la valeur/i
-    assert_select "h2", text: /partie administrative/i
+    assert_select "h2", text: /estimer la valeur/i
+    assert_select "h2", text: /documents.*nécessaires/i
     assert_select "h2", text: /mandat de vente/i
     assert_select "h2", text: /Comment vendons-nous/i
-    assert_select "h2", text: /versement des fonds/i
+    assert_select "h2", text: /fonds sont-ils versés/i
   end
 
   test "all 8 locales return 200" do
@@ -72,5 +72,24 @@ class VendrePageTest < ActionDispatch::IntegrationTest
     get "/sitemaps/fr.xml"
     assert_response :success
     assert_includes response.body, "/vendre"
+  end
+
+  test "vendre page includes FAQPage JSON-LD schema" do
+    get "/vendre"
+    assert_response :success
+    assert_select "script[type='application/ld+json']" do |scripts|
+      faq_script = scripts.find { |s| s.text.include?("FAQPage") }
+      assert faq_script, "Expected FAQPage JSON-LD to be present"
+      parsed = JSON.parse(faq_script.text)
+      assert_equal "FAQPage", parsed["@type"]
+      assert parsed["mainEntity"].is_a?(Array)
+      assert parsed["mainEntity"].size >= 2
+      parsed["mainEntity"].each do |item|
+        assert_equal "Question", item["@type"]
+        assert item["name"].present?
+        assert_equal "Answer", item["acceptedAnswer"]["@type"]
+        assert item["acceptedAnswer"]["text"].present?
+      end
+    end
   end
 end

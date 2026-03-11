@@ -27,4 +27,25 @@ class RobotsControllerTest < ActionDispatch::IntegrationTest
     get "/robots.txt"
     assert_includes response.body, "Sitemap: https://agencegaremonaco.com/sitemap.xml"
   end
+
+  test "robots.txt includes GPTBot allow rule" do
+    get "/robots.txt"
+    assert_includes response.body, "User-agent: GPTBot"
+    assert_includes response.body, "Allow: /"
+  end
+
+  test "robots.txt includes ClaudeBot allow rule" do
+    get "/robots.txt"
+    assert_includes response.body, "User-agent: ClaudeBot"
+  end
+
+  test "robots.txt includes PerplexityBot allow rule" do
+    get "/robots.txt"
+    assert_includes response.body, "User-agent: PerplexityBot"
+  end
+
+  test "robots.txt includes Google-Extended allow rule" do
+    get "/robots.txt"
+    assert_includes response.body, "User-agent: Google-Extended"
+  end
 end

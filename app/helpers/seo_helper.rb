@@ -275,6 +275,24 @@ module SeoHelper
     json_ld_script_tag(data)
   end
 
+  def json_ld_faq(faqs)
+    data = {
+      "@context" => "https://schema.org",
+      "@type" => "FAQPage",
+      "mainEntity" => faqs.map do |faq|
+        {
+          "@type" => "Question",
+          "name" => faq[:question],
+          "acceptedAnswer" => {
+            "@type" => "Answer",
+            "text" => faq[:answer]
+          }
+        }
+      end
+    }
+    json_ld_script_tag(data)
+  end
+
   def json_ld_breadcrumbs(crumbs)
     data = {
       "@context" => "https://schema.org",

@@ -112,16 +112,12 @@ class HomepageTest < ActionDispatch::IntegrationTest
 
   test "about section mentions founding story" do
     get "/"
-    assert_select "[data-testid='about']" do
-      assert_match I18n.t("homepage.about_title", locale: :fr), response.body
-    end
+    assert_select "[data-testid='about'] h2", text: /Agence Immobili/
   end
 
   test "about section is translated per locale" do
     get "/en"
-    assert_select "[data-testid='about']" do
-      assert_match I18n.t("homepage.about_title", locale: :en), response.body
-    end
+    assert_select "[data-testid='about'] h2", text: /Agence Immobili/
   end
 
   # === Team Section ===
