@@ -120,6 +120,12 @@ class HomepageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='about'] h2", text: /Agence Immobili/
   end
 
+  test "about section has multiple citation blocks" do
+    get "/"
+    assert_select "[data-testid='about'] [data-citation]", { minimum: 3 },
+      "About section should have at least 3 citation blocks for AI extractability"
+  end
+
   # === Team Section ===
 
   test "homepage displays team section with three members" do

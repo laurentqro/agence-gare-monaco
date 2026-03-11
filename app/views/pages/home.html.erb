@@ -147,8 +147,16 @@
   <h2 class="heading-section text-center mb-8">
     <%= t("homepage.about_title") %>
   </h2>
-  <div class="text-body text-justify space-y-4">
-    <%= simple_format(t("homepage.about_text"), {}, wrapper_tag: "p") %>
+  <div class="text-body text-justify space-y-6">
+    <div data-citation="history" class="space-y-4">
+      <%= simple_format(t("homepage.about_history"), {}, wrapper_tag: "p") %>
+    </div>
+    <div data-citation="services" class="space-y-4">
+      <%= simple_format(t("homepage.about_services"), {}, wrapper_tag: "p") %>
+    </div>
+    <div data-citation="expertise" class="space-y-4">
+      <%= simple_format(t("homepage.about_expertise"), {}, wrapper_tag: "p") %>
+    </div>
   </div>
 </section>
 
