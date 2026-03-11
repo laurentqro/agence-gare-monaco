@@ -224,8 +224,7 @@ module SeoHelper
       data["offers"] = {
         "@type" => "Offer",
         "price" => property.price,
-        "priceCurrency" => property.currency || "EUR",
-        "availability" => "https://schema.org/InStock"
+        "priceCurrency" => property.currency || "EUR"
       }
     end
 
