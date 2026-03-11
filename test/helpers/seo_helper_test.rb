@@ -156,6 +156,21 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
+  test "seo_meta_description for homepage includes specific data points" do
+    I18n.with_locale(:en) do
+      result = seo_meta_description(page_type: :homepage)
+      assert_includes result, "1942", "Homepage description should mention founding year"
+      assert_includes result, "Monaco", "Homepage description should mention Monaco"
+    end
+  end
+
+  test "seo_meta_description for gestion includes specific data points" do
+    I18n.with_locale(:en) do
+      result = seo_meta_description(page_type: :gestion)
+      assert_includes result, "1942", "Gestion description should mention founding year"
+    end
+  end
+
   test "seo_meta_description for property truncates to 160 chars" do
     I18n.with_locale(:en) do
       result = seo_meta_description(page_type: :property, property: @property)

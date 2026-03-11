@@ -143,19 +143,19 @@ fi:
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Kiinteistöt Monacossa vuodesta 1942"
-    homepage_description: "Chambre Immobilière Monégasquen jäsen, Agence Immobilière de la Gare perustettiin vuonna 1942. Myynti, vuokraus ja kiinteistöhallinta Monacossa."
-    articles_description: "Artikkeleita ja uutisia Monacon kiinteistöistä."
-    contact_description: "Ota yhteyttä Agence Immobilière de la Gareen Monacossa. 3, Rue Langlé, MC 98000 Monaco."
-    privacy_description: "Agence Immobilière de la Gare Monacon tietosuojakäytäntö."
-    listings_sales_monaco_description: "Tutustu myytäviin kiinteistöihimme Monacossa. Studiot, asunnot, kattoasunnot, toimistot ja pysäköintipaikat kaikissa kaupunginosissa."
-    listings_rentals_monaco_description: "Tutustu vuokrakiinteistöihimme Monacossa. Studiot, asunnot ja toimistot kaikissa kaupunginosissa."
-    listings_sales_france_description: "Tutustu myytäviin kiinteistöihimme Ranskassa, Ranskan Rivieralla."
+    homepage_description: "Itsenäinen perhetoimisto perustettu vuonna 1942, Chambre Immobilière Monégasquen jäsen. Myynti, vuokraus ja kiinteistöhallinta Monacossa. 3, Rue Langlé."
+    articles_description: "Artikkeleita ja markkina-analyyseja Monacon kiinteistöistä Agence Immobilière de la Garelta, itsenäinen toimisto vuodesta 1942."
+    contact_description: "Ota yhteyttä Agence Immobilière de la Gareen: (+377) 93 30 22 36, info@agencegaremonaco.com. 3, Rue Langlé, MC 98000 Monaco. Ma-Pe 9:00-18:00."
+    privacy_description: "Agence Immobilière de la Garen tietosuojakäytäntö, itsenäinen kiinteistötoimisto Monacossa vuodesta 1942."
+    listings_sales_monaco_description: "Myytävät kiinteistöt Monacossa Agence Immobilière de la Garelta. Studiot, asunnot, kattoasunnot, toimistot ja pysäköintipaikat kaikissa kaupunginosissa vuodesta 1942."
+    listings_rentals_monaco_description: "Vuokrakiinteistöt Monacossa Agence Immobilière de la Garelta. Studiot, asunnot ja toimistot kaikissa kaupunginosissa. Toimisto perustettu 1942."
+    listings_sales_france_description: "Myytävät kiinteistöt Ranskassa Ranskan Rivieralla Agence Immobilière de la Garelta, toimisto Monacossa vuodesta 1942."
     listings_sales_district_description: "Myytävät kiinteistöt kaupunginosassa %{district}, Monaco."
     listings_rentals_district_description: "Vuokrakiinteistöt kaupunginosassa %{district}, Monaco."
     listings_all_description: "Tutustu kaikkiin kiinteistöihimme Monacossa ja Ranskassa."
     offmarket_description: "Tutustu off-market-kiinteistöihimme Monacossa. Eksklusiivisia kiinteistöjä saatavilla pyynnöstä."
-    gestion_description: "Kiinteistöhallintapalvelut Monacossa. Agence de la Gare hallinnoi vuokrakiinteistöportfoliotasi asiantuntemuksella vuodesta 1942."
-    vendre_description: "Kuinka myydä kiinteistösi Monacossa? Agence de la Gare opastaa sinua myynnin jokaisessa vaiheessa: arviointi, toimeksianto, esisopimus ja notaarin vahvistama kauppakirja."
+    gestion_description: "Kiinteistöhallinta Monacossa Agence Immobilière de la Garelta, itsenäinen perhetoimisto vuodesta 1942. Kattava vuokraportfolion hallinta."
+    vendre_description: "Myy kiinteistösi Monacossa Agence Immobilière de la Garen kanssa, itsenäinen toimisto vuodesta 1942. Arviointi, toimeksianto, esisopimus ja notaarin vahvistama kauppakirja."
 
   gestion:
     title: "Kiinteistöhallinta Monacossa"

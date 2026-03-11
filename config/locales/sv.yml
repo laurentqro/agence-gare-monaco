@@ -143,19 +143,19 @@ sv:
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Fastigheter i Monaco sedan 1942"
-    homepage_description: "Medlem i Chambre Immobilière Monégasque, Agence Immobilière de la Gare grundades 1942. Försäljning, uthyrning och fastighetsförvaltning i Monaco."
-    articles_description: "Artiklar och nyheter om fastigheter i Monaco."
-    contact_description: "Kontakta Agence Immobilière de la Gare i Monaco. 3, Rue Langlé, MC 98000 Monaco."
-    privacy_description: "Integritetspolicy för Agence Immobilière de la Gare Monaco."
-    listings_sales_monaco_description: "Upptäck våra fastigheter till salu i Monaco. Studios, lägenheter, takvåningar, kontor och parkeringsplatser i alla stadsdelar."
-    listings_rentals_monaco_description: "Upptäck våra hyresfastigheter i Monaco. Studios, lägenheter och kontor i alla stadsdelar."
-    listings_sales_france_description: "Upptäck våra fastigheter till salu i Frankrike, på Franska Rivieran."
+    homepage_description: "Oberoende familjebyrå grundad 1942, medlem i Chambre Immobilière Monégasque. Försäljning, uthyrning och fastighetsförvaltning i Monaco. 3, Rue Langlé."
+    articles_description: "Artiklar och marknadsanalyser om fastigheter i Monaco av Agence Immobilière de la Gare, oberoende byrå sedan 1942."
+    contact_description: "Kontakta Agence Immobilière de la Gare: (+377) 93 30 22 36, info@agencegaremonaco.com. 3, Rue Langlé, MC 98000 Monaco. Mån-Fre 9:00-18:00."
+    privacy_description: "Integritetspolicy för Agence Immobilière de la Gare, oberoende fastighetsbyrå i Monaco sedan 1942."
+    listings_sales_monaco_description: "Fastigheter till salu i Monaco av Agence Immobilière de la Gare. Studios, lägenheter, takvåningar, kontor och parkeringsplatser i alla stadsdelar sedan 1942."
+    listings_rentals_monaco_description: "Hyresfastigheter i Monaco av Agence Immobilière de la Gare. Studios, lägenheter och kontor i alla stadsdelar. Byrå grundad 1942."
+    listings_sales_france_description: "Fastigheter till salu i Frankrike på Franska Rivieran av Agence Immobilière de la Gare, byrå i Monaco sedan 1942."
     listings_sales_district_description: "Fastigheter till salu i %{district}, Monaco."
     listings_rentals_district_description: "Hyresfastigheter i %{district}, Monaco."
     listings_all_description: "Upptäck alla våra fastigheter i Monaco och Frankrike."
     offmarket_description: "Upptäck våra off-market-fastigheter i Monaco. Exklusiva fastigheter tillgängliga på begäran."
-    gestion_description: "Fastighetsförvaltning i Monaco. Agence de la Gare förvaltar er hyresfastighetsportfölj med expertis sedan 1942."
-    vendre_description: "Hur säljer du din fastighet i Monaco? Agence de la Gare vägleder dig genom varje steg i försäljningen: värdering, mandat, förhandsavtal och notariellt köpebrev."
+    gestion_description: "Fastighetsförvaltning i Monaco av Agence Immobilière de la Gare, oberoende familjebyrå sedan 1942. Omfattande förvaltning av hyresportfölj."
+    vendre_description: "Sälj din fastighet i Monaco med Agence Immobilière de la Gare, oberoende byrå sedan 1942. Värdering, mandat, förhandsavtal och notariellt köpebrev."
 
   gestion:
     title: "Fastighetsförvaltning i Monaco"
