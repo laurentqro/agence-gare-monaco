@@ -11,6 +11,7 @@ it:
     articles: "Articoli"
     contact: "Contatto"
     privacy: "Privacy"
+    faq: "FAQ"
 
   footer:
     contact: "Contatto"

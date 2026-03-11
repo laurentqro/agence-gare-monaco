@@ -162,23 +162,6 @@
 
 <hr class="max-w-7xl mx-auto border-gray-200">
 
-<%# === FAQ Section === %>
-<section data-testid="faq" class="max-w-3xl mx-auto px-4 py-16">
-  <h2 class="heading-section text-center mb-8">
-    <%= t("homepage.faq_title") %>
-  </h2>
-  <div class="space-y-6">
-    <% t("homepage.faqs").each do |faq| %>
-      <div data-testid="faq-item">
-        <h3 class="text-base font-semibold text-navy mb-2"><%= faq[:question] %></h3>
-        <p class="text-body"><%= faq[:answer] %></p>
-      </div>
-    <% end %>
-  </div>
-</section>
-
-<hr class="max-w-7xl mx-auto border-gray-200">
-
 <%# === Image Carousel === %>
 <section data-testid="carousel" class="w-full" data-controller="carousel">
   <div class="relative overflow-hidden">

@@ -11,6 +11,7 @@ fi:
     articles: "Artikkelit"
     contact: "Yhteystiedot"
     privacy: "Tietosuoja"
+    faq: "FAQ"
 
   footer:
     contact: "Yhteystiedot"
