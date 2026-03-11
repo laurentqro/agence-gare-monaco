@@ -4,9 +4,20 @@ Disallow: /
 <% else %>
 User-agent: *
 Allow: /
-
 Disallow: /admin/
 Disallow: /rails/
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
 
 Sitemap: https://agencegaremonaco.com/sitemap.xml
 <% end %>

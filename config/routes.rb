@@ -115,6 +115,9 @@ Rails.application.routes.draw do
   # SEO: Dynamic robots.txt
   get "robots.txt", to: "robots#show", as: :robots, defaults: { format: :text }
 
+  # GEO: LLM-readable site summary
+  get "llms.txt", to: "llms#show", as: :llms, defaults: { format: :text }
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check

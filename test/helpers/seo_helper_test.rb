@@ -366,6 +366,21 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
+  test "json_ld_faq generates FAQPage schema" do
+    faqs = [
+      { question: "How much does property management cost in Monaco?", answer: "Fees vary based on services required." },
+      { question: "What documents are needed to sell a property?", answer: "Property title, assembly minutes, diagnostics." }
+    ]
+    result = json_ld_faq(faqs)
+    parsed = JSON.parse(result.match(/<script[^>]*>(.*)<\/script>/m)[1])
+    assert_equal "FAQPage", parsed["@type"]
+    assert_equal 2, parsed["mainEntity"].size
+    assert_equal "Question", parsed["mainEntity"][0]["@type"]
+    assert_equal "How much does property management cost in Monaco?", parsed["mainEntity"][0]["name"]
+    assert_equal "Answer", parsed["mainEntity"][0]["acceptedAnswer"]["@type"]
+    assert_equal "Fees vary based on services required.", parsed["mainEntity"][0]["acceptedAnswer"]["text"]
+  end
+
   test "json_ld_breadcrumbs generates BreadcrumbList" do
     I18n.with_locale(:en) do
       crumbs = [
