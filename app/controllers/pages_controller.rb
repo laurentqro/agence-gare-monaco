@@ -31,4 +31,16 @@ class PagesController < ApplicationController
   def faq
     set_seo(page_type: :faq)
   end
+
+  TEAM_MEMBERS = {
+    "pierre-mare" => { key: "pierre", name: "Pierre Maré", image: "team/pierre.jpg" },
+    "adrien-mare" => { key: "adrien", name: "Adrien Maré", image: "team/adrien.jpg" },
+    "josiane-alesi" => { key: "josiane", name: "Josiane Alesi", image: "team/josiane.jpg" }
+  }.freeze
+
+  def team_member
+    @member = TEAM_MEMBERS[params[:member]]
+    raise ActionController::RoutingError, "Not Found" unless @member
+    set_seo(page_type: :team_member, member: @member)
+  end
 end
