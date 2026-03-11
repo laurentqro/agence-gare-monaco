@@ -1,23 +1,24 @@
+<% locale_prefix = ->(loc) { loc.to_sym == :fr ? "" : "/#{loc}" } %>
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 <%# Homepage %>
 <url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}" %></loc>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/" %></loc>
   <% I18n.available_locales.each do |alt_locale| %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}" %>" />
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/" %>" />
   <% end %>
-  <xhtml:link rel="alternate" hreflang="x-default" href="https://agencegaremonaco.com/fr" />
+  <xhtml:link rel="alternate" hreflang="x-default" href="https://agencegaremonaco.com/" />
 </url>
 
 <%# Listing pages: sales and rentals %>
 <% %w[sale rental].each do |transaction| %>
 <% segment = transaction == "sale" ? I18n.t("routes.sales", locale: @locale) : I18n.t("routes.rentals", locale: @locale) %>
 <url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{segment}" %></loc>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{segment}" %></loc>
   <% I18n.available_locales.each do |alt_locale| %>
   <% alt_segment = transaction == "sale" ? I18n.t("routes.sales", locale: alt_locale) : I18n.t("routes.rentals", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_segment}" %>" />
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_segment}" %>" />
   <% end %>
 </url>
 <% end %>
@@ -27,12 +28,12 @@
 <% props_segment = I18n.t("routes.properties", locale: @locale) %>
 <% slug = property.slug_for(@locale) %>
 <url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{props_segment}/#{property.id}-#{slug}" %></loc>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{props_segment}/#{property.id}-#{slug}" %></loc>
   <lastmod><%= property.updated_at.iso8601 %></lastmod>
   <% I18n.available_locales.each do |alt_locale| %>
   <% alt_props = I18n.t("routes.properties", locale: alt_locale) %>
   <% alt_slug = property.slug_for(alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_props}/#{property.id}-#{alt_slug}" %>" />
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_props}/#{property.id}-#{alt_slug}" %>" />
   <% end %>
 </url>
 <% end %>
@@ -40,20 +41,20 @@
 <%# Article pages %>
 <% articles_segment = I18n.t("routes.articles", locale: @locale) %>
 <url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{articles_segment}" %></loc>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{articles_segment}" %></loc>
   <% I18n.available_locales.each do |alt_locale| %>
   <% alt_articles = I18n.t("routes.articles", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_articles}" %>" />
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_articles}" %>" />
   <% end %>
 </url>
 
 <% @articles.each do |article| %>
 <url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{articles_segment}/#{article.slug}" %></loc>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{articles_segment}/#{article.slug}" %></loc>
   <lastmod><%= article.updated_at.iso8601 %></lastmod>
   <% I18n.available_locales.each do |alt_locale| %>
   <% alt_articles = I18n.t("routes.articles", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_articles}/#{article.slug}" %>" />
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_articles}/#{article.slug}" %>" />
   <% end %>
 </url>
 <% end %>
@@ -61,50 +62,50 @@
 <%# Off-market page %>
 <% offmarket_segment = I18n.t("routes.offmarket", locale: @locale) %>
 <url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{offmarket_segment}" %></loc>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{offmarket_segment}" %></loc>
   <% I18n.available_locales.each do |alt_locale| %>
   <% alt_offmarket = I18n.t("routes.offmarket", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_offmarket}" %>" />
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_offmarket}" %>" />
   <% end %>
 </url>
 
 <%# Contact page %>
 <% contact_segment = I18n.t("routes.contact", locale: @locale) %>
 <url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{contact_segment}" %></loc>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{contact_segment}" %></loc>
   <% I18n.available_locales.each do |alt_locale| %>
   <% alt_contact = I18n.t("routes.contact", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_contact}" %>" />
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_contact}" %>" />
   <% end %>
 </url>
 
 <%# Vendre (selling guide) page %>
 <% vendre_segment = I18n.t("routes.vendre", locale: @locale) %>
 <url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{vendre_segment}" %></loc>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{vendre_segment}" %></loc>
   <% I18n.available_locales.each do |alt_locale| %>
   <% alt_vendre = I18n.t("routes.vendre", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_vendre}" %>" />
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_vendre}" %>" />
   <% end %>
 </url>
 
 <%# Gestion (property management) page %>
 <% gestion_segment = I18n.t("routes.gestion", locale: @locale) %>
 <url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{gestion_segment}" %></loc>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{gestion_segment}" %></loc>
   <% I18n.available_locales.each do |alt_locale| %>
   <% alt_gestion = I18n.t("routes.gestion", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_gestion}" %>" />
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_gestion}" %>" />
   <% end %>
 </url>
 
 <%# Privacy page %>
 <% privacy_segment = I18n.t("routes.privacy", locale: @locale) %>
 <url>
-  <loc><%= "https://agencegaremonaco.com/#{@locale}/#{privacy_segment}" %></loc>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{privacy_segment}" %></loc>
   <% I18n.available_locales.each do |alt_locale| %>
   <% alt_privacy = I18n.t("routes.privacy", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com/#{alt_locale}/#{alt_privacy}" %>" />
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_privacy}" %>" />
   <% end %>
 </url>
 </urlset>

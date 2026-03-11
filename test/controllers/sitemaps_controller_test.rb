@@ -146,4 +146,22 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "/biens/#{@property.id}-"
     assert_includes response.body, "/articles/test-article"
   end
+
+  test "French sitemap homepage URL uses root path not /fr" do
+    get "/sitemaps/fr.xml"
+    assert_includes response.body, "<loc>https://agencegaremonaco.com/</loc>"
+    refute_includes response.body, "<loc>https://agencegaremonaco.com/fr</loc>"
+  end
+
+  test "French sitemap hreflang for French points to root" do
+    get "/sitemaps/fr.xml"
+    assert_includes response.body, 'hreflang="fr" href="https://agencegaremonaco.com/"'
+  end
+
+  test "French sitemap static pages use root prefix not /fr" do
+    get "/sitemaps/fr.xml"
+    assert_includes response.body, "<loc>https://agencegaremonaco.com/ventes</loc>"
+    assert_includes response.body, "<loc>https://agencegaremonaco.com/locations</loc>"
+    refute_includes response.body, "<loc>https://agencegaremonaco.com/fr/"
+  end
 end
