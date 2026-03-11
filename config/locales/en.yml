@@ -143,19 +143,19 @@ en:
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Real Estate in Monaco since 1942"
-    homepage_description: "Member of the Chambre Immobilière Monégasque, Agence Immobilière de la Gare was founded in 1942. Sales, rentals and property management in Monaco."
-    articles_description: "Articles and news about real estate in Monaco."
-    contact_description: "Contact Agence Immobilière de la Gare in Monaco. 3, Rue Langlé, MC 98000 Monaco."
-    privacy_description: "Privacy policy of Agence Immobilière de la Gare Monaco."
-    listings_sales_monaco_description: "Discover our properties for sale in Monaco. Studios, apartments, penthouses, offices and parking spaces in all districts."
-    listings_rentals_monaco_description: "Discover our rental properties in Monaco. Studios, apartments and offices in all districts."
-    listings_sales_france_description: "Discover our properties for sale in France, on the French Riviera."
+    homepage_description: "Independent family agency founded in 1942, member of the Chambre Immobilière Monégasque. Property sales, rentals and management in Monaco. 3, Rue Langlé."
+    articles_description: "Articles and market insights on Monaco real estate by Agence Immobilière de la Gare, independent agency since 1942."
+    contact_description: "Contact Agence Immobilière de la Gare: (+377) 93 30 22 36, info@agencegaremonaco.com. 3, Rue Langlé, MC 98000 Monaco. Open Mon-Fri 9:00-18:00."
+    privacy_description: "Privacy policy of Agence Immobilière de la Gare, independent real estate agency in Monaco since 1942."
+    listings_sales_monaco_description: "Properties for sale in Monaco by Agence Immobilière de la Gare. Studios, apartments, penthouses, offices and parking in all districts since 1942."
+    listings_rentals_monaco_description: "Rental properties in Monaco by Agence Immobilière de la Gare. Studios, apartments and offices in all districts. Agency founded in 1942."
+    listings_sales_france_description: "Properties for sale in France on the French Riviera by Agence Immobilière de la Gare, Monaco agency since 1942."
     listings_sales_district_description: "Properties for sale in %{district}, Monaco."
     listings_rentals_district_description: "Rental properties in %{district}, Monaco."
     listings_all_description: "Discover all our properties in Monaco and France."
     offmarket_description: "Discover our off-market properties in Monaco. Exclusive properties available on request."
-    gestion_description: "Property management services in Monaco. Agence de la Gare manages your rental property portfolio with expertise since 1942."
-    vendre_description: "How to sell your property in Monaco? Agence de la Gare guides you through every step of the sale: valuation, mandate, preliminary contract and notarial deed."
+    gestion_description: "Property management in Monaco by Agence Immobilière de la Gare, independent family agency since 1942. Comprehensive rental portfolio management."
+    vendre_description: "Sell your property in Monaco with Agence Immobilière de la Gare, independent agency since 1942. Valuation, mandate, contract and notarial deed."
 
   gestion:
     title: "Property Management in Monaco"

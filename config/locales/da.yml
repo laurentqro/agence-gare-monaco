@@ -143,19 +143,19 @@ da:
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Ejendomme i Monaco siden 1942"
-    homepage_description: "Medlem af Chambre Immobilière Monégasque, Agence Immobilière de la Gare blev grundlagt i 1942. Salg, udlejning og ejendomsforvaltning i Monaco."
-    articles_description: "Artikler og nyheder om ejendomme i Monaco."
-    contact_description: "Kontakt Agence Immobilière de la Gare i Monaco. 3, Rue Langlé, MC 98000 Monaco."
-    privacy_description: "Privatlivspolitik for Agence Immobilière de la Gare Monaco."
-    listings_sales_monaco_description: "Opdag vores ejendomme til salg i Monaco. Studier, lejligheder, penthuse, kontorer og parkeringspladser i alle kvarterer."
-    listings_rentals_monaco_description: "Opdag vores udlejningsejendomme i Monaco. Studier, lejligheder og kontorer i alle kvarterer."
-    listings_sales_france_description: "Opdag vores ejendomme til salg i Frankrig, på den franske riviera."
+    homepage_description: "Uafhængigt familiebureau grundlagt i 1942, medlem af Chambre Immobilière Monégasque. Salg, udlejning og ejendomsforvaltning i Monaco. 3, Rue Langlé."
+    articles_description: "Artikler og markedsanalyser om ejendomme i Monaco af Agence Immobilière de la Gare, uafhængigt bureau siden 1942."
+    contact_description: "Kontakt Agence Immobilière de la Gare: (+377) 93 30 22 36, info@agencegaremonaco.com. 3, Rue Langlé, MC 98000 Monaco. Man-Fre 9:00-18:00."
+    privacy_description: "Privatlivspolitik for Agence Immobilière de la Gare, uafhængigt ejendomsbureau i Monaco siden 1942."
+    listings_sales_monaco_description: "Ejendomme til salg i Monaco af Agence Immobilière de la Gare. Studier, lejligheder, penthuse, kontorer og parkeringspladser i alle kvarterer siden 1942."
+    listings_rentals_monaco_description: "Udlejningsejendomme i Monaco af Agence Immobilière de la Gare. Studier, lejligheder og kontorer i alle kvarterer. Bureau grundlagt i 1942."
+    listings_sales_france_description: "Ejendomme til salg i Frankrig på den franske riviera af Agence Immobilière de la Gare, bureau i Monaco siden 1942."
     listings_sales_district_description: "Ejendomme til salg i %{district}, Monaco."
     listings_rentals_district_description: "Udlejningsejendomme i %{district}, Monaco."
     listings_all_description: "Opdag alle vores ejendomme i Monaco og Frankrig."
     offmarket_description: "Opdag vores off-market-ejendomme i Monaco. Eksklusive ejendomme tilgængelige efter forespørgsel."
-    gestion_description: "Ejendomsadministration i Monaco. Agence de la Gare administrerer din udlejningsejendomsportefølje med ekspertise siden 1942."
-    vendre_description: "Hvordan sælger du din ejendom i Monaco? Agence de la Gare guider dig gennem hvert trin i salget: vurdering, mandat, foreløbig kontrakt og notariel bekræftelse."
+    gestion_description: "Ejendomsadministration i Monaco af Agence Immobilière de la Gare, uafhængigt familiebureau siden 1942. Omfattende administration af udlejningsportefølje."
+    vendre_description: "Sælg din ejendom i Monaco med Agence Immobilière de la Gare, uafhængigt bureau siden 1942. Vurdering, mandat, foreløbig kontrakt og notariel bekræftelse."
 
   gestion:
     title: "Ejendomsadministration i Monaco"

@@ -143,19 +143,19 @@ it:
 
   seo:
     homepage_title: "Agence Immobilière de la Gare | Immobiliare a Monaco dal 1942"
-    homepage_description: "Membro della Chambre Immobilière Monégasque, l'Agence Immobilière de la Gare fu fondata nel 1942. Vendite, affitti e gestione immobiliare a Monaco."
-    articles_description: "Articoli e notizie sull'immobiliare a Monaco."
-    contact_description: "Contattate l'Agence Immobilière de la Gare a Monaco. 3, Rue Langlé, MC 98000 Monaco."
-    privacy_description: "Politica sulla privacy dell'Agence Immobilière de la Gare Monaco."
-    listings_sales_monaco_description: "Scoprite i nostri immobili in vendita a Monaco. Monolocali, appartamenti, attici, uffici e parcheggi in tutti i quartieri."
-    listings_rentals_monaco_description: "Scoprite i nostri immobili in affitto a Monaco. Monolocali, appartamenti e uffici in tutti i quartieri."
-    listings_sales_france_description: "Scoprite i nostri immobili in vendita in Francia, sulla Costa Azzurra."
+    homepage_description: "Agenzia familiare indipendente fondata nel 1942, membro della Chambre Immobilière Monégasque. Vendite, affitti e gestione immobiliare a Monaco. 3, Rue Langlé."
+    articles_description: "Articoli e analisi del mercato immobiliare monegasco dell'Agence Immobilière de la Gare, agenzia indipendente dal 1942."
+    contact_description: "Contattate l'Agence Immobilière de la Gare: (+377) 93 30 22 36, info@agencegaremonaco.com. 3, Rue Langlé, MC 98000 Monaco. Lun-Ven 9:00-18:00."
+    privacy_description: "Politica sulla privacy dell'Agence Immobilière de la Gare, agenzia immobiliare indipendente a Monaco dal 1942."
+    listings_sales_monaco_description: "Immobili in vendita a Monaco dell'Agence Immobilière de la Gare. Monolocali, appartamenti, attici, uffici e parcheggi in tutti i quartieri dal 1942."
+    listings_rentals_monaco_description: "Immobili in affitto a Monaco dell'Agence Immobilière de la Gare. Monolocali, appartamenti e uffici in tutti i quartieri. Agenzia fondata nel 1942."
+    listings_sales_france_description: "Immobili in vendita in Francia sulla Costa Azzurra dell'Agence Immobilière de la Gare, agenzia monegasca dal 1942."
     listings_sales_district_description: "Immobili in vendita nel quartiere %{district} a Monaco."
     listings_rentals_district_description: "Immobili in affitto nel quartiere %{district} a Monaco."
     listings_all_description: "Scoprite tutti i nostri immobili a Monaco e in Francia."
     offmarket_description: "Scoprite i nostri immobili off-market a Monaco. Proprietà esclusive disponibili su richiesta."
-    gestion_description: "Servizio di gestione locativa a Monaco. L'Agence de la Gare gestisce il vostro patrimonio immobiliare in affitto con competenza dal 1942."
-    vendre_description: "Come vendere il vostro immobile a Monaco? L'Agence de la Gare vi accompagna in ogni fase della vendita: stima, mandato, compromesso e atto notarile."
+    gestion_description: "Gestione locativa a Monaco dell'Agence Immobilière de la Gare, agenzia familiare indipendente dal 1942. Gestione completa del patrimonio immobiliare."
+    vendre_description: "Vendete il vostro immobile a Monaco con l'Agence Immobilière de la Gare, agenzia indipendente dal 1942. Stima, mandato, compromesso e atto notarile."
 
   gestion:
     title: "Gestione locativa a Monaco"
