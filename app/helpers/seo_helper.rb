@@ -195,7 +195,15 @@ module SeoHelper
         "https://www.instagram.com/agencedelagaremonaco",
         "https://www.youtube.com/channel/UC2w6AJOPj37wDZxXjWLRxtg"
       ],
-      "foundingDate" => "1942"
+      "foundingDate" => "1942",
+      "openingHoursSpecification" => [
+        {
+          "@type" => "OpeningHoursSpecification",
+          "dayOfWeek" => %w[Monday Tuesday Wednesday Thursday Friday],
+          "opens" => "09:00",
+          "closes" => "18:00"
+        }
+      ]
     }
     json_ld_script_tag(data)
   end

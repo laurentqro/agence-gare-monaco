@@ -335,6 +335,19 @@ class SeoHelperTest < ActionView::TestCase
     assert_equal "+377 93 30 22 36", parsed["telephone"]
   end
 
+  test "json_ld_organization includes openingHoursSpecification" do
+    result = json_ld_organization
+    parsed = JSON.parse(result.match(/<script[^>]*>(.*)<\/script>/m)[1])
+    hours = parsed["openingHoursSpecification"]
+    assert hours.present?, "Expected openingHoursSpecification in Organization schema"
+    assert_equal 1, hours.size
+    spec = hours.first
+    assert_equal "OpeningHoursSpecification", spec["@type"]
+    assert_equal %w[Monday Tuesday Wednesday Thursday Friday], spec["dayOfWeek"]
+    assert_equal "09:00", spec["opens"]
+    assert_equal "18:00", spec["closes"]
+  end
+
   test "json_ld_property includes RealEstateListing" do
     I18n.with_locale(:en) do
       result = json_ld_property(@property)
