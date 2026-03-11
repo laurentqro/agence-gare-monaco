@@ -275,6 +275,22 @@ module SeoHelper
     json_ld_script_tag(data)
   end
 
+  def json_ld_website
+    data = {
+      "@context" => "https://schema.org",
+      "@type" => "WebSite",
+      "name" => "Agence Immobilière de la Gare",
+      "url" => "https://agencegaremonaco.com",
+      "description" => "Independent real estate agency in Monaco since 1942. Property sales, rentals, and management.",
+      "inLanguage" => %w[fr en it de sv nb da fi],
+      "publisher" => {
+        "@type" => "RealEstateAgent",
+        "name" => "Agence Immobilière de la Gare"
+      }
+    }
+    json_ld_script_tag(data)
+  end
+
   def json_ld_faq(faqs)
     data = {
       "@context" => "https://schema.org",

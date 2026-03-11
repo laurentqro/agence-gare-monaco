@@ -48,4 +48,39 @@ class RobotsControllerTest < ActionDispatch::IntegrationTest
     get "/robots.txt"
     assert_includes response.body, "User-agent: Google-Extended"
   end
+
+  test "robots.txt includes ChatGPT-User allow rule" do
+    get "/robots.txt"
+    assert_includes response.body, "User-agent: ChatGPT-User"
+  end
+
+  test "robots.txt includes OAI-SearchBot allow rule" do
+    get "/robots.txt"
+    assert_includes response.body, "User-agent: OAI-SearchBot"
+  end
+
+  test "robots.txt includes Claude-Web allow rule" do
+    get "/robots.txt"
+    assert_includes response.body, "User-agent: Claude-Web"
+  end
+
+  test "robots.txt includes Applebot-Extended allow rule" do
+    get "/robots.txt"
+    assert_includes response.body, "User-agent: Applebot-Extended"
+  end
+
+  test "robots.txt includes Bytespider allow rule" do
+    get "/robots.txt"
+    assert_includes response.body, "User-agent: Bytespider"
+  end
+
+  test "robots.txt includes cohere-ai allow rule" do
+    get "/robots.txt"
+    assert_includes response.body, "User-agent: cohere-ai"
+  end
+
+  test "robots.txt includes Diffbot allow rule" do
+    get "/robots.txt"
+    assert_includes response.body, "User-agent: Diffbot"
+  end
 end

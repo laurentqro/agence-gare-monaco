@@ -381,6 +381,19 @@ class SeoHelperTest < ActionView::TestCase
     assert_equal "Fees vary based on services required.", parsed["mainEntity"][0]["acceptedAnswer"]["text"]
   end
 
+  test "json_ld_website generates WebSite schema" do
+    result = json_ld_website
+    parsed = JSON.parse(result.match(/<script[^>]*>(.*)<\/script>/m)[1])
+    assert_equal "https://schema.org", parsed["@context"]
+    assert_equal "WebSite", parsed["@type"]
+    assert_equal "Agence Immobilière de la Gare", parsed["name"]
+    assert_equal "https://agencegaremonaco.com", parsed["url"]
+    assert_equal "RealEstateAgent", parsed["publisher"]["@type"]
+    assert parsed["inLanguage"].is_a?(Array)
+    assert_includes parsed["inLanguage"], "fr"
+    assert_includes parsed["inLanguage"], "en"
+  end
+
   test "json_ld_breadcrumbs generates BreadcrumbList" do
     I18n.with_locale(:en) do
       crumbs = [
