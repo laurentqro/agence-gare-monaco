@@ -52,6 +52,11 @@ module ApplicationHelper
     "#{locale_prefix(locale)}/#{faq}"
   end
 
+  def locale_team_member_path(member_slug, locale = I18n.locale)
+    team = I18n.t("routes.team", locale: locale)
+    "#{locale_prefix(locale)}/#{team}/#{member_slug}"
+  end
+
   def switch_locale_path(locale)
     controller_name = params[:controller]
     action_name = params[:action]
@@ -79,6 +84,8 @@ module ApplicationHelper
       locale_vendre_path(locale)
     when "pages#faq"
       locale_faq_path(locale)
+    when "pages#team_member"
+      locale_team_member_path(params[:member], locale)
     else
       locale_root_path(locale)
     end

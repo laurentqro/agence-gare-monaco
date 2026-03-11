@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     gestion  = I18n.t("routes.gestion", locale: locale)
     vendre   = I18n.t("routes.vendre", locale: locale)
     faq      = I18n.t("routes.faq", locale: locale)
+    team     = I18n.t("routes.team", locale: locale)
 
     prefix = locale == :fr ? "" : "/#{locale}"
     sales_target = "#{prefix}/#{sales}"
@@ -73,6 +74,9 @@ Rails.application.routes.draw do
 
       # FAQ
       get "/#{faq}", to: "pages#faq", as: :"#{locale}_faq"
+
+      # Team member pages
+      get "/#{team}/:member", to: "pages#team_member", as: :"#{locale}_team_member"
     end
   end
 

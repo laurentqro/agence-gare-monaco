@@ -1,0 +1,17 @@
+<%# === Team Member Page === %>
+<section class="max-w-3xl mx-auto px-4 py-16">
+  <div class="text-center mb-8">
+    <%= image_tag @member[:image], alt: @member[:name], class: "w-48 h-48 mx-auto rounded-full object-cover mb-6 border-2 border-gray-200" %>
+    <h1 class="text-2xl font-bold text-navy mb-2"><%= @member[:name] %></h1>
+    <p class="text-sm text-gray-500 uppercase tracking-wide"><%= t("homepage.team.#{@member[:key]}_role") %></p>
+  </div>
+  <div class="text-body text-justify space-y-4">
+    <p><%= t("homepage.team.#{@member[:key]}_bio") %></p>
+  </div>
+  <div class="mt-8 text-center">
+    <a href="mailto:info@agencegaremonaco.com" class="inline-flex items-center gap-2 text-sm text-navy font-semibold hover:underline">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      info@agencegaremonaco.com
+    </a>
+  </div>
+</section>
