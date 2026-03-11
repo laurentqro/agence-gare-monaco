@@ -445,4 +445,22 @@ class SeoHelperTest < ActionView::TestCase
       assert_equal 1, parsed["itemListElement"][0]["position"]
     end
   end
+
+  # --- VideoObject JSON-LD ---
+
+  test "json_ld_videos generates VideoObject array" do
+    videos = [
+      YoutubeVideo.new(video_id: "abc123", title: "Monaco Tour", published_at: Time.zone.parse("2025-01-15")),
+      YoutubeVideo.new(video_id: "def456", title: "Property Visit", published_at: Time.zone.parse("2025-02-20"))
+    ]
+    result = json_ld_videos(videos)
+    parsed = JSON.parse(result.match(/<script[^>]*>(.*)<\/script>/m)[1])
+    assert_equal "ItemList", parsed["@type"]
+    assert_equal 2, parsed["itemListElement"].size
+    first_video = parsed["itemListElement"][0]["item"]
+    assert_equal "VideoObject", first_video["@type"]
+    assert_equal "Monaco Tour", first_video["name"]
+    assert_equal "https://www.youtube.com/watch?v=abc123", first_video["contentUrl"]
+    assert_equal "https://img.youtube.com/vi/abc123/maxresdefault.jpg", first_video["thumbnailUrl"]
+  end
 end
