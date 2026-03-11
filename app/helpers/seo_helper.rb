@@ -342,6 +342,32 @@ module SeoHelper
     json_ld_script_tag(data)
   end
 
+  def json_ld_videos(videos)
+    data = {
+      "@context" => "https://schema.org",
+      "@type" => "ItemList",
+      "itemListElement" => videos.each_with_index.map do |video, i|
+        {
+          "@type" => "ListItem",
+          "position" => i + 1,
+          "item" => {
+            "@type" => "VideoObject",
+            "name" => video.title,
+            "contentUrl" => "https://www.youtube.com/watch?v=#{video.video_id}",
+            "embedUrl" => video.embed_url,
+            "thumbnailUrl" => "https://img.youtube.com/vi/#{video.video_id}/maxresdefault.jpg",
+            "uploadDate" => video.published_at&.iso8601,
+            "publisher" => {
+              "@type" => "Organization",
+              "name" => "Agence Immobilière de la Gare"
+            }
+          }
+        }
+      end
+    }
+    json_ld_script_tag(data)
+  end
+
   def listing_breadcrumbs(seo_opts)
     locale = I18n.locale
     home_path = locale.to_sym == :fr ? "/" : "/#{locale}"

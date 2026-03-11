@@ -529,6 +529,31 @@ class HomepageTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # === VideoObject JSON-LD ===
+
+  test "homepage includes VideoObject JSON-LD when videos exist" do
+    YoutubeVideo.create!(video_id: "vid123", title: "Monaco Tour 2025", published_at: 1.day.ago)
+    YoutubeVideo.create!(video_id: "vid456", title: "Property Visit", published_at: 2.days.ago)
+
+    get "/"
+    assert_select "script[type='application/ld+json']" do |scripts|
+      video_script = scripts.find { |s| s.text.include?('"ItemList"') && s.text.include?('"VideoObject"') }
+      assert video_script, "Expected VideoObject JSON-LD on homepage"
+      parsed = JSON.parse(video_script.text)
+      assert_equal "ItemList", parsed["@type"]
+      assert_equal 2, parsed["itemListElement"].size
+      assert_equal "VideoObject", parsed["itemListElement"][0]["item"]["@type"]
+      assert_equal "Monaco Tour 2025", parsed["itemListElement"][0]["item"]["name"]
+    end
+  end
+
+  test "homepage omits VideoObject JSON-LD when no videos" do
+    get "/"
+    scripts = css_select("script[type='application/ld+json']")
+    video_script = scripts.find { |s| s.text.include?('"VideoObject"') }
+    assert_nil video_script, "VideoObject JSON-LD should not appear when no videos exist"
+  end
+
   # === Navbar Transparency on Homepage ===
 
   test "homepage navbar has white background" do

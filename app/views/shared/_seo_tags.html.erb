@@ -10,6 +10,9 @@
 <% end %>
 <% if seo_config[:page_type] == :homepage %>
 <%= json_ld_website %>
+<% if defined?(@youtube_videos) && @youtube_videos&.any? %>
+<%= json_ld_videos(@youtube_videos) %>
+<% end %>
 <% end %>
 <% if seo_config[:page_type] == :property && seo_config[:property] %>
 <%= json_ld_property(seo_config[:property]) %>
