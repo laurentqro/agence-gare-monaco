@@ -40,6 +40,20 @@ fr:
     card_management: "Gestion"
     videos_title: "Vidéos"
     videos_view_channel: "Voir toutes nos vidéos"
+    faq_title: "Questions fréquentes"
+    faqs:
+      - question: "Qu'est-ce que l'Agence Immobilière de la Gare ?"
+        answer: "L'Agence Immobilière de la Gare est une agence familiale indépendante fondée en 1942 à Monaco, membre de la Chambre Immobilière Monégasque. Située au 3, Rue Langlé dans le quartier de la Condamine, elle est dirigée par Pierre Maré et son fils Adrien Maré."
+      - question: "Quels services proposez-vous ?"
+        answer: "Nous proposons des services complets de vente, location et gestion immobilière à Monaco et sur la Côte d'Azur. Nous assurons également l'estimation de biens, la rédaction de baux, l'enregistrement fiscal et les états des lieux."
+      - question: "Dans quels quartiers de Monaco intervenez-vous ?"
+        answer: "Nous intervenons dans tous les quartiers de Monaco : Monte-Carlo, la Condamine, Fontvieille, le Larvotto, Moneghetti, Saint-Roman et Monaco-Ville. Notre domaine s'étend également à la région française limitrophe."
+      - question: "Comment contacter l'agence ?"
+        answer: "Vous pouvez nous joindre par téléphone au (+377) 93 30 22 36, par email à info@agencegaremonaco.com ou en vous rendant directement au 3, Rue Langlé, MC 98000 Monaco. Nous sommes ouverts du lundi au vendredi de 9h à 18h."
+      - question: "Qu'est-ce qu'un bien off-market ?"
+        answer: "Un bien off-market est une propriété vendue de manière confidentielle, sans publication sur les portails immobiliers. L'Agence Immobilière de la Gare dispose d'un portefeuille exclusif de biens off-market à Monaco, accessibles sur demande."
+      - question: "Proposez-vous un service de gestion locative ?"
+        answer: "Oui, depuis 1942, nous proposons un service complet de gestion locative à Monaco. Nous prenons en charge la recherche de locataires, la rédaction des baux, les états des lieux, l'encaissement des loyers et toutes les formalités administratives."
 
   listings:
     sales: "Ventes"
