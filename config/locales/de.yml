@@ -170,6 +170,8 @@ de:
     offmarket_description: "Entdecken Sie unsere Off-market-Immobilien in Monaco. Exklusive Immobilien auf Anfrage verfügbar."
     gestion_description: "Immobilienverwaltung in Monaco von der Agence Immobilière de la Gare, unabhängige Familienagentur seit 1942. Umfassende Mietportfolioverwaltung."
     vendre_description: "Verkaufen Sie Ihre Immobilie in Monaco mit der Agence Immobilière de la Gare, unabhängige Agentur seit 1942. Bewertung, Mandat, Vorvertrag und notarielle Urkunde."
+    faq_title: "FAQ | Agence Immobilière de la Gare"
+    faq_description: "Häufig gestellte Fragen über Immobilien in Monaco. Die Agence Immobilière de la Gare, unabhängige Familienagentur seit 1942, beantwortet Ihre Fragen."
 
   gestion:
     title: "Immobilienverwaltung in Monaco"
@@ -288,3 +290,4 @@ de:
     offmarket: "off-market"
     gestion: "verwaltung"
     vendre: "verkaufen"
+    faq: "faq"

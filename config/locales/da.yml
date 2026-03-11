@@ -170,6 +170,8 @@ da:
     offmarket_description: "Opdag vores off-market-ejendomme i Monaco. Eksklusive ejendomme tilgængelige efter forespørgsel."
     gestion_description: "Ejendomsadministration i Monaco af Agence Immobilière de la Gare, uafhængigt familiebureau siden 1942. Omfattende administration af udlejningsportefølje."
     vendre_description: "Sælg din ejendom i Monaco med Agence Immobilière de la Gare, uafhængigt bureau siden 1942. Vurdering, mandat, foreløbig kontrakt og notariel bekræftelse."
+    faq_title: "FAQ | Agence Immobilière de la Gare"
+    faq_description: "Ofte stillede spørgsmål om ejendomme i Monaco. Agence Immobilière de la Gare, uafhængigt familiebureau siden 1942, besvarer dine spørgsmål."
 
   gestion:
     title: "Ejendomsadministration i Monaco"
@@ -288,3 +290,4 @@ da:
     offmarket: "off-market"
     gestion: "administration"
     vendre: "saelg"
+    faq: "faq"

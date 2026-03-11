@@ -27,6 +27,7 @@ Rails.application.routes.draw do
     offmarket = I18n.t("routes.offmarket", locale: locale)
     gestion  = I18n.t("routes.gestion", locale: locale)
     vendre   = I18n.t("routes.vendre", locale: locale)
+    faq      = I18n.t("routes.faq", locale: locale)
 
     prefix = locale == :fr ? "" : "/#{locale}"
     sales_target = "#{prefix}/#{sales}"
@@ -69,6 +70,9 @@ Rails.application.routes.draw do
 
       # Vendre (selling guide)
       get "/#{vendre}", to: "pages#vendre", as: :"#{locale}_vendre"
+
+      # FAQ
+      get "/#{faq}", to: "pages#faq", as: :"#{locale}_faq"
     end
   end
 

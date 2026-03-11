@@ -170,6 +170,8 @@ fi:
     offmarket_description: "Tutustu off-market-kiinteistöihimme Monacossa. Eksklusiivisia kiinteistöjä saatavilla pyynnöstä."
     gestion_description: "Kiinteistöhallinta Monacossa Agence Immobilière de la Garelta, itsenäinen perhetoimisto vuodesta 1942. Kattava vuokraportfolion hallinta."
     vendre_description: "Myy kiinteistösi Monacossa Agence Immobilière de la Garen kanssa, itsenäinen toimisto vuodesta 1942. Arviointi, toimeksianto, esisopimus ja notaarin vahvistama kauppakirja."
+    faq_title: "FAQ | Agence Immobilière de la Gare"
+    faq_description: "Usein kysytyt kysymykset kiinteistöistä Monacossa. Agence Immobilière de la Gare, itsenäinen perhetoimisto vuodesta 1942, vastaa kysymyksiisi."
 
   gestion:
     title: "Kiinteistöhallinta Monacossa"
@@ -288,3 +290,4 @@ fi:
     offmarket: "off-market"
     gestion: "hallinto"
     vendre: "myy"
+    faq: "faq"
