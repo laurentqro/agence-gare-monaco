@@ -40,6 +40,20 @@
     card_management: "Forvaltning"
     videos_title: "Videoer"
     videos_view_channel: "Se alle våre videoer"
+    faq_title: "Ofte stilte spørsmål"
+    faqs:
+      - question: "Hva er Agence Immobilière de la Gare?"
+        answer: "Agence Immobilière de la Gare er et uavhengig familiebyrå grunnlagt i 1942 i Monaco, medlem av Chambre Immobilière Monégasque. Beliggende i 3, Rue Langlé i Condamine-bydelen, ledes det av Pierre Maré og hans sønn Adrien Maré."
+      - question: "Hvilke tjenester tilbyr dere?"
+        answer: "Vi tilbyr komplette tjenester innen eiendomssalg, utleie og forvaltning i Monaco og på den franske rivieraen. Vi tilbyr også eiendomsvurderinger, leieavtaler, skatteregistrering og tilstandsrapporter."
+      - question: "I hvilke bydeler i Monaco opererer dere?"
+        answer: "Vi opererer i alle bydeler i Monaco: Monte-Carlo, Condamine, Fontvieille, Larvotto, Moneghetti, Saint-Roman og Monaco-Ville. Vårt område strekker seg også til den nærliggende franske regionen."
+      - question: "Hvordan kontakte byrået?"
+        answer: "Du kan nå oss per telefon på (+377) 93 30 22 36, via e-post på info@agencegaremonaco.com eller besøke oss på 3, Rue Langlé, MC 98000 Monaco. Vi har åpent mandag til fredag 9:00-18:00."
+      - question: "Hva er en off-market-eiendom?"
+        answer: "En off-market-eiendom selges konfidensielt, uten å bli listet på offentlige eiendomsportaler. Agence Immobilière de la Gare har en eksklusiv portefølje av off-market-eiendommer i Monaco, tilgjengelig på forespørsel."
+      - question: "Tilbyr dere eiendomsforvaltning?"
+        answer: "Ja, siden 1942 tilbyr vi en komplett eiendomsforvaltningstjeneste i Monaco. Vi håndterer leietakersøk, leieavtaler, tilstandsrapporter, husleieinnkreving og alle administrative formaliteter."
 
   listings:
     sales: "Salg"

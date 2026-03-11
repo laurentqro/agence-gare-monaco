@@ -40,6 +40,20 @@ it:
     card_management: "Gestione"
     videos_title: "Video"
     videos_view_channel: "Guarda tutti i nostri video"
+    faq_title: "Domande frequenti"
+    faqs:
+      - question: "Cos'è l'Agence Immobilière de la Gare?"
+        answer: "L'Agence Immobilière de la Gare è un'agenzia familiare indipendente fondata nel 1942 a Monaco, membro della Chambre Immobilière Monégasque. Situata al 3, Rue Langlé nel quartiere della Condamine, è diretta da Pierre Maré e suo figlio Adrien Maré."
+      - question: "Quali servizi offrite?"
+        answer: "Offriamo servizi completi di vendita, affitto e gestione immobiliare a Monaco e sulla Costa Azzurra. Forniamo anche stime immobiliari, redazione di contratti, registrazione fiscale e inventari."
+      - question: "In quali quartieri di Monaco operate?"
+        answer: "Operiamo in tutti i quartieri di Monaco: Monte-Carlo, Condamine, Fontvieille, Larvotto, Moneghetti, Saint-Roman e Monaco-Ville. La nostra area si estende anche alla regione francese limitrofa."
+      - question: "Come contattare l'agenzia?"
+        answer: "Potete contattarci telefonicamente al (+377) 93 30 22 36, via email a info@agencegaremonaco.com o visitandoci al 3, Rue Langlé, MC 98000 Monaco. Siamo aperti dal lunedì al venerdì dalle 9:00 alle 18:00."
+      - question: "Cos'è un immobile off-market?"
+        answer: "Un immobile off-market è una proprietà venduta in modo confidenziale, senza pubblicazione sui portali immobiliari. L'Agence Immobilière de la Gare dispone di un portafoglio esclusivo di immobili off-market a Monaco, disponibili su richiesta."
+      - question: "Offrite un servizio di gestione locativa?"
+        answer: "Sì, dal 1942 offriamo un servizio completo di gestione locativa a Monaco. Ci occupiamo della ricerca di inquilini, redazione dei contratti, inventari, riscossione degli affitti e tutte le formalità amministrative."
 
   listings:
     sales: "Vendite"

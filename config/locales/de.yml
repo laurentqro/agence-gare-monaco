@@ -40,6 +40,20 @@ de:
     card_management: "Verwaltung"
     videos_title: "Videos"
     videos_view_channel: "Alle unsere Videos ansehen"
+    faq_title: "Häufig gestellte Fragen"
+    faqs:
+      - question: "Was ist die Agence Immobilière de la Gare?"
+        answer: "Die Agence Immobilière de la Gare ist eine unabhängige Familienagentur, die 1942 in Monaco gegründet wurde und Mitglied der Chambre Immobilière Monégasque ist. Sie befindet sich in der 3, Rue Langlé im Stadtteil Condamine und wird von Pierre Maré und seinem Sohn Adrien Maré geleitet."
+      - question: "Welche Dienstleistungen bieten Sie an?"
+        answer: "Wir bieten umfassende Immobilienverkaufs-, Vermietungs- und Verwaltungsdienstleistungen in Monaco und an der Côte d'Azur. Wir erstellen auch Immobilienbewertungen, Mietverträge, Steuerregistrierungen und Bestandsaufnahmen."
+      - question: "In welchen Stadtteilen von Monaco sind Sie tätig?"
+        answer: "Wir sind in allen Stadtteilen von Monaco tätig: Monte-Carlo, Condamine, Fontvieille, Larvotto, Moneghetti, Saint-Roman und Monaco-Ville. Unser Gebiet erstreckt sich auch auf die angrenzende französische Region."
+      - question: "Wie kann ich die Agentur kontaktieren?"
+        answer: "Sie erreichen uns telefonisch unter (+377) 93 30 22 36, per E-Mail an info@agencegaremonaco.com oder besuchen Sie uns in der 3, Rue Langlé, MC 98000 Monaco. Wir sind montags bis freitags von 9:00 bis 18:00 Uhr geöffnet."
+      - question: "Was ist eine Off-Market-Immobilie?"
+        answer: "Eine Off-Market-Immobilie wird vertraulich verkauft, ohne auf öffentlichen Immobilienportalen gelistet zu werden. Die Agence Immobilière de la Gare verfügt über ein exklusives Portfolio von Off-Market-Immobilien in Monaco, die auf Anfrage verfügbar sind."
+      - question: "Bieten Sie Mietverwaltungsdienstleistungen an?"
+        answer: "Ja, seit 1942 bieten wir einen umfassenden Mietverwaltungsservice in Monaco an. Wir kümmern uns um Mietersuche, Mietvertragsgestaltung, Bestandsaufnahmen, Mieteinzug und alle Verwaltungsformalitäten."
 
   listings:
     sales: "Verkauf"

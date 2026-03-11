@@ -7,6 +7,7 @@
 <%= json_ld_organization %>
 <% if seo_config[:page_type] == :homepage %>
 <%= json_ld_website %>
+<%= json_ld_faq(t("homepage.faqs").map { |faq| { question: faq[:question], answer: faq[:answer] } }) %>
 <% end %>
 <% if seo_config[:page_type] == :property && seo_config[:property] %>
 <%= json_ld_property(seo_config[:property]) %>

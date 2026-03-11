@@ -485,6 +485,50 @@ class HomepageTest < ActionDispatch::IntegrationTest
     assert_nil website_script, "WebSite JSON-LD should only appear on homepage"
   end
 
+  # === FAQ Section ===
+
+  test "homepage displays FAQ section with questions and answers" do
+    get "/"
+    assert_select "[data-testid='faq']" do
+      assert_select "h2"
+      assert_select "[data-testid='faq-item']", { minimum: 5 },
+        "FAQ section should have at least 5 fact-rich questions"
+    end
+  end
+
+  test "FAQ items contain questions and answers" do
+    get "/"
+    assert_select "[data-testid='faq'] [data-testid='faq-item']" do |items|
+      items.each do |item|
+        assert_select item, "h3", { count: 1 }, "Each FAQ should have a question heading"
+        assert_select item, "p", { minimum: 1 }, "Each FAQ should have an answer"
+      end
+    end
+  end
+
+  test "FAQ answers contain specific data points" do
+    get "/"
+    faq_section = css_select("[data-testid='faq']").first.to_s
+    assert_match "1942", faq_section, "FAQ should reference founding year"
+    assert_match "Monaco", faq_section, "FAQ should reference Monaco"
+  end
+
+  test "FAQ section is translated per locale" do
+    get "/en"
+    assert_select "[data-testid='faq'] [data-testid='faq-item']", { minimum: 5 }
+  end
+
+  test "homepage includes FAQPage JSON-LD schema" do
+    get "/"
+    assert_select "script[type='application/ld+json']" do |scripts|
+      faq_script = scripts.find { |s| s.text.include?('"FAQPage"') }
+      assert faq_script, "Expected FAQPage JSON-LD on homepage"
+      parsed = JSON.parse(faq_script.text)
+      assert_equal "FAQPage", parsed["@type"]
+      assert parsed["mainEntity"].length >= 5, "FAQPage should have at least 5 questions"
+    end
+  end
+
   # === Navbar Transparency on Homepage ===
 
   test "homepage navbar has white background" do
