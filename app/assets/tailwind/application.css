@@ -24,7 +24,7 @@
 
 /* H2 — section headings */
 .heading-section {
-  @apply text-xl font-bold text-navy;
+  @apply text-3xl md:text-4xl font-extrabold text-navy;
 }
 
 /* Body text — standard content paragraphs */
