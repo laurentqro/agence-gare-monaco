@@ -86,12 +86,12 @@ module SeoHelper
       property = opts[:property]
       title = property.title_for(I18n.locale)
       if property.formatted_price.present?
-        "#{title} | #{property.formatted_price} \u20AC | Agence de la Gare Monaco"
+        "#{title} | #{property.formatted_price} \u20AC | Agence Immobilière de la Gare"
       else
-        "#{title} | Agence de la Gare Monaco"
+        "#{title} | Agence Immobilière de la Gare"
       end
     when :article
-      "#{opts[:article].title_for(I18n.locale)} | Agence de la Gare Monaco"
+      "#{opts[:article].title_for(I18n.locale)} | Agence Immobilière de la Gare"
     when :listings
       "#{seo_listings_title(opts)} | #{t('site_name')}"
     when :articles
