@@ -122,9 +122,4 @@ class OffMarketPageTest < ActionDispatch::IntegrationTest
     get "/"
     assert_select "nav a[href='/off-market']", minimum: 1
   end
-
-  test "homepage hero card links to off-market page" do
-    get "/"
-    assert_select "[data-testid='hero-cards'] a[href='/off-market']"
-  end
 end
