@@ -2,7 +2,7 @@ require "test_helper"
 
 class LocaleTest < ActionDispatch::IntegrationTest
   test "available locales are configured" do
-    assert_equal %i[fr en it de sv no da fi], I18n.available_locales
+    assert_equal %i[fr en it de sv no da fi ru], I18n.available_locales
   end
 
   test "default locale is French" do
@@ -134,11 +134,11 @@ class LocaleTest < ActionDispatch::IntegrationTest
     assert_no_match(/Immobilien/, response.body)
   end
 
-  test "all eight locales are routable" do
+  test "all nine locales are routable" do
     get "/"
     assert_response :success, "Expected 200 for / (fr) but got #{response.status}"
 
-    %w[en it de sv no da fi].each do |locale|
+    %w[en it de sv no da fi ru].each do |locale|
       get "/#{locale}"
       assert_response :success, "Expected 200 for /#{locale} but got #{response.status}"
     end

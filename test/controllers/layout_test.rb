@@ -80,11 +80,11 @@ class LayoutTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "navbar includes language switcher with all 8 locales" do
+  test "navbar includes language switcher with all 9 locales" do
     get "/"
     assert_select "[data-controller='language-switcher']" do
       assert_select "a[href='/']"
-      %w[en it de sv no da fi].each do |locale|
+      %w[en it de sv no da fi ru].each do |locale|
         assert_select "a[href*='/#{locale}']"
       end
     end

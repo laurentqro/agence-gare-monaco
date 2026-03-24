@@ -98,10 +98,10 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "property detail page renders for all 8 locales" do
+  test "property detail page renders for all 9 locales" do
     locales_with_properties = {
       en: "properties", it: "immobili", de: "immobilien",
-      sv: "fastigheter", no: "eiendommer", da: "ejendomme", fi: "kiinteistot"
+      sv: "fastigheter", no: "eiendommer", da: "ejendomme", fi: "kiinteistot", ru: "obekty"
     }
     # French has no locale prefix
     get "/biens/#{@property.id}-slug"

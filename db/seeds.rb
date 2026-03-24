@@ -10,7 +10,8 @@
       "sv" => "Fastighetsmarknad",
       "no" => "Eiendomsmarked",
       "da" => "Ejendomsmarked",
-      "fi" => "Kiinteistömarkkina"
+      "fi" => "Kiinteistömarkkina",
+      "ru" => "Рынок недвижимости"
     }
   },
   {
@@ -23,7 +24,8 @@
       "sv" => "Praktiska guider",
       "no" => "Praktiske guider",
       "da" => "Praktiske guider",
-      "fi" => "Käytännön oppaat"
+      "fi" => "Käytännön oppaat",
+      "ru" => "Практические руководства"
     }
   },
   {
@@ -36,7 +38,8 @@
       "sv" => "Monacos stadsdelar",
       "no" => "Monacos bydeler",
       "da" => "Monacos kvarterer",
-      "fi" => "Monacon kaupunginosat"
+      "fi" => "Monacon kaupunginosat",
+      "ru" => "Районы Монако"
     }
   },
   {
@@ -49,7 +52,8 @@
       "sv" => "Projekt & nyheter",
       "no" => "Prosjekter & nyheter",
       "da" => "Projekter & nyheder",
-      "fi" => "Projektit & uutiset"
+      "fi" => "Projektit & uutiset",
+      "ru" => "Проекты и новости"
     }
   },
   {
@@ -62,7 +66,8 @@
       "sv" => "Livet i Monaco",
       "no" => "Livet i Monaco",
       "da" => "Livet i Monaco",
-      "fi" => "Elämä Monacossa"
+      "fi" => "Elämä Monacossa",
+      "ru" => "Жизнь в Монако"
     }
   },
   {
@@ -75,7 +80,8 @@
       "sv" => "Inredning & arkitektur",
       "no" => "Interiør & arkitektur",
       "da" => "Indretning & arkitektur",
-      "fi" => "Sisustus & arkkitehtuuri"
+      "fi" => "Sisustus & arkkitehtuuri",
+      "ru" => "Дизайн и архитектура"
     }
   },
   {
@@ -88,7 +94,8 @@
       "sv" => "Nyheter",
       "no" => "Nyheter",
       "da" => "Nyheder",
-      "fi" => "Ajankohtaista"
+      "fi" => "Ajankohtaista",
+      "ru" => "Новости"
     }
   }
 ].each do |attrs|

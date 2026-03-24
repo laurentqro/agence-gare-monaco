@@ -28,8 +28,8 @@ module AgenceGareMonaco
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
-    # I18n configuration: 8 languages, French as default
-    config.i18n.available_locales = %i[fr en it de sv no da fi]
+    # I18n configuration: 9 languages, French as default
+    config.i18n.available_locales = %i[fr en it de sv no da fi ru]
     config.i18n.default_locale = :fr
     config.i18n.fallbacks = true
 

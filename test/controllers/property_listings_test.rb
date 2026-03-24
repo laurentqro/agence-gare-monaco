@@ -389,10 +389,10 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
 
   # === Locale rendering ===
 
-  test "listing renders correctly for all 8 locales" do
+  test "listing renders correctly for all 9 locales" do
     locales_with_sales = {
       en: "sales", it: "vendite", de: "verkauf",
-      sv: "forsaljning", no: "salg", da: "salg", fi: "myynti"
+      sv: "forsaljning", no: "salg", da: "salg", fi: "myynti", ru: "prodazha"
     }
     get "/ventes"
     assert_response :success, "Failed for locale fr"

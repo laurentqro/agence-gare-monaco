@@ -18,7 +18,7 @@ class VendrePageTest < ActionDispatch::IntegrationTest
     assert_select "h2", text: /fonds sont-ils versés/i
   end
 
-  test "all 8 locales return 200" do
+  test "all 9 locales return 200" do
     locale_paths = {
       fr: "/vendre",
       en: "/en/sell",
@@ -27,7 +27,8 @@ class VendrePageTest < ActionDispatch::IntegrationTest
       sv: "/sv/salja",
       no: "/no/selge",
       da: "/da/saelg",
-      fi: "/fi/myy"
+      fi: "/fi/myy",
+      ru: "/ru/prodat"
     }
 
     locale_paths.each do |locale, path|

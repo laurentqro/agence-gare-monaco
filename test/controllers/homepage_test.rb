@@ -45,60 +45,9 @@ class HomepageTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # === Hero Service Cards ===
-
-  test "homepage hero displays five service cards" do
+  test "homepage hero does not display service cards" do
     get "/"
-    assert_select "[data-testid='hero-cards'] a.hero-card", 5
-  end
-
-  test "hero cards link to correct paths for French" do
-    get "/"
-    assert_select "[data-testid='hero-cards']" do
-      assert_select "a[href='/ventes']", 1
-      assert_select "a[href='/locations']", 1
-      assert_select "a[href='/off-market']", 1
-      assert_select "a[href='/vendre']", 1
-      assert_select "a[href='/gestion']", 1
-    end
-  end
-
-  test "hero cards link to correct paths for English" do
-    get "/en"
-    assert_select "[data-testid='hero-cards']" do
-      assert_select "a[href='/en/sales']", 1
-      assert_select "a[href='/en/rentals']", 1
-      assert_select "a[href='/en/off-market']", 1
-      assert_select "a[href='/en/sell']", 1
-      assert_select "a[href='/en/management']", 1
-    end
-  end
-
-  test "hero cards display translated labels for French" do
-    get "/"
-    assert_select "[data-testid='hero-cards']" do
-      assert_select "a", text: /Acheter/
-      assert_select "a", text: /Louer/
-      assert_select "a", text: /Off-market/
-      assert_select "a", text: /Vendre/
-      assert_select "a", text: /Gestion/
-    end
-  end
-
-  test "hero cards display translated labels for English" do
-    get "/en"
-    assert_select "[data-testid='hero-cards']" do
-      assert_select "a", text: /Buy/
-      assert_select "a", text: /Rent/
-      assert_select "a", text: /Off-market/
-      assert_select "a", text: /Sell/
-      assert_select "a", text: /Management/
-    end
-  end
-
-  test "hero cards contain SVG icons" do
-    get "/"
-    assert_select "[data-testid='hero-cards'] svg", 5
+    assert_select "[data-testid='hero-cards']", 0
   end
 
   # === About Section ===
@@ -450,16 +399,15 @@ class HomepageTest < ActionDispatch::IntegrationTest
 
   # === All Locales Render ===
 
-  test "homepage renders successfully for all 8 locales" do
+  test "homepage renders successfully for all 9 locales" do
     get "/"
     assert_response :success, "Homepage failed for locale fr"
     assert_select "[data-testid='hero']", { minimum: 1 }, "Missing hero for locale fr"
 
-    %w[en it de sv no da fi].each do |locale|
+    %w[en it de sv no da fi ru].each do |locale|
       get "/#{locale}"
       assert_response :success, "Homepage failed for locale #{locale}"
       assert_select "[data-testid='hero']", { minimum: 1 }, "Missing hero for locale #{locale}"
-      assert_select "[data-testid='hero-cards']", { minimum: 1 }, "Missing hero cards for locale #{locale}"
       assert_select "[data-testid='about']", { minimum: 1 }, "Missing about section for locale #{locale}"
       assert_select "[data-testid='team']", { minimum: 1 }, "Missing team section for locale #{locale}"
     end

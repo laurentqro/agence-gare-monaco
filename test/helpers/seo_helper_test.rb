@@ -109,7 +109,7 @@ class SeoHelperTest < ActionView::TestCase
 
   # --- Hreflang tags ---
 
-  test "hreflang_tags for homepage includes all 8 locales plus x-default" do
+  test "hreflang_tags for homepage includes all 9 locales plus x-default" do
     I18n.with_locale(:en) do
       tags = hreflang_tags(page_type: :homepage)
       assert_includes tags, 'hreflang="fr"'
@@ -120,6 +120,7 @@ class SeoHelperTest < ActionView::TestCase
       assert_includes tags, 'hreflang="nb"'
       assert_includes tags, 'hreflang="da"'
       assert_includes tags, 'hreflang="fi"'
+      assert_includes tags, 'hreflang="ru"'
       assert_includes tags, 'hreflang="x-default"'
     end
   end

@@ -93,12 +93,12 @@ module ApplicationHelper
 
   LOCALE_FLAGS = {
     fr: "fr", en: "gb", it: "it", de: "de",
-    sv: "se", no: "no", da: "dk", fi: "fi"
+    sv: "se", no: "no", da: "dk", fi: "fi", ru: "ru"
   }.freeze
 
   LOCALE_NAMES = {
     fr: "Français", en: "English", it: "Italiano", de: "Deutsch",
-    sv: "Svenska", no: "Norsk", da: "Dansk", fi: "Suomi"
+    sv: "Svenska", no: "Norsk", da: "Dansk", fi: "Suomi", ru: "Русский"
   }.freeze
 
   def locale_property_path(property, locale = I18n.locale)

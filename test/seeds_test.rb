@@ -73,7 +73,7 @@ class SeedsTest < ActiveSupport::TestCase
       category = Category.find_by(slug: attrs[:slug])
       assert category, "Expected category with slug '#{attrs[:slug]}' to exist"
       assert_equal attrs[:name], category.name_for(:fr)
-      assert_equal 8, category.name.keys.size, "Expected 8 locale keys for category '#{attrs[:slug]}'"
+      assert_equal 9, category.name.keys.size, "Expected 8 locale keys for category '#{attrs[:slug]}'"
     end
   end
 
@@ -121,6 +121,6 @@ class SeedsTest < ActiveSupport::TestCase
 
     category.reload
     assert_equal "Marché immobilier", category.name_for(:fr)
-    assert_equal 8, category.name.keys.size, "Expected all 8 locale keys to be restored"
+    assert_equal 9, category.name.keys.size, "Expected all 8 locale keys to be restored"
   end
 end

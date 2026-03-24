@@ -272,48 +272,48 @@ class TranslatedRoutesTest < ActionDispatch::IntegrationTest
   end
 
   # === All 8 locales work for each route type ===
-  test "all 8 locales have working sales routes" do
+  test "all 9 locales have working sales routes" do
     get "/ventes"
     assert_response :success, "Expected 200 for /ventes (fr) but got #{response.status}"
 
     routes = { en: "sales", it: "vendite", de: "verkauf",
-               sv: "forsaljning", no: "salg", da: "salg", fi: "myynti" }
+               sv: "forsaljning", no: "salg", da: "salg", fi: "myynti", ru: "prodazha" }
     routes.each do |locale, segment|
       get "/#{locale}/#{segment}"
       assert_response :success, "Expected 200 for /#{locale}/#{segment} but got #{response.status}"
     end
   end
 
-  test "all 8 locales have working rentals routes" do
+  test "all 9 locales have working rentals routes" do
     get "/locations"
     assert_response :success, "Expected 200 for /locations (fr) but got #{response.status}"
 
     routes = { en: "rentals", it: "affitti", de: "vermietung",
-               sv: "uthyrning", no: "utleie", da: "udlejning", fi: "vuokraus" }
+               sv: "uthyrning", no: "utleie", da: "udlejning", fi: "vuokraus", ru: "arenda" }
     routes.each do |locale, segment|
       get "/#{locale}/#{segment}"
       assert_response :success, "Expected 200 for /#{locale}/#{segment} but got #{response.status}"
     end
   end
 
-  test "all 8 locales have working contact routes" do
+  test "all 9 locales have working contact routes" do
     get "/contact"
     assert_response :success, "Expected 200 for /contact (fr) but got #{response.status}"
 
     routes = { en: "contact", it: "contatto", de: "kontakt",
-               sv: "kontakt", no: "kontakt", da: "kontakt", fi: "yhteystiedot" }
+               sv: "kontakt", no: "kontakt", da: "kontakt", fi: "yhteystiedot", ru: "kontakt" }
     routes.each do |locale, segment|
       get "/#{locale}/#{segment}"
       assert_response :success, "Expected 200 for /#{locale}/#{segment} but got #{response.status}"
     end
   end
 
-  test "all 8 locales have working privacy routes" do
+  test "all 9 locales have working privacy routes" do
     get "/confidentialite"
     assert_response :success, "Expected 200 for /confidentialite (fr) but got #{response.status}"
 
     routes = { en: "privacy", it: "privacy", de: "datenschutz",
-               sv: "integritet", no: "personvern", da: "privatlivspolitik", fi: "tietosuoja" }
+               sv: "integritet", no: "personvern", da: "privatlivspolitik", fi: "tietosuoja", ru: "konfidentsialnost" }
     routes.each do |locale, segment|
       get "/#{locale}/#{segment}"
       assert_response :success, "Expected 200 for /#{locale}/#{segment} but got #{response.status}"

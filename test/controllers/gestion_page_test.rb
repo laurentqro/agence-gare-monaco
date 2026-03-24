@@ -18,7 +18,7 @@ class GestionPageTest < ActionDispatch::IntegrationTest
     assert_select "h2", text: /gérons-nous vos fonds/i
   end
 
-  test "all 8 locales return 200" do
+  test "all 9 locales return 200" do
     locale_paths = {
       fr: "/gestion",
       en: "/en/management",
@@ -27,7 +27,8 @@ class GestionPageTest < ActionDispatch::IntegrationTest
       sv: "/sv/forvaltning",
       no: "/no/forvaltning",
       da: "/da/administration",
-      fi: "/fi/hallinto"
+      fi: "/fi/hallinto",
+      ru: "/ru/upravlenie"
     }
 
     locale_paths.each do |locale, path|

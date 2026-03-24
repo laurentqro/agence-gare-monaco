@@ -44,10 +44,10 @@ class Admin::PropertyBrochuresControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", /MC-BRO-001/
   end
 
-  test "GET new shows locale selector with 8 options" do
+  test "GET new shows locale selector with 9 options" do
     get new_admin_property_brochure_url(@property)
     assert_response :success
-    assert_select "select[name='locale'] option", 8
+    assert_select "select[name='locale'] option", 9
   end
 
   test "GET new shows logo checkbox" do

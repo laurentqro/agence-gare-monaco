@@ -4,12 +4,12 @@ module SeoHelper
 
   HREFLANG_CODES = {
     fr: "fr", en: "en", it: "it", de: "de",
-    sv: "sv", no: "nb", da: "da", fi: "fi"
+    sv: "sv", no: "nb", da: "da", fi: "fi", ru: "ru"
   }.freeze
 
   OG_LOCALE_CODES = {
     fr: "fr_FR", en: "en_GB", it: "it_IT", de: "de_DE",
-    sv: "sv_SE", no: "nb_NO", da: "da_DK", fi: "fi_FI"
+    sv: "sv_SE", no: "nb_NO", da: "da_DK", fi: "fi_FI", ru: "ru_RU"
   }.freeze
 
   # --- Staging detection ---
@@ -299,7 +299,7 @@ module SeoHelper
       "name" => "Agence Immobilière de la Gare",
       "url" => "https://agencegaremonaco.com",
       "description" => "Independent real estate agency in Monaco since 1942. Property sales, rentals, and management.",
-      "inLanguage" => %w[fr en it de sv nb da fi],
+      "inLanguage" => %w[fr en it de sv nb da fi ru],
       "publisher" => {
         "@type" => "RealEstateAgent",
         "name" => "Agence Immobilière de la Gare"
