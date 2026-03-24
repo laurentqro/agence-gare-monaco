@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resource :session, only: %i[new create destroy]
+  resource :session, only: %i[new create destroy], path: "admin", path_names: { new: "login" }
 
   namespace :admin do
     get "/", to: "dashboard#show", as: :root
