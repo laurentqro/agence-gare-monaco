@@ -266,7 +266,7 @@ fr:
     enquiry_reference: "Référence du bien"
     whatsapp: "WhatsApp"
     whatsapp_message: "Bonjour, je souhaiterais des informations sur vos biens immobiliers."
-    whatsapp_enquiry_message: "Bonjour, je suis intéressé(e) par le %{description}. Pourriez-vous m'envoyer plus de détails ? %{url}"
+    whatsapp_enquiry_message: "Bonjour, je suis intéressé(e) par le %{description} (%{url}).\n\nPourriez-vous m'envoyer plus de détails ?"
     whatsapp_rooms:
       one: "%{count} pièce"
       other: "%{count} pièces"

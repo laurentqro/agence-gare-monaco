@@ -266,7 +266,7 @@ da:
     enquiry_reference: "Ejendomsreference"
     whatsapp: "WhatsApp"
     whatsapp_message: "Hej, jeg vil gerne have information om jeres ejendomme."
-    whatsapp_enquiry_message: "Hello, I am interested in the %{description}. Could you send me more details? %{url}"
+    whatsapp_enquiry_message: "Hello, I am interested in the %{description} (%{url}).\n\nCould you please send me more details?"
     whatsapp_rooms:
       one: "%{count} room"
       other: "%{count} rooms"

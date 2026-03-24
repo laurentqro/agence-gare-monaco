@@ -315,18 +315,19 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     assert_select "a[href*='wa.me']"
   end
 
-  test "WhatsApp link in English uses adjective-style description" do
+  test "WhatsApp link in English uses adjective-style description with URL inline" do
     get "/en/properties/#{@property.id}-slug"
     whatsapp_link = css_select("[data-testid='whatsapp-button'] a[href*='wa.me']").first
     assert whatsapp_link, "WhatsApp link not found"
     message = CGI.unescape(whatsapp_link["href"])
-    # English format: "35.5m² 1-bedroom flat for sale in Le Montaigne"
+    # English format: description (url).\n\nCould you please...
     assert_match(/35.5m²/, message)
     assert_match(/1-bedroom/, message)
     assert_match(/flat/, message)
     assert_match(/for sale/, message)
     assert_match(/Le Montaigne/, message)
-    assert_match(/agencegaremonaco\.com/, message)
+    assert_match(/agencegaremonaco\.com.*\)\./, message) # URL in parentheses before period
+    assert_match(/\.\n\nCould you please/, message) # line break before second sentence
   end
 
   test "WhatsApp English message with multiple bedrooms" do

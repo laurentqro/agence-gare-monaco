@@ -270,7 +270,7 @@ ru:
     enquiry_reference: "Референс объекта"
     whatsapp: "WhatsApp"
     whatsapp_message: "Здравствуйте, я хотел бы получить информацию о вашей недвижимости."
-    whatsapp_enquiry_message: "Здравствуйте, меня интересует %{description}. Не могли бы вы отправить мне подробности? %{url}"
+    whatsapp_enquiry_message: "Здравствуйте, меня интересует %{description} (%{url}).\n\nНе могли бы вы отправить мне подробности?"
     whatsapp_rooms:
       one: "%{count} комната"
       few: "%{count} комнаты"
