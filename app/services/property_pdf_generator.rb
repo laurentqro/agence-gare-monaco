@@ -45,16 +45,7 @@ class PropertyPdfGenerator
         margin: (top: 40mm, bottom: 35mm, left: 15mm, right: 15mm),
         header: context {
           set text(font: "Montserrat", size: 6.5pt, fill: rgb("#{ACCENT}"))
-          grid(
-            columns: (1fr, auto, auto),
-            align: (left + horizon, right + horizon, right + horizon),
-            column-gutter: 8pt,
-            #{logo_header_markup}
-            [
-              #{escape(t("pdf_brochure.contact_address"))} \\ #{escape(t("pdf_brochure.contact_city"))} \\ #{escape(t("pdf_brochure.contact_phone"))} \\ #{escape(t("pdf_brochure.contact_email"))} \\ #{escape(t("pdf_brochure.contact_website"))}
-            ],
-            #{qr_code_markup}
-          )
+          #{header_grid_markup}
           v(6pt)
           line(length: 100%, stroke: 0.4pt + rgb("#{ACCENT}"))
         },
@@ -82,6 +73,25 @@ class PropertyPdfGenerator
 
   def header_footer_functions
     "" # Using page header/footer directly
+  end
+
+  def header_grid_markup
+    if @include_logo
+      <<~TYPST
+        grid(
+            columns: (1fr, auto, auto),
+            align: (left + horizon, right + horizon, right + horizon),
+            column-gutter: 8pt,
+            #{logo_header_markup}
+            [
+              #{escape(t("pdf_brochure.contact_address"))} \\\\ #{escape(t("pdf_brochure.contact_city"))} \\\\ #{escape(t("pdf_brochure.contact_phone"))} \\\\ #{escape(t("pdf_brochure.contact_email"))} \\\\ #{escape(t("pdf_brochure.contact_website"))}
+            ],
+            #{qr_code_markup}
+          )
+      TYPST
+    else
+      "[]"
+    end
   end
 
   def logo_header_markup

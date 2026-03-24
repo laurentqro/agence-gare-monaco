@@ -303,15 +303,23 @@
           </tbody>
         </table>
 
-        <%# PDF download button %>
-        <div class="mt-4 pt-4 border-t border-gray-200">
+        <%# PDF download buttons %>
+        <div class="mt-5 pt-5 border-t border-gray-200 flex flex-col gap-2">
           <a href="<%= locale_property_path(@property) %>/pdf"
              data-testid="pdf-download-link"
-             class="inline-flex items-center gap-2 w-full justify-center bg-white border border-navy text-navy px-4 py-2 rounded text-xs font-semibold hover:bg-gray-50">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+             class="group flex items-center justify-center gap-2 w-full bg-navy text-white px-4 py-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all hover:bg-navy/90 hover:shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0 transition-transform group-hover:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
             <%= t("property_detail.download_pdf") %>
+          </a>
+          <a href="<%= locale_property_path(@property) %>/pdf?include_logo=0"
+             data-testid="pdf-download-no-logo-link"
+             class="group flex items-center justify-center gap-2 w-full border border-gray-300 text-accent px-4 py-2 rounded-lg text-xs font-medium transition-all hover:border-navy hover:text-navy">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0 transition-transform group-hover:translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <%= t("property_detail.without_agency_logo") %>
           </a>
         </div>
 

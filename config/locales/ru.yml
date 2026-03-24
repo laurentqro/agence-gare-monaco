@@ -158,7 +158,8 @@ ru:
     documents: "Документы"
     download: "Скачать"
     qr_code: "QR-код"
-    download_pdf: "Скачать PDF-брошюру"
+    download_pdf: "Брошюра"
+    without_agency_logo: "Брошюра без логотипа"
 
   articles:
     all: "Все"

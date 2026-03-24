@@ -60,7 +60,8 @@ class PropertiesController < ApplicationController
     @property = Property.published.includes(:district, :building, :property_images).find(params[:id])
     locale = params[:locale]&.to_sym || I18n.locale
 
-    pdf_bytes = PropertyPdfGenerator.new(@property, locale: locale, include_logo: true).generate
+    include_logo = params[:include_logo] != "0"
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: locale, include_logo: include_logo).generate
     filename = "#{@property.reference}-#{locale}.pdf"
 
     send_data pdf_bytes, filename: filename, type: "application/pdf", disposition: :attachment

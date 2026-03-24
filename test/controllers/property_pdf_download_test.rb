@@ -42,10 +42,29 @@ class PropertyPdfDownloadTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  # Show page has PDF download link
+  # Without logo
+  test "GET pdf with include_logo=0 returns PDF without logo" do
+    get "/biens/#{@property.id}-studio-carre-dor/pdf?include_logo=0"
+    assert_response :success
+    assert_equal "application/pdf", response.content_type
+  end
+
+  test "GET pdf defaults to including logo" do
+    get "/biens/#{@property.id}-studio-carre-dor/pdf"
+    assert_response :success
+    assert_equal "application/pdf", response.content_type
+  end
+
+  # Show page has PDF download link and logo checkbox
   test "property show page contains PDF download link" do
     get "/biens/#{@property.id}-studio-carre-dor"
     assert_response :success
     assert_select "a[data-testid='pdf-download-link']"
+  end
+
+  test "property show page contains PDF without logo link" do
+    get "/biens/#{@property.id}-studio-carre-dor"
+    assert_response :success
+    assert_select "a[data-testid='pdf-download-no-logo-link']"
   end
 end

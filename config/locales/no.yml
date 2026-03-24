@@ -154,7 +154,8 @@
     documents: "Dokumenter"
     download: "Last ned"
     qr_code: "QR-kode"
-    download_pdf: "Last ned PDF-brosjyre"
+    download_pdf: "Brosjyre"
+    without_agency_logo: "Brosjyre uten logo"
 
   articles:
     all: "Alle"

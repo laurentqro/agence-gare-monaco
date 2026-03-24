@@ -119,6 +119,20 @@ class PropertyPdfGeneratorTest < ActiveSupport::TestCase
     assert pdf_bytes.start_with?("%PDF")
   end
 
+  test "excludes contact details when include_logo is false" do
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr, include_logo: false).generate
+    text = extract_text(pdf_bytes)
+    refute_includes text, I18n.t("pdf_brochure.contact_phone", locale: :fr)
+    refute_includes text, I18n.t("pdf_brochure.contact_email", locale: :fr)
+    refute_includes text, I18n.t("pdf_brochure.contact_address", locale: :fr)
+  end
+
+  test "includes contact details when include_logo is true" do
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr, include_logo: true).generate
+    text = extract_text(pdf_bytes)
+    assert_includes text, I18n.t("pdf_brochure.contact_phone", locale: :fr)
+  end
+
   test "includes logo by default" do
     pdf_bytes_default = PropertyPdfGenerator.new(@property, locale: :fr).generate
     pdf_bytes_with_logo = PropertyPdfGenerator.new(@property, locale: :fr, include_logo: true).generate

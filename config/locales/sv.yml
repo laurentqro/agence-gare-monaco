@@ -154,7 +154,8 @@ sv:
     documents: "Dokument"
     download: "Ladda ner"
     qr_code: "QR-kod"
-    download_pdf: "Ladda ner PDF-broschyr"
+    download_pdf: "Broschyr"
+    without_agency_logo: "Broschyr utan logotyp"
 
   articles:
     all: "Alla"

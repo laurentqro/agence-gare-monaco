@@ -154,7 +154,8 @@ it:
     documents: "Documenti"
     download: "Scarica"
     qr_code: "QR Code"
-    download_pdf: "Scarica la brochure PDF"
+    download_pdf: "Brochure"
+    without_agency_logo: "Brochure senza logo"
 
   articles:
     all: "Tutti"

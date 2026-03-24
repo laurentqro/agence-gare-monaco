@@ -154,7 +154,8 @@ fi:
     documents: "Asiakirjat"
     download: "Lataa"
     qr_code: "QR-koodi"
-    download_pdf: "Lataa PDF-esite"
+    download_pdf: "Esite"
+    without_agency_logo: "Esite ilman logoa"
 
   articles:
     all: "Kaikki"
