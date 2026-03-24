@@ -148,7 +148,7 @@ class PropertyListingsTest < ActionDispatch::IntegrationTest
   test "property card displays location as main heading" do
     get "/en/sales"
     assert_response :success
-    assert_select "[data-testid='property-card'] [data-testid='card-location']", text: /Monaco/
+    assert_select "[data-testid='property-card'] [data-testid='card-location']", text: /Carré d'Or|Fontvieille/
   end
 
   test "property card displays title as tagline" do

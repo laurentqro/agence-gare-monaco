@@ -44,6 +44,11 @@ class Property < ApplicationRecord
     title_for(locale).parameterize
   end
 
+  def location_label
+    parts = [building&.name, district&.name].compact
+    parts.any? ? parts.join(", ") : city
+  end
+
   def formatted_price
     return nil if price.blank?
     price.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1.').reverse

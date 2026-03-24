@@ -213,6 +213,39 @@ class PropertyTest < ActiveSupport::TestCase
     assert_equal "Beau studio", property.description_for(:it)
   end
 
+  test "location_label returns building name and district name" do
+    property = Property.new(
+      reference: "MC-LOC1", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", building: @building, district: @district
+    )
+    assert_equal "Le Montaigne, Monte-Carlo", property.location_label
+  end
+
+  test "location_label returns district name when no building" do
+    property = Property.new(
+      reference: "MC-LOC2", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", district: @district
+    )
+    assert_equal "Monte-Carlo", property.location_label
+  end
+
+  test "location_label returns building name when no district" do
+    building_no_district = Building.create!(name: "Le Panorama", city: "Monaco")
+    property = Property.new(
+      reference: "MC-LOC3", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", building: building_no_district
+    )
+    assert_equal "Le Panorama", property.location_label
+  end
+
+  test "location_label returns city when no building and no district" do
+    property = Property.new(
+      reference: "MC-LOC4", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco"
+    )
+    assert_equal "Monaco", property.location_label
+  end
+
   test "scope for_rental returns rental properties" do
     Property.create!(reference: "MC-SALE", transaction_type: "sale", property_type: "apartment", country: "MC", city: "Monaco")
     Property.create!(reference: "MC-RENT", transaction_type: "rental", property_type: "apartment", country: "MC", city: "Monaco")
