@@ -326,7 +326,7 @@
         <%# WhatsApp button %>
         <div data-testid="whatsapp-button" class="mt-4">
           <% property_url = "#{SeoHelper::SITE_HOST}#{locale_property_path(@property)}" %>
-          <% whatsapp_message = t("contact_form.whatsapp_enquiry_message", reference: @property.reference, url: property_url) %>
+          <% whatsapp_message = whatsapp_property_message(@property, property_url) %>
           <a href="https://wa.me/33662392065?text=<%= ERB::Util.url_encode(whatsapp_message) %>"
              target="_blank" rel="noopener noreferrer"
              class="inline-flex items-center gap-2 w-full justify-center bg-[#25D366] text-white px-4 py-2 rounded text-xs font-semibold hover:bg-[#1da851]">

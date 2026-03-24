@@ -270,7 +270,16 @@ ru:
     enquiry_reference: "Референс объекта"
     whatsapp: "WhatsApp"
     whatsapp_message: "Здравствуйте, я хотел бы получить информацию о вашей недвижимости."
-    whatsapp_enquiry_message: "Здравствуйте, меня интересует объект %{reference}. Не могли бы вы отправить мне подробности? %{url}"
+    whatsapp_enquiry_message: "Здравствуйте, меня интересует %{description}. Не могли бы вы отправить мне подробности? %{url}"
+    whatsapp_rooms:
+      one: "%{count} комната"
+      few: "%{count} комнаты"
+      many: "%{count} комнат"
+      other: "%{count} комнат"
+    whatsapp_for_sale: "на продажу"
+    whatsapp_for_rent: "в аренду"
+    whatsapp_of_area: "%{area}м²"
+    whatsapp_in_building: "в здании %{building}"
 
   pdf_brochure:
     off_market_badge: "OFF MARKET"

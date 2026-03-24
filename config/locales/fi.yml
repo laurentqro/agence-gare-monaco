@@ -266,7 +266,14 @@ fi:
     enquiry_reference: "Kiinteistöviite"
     whatsapp: "WhatsApp"
     whatsapp_message: "Hei, haluaisin tietoa kiinteistöistänne."
-    whatsapp_enquiry_message: "Hello, I am interested in property %{reference}. Could you send me more details? %{url}"
+    whatsapp_enquiry_message: "Hello, I am interested in the %{description}. Could you send me more details? %{url}"
+    whatsapp_rooms:
+      one: "%{count} room"
+      other: "%{count} rooms"
+    whatsapp_for_sale: "for sale"
+    whatsapp_for_rent: "for rent"
+    whatsapp_of_area: "of %{area}m²"
+    whatsapp_in_building: "in %{building}"
 
   pdf_brochure:
     off_market_badge: "EI MARKKINOILLA"

@@ -266,7 +266,14 @@ fr:
     enquiry_reference: "Référence du bien"
     whatsapp: "WhatsApp"
     whatsapp_message: "Bonjour, je souhaiterais des informations sur vos biens immobiliers."
-    whatsapp_enquiry_message: "Bonjour, je suis intéressé(e) par le bien %{reference}. Pourriez-vous m'envoyer plus de détails ? %{url}"
+    whatsapp_enquiry_message: "Bonjour, je suis intéressé(e) par le %{description}. Pourriez-vous m'envoyer plus de détails ? %{url}"
+    whatsapp_rooms:
+      one: "%{count} pièce"
+      other: "%{count} pièces"
+    whatsapp_for_sale: "à la vente"
+    whatsapp_for_rent: "à la location"
+    whatsapp_of_area: "de %{area}m²"
+    whatsapp_in_building: "dans l'immeuble %{building}"
 
   pdf_brochure:
     off_market_badge: "HORS MARCHÉ"

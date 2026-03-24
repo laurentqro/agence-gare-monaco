@@ -204,6 +204,29 @@ module ApplicationHelper
     LOCALE_NAMES[locale.to_sym] || locale.to_s
   end
 
+  def whatsapp_property_message(property, property_url)
+    # FR and RU use their own locale for WhatsApp text; all others use English
+    wa_locale = %i[fr ru].include?(I18n.locale) ? I18n.locale : :en
+
+    area_val = property.living_area
+    area_str = area_val ? (area_val.to_i == area_val ? area_val.to_i.to_s : area_val.to_s) : nil
+    transaction = property.transaction_type == "sale" ? I18n.t("contact_form.whatsapp_for_sale", locale: wa_locale) : I18n.t("contact_form.whatsapp_for_rent", locale: wa_locale)
+    building_part = property.building ? " #{I18n.t('contact_form.whatsapp_in_building', building: property.building.name, locale: wa_locale)}" : ""
+
+    description = if wa_locale == :en
+      rooms = property.num_rooms ? "#{property.num_rooms}-bedroom" : nil
+      area = area_str ? "#{area_str}m²" : nil
+      parts = [area, rooms, I18n.t("contact_form.whatsapp_property_type.#{property.property_type}", default: "property", locale: :en)].compact
+      "#{parts.join(' ')} #{transaction}#{building_part}"
+    else
+      rooms = I18n.t("contact_form.whatsapp_rooms", count: property.num_rooms || 0, locale: wa_locale)
+      area = area_str ? " #{I18n.t('contact_form.whatsapp_of_area', area: area_str, locale: wa_locale)}" : ""
+      "#{rooms}#{area} #{transaction}#{building_part}"
+    end
+
+    I18n.t("contact_form.whatsapp_enquiry_message", description: description, url: property_url, locale: wa_locale)
+  end
+
   def nav_active_class(nav_path)
     request.path.start_with?(nav_path) ? "nav-active" : ""
   end

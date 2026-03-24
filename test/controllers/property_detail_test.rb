@@ -315,11 +315,63 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     assert_select "a[href*='wa.me']"
   end
 
-  test "WhatsApp link includes property reference in message" do
+  test "WhatsApp link in English uses adjective-style description" do
     get "/en/properties/#{@property.id}-slug"
-    whatsapp_link = css_select("a[href*='wa.me']").first
+    whatsapp_link = css_select("[data-testid='whatsapp-button'] a[href*='wa.me']").first
     assert whatsapp_link, "WhatsApp link not found"
-    assert_match(/MC-100/, CGI.unescape(whatsapp_link["href"]))
+    message = CGI.unescape(whatsapp_link["href"])
+    # English format: "35.5m² 1-bedroom flat for sale in Le Montaigne"
+    assert_match(/35.5m²/, message)
+    assert_match(/1-bedroom/, message)
+    assert_match(/flat/, message)
+    assert_match(/for sale/, message)
+    assert_match(/Le Montaigne/, message)
+    assert_match(/agencegaremonaco\.com/, message)
+  end
+
+  test "WhatsApp English message with multiple bedrooms" do
+    @property.update!(num_rooms: 3, living_area: 75)
+    get "/en/properties/#{@property.id}-slug"
+    whatsapp_link = css_select("[data-testid='whatsapp-button'] a[href*='wa.me']").first
+    message = CGI.unescape(whatsapp_link["href"])
+    assert_match(/75m²/, message)
+    assert_match(/3-bedroom/, message)
+  end
+
+  test "WhatsApp message for rental property" do
+    @property.update!(transaction_type: "rental")
+    get "/en/properties/#{@property.id}-slug"
+    whatsapp_link = css_select("[data-testid='whatsapp-button'] a[href*='wa.me']").first
+    message = CGI.unescape(whatsapp_link["href"])
+    assert_match(/for rent/, message)
+  end
+
+  test "WhatsApp message without building omits building name" do
+    @property.update!(building: nil)
+    get "/en/properties/#{@property.id}-slug"
+    whatsapp_link = css_select("[data-testid='whatsapp-button'] a[href*='wa.me']").first
+    message = CGI.unescape(whatsapp_link["href"])
+    refute_match(/in Le Montaigne/, message)
+  end
+
+  test "WhatsApp message in French uses noun-style description" do
+    get "/biens/#{@property.id}-slug"
+    whatsapp_link = css_select("[data-testid='whatsapp-button'] a[href*='wa.me']").first
+    message = CGI.unescape(whatsapp_link["href"])
+    # French format: "1 pièce de 35.5m² à la vente dans l'immeuble Le Montaigne"
+    assert_match(/1 pièce/, message)
+    assert_match(/35.5m²/, message)
+    assert_match(/la vente/, message)
+    assert_match(/Le Montaigne/, message)
+  end
+
+  test "WhatsApp message in non-FR/EN/RU locale uses English text" do
+    get "/it/immobili/#{@property.id}-slug"
+    whatsapp_link = css_select("[data-testid='whatsapp-button'] a[href*='wa.me']").first
+    message = CGI.unescape(whatsapp_link["href"])
+    assert_match(/Hello/, message)
+    assert_match(/1-bedroom/, message)
+    assert_match(/for sale/, message)
   end
 
   test "displays video section when video URL present" do
