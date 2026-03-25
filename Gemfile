@@ -47,7 +47,7 @@ gem "image_processing", "~> 1.2"
 gem "aws-sdk-s3", require: false
 
 # QR code generation for property listing pages
-gem "rqrcode", "~> 2.0"
+gem "rqrcode", "~> 3.2"
 
 # Markdown rendering for blog articles (Rust-based GFM parser)
 gem "commonmarker"
