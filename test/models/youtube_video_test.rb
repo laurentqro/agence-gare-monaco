@@ -31,7 +31,7 @@ class YoutubeVideoTest < ActiveSupport::TestCase
     new_vid = YoutubeVideo.create!(video_id: "new", title: "New Video", published_at: 1.day.ago)
 
     result = YoutubeVideo.latest
-    assert_equal [new_vid, old], result.to_a
+    assert_equal [ new_vid, old ], result.to_a
   end
 
   test "latest defaults to 4 videos" do

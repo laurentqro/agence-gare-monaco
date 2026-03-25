@@ -124,7 +124,7 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
 
   test "language sitemap includes hreflang alternates" do
     get "/sitemaps/en.xml"
-    assert_includes response.body, 'xhtml:link'
+    assert_includes response.body, "xhtml:link"
     assert_includes response.body, 'hreflang="fr"'
     assert_includes response.body, 'hreflang="en"'
   end

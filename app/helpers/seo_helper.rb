@@ -371,7 +371,7 @@ module SeoHelper
   def listing_breadcrumbs(seo_opts)
     locale = I18n.locale
     home_path = locale.to_sym == :fr ? "/" : "/#{locale}"
-    crumbs = [{ name: I18n.t("homepage.hero_title"), url: "#{SITE_HOST}#{home_path}" }]
+    crumbs = [ { name: I18n.t("homepage.hero_title"), url: "#{SITE_HOST}#{home_path}" } ]
 
     transaction = seo_opts[:transaction_type]
 

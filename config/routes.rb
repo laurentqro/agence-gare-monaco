@@ -4,12 +4,12 @@ Rails.application.routes.draw do
   namespace :admin do
     get "/", to: "dashboard#show", as: :root
     resources :articles
-    resource :article_preview, only: [:create]
+    resource :article_preview, only: [ :create ]
     resources :categories
     resources :contacts
     resources :properties do
-      resource :share, only: [:new, :create], controller: "property_shares"
-      resource :brochure, only: [:new, :create], controller: "property_brochures"
+      resource :share, only: [ :new, :create ], controller: "property_shares"
+      resource :brochure, only: [ :new, :create ], controller: "property_brochures"
     end
   end
 
@@ -114,7 +114,7 @@ Rails.application.routes.draw do
   end
 
   # Contact form submissions
-  resources :contact_submissions, only: [:create]
+  resources :contact_submissions, only: [ :create ]
 
   # SEO: XML Sitemaps
   get "sitemap.xml", to: "sitemaps#index", as: :sitemap, defaults: { format: :xml }

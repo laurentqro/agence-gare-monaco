@@ -539,7 +539,7 @@ namespace :articles do
 
           Hvis du planlægger at bosætte dig der, her er en artikel om alt, du skal vide om at købe ejendom i Monaco.
         BODY
-        "fi" => <<~BODY,
+        "fi" => <<~BODY
           Yli 300 aurinkoisella päivällä vuodessa Monacon ruhtinaskunnan asukkaat nauttivat Välimereltä, vesisporteista ja laskettelun iloista Etelä-Alppien hiihtokeskusten läheisyyden ansiosta. Ruhtinaskunnassa asumisen edut voisivat tuottaa loputtoman listan. Olemme kuitenkin koonneet teille 5 pääsyytä, miksi teidän tulisi muuttaa Monacoon.
 
           ### 1. Kadehdittava maantieteellinen sijainti ja ilmasto
@@ -1031,7 +1031,7 @@ namespace :articles do
 
           Konkluderende kan en bosættelse i Monaco med stor sandsynlighed have en særligt positiv indvirkning på din skattesituation, ikke kun i privat sammenhæng, men også i professionel sammenhæng. Du øger dermed dine indtægter og øger dit potentiale for at købe en ejendom i et af Fyrstendømmets kvarterer.
         BODY
-        "fi" => <<~BODY,
+        "fi" => <<~BODY
           ### Miten Monacon verojärjestelmä toimii?
 
           Monacon verojärjestelmä on ainutlaatuinen ja yksinkertainen, sillä se toimii ilman tuloveroa ja alhaisella elinkeinoverolla, mikä on todellinen etu ruhtinaskuntaan asettuville yksityishenkilöille ja ulkomaisille yrityksille.

@@ -53,7 +53,7 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
   test "POST create sends emails to selected contacts" do
     assert_emails 2 do
       post admin_property_share_url(@property), params: {
-        contact_ids: [@contact1.id, @contact2.id]
+        contact_ids: [ @contact1.id, @contact2.id ]
       }
     end
     assert_redirected_to admin_contacts_url
@@ -63,7 +63,7 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
   test "POST create sends email to a single contact" do
     assert_emails 1 do
       post admin_property_share_url(@property), params: {
-        contact_ids: [@contact1.id]
+        contact_ids: [ @contact1.id ]
       }
     end
     assert_redirected_to admin_contacts_url

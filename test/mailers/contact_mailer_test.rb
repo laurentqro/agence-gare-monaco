@@ -41,7 +41,7 @@ class ContactMailerTest < ActionMailer::TestCase
     )
 
     email = ContactMailer.contact_email(submission)
-    assert_equal ["info@agencegaremonaco.com"], email.to
+    assert_equal [ "info@agencegaremonaco.com" ], email.to
   end
 
   test "contact email has correct reply-to" do
@@ -54,7 +54,7 @@ class ContactMailerTest < ActionMailer::TestCase
     )
 
     email = ContactMailer.contact_email(submission)
-    assert_equal ["jean@example.com"], email.reply_to
+    assert_equal [ "jean@example.com" ], email.reply_to
   end
 
   test "contact email subject includes submission subject" do
@@ -114,7 +114,7 @@ class ContactMailerTest < ActionMailer::TestCase
     )
 
     email = ContactMailer.enquiry_email(submission)
-    assert_equal ["info@agencegaremonaco.com"], email.to
+    assert_equal [ "info@agencegaremonaco.com" ], email.to
   end
 
   test "enquiry email has correct reply-to" do
@@ -127,7 +127,7 @@ class ContactMailerTest < ActionMailer::TestCase
     )
 
     email = ContactMailer.enquiry_email(submission)
-    assert_equal ["pierre@example.com"], email.reply_to
+    assert_equal [ "pierre@example.com" ], email.reply_to
   end
 
   test "enquiry email subject includes property reference" do

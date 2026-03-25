@@ -135,7 +135,7 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
       .with(query: { "status" => "published", "page" => "1" })
       .to_return(
         status: 200,
-        body: [html_property].to_json,
+        body: [ html_property ].to_json,
         headers: { "Content-Type" => "application/json" }
       )
     stub_request(:get, "#{@base_url}/properties")
@@ -169,7 +169,7 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
       .with(query: { "status" => "published", "page" => "1" })
       .to_return(
         status: 200,
-        body: [html_property].to_json,
+        body: [ html_property ].to_json,
         headers: { "Content-Type" => "application/json" }
       )
     stub_request(:get, "#{@base_url}/properties")
@@ -331,7 +331,7 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
       .with(query: { "status" => "published", "page" => "1" })
       .to_return(
         status: 200,
-        body: [property_data(num_rooms: "Non défini/Aucun", num_bedrooms: "", num_bathrooms: "")].to_json,
+        body: [ property_data(num_rooms: "Non défini/Aucun", num_bedrooms: "", num_bathrooms: "") ].to_json,
         headers: { "Content-Type" => "application/json" }
       )
 
@@ -539,7 +539,7 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
       .with(query: { "status" => "published", "page" => "1" })
       .to_return(
         status: 200,
-        body: [property_data].to_json,
+        body: [ property_data ].to_json,
         headers: { "Content-Type" => "application/json" }
       )
 

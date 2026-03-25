@@ -320,7 +320,7 @@ class SeoHelperTest < ActionView::TestCase
     @article.update!(cover_image_url: nil, body: { "fr" => "Text only", "en" => "Text only" })
     I18n.with_locale(:en) do
       tags = og_tags(page_type: :article, article: @article)
-      refute_includes tags, 'og:image'
+      refute_includes tags, "og:image"
     end
   end
 

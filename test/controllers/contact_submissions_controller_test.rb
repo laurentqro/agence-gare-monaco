@@ -268,5 +268,4 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-testid='enquiry-form'] input[name='website']"
   end
-
 end

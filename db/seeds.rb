@@ -194,7 +194,7 @@ end
     off_market: true,
     published: true,
     manually_edited: true,
-    image_urls: ["https://www.agencegaremonaco.com/uploads/properties/15/VktDYfMir/VktDYfMir-1920-1200.jpg"]
+    image_urls: [ "https://www.agencegaremonaco.com/uploads/properties/15/VktDYfMir/VktDYfMir-1920-1200.jpg" ]
   },
   {
     reference: "AG00002",
@@ -215,7 +215,7 @@ end
     off_market: true,
     published: true,
     manually_edited: true,
-    image_urls: ["https://www.agencegaremonaco.com/uploads/properties/2/7Q0DXBhuA/7Q0DXBhuA-1920-1200.jpg"]
+    image_urls: [ "https://www.agencegaremonaco.com/uploads/properties/2/7Q0DXBhuA/7Q0DXBhuA-1920-1200.jpg" ]
   }
 ].each do |attrs|
   image_urls = attrs.delete(:image_urls) || []

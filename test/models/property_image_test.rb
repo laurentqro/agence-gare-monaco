@@ -55,7 +55,7 @@ class PropertyImageTest < ActiveSupport::TestCase
   test "ordered by position" do
     PropertyImage.create!(property: @property, remote_url: "https://example.com/b.jpg", position: 2)
     PropertyImage.create!(property: @property, remote_url: "https://example.com/a.jpg", position: 1)
-    assert_equal ["https://example.com/a.jpg", "https://example.com/b.jpg"],
+    assert_equal [ "https://example.com/a.jpg", "https://example.com/b.jpg" ],
                  @property.property_images.ordered.map(&:remote_url)
   end
 end

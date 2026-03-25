@@ -101,7 +101,7 @@ class ImmotoolboxClientTest < ActiveSupport::TestCase
       .with(query: { "status" => "published", "page" => "2" })
       .to_return(
         status: 200,
-        body: [{ "id" => 21, "reference" => "AG-21" }].to_json,
+        body: [ { "id" => 21, "reference" => "AG-21" } ].to_json,
         headers: { "Content-Type" => "application/json" }
       )
 

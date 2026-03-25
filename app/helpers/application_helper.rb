@@ -124,25 +124,25 @@ module ApplicationHelper
   TYPE_FILTER_GROUPS = [
     # Residential by room count
     [
-      ["studio",   "apartment", 1],
-      ["2-pieces", "apartment", 2],
-      ["3-pieces", "apartment", 3],
-      ["4-pieces", "apartment", 4],
-      ["5-pieces", "apartment", 5],
-      ["5-pieces-plus", "apartment", :gt5]
+      [ "studio",   "apartment", 1 ],
+      [ "2-pieces", "apartment", 2 ],
+      [ "3-pieces", "apartment", 3 ],
+      [ "4-pieces", "apartment", 4 ],
+      [ "5-pieces", "apartment", 5 ],
+      [ "5-pieces-plus", "apartment", :gt5 ]
     ],
     # Premium
     [
-      ["penthouse", "penthouse", nil],
-      ["duplex",    "duplex",    nil]
+      [ "penthouse", "penthouse", nil ],
+      [ "duplex",    "duplex",    nil ]
     ],
     # Commercial
     [
-      ["office",     "office",     nil],
-      ["commercial", "commercial", nil],
-      ["local",      "local",      nil],
-      ["parking",    "parking",    nil],
-      ["cave",       "cave",       nil]
+      [ "office",     "office",     nil ],
+      [ "commercial", "commercial", nil ],
+      [ "local",      "local",      nil ],
+      [ "parking",    "parking",    nil ],
+      [ "cave",       "cave",       nil ]
     ]
   ].freeze
 
@@ -152,7 +152,7 @@ module ApplicationHelper
       options = group.filter_map do |key, type, rooms|
         label = I18n.t("listings.type_filters.#{key}", default: key.capitalize)
         localized_key = label.downcase
-        [localized_key, key, label]
+        [ localized_key, key, label ]
       end
       options.presence
     end
@@ -167,7 +167,7 @@ module ApplicationHelper
     qp = request.query_parameters.deep_dup
     key = localized_filter_param(param_name)
     current = Array(qp[key])
-    remaining = current - [value.to_s]
+    remaining = current - [ value.to_s ]
     if remaining.any?
       qp[key] = remaining
     else
@@ -216,7 +216,7 @@ module ApplicationHelper
     description = if wa_locale == :en
       rooms = property.num_rooms ? "#{property.num_rooms}-bedroom" : nil
       area = area_str ? "#{area_str}m²" : nil
-      parts = [area, rooms, I18n.t("contact_form.whatsapp_property_type.#{property.property_type}", default: "property", locale: :en)].compact
+      parts = [ area, rooms, I18n.t("contact_form.whatsapp_property_type.#{property.property_type}", default: "property", locale: :en) ].compact
       "#{parts.join(' ')} #{transaction}#{building_part}"
     else
       rooms = I18n.t("contact_form.whatsapp_rooms", count: property.num_rooms || 0, locale: wa_locale)

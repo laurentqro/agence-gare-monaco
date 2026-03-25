@@ -36,12 +36,12 @@ class PropertyMailerTest < ActionMailer::TestCase
 
   test "share email is sent to contact email" do
     email = PropertyMailer.share_email(@property, @contact)
-    assert_equal ["jean@example.com"], email.to
+    assert_equal [ "jean@example.com" ], email.to
   end
 
   test "share email is sent from agency" do
     email = PropertyMailer.share_email(@property, @contact)
-    assert_equal ["info@agencegaremonaco.com"], email.from
+    assert_equal [ "info@agencegaremonaco.com" ], email.from
   end
 
   test "share email subject includes property reference and title" do

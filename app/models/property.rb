@@ -45,7 +45,7 @@ class Property < ApplicationRecord
   end
 
   def location_label
-    parts = [building&.name, district&.name].compact
+    parts = [ building&.name, district&.name ].compact
     parts.any? ? parts.join(", ") : city
   end
 

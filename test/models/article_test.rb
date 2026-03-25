@@ -206,7 +206,7 @@ class ArticleTest < ActiveSupport::TestCase
       body: { "fr" => "![First](https://example.com/a.jpg)\n\ntext\n\n![Second](https://example.com/b.jpg)" },
       category: @category
     )
-    assert_equal ["https://example.com/a.jpg", "https://example.com/b.jpg"], article.body_image_urls
+    assert_equal [ "https://example.com/a.jpg", "https://example.com/b.jpg" ], article.body_image_urls
   end
 
   test "body_image_urls returns empty array when no images" do

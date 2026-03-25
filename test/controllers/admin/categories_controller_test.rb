@@ -109,7 +109,7 @@ class Admin::CategoriesControllerTest < ActionDispatch::IntegrationTest
   test "DELETE destroy also deletes associated articles" do
     cat = Category.create!(name: { "fr" => "To delete" }, slug: "to-delete")
     Article.create!(title: { "fr" => "Art" }, body: { "fr" => "C" }, slug: "art", category: cat)
-    assert_difference ["Category.count", "Article.count"], -1 do
+    assert_difference [ "Category.count", "Article.count" ], -1 do
       delete admin_category_url(cat)
     end
   end

@@ -14,7 +14,7 @@ class CreatePropertyImages < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :property_images, [:property_id, :position]
+    add_index :property_images, [ :property_id, :position ]
     add_index :property_images, :immotoolbox_id, unique: true
   end
 end
