@@ -241,7 +241,7 @@ class SeoHelperTest < ActionView::TestCase
     I18n.with_locale(:en) do
       result = seo_title(page_type: :article, article: @article)
       assert_includes result, "Monaco Market Update"
-      assert_includes result, "Agence de la Gare"
+      assert_includes result, "Agence Immobilière de la Gare"
     end
   end
 

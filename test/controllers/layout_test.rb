@@ -232,7 +232,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
 
   test "footer includes copyright and agency name" do
     get "/"
-    assert_select "footer", text: /Agence de la Gare/
+    assert_select "footer", text: /Agence Immobilière de la Gare/
   end
 
   test "footer includes privacy link for current locale" do

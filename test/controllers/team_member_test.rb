@@ -37,9 +37,8 @@ class TeamMemberTest < ActionDispatch::IntegrationTest
   end
 
   test "unknown team member returns 404" do
-    assert_raises(ActionController::RoutingError) do
-      get "/equipe/unknown-person"
-    end
+    get "/equipe/unknown-person"
+    assert_response :not_found
   end
 
   test "team member pages render for all locales" do

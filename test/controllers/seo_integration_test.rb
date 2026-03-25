@@ -182,7 +182,7 @@ class SeoIntegrationTest < ActionDispatch::IntegrationTest
   test "property detail has title with price" do
     get "/en/properties/#{@property.id}-luxury-apartment"
     assert_response :success
-    assert_select "title", /Luxury Apartment.*2\.500\.000.*Agence de la Gare/
+    assert_select "title", /Luxury Apartment.*2\.500\.000.*Agence Immobilière de la Gare/
   end
 
   # --- Article SEO ---
