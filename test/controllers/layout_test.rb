@@ -255,6 +255,39 @@ class LayoutTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # === Page Background ===
+
+  test "non-homepage pages have background image" do
+    get "/ventes"
+    assert_select "[data-testid='page-background']" do
+      assert_select "img[src*='monaco-panorama']"
+    end
+  end
+
+  test "homepage does not have page background image" do
+    get "/"
+    assert_select "[data-testid='page-background']", count: 0
+  end
+
+  test "background image appears on property listing page" do
+    get "/en/sales"
+    assert_select "[data-testid='page-background']" do
+      assert_select "img[src*='monaco-panorama']"
+    end
+  end
+
+  test "background image appears on articles page" do
+    get "/articles"
+    assert_select "[data-testid='page-background']" do
+      assert_select "img[src*='monaco-panorama']"
+    end
+  end
+
+  test "background image has overlay" do
+    get "/ventes"
+    assert_select "[data-testid='page-background'] div.bg-white\\/80"
+  end
+
   # === Helper Methods ===
 
   test "navigation links use translated route segments" do
