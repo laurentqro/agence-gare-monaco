@@ -257,27 +257,36 @@ class LayoutTest < ActionDispatch::IntegrationTest
 
   # === Page Background ===
 
-  test "non-homepage pages have background image" do
+  test "background image appears on sales listing page" do
     get "/ventes"
     assert_select "[data-testid='page-background']" do
       assert_select "img[src*='monaco-panorama']"
     end
   end
 
-  test "homepage does not have page background image" do
-    get "/"
-    assert_select "[data-testid='page-background']", count: 0
-  end
-
-  test "background image appears on property listing page" do
-    get "/en/sales"
+  test "background image appears on rentals listing page" do
+    get "/locations"
     assert_select "[data-testid='page-background']" do
       assert_select "img[src*='monaco-panorama']"
     end
   end
 
-  test "background image appears on articles page" do
+  test "background image appears on off-market page" do
+    get "/off-market"
+    assert_select "[data-testid='page-background']" do
+      assert_select "img[src*='monaco-panorama']"
+    end
+  end
+
+  test "background image appears on articles index page" do
     get "/articles"
+    assert_select "[data-testid='page-background']" do
+      assert_select "img[src*='monaco-panorama']"
+    end
+  end
+
+  test "background image appears on English sales page" do
+    get "/en/sales"
     assert_select "[data-testid='page-background']" do
       assert_select "img[src*='monaco-panorama']"
     end
@@ -286,6 +295,28 @@ class LayoutTest < ActionDispatch::IntegrationTest
   test "background image has overlay" do
     get "/ventes"
     assert_select "[data-testid='page-background'] div.bg-white\\/80"
+  end
+
+  test "homepage does not have page background image" do
+    get "/"
+    assert_select "[data-testid='page-background']", count: 0
+  end
+
+  test "article show page does not have page background image" do
+    category = Category.create!(name: { "fr" => "Test" }, slug: "test-cat")
+    article = Article.create!(title: { "fr" => "Test Article" }, body: { "fr" => "Body" }, slug: "test-article", published: true, published_at: 1.day.ago, category: category)
+    get "/articles/test-article"
+    assert_select "[data-testid='page-background']", count: 0
+  end
+
+  test "privacy page does not have page background image" do
+    get "/confidentialite"
+    assert_select "[data-testid='page-background']", count: 0
+  end
+
+  test "contact page does not have page background image" do
+    get "/contact"
+    assert_select "[data-testid='page-background']", count: 0
   end
 
   # === Helper Methods ===

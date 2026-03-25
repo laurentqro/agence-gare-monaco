@@ -35,7 +35,7 @@
     <%= render "shared/navbar", homepage: content_for?(:homepage) %>
 
     <main class="relative">
-      <% unless content_for?(:homepage) %>
+      <% if content_for?(:page_background) %>
         <div data-testid="page-background" class="fixed inset-0 z-0">
           <%= image_tag "monaco-panorama.jpg", alt: "", class: "w-full h-full object-cover", "aria-hidden": "true" %>
           <div class="absolute inset-0 bg-white/80"></div>
