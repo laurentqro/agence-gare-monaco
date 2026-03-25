@@ -5,6 +5,8 @@ class Admin::PropertyBrochuresControllerTest < ActionDispatch::IntegrationTest
     @user = User.create!(email_address: "adrien@agencegaremonaco.com", password: "securepassword123")
     post session_url, params: { email_address: "adrien@agencegaremonaco.com", password: "securepassword123" }
 
+    @district = District.create!(name: "La Condamine", city: "Monaco")
+    @building = Building.create!(name: "Stella", city: "Monaco", district: @district)
     @property = Property.create!(
       reference: "MC-BRO-001",
       title: { "fr" => "Studio Carré d'Or", "en" => "Studio Carré d'Or" },
@@ -14,7 +16,10 @@ class Admin::PropertyBrochuresControllerTest < ActionDispatch::IntegrationTest
       country: "MC",
       city: "Monaco",
       price: 1_290_000,
-      published: true
+      published: true,
+      num_rooms: 2,
+      district: @district,
+      building: @building
     )
   end
 
@@ -67,7 +72,7 @@ class Admin::PropertyBrochuresControllerTest < ActionDispatch::IntegrationTest
     post admin_property_brochure_url(@property), params: { locale: "fr" }
     assert_response :success
     assert_match /attachment/, response.headers["Content-Disposition"]
-    assert_match /MC-BRO-001/, response.headers["Content-Disposition"]
+    assert_match /2p-la-condamine-stella\.pdf/, response.headers["Content-Disposition"]
   end
 
   test "POST create with different locale generates PDF" do

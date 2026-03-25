@@ -246,6 +246,52 @@ class PropertyTest < ActiveSupport::TestCase
     assert_equal "Monaco", property.location_label
   end
 
+  test "brochure_filename with rooms district and building" do
+    property = Property.new(
+      reference: "MC-001", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", num_rooms: 2,
+      district: @district, building: @building
+    )
+    assert_equal "2p-monte-carlo-le-montaigne.pdf", property.brochure_filename
+  end
+
+  test "brochure_filename without building" do
+    property = Property.new(
+      reference: "MC-001", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", num_rooms: 3,
+      district: @district
+    )
+    assert_equal "3p-monte-carlo.pdf", property.brochure_filename
+  end
+
+  test "brochure_filename without district or building falls back to reference" do
+    property = Property.new(
+      reference: "MC-001", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", num_rooms: 2
+    )
+    assert_equal "2p-MC-001.pdf", property.brochure_filename
+  end
+
+  test "brochure_filename without rooms" do
+    property = Property.new(
+      reference: "MC-001", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco",
+      district: @district, building: @building
+    )
+    assert_equal "monte-carlo-le-montaigne.pdf", property.brochure_filename
+  end
+
+  test "brochure_filename parameterizes names" do
+    district = District.create!(name: "La Condamine", city: "Monaco")
+    building = Building.create!(name: "Résidence Stella", city: "Monaco", district: district)
+    property = Property.new(
+      reference: "MC-001", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", num_rooms: 2,
+      district: district, building: building
+    )
+    assert_equal "2p-la-condamine-residence-stella.pdf", property.brochure_filename
+  end
+
   test "scope for_rental returns rental properties" do
     Property.create!(reference: "MC-SALE", transaction_type: "sale", property_type: "apartment", country: "MC", city: "Monaco")
     Property.create!(reference: "MC-RENT", transaction_type: "rental", property_type: "apartment", country: "MC", city: "Monaco")

@@ -49,6 +49,20 @@ class Property < ApplicationRecord
     parts.any? ? parts.join(", ") : city
   end
 
+  def brochure_filename
+    parts = []
+    parts << "#{num_rooms}p" if num_rooms.present?
+    if district.present?
+      parts << district.name.parameterize
+      parts << building.name.parameterize if building.present?
+    elsif building.present?
+      parts << building.name.parameterize
+    else
+      parts << reference
+    end
+    "#{parts.join('-')}.pdf"
+  end
+
   def formatted_price
     return nil if price.blank?
     price.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1.').reverse

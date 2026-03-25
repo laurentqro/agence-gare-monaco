@@ -62,7 +62,7 @@ class PropertiesController < ApplicationController
 
     include_logo = params[:include_logo] != "0"
     pdf_bytes = PropertyPdfGenerator.new(@property, locale: locale, include_logo: include_logo).generate
-    filename = "#{@property.reference}-#{locale}.pdf"
+    filename = @property.brochure_filename
 
     send_data pdf_bytes, filename: filename, type: "application/pdf", disposition: :attachment
   end
