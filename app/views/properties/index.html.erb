@@ -1,3 +1,4 @@
+<% content_for :page_background, true %>
 <div class="max-w-7xl mx-auto px-4 py-8">
   <%# Page heading & count %>
   <% type_param = localized_filter_param(:type) %>
@@ -22,7 +23,7 @@
             </span>
             <svg class="w-4 h-4 ml-2 flex-shrink-0 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
-          <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-max min-w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-72 overflow-y-auto">
+          <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-max min-w-full bg-white border border-gray-200 rounded-lg shadow-lg">
             <% grouped_type_filter_options.each_with_index do |group, gi| %>
               <% if gi > 0 %><div class="border-t border-gray-200"></div><% end %>
               <div class="py-1">
@@ -52,7 +53,7 @@
               </span>
               <svg class="w-4 h-4 ml-2 flex-shrink-0 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
-            <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-max min-w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto py-1">
+            <div data-multiselect-filter-target="dropdown" class="hidden absolute z-10 mt-1 w-max min-w-full bg-white border border-gray-200 rounded-lg shadow-lg py-1">
               <% @districts&.each do |district| %>
                 <label class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer whitespace-nowrap">
                   <input type="checkbox" name="<%= district_param %>[]" value="<%= district.slug %>"
