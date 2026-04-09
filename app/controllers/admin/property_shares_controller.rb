@@ -4,6 +4,7 @@ module Admin
 
     def new
       @contacts = Contact.order(:last_name, :first_name)
+      @email_preview = PropertyMailer.share_property(@property, nil).body.decoded
     end
 
     def create
@@ -16,7 +17,7 @@ module Admin
 
       contacts = Contact.where(id: contact_ids)
       contacts.each do |contact|
-        PropertyMailer.share_email(@property, contact).deliver_now
+        PropertyMailer.share_property(@property, contact).deliver_now
       end
 
       redirect_to admin_contacts_url, notice: t("admin.property_shares.flash.shared", count: contacts.size)

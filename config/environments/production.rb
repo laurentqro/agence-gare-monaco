@@ -61,14 +61,15 @@ Rails.application.configure do
   # SITE_HOST env var controls both SEO URLs and mailer links (staging vs production).
   config.action_mailer.default_url_options = { host: ENV.fetch("SITE_HOST", "https://agencegaremonaco.com").delete_prefix("https://").delete_prefix("http://") }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # Brevo SMTP relay. Add smtp/server, smtp/login, smtp/password via bin/rails credentials:edit.
+  config.action_mailer.smtp_settings = {
+    address: "smtp-relay.brevo.com",
+    user_name: Rails.application.credentials.dig(:smtp, :login),
+    password: Rails.application.credentials.dig(:smtp, :password),
+    port: 587,
+    authentication: :plain,
+    enable_starttls_auto: true
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

@@ -1,11 +1,11 @@
 class PropertyMailer < ApplicationMailer
-  def share_email(property, contact)
+  def share_property(property, contact)
     @property = property
     @contact = contact
     @images = property.photos.limit(4)
 
     mail(
-      to: contact.email,
+      to: contact&.email || "preview@example.com",
       subject: "#{property.reference} — #{property.title_for(:fr)}"
     )
   end

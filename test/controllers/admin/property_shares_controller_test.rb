@@ -36,10 +36,11 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type='checkbox'][name='contact_ids[]']", 2
   end
 
-  test "GET new shows property summary" do
+  test "GET new shows email preview in iframe with property details" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_select "td", /MC-TEST-001/
+    assert_select "iframe[srcdoc]"
+    assert_includes response.body, "MC-TEST-001"
   end
 
   test "GET new lists all contacts with checkboxes" do
