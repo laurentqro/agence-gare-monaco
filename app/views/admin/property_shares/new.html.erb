@@ -1,11 +1,6 @@
 <div class="p-8">
   <h1 class="heading-page mb-6"><%= t("admin.property_shares.title") %></h1>
 
-  <div class="bg-white rounded shadow p-6 mb-6">
-    <h2 class="heading-section mb-3"><%= t("admin.property_shares.email_preview") %></h2>
-    <iframe srcdoc="<%= ERB::Util.html_escape(@email_preview) %>" style="width: 100%; min-height: 600px; border: 1px solid #e5e7eb; border-radius: 4px;" sandbox></iframe>
-  </div>
-
   <%= form_with(url: admin_property_share_path(@property), method: :post, class: "space-y-6") do |f| %>
     <div class="bg-white rounded shadow p-6">
       <h2 class="heading-section mb-3"><%= t("admin.property_shares.select_contacts") %></h2>
@@ -32,4 +27,11 @@
       <%= link_to t("admin.shared.cancel"), admin_contacts_path, class: "px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50" %>
     </div>
   <% end %>
+
+  <div class="bg-white rounded shadow p-6 mt-6">
+    <h2 class="heading-section mb-3"><%= t("admin.property_shares.email_preview") %></h2>
+    <div class="border border-gray-200 rounded p-4 bg-white" style="max-width: 640px; margin: 0 auto;">
+      <%= @email_preview.html_safe %>
+    </div>
+  </div>
 </div>
