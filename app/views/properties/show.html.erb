@@ -341,79 +341,90 @@
   </div>
 
   <%# Enquiry form %>
-  <div data-testid="enquiry-form" class="mt-12">
-    <hr class="border-gray-200 mb-8">
-    <h2 class="heading-section mb-6"><%= t("contact_form.enquiry_title") %></h2>
+  <div data-testid="enquiry-form" class="mt-16">
+    <hr class="border-gray-200 mb-12">
 
-    <div class="max-w-xl">
-      <p class="text-xs text-accent mb-4">
-        <%= t("contact_form.enquiry_reference") %>:
-        <span class="font-semibold text-dark"><%= @property.reference %></span>
-      </p>
-
-      <% enquiry = @submission || ContactSubmission.new %>
-      <% if enquiry.errors.any? %>
-        <div data-testid="form-errors" class="bg-red-50 border border-red-200 rounded p-4 mb-6">
-          <ul class="text-xs text-red-600 space-y-1">
-            <% enquiry.errors.full_messages.each do |msg| %>
-              <li><%= msg %></li>
-            <% end %>
-          </ul>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+      <%# Left rail: editorial header + reference chip %>
+      <div class="lg:col-span-4">
+        <p class="text-[11px] uppercase tracking-[0.25em] text-gold mb-3"><%= t("contact_form.enquiry_kicker", default: "Agence de la Gare") %></p>
+        <h2 class="heading-section mb-5 leading-tight"><%= t("contact_form.enquiry_title") %></h2>
+        <p class="text-sm text-accent leading-relaxed mb-6">
+          <%= t("contact_form.enquiry_intro", default: "Une question sur ce bien ? Adressez-nous votre demande, nous vous répondrons personnellement sous 24 heures.") %>
+        </p>
+        <div class="inline-flex items-baseline gap-2 border-l-2 border-gold pl-3">
+          <span class="text-[10px] uppercase tracking-[0.2em] text-accent"><%= t("contact_form.enquiry_reference") %></span>
+          <span class="text-sm font-semibold text-navy tracking-wide"><%= @property.reference %></span>
         </div>
-      <% end %>
+      </div>
 
-      <%= form_with(model: enquiry, url: contact_submissions_path, method: :post, local: true, class: "space-y-4") do |f| %>
-        <%# Honeypot field %>
-        <div style="position: absolute; left: -9999px;" aria-hidden="true">
-          <label for="website">Website</label>
-          <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+      <%# Right column: form panel %>
+      <div class="lg:col-span-8">
+        <% enquiry = @submission || ContactSubmission.new %>
+
+        <div class="relative bg-[#faf8f4] border-l-2 border-gold px-6 py-8 md:px-10 md:py-10">
+          <% if enquiry.errors.any? %>
+            <div data-testid="form-errors" class="bg-red-50 border-l-2 border-red-400 px-4 py-3 mb-6">
+              <ul class="text-xs text-red-700 space-y-1">
+                <% enquiry.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <%= form_with(model: enquiry, url: contact_submissions_path, method: :post, local: true, class: "space-y-7") do |f| %>
+            <%# Honeypot field %>
+            <div style="position: absolute; left: -9999px;" aria-hidden="true">
+              <label for="website">Website</label>
+              <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+            </div>
+
+            <%= f.hidden_field :property_id, value: @property.id %>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-7">
+              <div class="group">
+                <label for="contact_submission_name" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
+                  <%= t("contact_form.name") %> <span class="text-gold">*</span>
+                </label>
+                <%= f.text_field :name, class: "w-full bg-transparent border-0 border-b border-accent/30 text-sm text-dark px-0 py-2 focus:border-navy focus:ring-0 focus:outline-none transition-colors placeholder-accent/40", required: true %>
+              </div>
+
+              <div class="group">
+                <label for="contact_submission_email" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
+                  <%= t("contact_form.email") %> <span class="text-gold">*</span>
+                </label>
+                <%= f.email_field :email, class: "w-full bg-transparent border-0 border-b border-accent/30 text-sm text-dark px-0 py-2 focus:border-navy focus:ring-0 focus:outline-none transition-colors placeholder-accent/40", required: true %>
+              </div>
+
+              <div class="group">
+                <label for="contact_submission_phone" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
+                  <%= t("contact_form.phone") %>
+                </label>
+                <%= f.telephone_field :phone, class: "w-full bg-transparent border-0 border-b border-accent/30 text-sm text-dark px-0 py-2 focus:border-navy focus:ring-0 focus:outline-none transition-colors placeholder-accent/40" %>
+              </div>
+
+              <div class="group">
+                <label for="contact_submission_country" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
+                  <%= t("contact_form.country") %>
+                </label>
+                <%= f.text_field :country, class: "w-full bg-transparent border-0 border-b border-accent/30 text-sm text-dark px-0 py-2 focus:border-navy focus:ring-0 focus:outline-none transition-colors placeholder-accent/40" %>
+              </div>
+            </div>
+
+            <div class="group">
+              <label for="contact_submission_message" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
+                <%= t("contact_form.message") %> <span class="text-gold">*</span>
+              </label>
+              <%= f.text_area :message, rows: 4, class: "w-full bg-transparent border-0 border-b border-accent/30 text-sm text-dark px-0 py-2 focus:border-navy focus:ring-0 focus:outline-none transition-colors placeholder-accent/40 resize-none", required: true %>
+            </div>
+
+            <div class="pt-2">
+              <%= f.submit t("contact_form.send"), class: "group inline-flex items-center justify-center gap-3 bg-navy text-white text-[11px] font-semibold uppercase tracking-[0.2em] px-8 py-3.5 hover:bg-navy/90 transition-all cursor-pointer w-full sm:w-auto" %>
+            </div>
+          <% end %>
         </div>
-
-        <%= f.hidden_field :property_id, value: @property.id %>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="contact_submission_name" class="block text-xs font-medium text-dark mb-1">
-              <%= t("contact_form.name") %> *
-            </label>
-            <%= f.text_field :name, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-navy focus:outline-none", required: true %>
-          </div>
-
-          <div>
-            <label for="contact_submission_email" class="block text-xs font-medium text-dark mb-1">
-              <%= t("contact_form.email") %> *
-            </label>
-            <%= f.email_field :email, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-navy focus:outline-none", required: true %>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="contact_submission_phone" class="block text-xs font-medium text-dark mb-1">
-              <%= t("contact_form.phone") %>
-            </label>
-            <%= f.telephone_field :phone, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-navy focus:outline-none" %>
-          </div>
-
-          <div>
-            <label for="contact_submission_country" class="block text-xs font-medium text-dark mb-1">
-              <%= t("contact_form.country") %>
-            </label>
-            <%= f.text_field :country, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-navy focus:outline-none" %>
-          </div>
-        </div>
-
-        <div>
-          <label for="contact_submission_message" class="block text-xs font-medium text-dark mb-1">
-            <%= t("contact_form.message") %> *
-          </label>
-          <%= f.text_area :message, rows: 5, class: "w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-navy focus:outline-none", required: true %>
-        </div>
-
-        <div>
-          <%= f.submit t("contact_form.send"), class: "bg-white border border-navy text-navy px-6 py-2 rounded text-xs font-semibold hover:bg-gray-50 cursor-pointer" %>
-        </div>
-      <% end %>
+      </div>
     </div>
   </div>
 
