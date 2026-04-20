@@ -128,9 +128,11 @@ class PropertyPdfGenerator
     image_data = fetch_image(cover.large_url || cover.remote_url)
     return "" unless image_data
 
-    @dependencies["hero.jpg"] = image_data
+    ext = image_extension(image_data)
+    key = "hero.#{ext}"
+    @dependencies[key] = image_data
     <<~TYPST
-      #image("hero.jpg", width: 100%)
+      #image("#{key}", width: 100%)
       #v(6pt)
     TYPST
   rescue StandardError
@@ -254,7 +256,8 @@ class PropertyPdfGenerator
           image_data = fetch_image(img.large_url || img.remote_url)
           next unless image_data
 
-          key = "gallery_#{page_idx}_#{i}.jpg"
+          ext = image_extension(image_data)
+          key = "gallery_#{page_idx}_#{i}.#{ext}"
           @dependencies[key] = image_data
           <<~TYPST
             #align(center)[
@@ -340,6 +343,19 @@ class PropertyPdfGenerator
     URI.parse(url).open.read.force_encoding("UTF-8")
   rescue StandardError
     nil
+  end
+
+  # Typst picks its image decoder from the filename extension, so bytes and
+  # extension have to agree even when the URL lies (e.g. a .jpg that actually
+  # serves PNG bytes). Sniffs the magic number, falling back to jpg.
+  def image_extension(bytes)
+    return "jpg" if bytes.nil? || bytes.bytesize < 4
+
+    head = bytes.byteslice(0, 8).b
+    return "png"  if head.start_with?("\x89PNG".b)
+    return "gif"  if head.start_with?("GIF87a".b) || head.start_with?("GIF89a".b)
+    return "webp" if head.byteslice(0, 4) == "RIFF".b && bytes.byteslice(8, 4) == "WEBP".b
+    "jpg"
   end
 
   def add_dependency(name, path)

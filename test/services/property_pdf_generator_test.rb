@@ -160,6 +160,18 @@ class PropertyPdfGeneratorTest < ActiveSupport::TestCase
     assert pdf_bytes.start_with?("%PDF")
   end
 
+  test "handles image URL that is labeled .jpg but actually serves PNG bytes" do
+    # 1×1 white PNG (valid CRC)
+    png_bytes = [ "89504e470d0a1a0a0000000d49484452000000010000000108000000003a7e9b550000000a49444154789c63fa0f0001050102cfa02ecd0000000049454e44ae426082" ].pack("H*")
+    stub_request(:get, "https://example.com/fake.jpg")
+      .to_return(status: 200, body: png_bytes, headers: { "Content-Type" => "image/png" })
+
+    @property.property_images.create!(remote_url: "https://example.com/fake.jpg", position: 1)
+
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr).generate
+    assert pdf_bytes.start_with?("%PDF")
+  end
+
   test "includes district name in details" do
     pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr).generate
     text = extract_text(pdf_bytes)
