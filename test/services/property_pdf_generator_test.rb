@@ -160,6 +160,14 @@ class PropertyPdfGeneratorTest < ActiveSupport::TestCase
     assert pdf_bytes.start_with?("%PDF")
   end
 
+  test "header contact line does not render literal backslashes as separators" do
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr, include_logo: true).generate
+    text = extract_text(pdf_bytes)
+    # Typst line-break is `\` — it must be interpreted, not printed literally.
+    refute_includes text, "Monaco \\ (+377)",
+      "contact line rendered with literal backslashes instead of line breaks"
+  end
+
   test "handles image URL that is labeled .jpg but actually serves PNG bytes" do
     # 1×1 white PNG (valid CRC)
     png_bytes = [ "89504e470d0a1a0a0000000d49484452000000010000000108000000003a7e9b550000000a49444154789c63fa0f0001050102cfa02ecd0000000049454e44ae426082" ].pack("H*")

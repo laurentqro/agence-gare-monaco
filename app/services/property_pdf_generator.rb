@@ -84,7 +84,7 @@ class PropertyPdfGenerator
             column-gutter: 8pt,
             #{logo_header_markup}
             [
-              #{escape(t("pdf_brochure.contact_address"))} \\\\ #{escape(t("pdf_brochure.contact_city"))} \\\\ #{escape(t("pdf_brochure.contact_phone"))} \\\\ #{escape(t("pdf_brochure.contact_email"))} \\\\ #{escape(t("pdf_brochure.contact_website"))}
+              #{escape(t("pdf_brochure.contact_address"))} \\ #{escape(t("pdf_brochure.contact_city"))} \\ #{escape(t("pdf_brochure.contact_phone"))} \\ #{escape(t("pdf_brochure.contact_email"))} \\ #{escape(t("pdf_brochure.contact_website"))}
             ],
             #{qr_code_markup}
           )
