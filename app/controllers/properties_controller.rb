@@ -59,12 +59,10 @@ class PropertiesController < ApplicationController
   def pdf
     @property = Property.published.includes(:district, :building, :property_images).find(params[:id])
     locale = params[:locale]&.to_sym || I18n.locale
-
     include_logo = params[:include_logo] != "0"
-    pdf_bytes = PropertyPdfGenerator.new(@property, locale: locale, include_logo: include_logo).generate
-    filename = @property.brochure_filename
 
-    send_data pdf_bytes, filename: filename, type: "application/pdf", disposition: :attachment
+    pdf_bytes = PropertyBrochureCache.fetch(@property, locale: locale, include_logo: include_logo)
+    send_data pdf_bytes, filename: @property.brochure_filename, type: "application/pdf", disposition: :attachment
   end
 
   private

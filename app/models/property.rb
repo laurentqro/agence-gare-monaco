@@ -1,9 +1,16 @@
 class Property < ApplicationRecord
+  BROCHURE_TRIGGER_COLUMNS = %w[
+    title description price num_rooms living_area reference transaction_type
+    property_type country city district_id building_id off_market published
+    video_url virtual_tour_url
+  ].freeze
+
   belongs_to :district, optional: true
   belongs_to :building, optional: true
   has_many :property_images, dependent: :destroy
   has_many :property_documents, dependent: :destroy
   has_many :contact_submissions, dependent: :nullify
+  has_many_attached :brochures
 
   validates :reference, presence: true, uniqueness: true
   validates :transaction_type, presence: true, inclusion: { in: %w[sale rental] }
@@ -11,6 +18,8 @@ class Property < ApplicationRecord
   validates :country, presence: true
   validates :city, presence: true
   validates :immotoolbox_id, uniqueness: true, allow_nil: true
+
+  after_commit :enqueue_brochure_generation, on: [ :create, :update ], if: :brochure_regeneration_needed?
 
   scope :published, -> { where(published: true) }
   scope :publicly_visible, -> { published.where(off_market: false) }
@@ -66,5 +75,22 @@ class Property < ApplicationRecord
   def formatted_price
     return nil if price.blank?
     price.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1.').reverse
+  end
+
+  def cached_brochure(locale:, include_logo:)
+    brochures.find do |attachment|
+      meta = attachment.blob.metadata
+      meta["locale"].to_s == locale.to_s && meta["include_logo"] == include_logo
+    end
+  end
+
+  private
+
+  def brochure_regeneration_needed?
+    (saved_changes.keys & BROCHURE_TRIGGER_COLUMNS).any?
+  end
+
+  def enqueue_brochure_generation
+    PropertyBrochureGenerationJob.perform_later(id)
   end
 end
