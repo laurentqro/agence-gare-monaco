@@ -75,6 +75,5 @@ module Admin
         description: [ "fr" ]
       )
     end
-
   end
 end

@@ -31,7 +31,7 @@ class PropertyTranslationJobTest < ActiveJob::TestCase
     PropertyTranslator.singleton_class.alias_method(:new_original, :new)
     PropertyTranslator.singleton_class.define_method(:new) do |property|
       received = property
-      Object.new.tap { |o| o.define_singleton_method(:translate!) {} }
+      Object.new.tap { |o| o.define_singleton_method(:translate!) { } }
     end
     begin
       PropertyTranslationJob.perform_now(@property.id)
