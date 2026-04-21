@@ -121,6 +121,31 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     end
   end
 
+  test "BlankTranslation does not update translation_source_hash, so the next retry still runs" do
+    @property.update_columns(translation_source_hash: nil)
+    with_stubbed_chat(content: canned_response.merge("description_sv" => "")) do
+      assert_raises(PropertyTranslator::BlankTranslation) do
+        PropertyTranslator.new(@property).translate!
+      end
+    end
+    @property.reload
+    assert_nil @property.translation_source_hash, "hash should stay unset after a failed translation"
+  end
+
+  test "BlankTranslation does not overwrite existing locales" do
+    @property.update_columns(
+      title: { "fr" => @property.title["fr"], "de" => "Alter deutscher Titel" }
+    )
+    with_stubbed_chat(content: canned_response.merge("title_de" => "")) do
+      assert_raises(PropertyTranslator::BlankTranslation) do
+        PropertyTranslator.new(@property).translate!
+      end
+    end
+    @property.reload
+    assert_equal "Alter deutscher Titel", @property.title["de"],
+                 "previous translation should be preserved on failure"
+  end
+
   test "empty FR description preserves existing descriptions and still translates titles" do
     @property.update_columns(
       description: { "fr" => "", "en" => "existing en description" }
