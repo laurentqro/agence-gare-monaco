@@ -1,11 +1,15 @@
 module Admin
   class PropertiesController < BaseController
-    before_action :set_property, only: %i[edit update destroy]
+    before_action :set_property, only: %i[show edit update destroy]
+    before_action :block_synced_edits!, only: %i[edit update destroy]
     before_action :set_form_data, only: %i[new create edit update]
 
     def index
       @properties = Property.includes(:district, :building).order(created_at: :desc)
       @properties = @properties.where(off_market: true) if params[:filter] == "off_market"
+    end
+
+    def show
     end
 
     def new
@@ -14,7 +18,9 @@ module Admin
 
     def create
       @property = Property.new(property_params)
+      @property.off_market = true
       if @property.save
+        enqueue_post_save_jobs(@property)
         redirect_to admin_properties_url, notice: t("admin.properties.flash.created")
       else
         render :new, status: :unprocessable_entity
@@ -26,8 +32,9 @@ module Admin
 
     def update
       @property.assign_attributes(property_params)
-      mark_manually_edited if @property.immotoolbox_id.present?
+      @property.off_market = true
       if @property.save
+        enqueue_post_save_jobs(@property)
         redirect_to admin_properties_url, notice: t("admin.properties.flash.updated")
       else
         render :edit, status: :unprocessable_entity
@@ -45,6 +52,10 @@ module Admin
       @property = Property.find(params[:id])
     end
 
+    def block_synced_edits!
+      raise ActionController::RoutingError, "Synced properties are read-only" if @property.immotoolbox_id.present?
+    end
+
     def set_form_data
       @districts = District.order(:name)
       @buildings = Building.order(:name)
@@ -58,15 +69,20 @@ module Admin
         :latitude, :longitude, :floor,
         :num_rooms, :num_bedrooms, :num_bathrooms, :num_parkings, :num_cellars,
         :living_area, :total_area, :terrace_area, :land_area, :garden_area,
-        :furnished, :published, :off_market, :featured, :exclusivity, :shared_exclusivity,
+        :furnished, :published, :featured, :exclusivity, :shared_exclusivity,
         :video_url, :virtual_tour_url, :has_360_tour,
-        title: I18n.available_locales.map(&:to_s),
-        description: I18n.available_locales.map(&:to_s)
+        title: [ "fr" ],
+        description: [ "fr" ]
       )
     end
 
-    def mark_manually_edited
-      @property.manually_edited = true
+    def enqueue_post_save_jobs(property)
+      text_changed = property.saved_changes.keys.intersect?(%w[title description])
+      if text_changed
+        PropertyTranslationJob.perform_later(property.id)
+      elsif property.saved_changes.keys.intersect?(Property::BROCHURE_TRIGGER_COLUMNS)
+        PropertyBrochureGenerationJob.perform_later(property.id)
+      end
     end
   end
 end
