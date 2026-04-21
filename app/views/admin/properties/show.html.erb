@@ -1,0 +1,61 @@
+<div class="p-8 max-w-4xl">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="heading-page"><%= @property.title_for(:fr).presence || @property.reference %></h1>
+    <%= link_to t("admin.shared.back"), admin_properties_path, class: "text-accent hover:underline" %>
+  </div>
+
+  <% if @property.immotoolbox_id.present? %>
+    <div class="mb-6 p-3 bg-blue-50 rounded text-sm text-blue-700">
+      <%= t("admin.properties.form.synced_from", id: @property.immotoolbox_id) %>
+    </div>
+  <% end %>
+
+  <div class="bg-white rounded shadow p-6 space-y-4">
+    <div>
+      <div class="text-xs uppercase text-gray-500 mb-1"><%= t("admin.properties.table.reference") %></div>
+      <div class="font-mono"><%= @property.reference %></div>
+    </div>
+
+    <div>
+      <div class="text-xs uppercase text-gray-500 mb-1"><%= t("admin.properties.show.title_fr") %></div>
+      <div><%= @property.title_for(:fr) %></div>
+    </div>
+
+    <div>
+      <div class="text-xs uppercase text-gray-500 mb-1"><%= t("admin.properties.show.description_fr") %></div>
+      <div class="whitespace-pre-wrap"><%= @property.description_for(:fr) %></div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <div class="text-xs uppercase text-gray-500 mb-1"><%= t("admin.properties.table.type") %></div>
+        <div class="capitalize"><%= @property.transaction_type %> · <%= @property.property_type %></div>
+      </div>
+      <div>
+        <div class="text-xs uppercase text-gray-500 mb-1"><%= t("admin.properties.table.price") %></div>
+        <div><%= @property.formatted_price ? "#{@property.formatted_price} €" : "—" %></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded shadow p-6 mt-6">
+    <h2 class="text-lg font-medium mb-4"><%= t("admin.properties.show.translations_title") %></h2>
+    <table class="w-full text-sm">
+      <tbody class="divide-y divide-gray-100">
+        <% %w[en it de sv no da fi ru].each do |locale| %>
+          <tr>
+            <td class="py-2 pr-4 font-medium uppercase w-16"><%= locale %></td>
+            <td class="py-2 pr-4"><%= @property.title_for(locale).presence || "—" %></td>
+            <td class="py-2 text-gray-500 text-xs whitespace-nowrap">
+              <% if (at = @property.translated_at_for(locale)) %>
+                <%= l(at.to_time, format: :short) %>
+              <% else %>
+                <%= t("admin.properties.show.not_translated") %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
