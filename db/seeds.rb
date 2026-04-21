@@ -174,7 +174,7 @@ end
     country: "monaco",
     city: "Monaco",
     off_market: true,
-    published: true,
+    published: true
   },
   {
     reference: "AG00015",

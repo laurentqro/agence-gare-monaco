@@ -317,7 +317,6 @@ class PropertyTest < ActiveSupport::TestCase
     )
     assert_nil property.translated_at_for(:de)
   end
-
 end
 
 class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase
