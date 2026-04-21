@@ -205,11 +205,6 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <%= f.check_box :off_market, class: "rounded border-gray-300 text-navy focus:ring-navy" %>
-          <label class="text-sm font-medium text-gray-700"><%= t("admin.properties.form.off_market") %></label>
-        </div>
-
-        <div class="flex items-center gap-2">
           <%= f.check_box :exclusivity, class: "rounded border-gray-300 text-navy focus:ring-navy" %>
           <label class="text-sm font-medium text-gray-700"><%= t("admin.properties.form.exclusivity") %></label>
         </div>
@@ -233,9 +228,6 @@
         <% if property.immotoolbox_id.present? %>
           <div class="mt-4 p-3 bg-blue-50 rounded text-sm text-blue-700">
             <%= t("admin.properties.form.synced_from", id: property.immotoolbox_id) %>
-            <% if property.manually_edited? %>
-              <br><span class="font-medium"><%= t("admin.properties.form.manually_edited") %></span>
-            <% end %>
           </div>
         <% end %>
       </div>

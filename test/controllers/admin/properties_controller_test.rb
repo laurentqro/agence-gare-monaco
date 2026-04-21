@@ -203,6 +203,18 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert prop.featured
   end
 
+  test "GET show on synced property renders read-only view with translation timestamps" do
+    prop = create_property(
+      reference: "MC-SYNC-001", immotoolbox_id: 42,
+      title: { "fr" => "Synced title", "de" => "Deutscher Titel" },
+      translations_status: { "de" => { "translated_at" => "2026-04-20T10:00:00Z" } }
+    )
+    get admin_property_url(prop)
+    assert_response :success
+    assert_select "a", text: /Modifier/, count: 0
+    assert_select "td", /Deutscher Titel/
+  end
+
   test "GET edit on synced property returns 404" do
     prop = create_property(reference: "MC-001", immotoolbox_id: 12345)
     get edit_admin_property_url(prop)
