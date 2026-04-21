@@ -70,23 +70,27 @@ class ImmotoolboxSync
     api_properties = @client.fetch_all_properties
     synced_ids = []
 
+    district_ids = api_properties.map { |d| d.dig("district", "id") }.compact.uniq
+    building_ids = api_properties.map { |d| d["building_id"] }.compact.uniq
+    districts_by_id = District.where(immotoolbox_id: district_ids).index_by(&:immotoolbox_id)
+    buildings_by_id = Building.where(immotoolbox_id: building_ids).index_by(&:immotoolbox_id)
+
     api_properties.each do |data|
       property = Property.find_or_initialize_by(immotoolbox_id: data["id"])
       is_new = property.new_record?
 
       # Only ingest French text from Immotoolbox — English arrives inconsistent
       # in quality. All 8 non-FR locales are machine-translated from FR.
-      title = property.title.is_a?(Hash) ? property.title.dup : {}
-      description = property.description.is_a?(Hash) ? property.description.dup : {}
+      title = (property.title || {}).dup
+      description = (property.description || {}).dup
       fr_texts = data.dig("texts", "fr")
       if fr_texts.is_a?(Hash)
         title["fr"] = sanitize_html(fr_texts["title"]) if fr_texts["title"].present?
         description["fr"] = sanitize_html(fr_texts["description"]) if fr_texts["description"].present?
       end
 
-      # Resolve district and building
-      district = District.find_by(immotoolbox_id: data.dig("district", "id")) if data["district"]
-      building = Building.find_by(immotoolbox_id: data["building_id"]) if data["building_id"]
+      district = districts_by_id[data.dig("district", "id")]
+      building = buildings_by_id[data["building_id"]]
 
       property.assign_attributes(
         reference: data["reference"],
@@ -139,11 +143,10 @@ class ImmotoolboxSync
     end
 
     # Unpublish synced properties that are no longer in the API response
-    stale_properties = Property.where.not(immotoolbox_id: nil)
-                               .where.not(immotoolbox_id: synced_ids)
-                               .where(published: true)
-    stale_properties.update_all(published: false)
-    stats[:unpublished] = stale_properties.count
+    stats[:unpublished] = Property.where.not(immotoolbox_id: nil)
+                                  .where.not(immotoolbox_id: synced_ids)
+                                  .where(published: true)
+                                  .update_all(published: false)
 
     stats
   end

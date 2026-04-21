@@ -1,6 +1,10 @@
 class PropertyTranslator
   DEFAULT_MODEL = "claude-sonnet-4-6".freeze
-  LOCALES = %w[en it de sv no da fi ru].freeze
+
+  # The 8 locales the translator fills from French. Derived from the app's
+  # configured locale list so adding a locale in config/application.rb is a
+  # one-place change.
+  LOCALES = (I18n.available_locales.map(&:to_s) - [ "fr" ]).freeze
 
   def self.model
     Rails.configuration.x.translator_model.presence || DEFAULT_MODEL
@@ -13,11 +17,11 @@ class PropertyTranslator
   end
 
   def translate!
-    fr_title = fr("title")
-    fr_description = fr("description")
-    hash = content_hash(fr_title, fr_description)
+    fr_title = @property.title_for(:fr)
+    fr_description = @property.description_for(:fr)
+    new_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_description}")
     expected_hash = @property.translation_source_hash
-    return if hash == expected_hash
+    return if new_hash == expected_hash
 
     builder = PromptBuilder.new(@property)
     chat = RubyLLM.chat(model: self.class.model)
@@ -28,8 +32,7 @@ class PropertyTranslator
     log_usage(response)
 
     translations = parse(response.content, fr_description)
-    applied = apply_translations!(translations, hash, expected_hash)
-    return unless applied
+    return unless apply_translations!(translations, new_hash, expected_hash)
 
     PropertyBrochureGenerationJob.perform_later(@property.id)
   end
@@ -37,18 +40,10 @@ class PropertyTranslator
   private
 
   def log_usage(response)
-    input = response.respond_to?(:input_tokens) ? response.input_tokens : nil
-    output = response.respond_to?(:output_tokens) ? response.output_tokens : nil
-    Rails.logger.info("[PropertyTranslator] property=#{@property.id} model=#{self.class.model} in=#{input} out=#{output}")
-  end
-
-  def fr(field)
-    value = @property.public_send(field)
-    value.is_a?(Hash) ? value["fr"].to_s : ""
-  end
-
-  def content_hash(title, description)
-    Digest::SHA256.hexdigest("#{title}\n#{description}")
+    Rails.logger.info(
+      "[PropertyTranslator] property=#{@property.id} model=#{self.class.model} " \
+      "in=#{response.input_tokens} out=#{response.output_tokens}"
+    )
   end
 
   def parse(content, fr_description)
@@ -71,17 +66,12 @@ class PropertyTranslator
     parsed
   end
 
-  # Guarded write: only applies translations if translation_source_hash is
-  # still what we read at the start. If a concurrent worker beat us to it,
-  # their result stands — our response is stale by definition.
-  # Returns true if the row was updated, false if another worker raced ahead.
-  def apply_translations!(translations, hash, expected_hash)
-    current = Property.where(id: @property.id).limit(1).pluck(:title, :description, :translations_status).first
-    return false unless current # row vanished
-
-    title = current[0].is_a?(Hash) ? current[0].dup : {}
-    description = current[1].is_a?(Hash) ? current[1].dup : {}
-    status = current[2].is_a?(Hash) ? current[2].dup : {}
+  # Returns true if the row was updated, false if a concurrent worker raced
+  # ahead (its translations stay; ours are stale by definition).
+  def apply_translations!(translations, new_hash, expected_hash)
+    title = (@property.title || {}).dup
+    description = (@property.description || {}).dup
+    status = (@property.translations_status || {}).dup
     timestamp = Time.current.iso8601
 
     translations.each do |locale, fields|
@@ -94,7 +84,7 @@ class PropertyTranslator
       title: title,
       description: description,
       translations_status: status,
-      translation_source_hash: hash,
+      translation_source_hash: new_hash,
       updated_at: Time.current
     )
     rows.positive?
