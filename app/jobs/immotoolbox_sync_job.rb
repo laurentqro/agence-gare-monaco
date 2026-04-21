@@ -16,6 +16,6 @@ class ImmotoolboxSyncJob < ApplicationJob
     Rails.logger.info("[ImmotoolboxSyncJob] Immotoolbox sync complete:")
     Rails.logger.info("  Districts — created: #{result[:districts][:created]}, updated: #{result[:districts][:updated]}")
     Rails.logger.info("  Buildings — created: #{result[:buildings][:created]}, updated: #{result[:buildings][:updated]}")
-    Rails.logger.info("  Properties — created: #{result[:properties][:created]}, updated: #{result[:properties][:updated]}, unpublished: #{result[:properties][:unpublished]}, skipped: #{result[:properties][:skipped]}")
+    Rails.logger.info("  Properties — created: #{result[:properties][:created]}, updated: #{result[:properties][:updated]}, unpublished: #{result[:properties][:unpublished]}")
   end
 end
