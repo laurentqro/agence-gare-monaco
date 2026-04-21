@@ -354,6 +354,15 @@ class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase
     assert_empty enqueued_jobs
   end
 
+  test "touch does not enqueue jobs via any callback (regression guard)" do
+    # Touch-only writes (e.g. belongs_to :touch, sitemap lastmod bumps) must
+    # not fan out into LLM calls or brochure regen. Callers enqueue jobs
+    # explicitly via enqueue_post_save_jobs! instead of via after_commit.
+    assert_no_enqueued_jobs do
+      @property.touch
+    end
+  end
+
   test "enqueues translation when hash is nil even if FR text did not just change" do
     @property.update_columns(translation_source_hash: nil)
     @property.update!(price: 2_000_000)

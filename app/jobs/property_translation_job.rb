@@ -33,6 +33,8 @@ class PropertyTranslationJob < ApplicationJob
       "message" => error.message.to_s[0, 500],
       "failed_at" => Time.current.iso8601
     }
+    # update_columns bypasses callbacks on purpose: we're on the failure path
+    # and must not re-trigger enqueue_post_save_jobs! and another translation.
     @property.update_columns(translations_status: status)
   end
 end
