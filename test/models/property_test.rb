@@ -317,4 +317,40 @@ class PropertyTest < ActiveSupport::TestCase
     )
     assert_nil property.translated_at_for(:de)
   end
+
+end
+
+class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase
+  include ActiveJob::TestHelper
+
+  setup do
+    @property = Property.create!(
+      reference: "MC-PSJ-001", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco",
+      title: { "fr" => "Titre" }, description: { "fr" => "Description" }
+    )
+    clear_enqueued_jobs
+  end
+
+  test "enqueues translation job when FR text just changed" do
+    @property.update!(title: { "fr" => "Nouveau titre" })
+    assert_enqueued_with(job: PropertyTranslationJob, args: [ @property.id ]) do
+      @property.enqueue_post_save_jobs!
+    end
+  end
+
+  test "enqueues brochure job when only non-text trigger columns just changed" do
+    @property.update!(price: 2_000_000)
+    @property.enqueue_post_save_jobs!
+    brochure_jobs = enqueued_jobs.select { |j| j[:job] == PropertyBrochureGenerationJob }
+    translation_jobs = enqueued_jobs.select { |j| j[:job] == PropertyTranslationJob }
+    assert_empty translation_jobs
+    refute_empty brochure_jobs
+  end
+
+  test "no jobs when nothing trigger-worthy changed" do
+    @property.update!(subtype: "penthouse")
+    @property.enqueue_post_save_jobs!
+    assert_empty enqueued_jobs
+  end
 end

@@ -20,7 +20,7 @@ module Admin
       @property = Property.new(property_params)
       @property.off_market = true
       if @property.save
-        enqueue_post_save_jobs(@property)
+        @property.enqueue_post_save_jobs!
         redirect_to admin_properties_url, notice: t("admin.properties.flash.created")
       else
         render :new, status: :unprocessable_entity
@@ -34,7 +34,7 @@ module Admin
       @property.assign_attributes(property_params)
       @property.off_market = true
       if @property.save
-        enqueue_post_save_jobs(@property)
+        @property.enqueue_post_save_jobs!
         redirect_to admin_properties_url, notice: t("admin.properties.flash.updated")
       else
         render :edit, status: :unprocessable_entity
@@ -76,13 +76,5 @@ module Admin
       )
     end
 
-    def enqueue_post_save_jobs(property)
-      text_changed = property.saved_changes.keys.intersect?(%w[title description])
-      if text_changed
-        PropertyTranslationJob.perform_later(property.id)
-      elsif property.saved_changes.keys.intersect?(Property::BROCHURE_TRIGGER_COLUMNS)
-        PropertyBrochureGenerationJob.perform_later(property.id)
-      end
-    end
   end
 end
