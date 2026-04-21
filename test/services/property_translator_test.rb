@@ -132,6 +132,28 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     assert_nil @property.translation_source_hash, "hash should stay unset after a failed translation"
   end
 
+  test "does not overwrite when another job updated the hash between load and write" do
+    original_hash = Digest::SHA256.hexdigest("#{@property.title['fr']}\n#{@property.description['fr']}")
+    @property.update_columns(translation_source_hash: "stale-from-old-load")
+    translator = PropertyTranslator.new(@property)
+
+    # Simulate a faster concurrent worker that finished first: it updated the
+    # DB with the current canonical hash and a fresh batch of translations.
+    Property.where(id: @property.id).update_all(
+      translation_source_hash: original_hash,
+      title: { "fr" => @property.title["fr"], "en" => "From faster worker" }
+    )
+
+    with_stubbed_chat(content: canned_response) do
+      translator.translate!
+    end
+
+    @property.reload
+    assert_equal "From faster worker", @property.title["en"],
+                 "slower job must not overwrite the faster job's result"
+    assert_equal original_hash, @property.translation_source_hash
+  end
+
   test "BlankTranslation does not overwrite existing locales" do
     @property.update_columns(
       title: { "fr" => @property.title["fr"], "de" => "Alter deutscher Titel" }

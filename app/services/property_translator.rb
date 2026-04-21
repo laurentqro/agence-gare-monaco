@@ -12,7 +12,8 @@ class PropertyTranslator
     fr_title = fr("title")
     fr_description = fr("description")
     hash = content_hash(fr_title, fr_description)
-    return if hash == @property.translation_source_hash
+    expected_hash = @property.translation_source_hash
+    return if hash == expected_hash
 
     builder = PromptBuilder.new(@property)
     chat = RubyLLM.chat(model: MODEL)
@@ -23,7 +24,8 @@ class PropertyTranslator
     log_usage(response)
 
     translations = parse(response.content, fr_description)
-    apply_translations!(translations, hash)
+    applied = apply_translations!(translations, hash, expected_hash)
+    return unless applied
 
     PropertyBrochureGenerationJob.perform_later(@property.id)
   end
@@ -65,10 +67,17 @@ class PropertyTranslator
     parsed
   end
 
-  def apply_translations!(translations, hash)
-    title = (@property.title.is_a?(Hash) ? @property.title.dup : {})
-    description = (@property.description.is_a?(Hash) ? @property.description.dup : {})
-    status = (@property.translations_status.is_a?(Hash) ? @property.translations_status.dup : {})
+  # Guarded write: only applies translations if translation_source_hash is
+  # still what we read at the start. If a concurrent worker beat us to it,
+  # their result stands — our response is stale by definition.
+  # Returns true if the row was updated, false if another worker raced ahead.
+  def apply_translations!(translations, hash, expected_hash)
+    current = Property.where(id: @property.id).limit(1).pluck(:title, :description, :translations_status).first
+    return false unless current # row vanished
+
+    title = current[0].is_a?(Hash) ? current[0].dup : {}
+    description = current[1].is_a?(Hash) ? current[1].dup : {}
+    status = current[2].is_a?(Hash) ? current[2].dup : {}
     timestamp = Time.current.iso8601
 
     translations.each do |locale, fields|
@@ -77,12 +86,13 @@ class PropertyTranslator
       status[locale] = { "translated_at" => timestamp }
     end
 
-    @property.update_columns(
+    rows = Property.where(id: @property.id, translation_source_hash: expected_hash).update_all(
       title: title,
       description: description,
       translations_status: status,
       translation_source_hash: hash,
       updated_at: Time.current
     )
+    rows.positive?
   end
 end
