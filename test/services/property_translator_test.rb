@@ -64,6 +64,18 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     called
   end
 
+  test "bumps updated_at so downstream caches and sitemap lastmod notice the change" do
+    @property.update_columns(updated_at: 2.days.ago)
+    original = @property.updated_at
+
+    with_stubbed_chat(content: canned_response) do
+      PropertyTranslator.new(@property).translate!
+    end
+
+    @property.reload
+    assert_operator @property.updated_at, :>, original
+  end
+
   test "populates 8 non-FR locales, preserves FR, updates hash and status, enqueues brochure job" do
     with_stubbed_chat(content: canned_response) do
       assert_enqueued_with(job: PropertyBrochureGenerationJob, args: [ @property.id ]) do
