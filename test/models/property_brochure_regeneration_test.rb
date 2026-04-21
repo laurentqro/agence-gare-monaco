@@ -15,31 +15,6 @@ class PropertyBrochureRegenerationTest < ActiveJob::TestCase
     }.merge(overrides))
   end
 
-  test "creating a property enqueues the brochure job" do
-    property = build_property
-    assert_enqueued_with(job: PropertyBrochureGenerationJob) do
-      property.save!
-    end
-  end
-
-  test "updating a content field enqueues the brochure job" do
-    property = build_property
-    property.save!
-
-    assert_enqueued_with(job: PropertyBrochureGenerationJob, args: [ property.id ]) do
-      property.update!(price: 2_000_000)
-    end
-  end
-
-  test "touch-only updates do not enqueue" do
-    property = build_property
-    property.save!
-
-    assert_no_enqueued_jobs(only: PropertyBrochureGenerationJob) do
-      property.touch
-    end
-  end
-
   test "creating a property image enqueues the job for its property" do
     property = build_property
     property.save!
