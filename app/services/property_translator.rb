@@ -20,6 +20,8 @@ class PropertyTranslator
       .with_schema(Schema)
     response = chat.ask(builder.user_prompt)
 
+    log_usage(response)
+
     translations = parse(response.content, fr_description)
     apply_translations!(translations, hash)
 
@@ -27,6 +29,12 @@ class PropertyTranslator
   end
 
   private
+
+  def log_usage(response)
+    input = response.respond_to?(:input_tokens) ? response.input_tokens : nil
+    output = response.respond_to?(:output_tokens) ? response.output_tokens : nil
+    Rails.logger.info("[PropertyTranslator] property=#{@property.id} model=#{MODEL} in=#{input} out=#{output}")
+  end
 
   def fr(field)
     value = @property.public_send(field)
