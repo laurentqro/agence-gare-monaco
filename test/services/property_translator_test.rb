@@ -44,30 +44,16 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     end
   end
 
-  def with_stubbed_chat(content:)
+  def with_stubbed_chat(content:, &block)
     fake = FakeChat.new(content)
     call_count = 0
-    RubyLLM.singleton_class.alias_method(:chat_original, :chat)
-    RubyLLM.singleton_class.define_method(:chat) { |**_kwargs| call_count += 1; fake }
-    begin
-      yield
-    ensure
-      RubyLLM.singleton_class.alias_method(:chat, :chat_original)
-      RubyLLM.singleton_class.remove_method(:chat_original)
-    end
+    SingletonStub.with(RubyLLM, :chat, ->(**_kwargs) { call_count += 1; fake }, &block)
     call_count
   end
 
   def with_failing_chat(&block)
     called = false
-    RubyLLM.singleton_class.alias_method(:chat_original, :chat)
-    RubyLLM.singleton_class.define_method(:chat) { |**_kwargs| called = true; raise "should not be called" }
-    begin
-      block.call
-    ensure
-      RubyLLM.singleton_class.alias_method(:chat, :chat_original)
-      RubyLLM.singleton_class.remove_method(:chat_original)
-    end
+    SingletonStub.with(RubyLLM, :chat, ->(**_kwargs) { called = true; raise "should not be called" }, &block)
     called
   end
 
@@ -265,32 +251,20 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
 
   test "uses the model configured on Rails.configuration" do
     received_model = nil
-    RubyLLM.singleton_class.alias_method(:chat_original, :chat)
-    RubyLLM.singleton_class.define_method(:chat) do |**kwargs|
+    fake = FakeChat.new(canned_response)
+    chat_builder = ->(**kwargs) {
       received_model = kwargs[:model]
-      # Return a chat that's no-op enough to reach application
-      chat = Object.new
-      chat.define_singleton_method(:with_instructions) { |_| chat }
-      chat.define_singleton_method(:with_schema) { |_| chat }
-      fields = {}
-      %w[en it de sv no da fi ru].each do |locale|
-        fields["title_#{locale}"] = "Title #{locale}"
-        fields["description_#{locale}"] = "Desc #{locale}"
-      end
-      chat.define_singleton_method(:ask) { |_|
-        Struct.new(:content, :input_tokens, :output_tokens).new(fields, 1, 1)
-      }
-      chat
-    end
+      fake
+    }
 
     previous = Rails.configuration.x.translator_model
     Rails.configuration.x.translator_model = "claude-haiku-4-5"
     begin
-      PropertyTranslator.new(@property).translate!
+      SingletonStub.with(RubyLLM, :chat, chat_builder) do
+        PropertyTranslator.new(@property).translate!
+      end
     ensure
       Rails.configuration.x.translator_model = previous
-      RubyLLM.singleton_class.alias_method(:chat, :chat_original)
-      RubyLLM.singleton_class.remove_method(:chat_original)
     end
 
     assert_equal "claude-haiku-4-5", received_model

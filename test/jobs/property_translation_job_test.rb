@@ -28,16 +28,12 @@ class PropertyTranslationJobTest < ActiveJob::TestCase
 
   test "invokes PropertyTranslator#translate! with the property" do
     received = nil
-    PropertyTranslator.singleton_class.alias_method(:new_original, :new)
-    PropertyTranslator.singleton_class.define_method(:new) do |property|
+    fake_new = ->(property) {
       received = property
       Object.new.tap { |o| o.define_singleton_method(:translate!) { } }
-    end
-    begin
+    }
+    SingletonStub.with(PropertyTranslator, :new, fake_new) do
       PropertyTranslationJob.perform_now(@property.id)
-    ensure
-      PropertyTranslator.singleton_class.alias_method(:new, :new_original)
-      PropertyTranslator.singleton_class.remove_method(:new_original)
     end
     assert_equal @property.id, received.id
   end
@@ -67,16 +63,15 @@ class PropertyTranslationJobTest < ActiveJob::TestCase
   end
 
   test "records failure metadata on the property when a permanent error discards the job" do
-    PropertyTranslator.singleton_class.alias_method(:new_original, :new)
-    PropertyTranslator.singleton_class.define_method(:new) do |property|
-      translator = Object.new
-      translator.define_singleton_method(:translate!) do
-        raise RubyLLM::UnauthorizedError.new(nil, "Bad API key")
+    raising_translator = ->(_property) {
+      Object.new.tap do |t|
+        t.define_singleton_method(:translate!) do
+          raise RubyLLM::UnauthorizedError.new(nil, "Bad API key")
+        end
       end
-      translator
-    end
+    }
 
-    begin
+    SingletonStub.with(PropertyTranslator, :new, raising_translator) do
       freeze_time do
         PropertyTranslationJob.perform_now(@property.id)
         @property.reload
@@ -85,9 +80,6 @@ class PropertyTranslationJobTest < ActiveJob::TestCase
         assert_match(/Bad API key/, @property.translations_status["_error"]["message"])
         assert_equal Time.current.iso8601, @property.translations_status["_error"]["failed_at"]
       end
-    ensure
-      PropertyTranslator.singleton_class.alias_method(:new, :new_original)
-      PropertyTranslator.singleton_class.remove_method(:new_original)
     end
   end
 end
