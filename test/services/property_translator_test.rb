@@ -189,6 +189,49 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     assert_includes builder.system_prompt, "Monte-Carlo"
   end
 
+  test "system prompt lists each of the 8 target languages with its locale code" do
+    builder = PropertyTranslator::PromptBuilder.new(@property)
+    system = builder.system_prompt
+    {
+      "English" => "en", "Italian" => "it", "German" => "de", "Swedish" => "sv",
+      "Norwegian" => "no", "Danish" => "da", "Finnish" => "fi", "Russian" => "ru"
+    }.each do |name, code|
+      assert_includes system, name, "system prompt missing #{name}"
+      assert_includes system, "(#{code})", "system prompt missing code for #{code}"
+    end
+  end
+
+  test "user prompt contains FR title and description verbatim" do
+    @property.update_columns(
+      title: { "fr" => "Duplex exceptionnel vue mer" },
+      description: { "fr" => "Grand duplex de 220m² avec terrasse et vue panoramique." }
+    )
+    builder = PropertyTranslator::PromptBuilder.new(@property)
+    user = builder.user_prompt
+    assert_includes user, "Duplex exceptionnel vue mer"
+    assert_includes user, "Grand duplex de 220m² avec terrasse et vue panoramique."
+  end
+
+  test "user prompt includes grounding metadata" do
+    builder = PropertyTranslator::PromptBuilder.new(@property)
+    user = builder.user_prompt
+    assert_includes user, "City: Monaco"
+    assert_includes user, "District: Carré d'Or"
+    assert_includes user, "Building: Le Mirabeau"
+    assert_includes user, "Type: apartment"
+    assert_includes user, "Transaction: sale"
+    assert_includes user, "Rooms: 5"
+  end
+
+  test "glossary omits nil building or district without empty placeholders" do
+    @property.update!(building: nil, district: nil)
+    builder = PropertyTranslator::PromptBuilder.new(@property)
+    system = builder.system_prompt
+    refute_match(/- \s*\n/, system, "glossary should not contain empty lines for missing names")
+    refute_includes system, "Carré d'Or"
+    refute_includes system, "Le Mirabeau"
+  end
+
   test "uses the model configured on Rails.configuration" do
     received_model = nil
     RubyLLM.singleton_class.alias_method(:chat_original, :chat)
