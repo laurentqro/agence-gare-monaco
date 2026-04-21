@@ -53,7 +53,7 @@ module Admin
     end
 
     def block_synced_edits!
-      raise ActionController::RoutingError, "Synced properties are read-only" if @property.immotoolbox_id.present?
+      raise ActiveRecord::RecordNotFound, "Synced properties are read-only" if @property.immotoolbox_id.present?
     end
 
     def set_form_data
