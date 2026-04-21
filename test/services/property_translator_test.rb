@@ -121,6 +121,25 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     end
   end
 
+  test "non-string title field raises BlankTranslation instead of stringifying a nested object" do
+    # If the LLM ever returns { title_de: { text: "..." } } (schema drift,
+    # future model), to_s would silently turn it into "{...}" — a garbage
+    # translation that passes the blank check. Fail loudly instead.
+    with_stubbed_chat(content: canned_response.merge("title_de" => { "text" => "Der Titel" })) do
+      assert_raises(PropertyTranslator::BlankTranslation) do
+        PropertyTranslator.new(@property).translate!
+      end
+    end
+  end
+
+  test "non-string description field raises BlankTranslation" do
+    with_stubbed_chat(content: canned_response.merge("description_it" => [ "lista", "di", "paragrafi" ])) do
+      assert_raises(PropertyTranslator::BlankTranslation) do
+        PropertyTranslator.new(@property).translate!
+      end
+    end
+  end
+
   test "BlankTranslation does not update translation_source_hash, so the next retry still runs" do
     @property.update_columns(translation_source_hash: nil)
     with_stubbed_chat(content: canned_response.merge("description_sv" => "")) do

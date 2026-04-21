@@ -63,14 +63,16 @@ class PropertyTranslator
 
     parsed = {}
     LOCALES.each do |locale|
-      title = content["title_#{locale}"].to_s
-      description = content["description_#{locale}"].to_s
+      title = content["title_#{locale}"]
+      description = content["description_#{locale}"]
 
+      raise BlankTranslation, "Non-string title for #{locale}: #{title.inspect}" unless title.is_a?(String)
       raise BlankTranslation, "Blank title for #{locale}" if title.strip.empty?
 
       if fr_description.strip.empty?
         parsed[locale] = { title: title }
       else
+        raise BlankTranslation, "Non-string description for #{locale}: #{description.inspect}" unless description.is_a?(String)
         raise BlankTranslation, "Blank description for #{locale}" if description.strip.empty?
         parsed[locale] = { title: title, description: description }
       end
