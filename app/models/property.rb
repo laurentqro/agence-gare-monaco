@@ -83,12 +83,20 @@ class Property < ApplicationRecord
   end
 
   def translated_at_for(locale)
-    return nil unless translations_status.is_a?(Hash)
-    entry = translations_status[locale.to_s]
+    entry = translations_status.is_a?(Hash) ? translations_status[locale.to_s] : nil
     return nil unless entry.is_a?(Hash) && entry["translated_at"].present?
     Time.iso8601(entry["translated_at"])
   rescue ArgumentError
     nil
+  end
+
+  # Returns the last recorded translation failure as a hash with "class",
+  # "message", "failed_at" keys, or nil if the last attempt succeeded or
+  # none has been recorded. Encapsulates the internal _error storage shape.
+  def translation_error
+    return nil unless translations_status.is_a?(Hash)
+    err = translations_status["_error"]
+    err.is_a?(Hash) && err["class"].present? ? err : nil
   end
 
   # Branches between the translation pipeline and brochure regeneration based on
