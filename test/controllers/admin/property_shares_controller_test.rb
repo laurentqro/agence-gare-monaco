@@ -43,6 +43,15 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Bonjour,"
   end
 
+  test "GET new renders email preview inside a sandboxed iframe, not inline HTML" do
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    # The preview must be isolated from the admin document so any HTML in
+    # property fields can't manipulate admin DOM / cookies. An iframe with
+    # sandbox and srcdoc achieves that.
+    assert_select "iframe[sandbox][srcdoc]", 1
+  end
+
   test "GET new lists all contacts with checkboxes" do
     get new_admin_property_share_url(@property)
     assert_response :success
