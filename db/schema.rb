@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_09_144418) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_204854) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -146,7 +146,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_144418) do
     t.decimal "latitude", precision: 10, scale: 7
     t.decimal "living_area", precision: 10, scale: 2
     t.decimal "longitude", precision: 10, scale: 7
-    t.boolean "manually_edited", default: false
     t.integer "num_bathrooms"
     t.integer "num_bedrooms"
     t.integer "num_cellars"
@@ -166,6 +165,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_09_144418) do
     t.json "title"
     t.decimal "total_area", precision: 10, scale: 2
     t.string "transaction_type", null: false
+    t.string "translation_source_hash"
+    t.json "translations_status", default: {}
     t.datetime "updated_at", null: false
     t.string "video_url"
     t.string "virtual_tour_url"
