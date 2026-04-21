@@ -96,7 +96,7 @@ class Property < ApplicationRecord
   # async follow-ups. The translator itself enqueues brochure regen on success.
   def enqueue_post_save_jobs!
     text_changed = saved_changes.keys.intersect?(%w[title description])
-    if text_changed
+    if text_changed || translation_source_hash.nil?
       PropertyTranslationJob.perform_later(id)
     elsif saved_changes.keys.intersect?(BROCHURE_TRIGGER_COLUMNS)
       PropertyBrochureGenerationJob.perform_later(id)

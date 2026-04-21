@@ -329,6 +329,7 @@ class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase
       country: "MC", city: "Monaco",
       title: { "fr" => "Titre" }, description: { "fr" => "Description" }
     )
+    @property.update_columns(translation_source_hash: "seeded-hash")
     clear_enqueued_jobs
   end
 
@@ -352,5 +353,14 @@ class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase
     @property.update!(subtype: "penthouse")
     @property.enqueue_post_save_jobs!
     assert_empty enqueued_jobs
+  end
+
+  test "enqueues translation when hash is nil even if FR text did not just change" do
+    @property.update_columns(translation_source_hash: nil)
+    @property.update!(price: 2_000_000)
+    @property.enqueue_post_save_jobs!
+    translation_jobs = enqueued_jobs.select { |j| j[:job] == PropertyTranslationJob }
+    refute_empty translation_jobs,
+                 "properties with no source hash should always retranslate on save"
   end
 end

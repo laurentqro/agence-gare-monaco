@@ -251,6 +251,7 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
 
   test "PATCH update enqueues brochure job directly when only price changes" do
     prop = create_property(reference: "MC-001", title: { "fr" => "Title" }, price: 1_000_000)
+    prop.update_columns(translation_source_hash: "seeded-hash")
     clear_enqueued_jobs
     patch admin_property_url(prop), params: {
       property: { price: 2_000_000 }
