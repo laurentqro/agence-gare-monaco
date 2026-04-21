@@ -185,6 +185,7 @@ fr:
         description_fr: "Description (FR)"
         translations_title: "Traductions"
         not_translated: "Non traduit"
+        translation_failed: "Échec de la dernière traduction"
       flash:
         created: "Bien créé."
         updated: "Bien mis à jour."
