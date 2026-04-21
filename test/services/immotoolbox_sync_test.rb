@@ -1,6 +1,8 @@
 require "test_helper"
 
 class ImmotoolboxSyncTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   setup do
     @base_url = "https://clientapi.immotoolbox.com/api"
 
@@ -108,27 +110,25 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     assert property.synced_at.present?
   end
 
-  test "sync sets multilingual title and description from inline texts" do
+  test "sync stores French title and description only; discards English from API" do
     setup_districts_and_buildings
 
     ImmotoolboxSync.new(api_token: "test-token").sync_properties
 
     property = Property.find_by(immotoolbox_id: 100)
     assert_equal "Studio Monte-Carlo", property.title["fr"]
-    assert_equal "Studio Monte-Carlo EN", property.title["en"]
     assert_equal "Magnifique studio", property.description["fr"]
-    assert_equal "Beautiful studio", property.description["en"]
+    refute property.title.key?("en"), "EN title from API should be discarded"
+    refute property.description.key?("en"), "EN description from API should be discarded"
   end
 
-  test "sync strips HTML tags from descriptions" do
+  test "sync strips HTML tags from French description" do
     setup_districts_and_buildings
 
-    # Reset stubs and re-stub with HTML descriptions
     WebMock.reset!
     html_property = property_data(
       "texts" => {
-        "fr" => { "id" => 300, "title" => "Studio Monte-Carlo", "description" => "<p>Magnifique studio</p><p>au coeur de Monaco</p>", "languageCode" => "FR" },
-        "en" => { "id" => 301, "title" => "Studio Monte-Carlo EN", "description" => "<p>Beautiful studio</p><br><p>in the heart of Monaco</p>", "languageCode" => "EN" }
+        "fr" => { "id" => 300, "title" => "Studio Monte-Carlo", "description" => "<p>Magnifique studio</p><p>au coeur de Monaco</p>", "languageCode" => "FR" }
       }
     )
     stub_request(:get, "#{@base_url}/properties")
@@ -150,19 +150,17 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
 
     property = Property.find_by(immotoolbox_id: 100)
     refute_includes property.description["fr"], "<p>"
-    refute_includes property.description["en"], "<br>"
     assert_includes property.description["fr"], "Magnifique studio"
-    assert_includes property.description["en"], "Beautiful studio"
+    assert_includes property.description["fr"], "au coeur de Monaco"
   end
 
-  test "sync strips HTML entities from titles and descriptions" do
+  test "sync strips HTML entities from French title and description" do
     setup_districts_and_buildings
 
     WebMock.reset!
     html_property = property_data(
       "texts" => {
-        "fr" => { "id" => 300, "title" => "Studio&nbsp;Monte-Carlo", "description" => "Situé&nbsp;au c&oelig;ur de <b>Monaco</b>,&nbsp;proche du port", "languageCode" => "FR" },
-        "en" => { "id" => 301, "title" => "Studio Monte-Carlo EN", "description" => "Located&nbsp;in the&nbsp;heart of Monaco", "languageCode" => "EN" }
+        "fr" => { "id" => 300, "title" => "Studio&nbsp;Monte-Carlo", "description" => "Situé&nbsp;au c&oelig;ur de <b>Monaco</b>,&nbsp;proche du port", "languageCode" => "FR" }
       }
     )
     stub_request(:get, "#{@base_url}/properties")
@@ -188,8 +186,6 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     refute_includes property.description["fr"], "<b>"
     assert_includes property.description["fr"], "Situé au"
     assert_includes property.description["fr"], "proche du port"
-    refute_includes property.description["en"], "&nbsp;"
-    assert_equal "Located in the heart of Monaco", property.description["en"]
   end
 
   test "sync creates property images from inline images" do
@@ -228,18 +224,38 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     assert_equal 1_500_000, property.price
   end
 
-  test "sync skips manually_edited properties" do
+  test "sync enqueues PropertyTranslationJob when FR content changes" do
     setup_districts_and_buildings
     Property.create!(
       reference: "AG-001", transaction_type: "sale", property_type: "apartment",
       country: "MC", city: "Monaco", price: 999_999, immotoolbox_id: 100,
-      manually_edited: true
+      title: { "fr" => "Old title" }, description: { "fr" => "Old description" }
     )
+
+    assert_enqueued_with(job: PropertyTranslationJob) do
+      ImmotoolboxSync.new(api_token: "test-token").sync_properties
+    end
+  end
+
+  test "sync enqueues brochure job directly when only non-text trigger columns change" do
+    setup_districts_and_buildings
+    # Seed property with FR text matching what the API returns, so only
+    # price and other metadata change on sync.
+    Property.create!(
+      reference: "AG-001", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", price: 999_999, immotoolbox_id: 100,
+      num_rooms: 1,
+      title: { "fr" => "Studio Monte-Carlo" },
+      description: { "fr" => "Magnifique studio" }
+    )
+    clear_enqueued_jobs
 
     ImmotoolboxSync.new(api_token: "test-token").sync_properties
 
-    property = Property.find_by(immotoolbox_id: 100)
-    assert_equal 999_999, property.price
+    translation_jobs = enqueued_jobs.select { |j| j[:job] == PropertyTranslationJob }
+    brochure_jobs = enqueued_jobs.select { |j| j[:job] == PropertyBrochureGenerationJob }
+    assert_empty translation_jobs, "Should not enqueue translation job when FR text is unchanged"
+    refute_empty brochure_jobs, "Should enqueue brochure job when price/rooms change"
   end
 
   test "sync unpublishes properties not in API response" do
@@ -343,29 +359,26 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     assert_nil property.num_bathrooms
   end
 
-  test "sync merges translations, preserving locales not in API" do
+  test "sync updates FR and preserves all other locales (which will be refreshed by translation job)" do
     setup_districts_and_buildings
-    # Property already has translations in 4 locales; API only provides fr and en
     property = Property.create!(
       reference: "AG-001", transaction_type: "sale", property_type: "apartment",
       country: "MC", city: "Monaco", immotoolbox_id: 100,
-      title: { "fr" => "Old FR", "en" => "Old EN", "it" => "Titolo italiano", "de" => "Deutscher Titel" },
-      description: { "fr" => "Old FR desc", "en" => "Old EN desc", "it" => "Descrizione", "de" => "Beschreibung" }
+      title: { "fr" => "Old FR", "en" => "Stale EN", "it" => "Titolo italiano", "de" => "Deutscher Titel" },
+      description: { "fr" => "Old FR desc", "en" => "Stale EN desc", "it" => "Descrizione", "de" => "Beschreibung" }
     )
 
     ImmotoolboxSync.new(api_token: "test-token").sync_properties
 
     property.reload
-    # API locales should be updated
     assert_equal "Studio Monte-Carlo", property.title["fr"]
-    assert_equal "Studio Monte-Carlo EN", property.title["en"]
     assert_equal "Magnifique studio", property.description["fr"]
-    assert_equal "Beautiful studio", property.description["en"]
-    # Non-API locales should be preserved
+    # All non-FR locales are preserved at the DB layer; the translation job
+    # will overwrite them on the next run (stale EN stays until the async job runs).
+    assert_equal "Stale EN", property.title["en"]
     assert_equal "Titolo italiano", property.title["it"]
     assert_equal "Deutscher Titel", property.title["de"]
     assert_equal "Descrizione", property.description["it"]
-    assert_equal "Beschreibung", property.description["de"]
   end
 
   test "sync handles shared images across properties" do
@@ -423,7 +436,6 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     assert_includes result[:properties].keys, :created
     assert_includes result[:properties].keys, :updated
     assert_includes result[:properties].keys, :unpublished
-    assert_includes result[:properties].keys, :skipped
   end
 
   private

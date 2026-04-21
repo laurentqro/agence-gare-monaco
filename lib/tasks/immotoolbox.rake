@@ -13,6 +13,6 @@ namespace :immotoolbox do
     puts "Immotoolbox sync complete:"
     puts "  Districts — created: #{result[:districts][:created]}, updated: #{result[:districts][:updated]}"
     puts "  Buildings — created: #{result[:buildings][:created]}, updated: #{result[:buildings][:updated]}"
-    puts "  Properties — created: #{result[:properties][:created]}, updated: #{result[:properties][:updated]}, unpublished: #{result[:properties][:unpublished]}, skipped: #{result[:properties][:skipped]}"
+    puts "  Properties — created: #{result[:properties][:created]}, updated: #{result[:properties][:updated]}, unpublished: #{result[:properties][:unpublished]}"
   end
 end

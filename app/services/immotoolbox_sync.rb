@@ -65,33 +65,23 @@ class ImmotoolboxSync
   end
 
   def sync_properties
-    stats = { created: 0, updated: 0, unpublished: 0, skipped: 0 }
+    stats = { created: 0, updated: 0, unpublished: 0 }
 
     api_properties = @client.fetch_all_properties
     synced_ids = []
 
     api_properties.each do |data|
       property = Property.find_or_initialize_by(immotoolbox_id: data["id"])
-
-      # Skip manually edited properties
-      if property.persisted? && property.manually_edited?
-        stats[:skipped] += 1
-        synced_ids << data["id"]
-        next
-      end
-
       is_new = property.new_record?
 
-      # Build multilingual title and description from inline texts,
-      # merging with existing translations to preserve locales not in API
+      # Only ingest French text from Immotoolbox — English arrives inconsistent
+      # in quality. All 8 non-FR locales are machine-translated from FR.
       title = property.title.is_a?(Hash) ? property.title.dup : {}
       description = property.description.is_a?(Hash) ? property.description.dup : {}
-      texts = data["texts"]
-      if texts.is_a?(Hash)
-        texts.each do |lang, text_data|
-          title[lang] = sanitize_html(text_data["title"]) if text_data["title"].present?
-          description[lang] = sanitize_html(text_data["description"]) if text_data["description"].present?
-        end
+      fr_texts = data.dig("texts", "fr")
+      if fr_texts.is_a?(Hash)
+        title["fr"] = sanitize_html(fr_texts["title"]) if fr_texts["title"].present?
+        description["fr"] = sanitize_html(fr_texts["description"]) if fr_texts["description"].present?
       end
 
       # Resolve district and building
@@ -138,6 +128,7 @@ class ImmotoolboxSync
         synced_at: Time.current
       )
       property.save!
+      enqueue_post_save_jobs(property)
 
       # Sync images from inline images array
       images = data["images"] || []
@@ -158,6 +149,19 @@ class ImmotoolboxSync
   end
 
   private
+
+  # After saving a property, either enqueue a translation job (which will
+  # regenerate brochures on success) or a brochure job directly — never both.
+  # FR text changes always win: the translation job is the source of truth for
+  # localized brochure content.
+  def enqueue_post_save_jobs(property)
+    text_changed = property.saved_changes.keys.intersect?(%w[title description])
+    if text_changed
+      PropertyTranslationJob.perform_later(property.id)
+    elsif property.saved_changes.keys.intersect?(Property::BROCHURE_TRIGGER_COLUMNS)
+      PropertyBrochureGenerationJob.perform_later(property.id)
+    end
+  end
 
   def map_transaction_type(api_type)
     case api_type&.downcase
