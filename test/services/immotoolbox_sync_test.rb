@@ -239,15 +239,16 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
 
   test "sync enqueues brochure job directly when only non-text trigger columns change" do
     setup_districts_and_buildings
-    # Seed property with FR text matching what the API returns, so only
-    # price and other metadata change on sync.
-    Property.create!(
+    # Seed property with FR text matching what the API returns and a non-nil
+    # translation_source_hash, so only price and other metadata change on sync.
+    prop = Property.create!(
       reference: "AG-001", transaction_type: "sale", property_type: "apartment",
       country: "MC", city: "Monaco", price: 999_999, immotoolbox_id: 100,
       num_rooms: 1,
       title: { "fr" => "Studio Monte-Carlo" },
       description: { "fr" => "Magnifique studio" }
     )
+    prop.update_columns(translation_source_hash: "seeded-hash")
     clear_enqueued_jobs
 
     ImmotoolboxSync.new(api_token: "test-token").sync_properties
