@@ -298,4 +298,23 @@ class PropertyTest < ActiveSupport::TestCase
     assert_equal 1, Property.for_rental.count
     assert_equal "MC-RENT", Property.for_rental.first.reference
   end
+
+  test "translated_at_for reads timestamp from translations_status" do
+    timestamp = "2026-04-21T12:00:00Z"
+    property = Property.create!(
+      reference: "MC-TX-001", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco",
+      translations_status: { "de" => { "translated_at" => timestamp } }
+    )
+    assert_equal Time.iso8601(timestamp), property.translated_at_for(:de)
+  end
+
+  test "translated_at_for returns nil when locale not present" do
+    property = Property.create!(
+      reference: "MC-TX-002", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco",
+      translations_status: {}
+    )
+    assert_nil property.translated_at_for(:de)
+  end
 end

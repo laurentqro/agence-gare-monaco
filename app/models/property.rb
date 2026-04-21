@@ -19,8 +19,6 @@ class Property < ApplicationRecord
   validates :city, presence: true
   validates :immotoolbox_id, uniqueness: true, allow_nil: true
 
-  after_commit :enqueue_brochure_generation, on: [ :create, :update ], if: :brochure_regeneration_needed?
-
   scope :published, -> { where(published: true) }
   scope :publicly_visible, -> { published.where(off_market: false) }
   scope :for_sale, -> { where(transaction_type: "sale") }
@@ -84,13 +82,12 @@ class Property < ApplicationRecord
     end
   end
 
-  private
-
-  def brochure_regeneration_needed?
-    (saved_changes.keys & BROCHURE_TRIGGER_COLUMNS).any?
-  end
-
-  def enqueue_brochure_generation
-    PropertyBrochureGenerationJob.perform_later(id)
+  def translated_at_for(locale)
+    return nil unless translations_status.is_a?(Hash)
+    entry = translations_status[locale.to_s]
+    return nil unless entry.is_a?(Hash) && entry["translated_at"].present?
+    Time.iso8601(entry["translated_at"])
+  rescue ArgumentError
+    nil
   end
 end
