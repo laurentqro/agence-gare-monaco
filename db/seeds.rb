@@ -175,7 +175,6 @@ end
     city: "Monaco",
     off_market: true,
     published: true,
-    manually_edited: true
   },
   {
     reference: "AG00015",
@@ -193,7 +192,6 @@ end
     city: "Monaco",
     off_market: true,
     published: true,
-    manually_edited: true,
     image_urls: [ "https://www.agencegaremonaco.com/uploads/properties/15/VktDYfMir/VktDYfMir-1920-1200.jpg" ]
   },
   {
@@ -214,7 +212,6 @@ end
     city: "Monaco",
     off_market: true,
     published: true,
-    manually_edited: true,
     image_urls: [ "https://www.agencegaremonaco.com/uploads/properties/2/7Q0DXBhuA/7Q0DXBhuA-1920-1200.jpg" ]
   }
 ].each do |attrs|
