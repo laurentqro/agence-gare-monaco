@@ -31,10 +31,17 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
   end
 
   class FakeChat
-    def initialize(content); @content = content; end
+    def initialize(content, input_tokens: 123, output_tokens: 456)
+      @content = content
+      @input_tokens = input_tokens
+      @output_tokens = output_tokens
+    end
     def with_instructions(_); self; end
     def with_schema(_); self; end
-    def ask(_); Struct.new(:content).new(@content); end
+    def ask(_)
+      Struct.new(:content, :input_tokens, :output_tokens)
+        .new(@content, @input_tokens, @output_tokens)
+    end
   end
 
   def with_stubbed_chat(content:)
@@ -133,6 +140,23 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     assert_includes builder.system_prompt, "Le Mirabeau"
     assert_includes builder.system_prompt, "Monaco"
     assert_includes builder.system_prompt, "Monte-Carlo"
+  end
+
+  test "logs token usage so cost can be monitored without an APM" do
+    io = StringIO.new
+    logger_before = Rails.logger
+    Rails.logger = Logger.new(io)
+    begin
+      with_stubbed_chat(content: canned_response) do
+        PropertyTranslator.new(@property).translate!
+      end
+    ensure
+      Rails.logger = logger_before
+    end
+    assert_match(/PropertyTranslator/, io.string)
+    assert_match(/property=#{@property.id}/, io.string)
+    assert_match(/in=123/, io.string)
+    assert_match(/out=456/, io.string)
   end
 
   test "FR source text is wrapped in delimiters to isolate from instructions" do
