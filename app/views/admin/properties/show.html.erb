@@ -40,6 +40,13 @@
 
   <div class="bg-white rounded shadow p-6 mt-6">
     <h2 class="text-lg font-medium mb-4"><%= t("admin.properties.show.translations_title") %></h2>
+    <% if (err = @property.translations_status.is_a?(Hash) ? @property.translations_status["_error"] : nil) %>
+      <div class="mb-4 p-3 bg-red-50 rounded text-sm text-red-700">
+        <div class="font-medium"><%= t("admin.properties.show.translation_failed") %></div>
+        <div><%= err["class"] %>: <%= err["message"] %></div>
+        <div class="text-xs text-red-500"><%= err["failed_at"] %></div>
+      </div>
+    <% end %>
     <table class="w-full text-sm">
       <tbody class="divide-y divide-gray-100">
         <% %w[en it de sv no da fi ru].each do |locale| %>
