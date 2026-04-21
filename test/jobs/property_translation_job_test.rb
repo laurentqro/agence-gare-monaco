@@ -42,10 +42,27 @@ class PropertyTranslationJobTest < ActiveJob::TestCase
     assert_equal @property.id, received.id
   end
 
-  test "retry_on configured for RubyLLM::Error, Net::OpenTimeout, JSON::ParserError" do
+  test "retry_on covers transient transport errors" do
     handled = PropertyTranslationJob.rescue_handlers.map(&:first)
-    assert_includes handled, "RubyLLM::Error"
+    assert_includes handled, "RubyLLM::RateLimitError"
+    assert_includes handled, "RubyLLM::ServerError"
+    assert_includes handled, "RubyLLM::ServiceUnavailableError"
+    assert_includes handled, "RubyLLM::OverloadedError"
     assert_includes handled, "Net::OpenTimeout"
     assert_includes handled, "JSON::ParserError"
+  end
+
+  test "discard_on covers permanent errors so they do not burn retries" do
+    handled = PropertyTranslationJob.rescue_handlers.map(&:first)
+    assert_includes handled, "RubyLLM::UnauthorizedError"
+    assert_includes handled, "RubyLLM::ForbiddenError"
+    assert_includes handled, "RubyLLM::BadRequestError"
+    assert_includes handled, "RubyLLM::PaymentRequiredError"
+    assert_includes handled, "RubyLLM::ContextLengthExceededError"
+  end
+
+  test "does not swallow the base RubyLLM::Error class (would hide unexpected errors)" do
+    handled = PropertyTranslationJob.rescue_handlers.map(&:first)
+    refute_includes handled, "RubyLLM::Error"
   end
 end
