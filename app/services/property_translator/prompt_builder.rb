@@ -1,15 +1,4 @@
 class PropertyTranslator::PromptBuilder
-  LOCALE_NAMES = {
-    "en" => "English",
-    "it" => "Italian",
-    "de" => "German",
-    "sv" => "Swedish",
-    "no" => "Norwegian (Bokmål)",
-    "da" => "Danish",
-    "fi" => "Finnish",
-    "ru" => "Russian"
-  }.freeze
-
   def initialize(property)
     @property = property
   end
@@ -37,7 +26,7 @@ class PropertyTranslator::PromptBuilder
       - Do not translate proper nouns listed in the glossary.
       - Keep numerals, currency symbols, and units (m², €) as-is.
 
-      Target languages: #{LOCALE_NAMES.map { |code, name| "#{name} (#{code})" }.join(", ")}.
+      Target languages: #{PropertyTranslator::LOCALE_NAMES.map { |code, name| "#{name} (#{code})" }.join(", ")}.
     PROMPT
   end
 

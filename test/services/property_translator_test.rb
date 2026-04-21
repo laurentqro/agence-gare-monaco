@@ -201,6 +201,18 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     end
   end
 
+  test "LOCALES is derived from LOCALE_NAMES keys (single source of truth)" do
+    assert_equal PropertyTranslator::LOCALE_NAMES.keys, PropertyTranslator::LOCALES
+  end
+
+  test "LOCALE_NAMES plus FR covers exactly I18n.available_locales (boot-time consistency)" do
+    app_locales = I18n.available_locales.map(&:to_s).sort
+    translator_locales = (PropertyTranslator::LOCALE_NAMES.keys + [ "fr" ]).sort
+    assert_equal app_locales, translator_locales,
+                 "PropertyTranslator::LOCALE_NAMES must name every non-FR locale in config/application.rb. " \
+                 "Missing: #{(app_locales - translator_locales).inspect}, extra: #{(translator_locales - app_locales).inspect}."
+  end
+
   test "user prompt contains FR title and description verbatim" do
     @property.update_columns(
       title: { "fr" => "Duplex exceptionnel vue mer" },

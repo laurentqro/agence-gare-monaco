@@ -1,10 +1,22 @@
 class PropertyTranslator
   DEFAULT_MODEL = "claude-sonnet-4-6".freeze
 
-  # The 8 locales the translator fills from French. Derived from the app's
-  # configured locale list so adding a locale in config/application.rb is a
-  # one-place change.
-  LOCALES = (I18n.available_locales.map(&:to_s) - [ "fr" ]).freeze
+  # Single source of truth for the non-FR locales the translator fills and
+  # their human-readable names for the LLM prompt. Adding a locale to the app
+  # means adding a row here — keys must match I18n.available_locales minus :fr
+  # (enforced by a test, so booting prod never silently drops a language).
+  LOCALE_NAMES = {
+    "en" => "English",
+    "it" => "Italian",
+    "de" => "German",
+    "sv" => "Swedish",
+    "no" => "Norwegian (Bokmål)",
+    "da" => "Danish",
+    "fi" => "Finnish",
+    "ru" => "Russian"
+  }.freeze
+
+  LOCALES = LOCALE_NAMES.keys.freeze
 
   def self.model
     Rails.configuration.x.translator_model.presence || DEFAULT_MODEL
