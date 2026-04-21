@@ -90,4 +90,16 @@ class Property < ApplicationRecord
   rescue ArgumentError
     nil
   end
+
+  # Branches between the translation pipeline and brochure regeneration based on
+  # what just changed. Call this right after a save when the caller wants the
+  # async follow-ups. The translator itself enqueues brochure regen on success.
+  def enqueue_post_save_jobs!
+    text_changed = saved_changes.keys.intersect?(%w[title description])
+    if text_changed
+      PropertyTranslationJob.perform_later(id)
+    elsif saved_changes.keys.intersect?(BROCHURE_TRIGGER_COLUMNS)
+      PropertyBrochureGenerationJob.perform_later(id)
+    end
+  end
 end

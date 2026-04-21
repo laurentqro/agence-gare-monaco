@@ -128,7 +128,7 @@ class ImmotoolboxSync
         synced_at: Time.current
       )
       property.save!
-      enqueue_post_save_jobs(property)
+      property.enqueue_post_save_jobs!
 
       # Sync images from inline images array
       images = data["images"] || []
@@ -149,19 +149,6 @@ class ImmotoolboxSync
   end
 
   private
-
-  # After saving a property, either enqueue a translation job (which will
-  # regenerate brochures on success) or a brochure job directly — never both.
-  # FR text changes always win: the translation job is the source of truth for
-  # localized brochure content.
-  def enqueue_post_save_jobs(property)
-    text_changed = property.saved_changes.keys.intersect?(%w[title description])
-    if text_changed
-      PropertyTranslationJob.perform_later(property.id)
-    elsif property.saved_changes.keys.intersect?(Property::BROCHURE_TRIGGER_COLUMNS)
-      PropertyBrochureGenerationJob.perform_later(property.id)
-    end
-  end
 
   def map_transaction_type(api_type)
     case api_type&.downcase
