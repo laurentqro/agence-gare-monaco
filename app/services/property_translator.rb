@@ -73,7 +73,8 @@ class PropertyTranslator
       title: title,
       description: description,
       translations_status: status,
-      translation_source_hash: hash
+      translation_source_hash: hash,
+      updated_at: Time.current
     )
   end
 end
