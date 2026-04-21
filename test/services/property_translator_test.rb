@@ -189,6 +189,39 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     assert_includes builder.system_prompt, "Monte-Carlo"
   end
 
+  test "uses the model configured on Rails.configuration" do
+    received_model = nil
+    RubyLLM.singleton_class.alias_method(:chat_original, :chat)
+    RubyLLM.singleton_class.define_method(:chat) do |**kwargs|
+      received_model = kwargs[:model]
+      # Return a chat that's no-op enough to reach application
+      chat = Object.new
+      chat.define_singleton_method(:with_instructions) { |_| chat }
+      chat.define_singleton_method(:with_schema) { |_| chat }
+      fields = {}
+      %w[en it de sv no da fi ru].each do |locale|
+        fields["title_#{locale}"] = "Title #{locale}"
+        fields["description_#{locale}"] = "Desc #{locale}"
+      end
+      chat.define_singleton_method(:ask) { |_|
+        Struct.new(:content, :input_tokens, :output_tokens).new(fields, 1, 1)
+      }
+      chat
+    end
+
+    previous = Rails.configuration.x.translator_model
+    Rails.configuration.x.translator_model = "claude-haiku-4-5"
+    begin
+      PropertyTranslator.new(@property).translate!
+    ensure
+      Rails.configuration.x.translator_model = previous
+      RubyLLM.singleton_class.alias_method(:chat, :chat_original)
+      RubyLLM.singleton_class.remove_method(:chat_original)
+    end
+
+    assert_equal "claude-haiku-4-5", received_model
+  end
+
   test "logs token usage so cost can be monitored without an APM" do
     io = StringIO.new
     logger_before = Rails.logger

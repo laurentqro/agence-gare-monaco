@@ -1,6 +1,10 @@
 class PropertyTranslator
-  MODEL = "claude-sonnet-4-6".freeze
+  DEFAULT_MODEL = "claude-sonnet-4-6".freeze
   LOCALES = %w[en it de sv no da fi ru].freeze
+
+  def self.model
+    Rails.configuration.x.translator_model.presence || DEFAULT_MODEL
+  end
 
   class BlankTranslation < StandardError; end
 
@@ -16,7 +20,7 @@ class PropertyTranslator
     return if hash == expected_hash
 
     builder = PromptBuilder.new(@property)
-    chat = RubyLLM.chat(model: MODEL)
+    chat = RubyLLM.chat(model: self.class.model)
       .with_instructions(builder.system_prompt)
       .with_schema(Schema)
     response = chat.ask(builder.user_prompt)
@@ -35,7 +39,7 @@ class PropertyTranslator
   def log_usage(response)
     input = response.respond_to?(:input_tokens) ? response.input_tokens : nil
     output = response.respond_to?(:output_tokens) ? response.output_tokens : nil
-    Rails.logger.info("[PropertyTranslator] property=#{@property.id} model=#{MODEL} in=#{input} out=#{output}")
+    Rails.logger.info("[PropertyTranslator] property=#{@property.id} model=#{self.class.model} in=#{input} out=#{output}")
   end
 
   def fr(field)
