@@ -1,6 +1,8 @@
 require "test_helper"
 
 class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
+
   setup do
     @user = User.create!(email_address: "adrien@agencegaremonaco.com", password: "securepassword123")
     post session_url, params: { email_address: "adrien@agencegaremonaco.com", password: "securepassword123" }
@@ -103,6 +105,20 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_properties_url
   end
 
+  test "POST create forces off_market to true even if false passed in" do
+    post admin_properties_url, params: {
+      property: property_params.merge(off_market: "0")
+    }
+    prop = Property.last
+    assert prop.off_market
+  end
+
+  test "POST create enqueues PropertyTranslationJob" do
+    assert_enqueued_with(job: PropertyTranslationJob) do
+      post admin_properties_url, params: { property: property_params }
+    end
+  end
+
   test "POST create with district and building" do
     post admin_properties_url, params: {
       property: property_params.merge(district_id: @district.id, building_id: @building.id)
@@ -187,22 +203,50 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert prop.featured
   end
 
-  test "PATCH update marks synced property as manually_edited" do
-    prop = create_property(reference: "MC-001", immotoolbox_id: 12345, manually_edited: false)
-    patch admin_property_url(prop), params: {
-      property: { title: { fr: "Changed by admin" } }
-    }
-    prop.reload
-    assert prop.manually_edited
+  test "GET edit on synced property returns 404" do
+    prop = create_property(reference: "MC-001", immotoolbox_id: 12345)
+    get edit_admin_property_url(prop)
+    assert_response :not_found
   end
 
-  test "PATCH update does not mark non-synced property as manually_edited" do
-    prop = create_property(reference: "MC-001", immotoolbox_id: nil, manually_edited: false)
+  test "PATCH update on synced property returns 404" do
+    prop = create_property(reference: "MC-001", immotoolbox_id: 12345, title: { "fr" => "Original" })
     patch admin_property_url(prop), params: {
       property: { title: { fr: "Changed by admin" } }
     }
+    assert_response :not_found
     prop.reload
-    refute prop.manually_edited
+    assert_equal "Original", prop.title["fr"]
+  end
+
+  test "DELETE destroy on synced property returns 404" do
+    prop = create_property(reference: "MC-001", immotoolbox_id: 12345)
+    assert_no_difference "Property.count" do
+      delete admin_property_url(prop)
+    end
+    assert_response :not_found
+  end
+
+  test "PATCH update enqueues PropertyTranslationJob when FR title changes" do
+    prop = create_property(reference: "MC-001", title: { "fr" => "Old title" })
+    clear_enqueued_jobs
+    assert_enqueued_with(job: PropertyTranslationJob, args: [ prop.id ]) do
+      patch admin_property_url(prop), params: {
+        property: { title: { fr: "New title" } }
+      }
+    end
+  end
+
+  test "PATCH update enqueues brochure job directly when only price changes" do
+    prop = create_property(reference: "MC-001", title: { "fr" => "Title" }, price: 1_000_000)
+    clear_enqueued_jobs
+    patch admin_property_url(prop), params: {
+      property: { price: 2_000_000 }
+    }
+    translation_jobs = enqueued_jobs.select { |j| j[:job] == PropertyTranslationJob }
+    brochure_jobs = enqueued_jobs.select { |j| j[:job] == PropertyBrochureGenerationJob }
+    assert_empty translation_jobs
+    refute_empty brochure_jobs
   end
 
   test "PATCH update with invalid data re-renders form" do
