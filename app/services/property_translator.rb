@@ -1,10 +1,8 @@
 class PropertyTranslator
   DEFAULT_MODEL = "claude-sonnet-4-6".freeze
 
-  # Single source of truth for the non-FR locales the translator fills and
-  # their human-readable names for the LLM prompt. Adding a locale to the app
-  # means adding a row here — keys must match I18n.available_locales minus :fr
-  # (enforced by a test, so booting prod never silently drops a language).
+  # Keys must match I18n.available_locales minus :fr — enforced by a test so
+  # adding a locale to config/application.rb without naming it fails loudly.
   LOCALE_NAMES = {
     "en" => "English",
     "it" => "Italian",
@@ -63,25 +61,26 @@ class PropertyTranslator
 
     parsed = {}
     LOCALES.each do |locale|
-      title = content["title_#{locale}"]
-      description = content["description_#{locale}"]
-
-      raise BlankTranslation, "Non-string title for #{locale}: #{title.inspect}" unless title.is_a?(String)
-      raise BlankTranslation, "Blank title for #{locale}" if title.strip.empty?
+      title = require_string!(content["title_#{locale}"], "title", locale)
 
       if fr_description.strip.empty?
         parsed[locale] = { title: title }
       else
-        raise BlankTranslation, "Non-string description for #{locale}: #{description.inspect}" unless description.is_a?(String)
-        raise BlankTranslation, "Blank description for #{locale}" if description.strip.empty?
+        description = require_string!(content["description_#{locale}"], "description", locale)
         parsed[locale] = { title: title, description: description }
       end
     end
     parsed
   end
 
-  # Returns true if the row was updated, false if a concurrent worker raced
-  # ahead (its translations stay; ours are stale by definition).
+  def require_string!(value, field, locale)
+    raise BlankTranslation, "Non-string #{field} for #{locale}: #{value.inspect}" unless value.is_a?(String)
+    raise BlankTranslation, "Blank #{field} for #{locale}" if value.strip.empty?
+    value
+  end
+
+  # Returns false if a concurrent worker raced ahead — its translations stay,
+  # ours are stale by definition.
   def apply_translations!(translations, new_hash, expected_hash)
     title = (@property.title || {}).dup
     description = (@property.description || {}).dup

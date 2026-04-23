@@ -90,18 +90,14 @@ class Property < ApplicationRecord
     nil
   end
 
-  # Returns the last recorded translation failure as a hash with "class",
-  # "message", "failed_at" keys, or nil if the last attempt succeeded or
-  # none has been recorded. Encapsulates the internal _error storage shape.
   def translation_error
     return nil unless translations_status.is_a?(Hash)
     err = translations_status["_error"]
     err.is_a?(Hash) && err["class"].present? ? err : nil
   end
 
-  # Branches between the translation pipeline and brochure regeneration based on
-  # what just changed. Call this right after a save when the caller wants the
-  # async follow-ups. The translator itself enqueues brochure regen on success.
+  # The translation job enqueues brochure regen itself on success, so the
+  # brochure branch only fires when translations aren't being re-run.
   def enqueue_post_save_jobs!
     text_changed = saved_changes.keys.intersect?(%w[title description])
     if text_changed || translation_source_hash.nil?
