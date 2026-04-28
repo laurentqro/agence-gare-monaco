@@ -5,7 +5,7 @@ class PagesController < ApplicationController
 
   def home
     @latest_articles = Article.published.order(published_at: :desc).limit(9)
-    @youtube_videos = YoutubeVideo.latest
+    @youtube_videos = YoutubeVideo.latest(9)
     set_seo(page_type: :homepage)
   end
 

@@ -393,11 +393,11 @@ class HomepageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='videos'] [data-testid='video-slide']"
   end
 
-  test "homepage shows at most 4 videos" do
-    5.times { |i| YoutubeVideo.create!(video_id: "vid#{i}", title: "Video #{i}", published_at: i.days.ago) }
+  test "homepage shows at most 9 videos" do
+    10.times { |i| YoutubeVideo.create!(video_id: "vid#{i}", title: "Video #{i}", published_at: i.days.ago) }
 
     get "/"
-    assert_select "[data-testid='videos'] iframe", 4
+    assert_select "[data-testid='videos'] iframe", 9
   end
 
   test "homepage videos are in reverse chronological order" do
@@ -434,7 +434,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
     PagesController.class_eval do
       def home
         @latest_articles = Article.published.order(published_at: :desc).limit(9)
-        @youtube_videos = YoutubeVideo.latest
+        @youtube_videos = YoutubeVideo.latest(9)
         set_seo(page_type: :homepage)
       end
     end
