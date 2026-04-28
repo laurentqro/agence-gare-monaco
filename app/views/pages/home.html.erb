@@ -31,6 +31,51 @@
   </div>
 </section>
 
+<%# === Videos Section === %>
+<section data-testid="videos" class="max-w-7xl mx-auto px-4 py-16" data-controller="videos-carousel">
+  <h2 class="heading-section !text-2xl md:!text-3xl text-center mb-8">
+    <%= t("homepage.videos_title") %>
+  </h2>
+  <% if @youtube_videos&.any? %>
+    <div class="relative">
+      <div class="overflow-hidden">
+        <div data-videos-carousel-target="track" class="flex transition-transform duration-500 -mx-3">
+          <% @youtube_videos.each do |video| %>
+            <div data-videos-carousel-target="slide" data-testid="video-slide" class="shrink-0 w-full md:w-1/3 px-3">
+              <div class="aspect-video rounded overflow-hidden">
+                <iframe src="<%= video.embed_url %>"
+                        class="w-full h-full"
+                        frameborder="0"
+                        loading="lazy"
+                        allowfullscreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+                </iframe>
+              </div>
+              <p class="text-xs text-dark mt-2"><%= video.title %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <button data-videos-carousel-target="prevButton" data-action="videos-carousel#prev" class="hidden absolute -left-2 md:-left-5 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg" aria-label="<%= t('shared.previous', default: 'Previous') %>">
+        <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <button data-videos-carousel-target="nextButton" data-action="videos-carousel#next" class="hidden absolute -right-2 md:-right-5 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-lg" aria-label="<%= t('shared.next', default: 'Next') %>">
+        <svg class="w-5 h-5 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="text-center mt-10">
+      <%= link_to YoutubeVideo::CHANNEL_URL,
+            target: "_blank", rel: "noopener noreferrer",
+            class: "inline-flex items-center gap-2 px-5 py-3 border border-navy text-navy hover:bg-navy hover:text-white transition-colors text-xs font-semibold uppercase tracking-wide rounded" do %>
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.546 15.568V8.432L15.818 12l-6.272 3.568z"/></svg>
+        <span><%= t("homepage.videos_view_channel") %></span>
+      <% end %>
+    </div>
+  <% end %>
+</section>
+
+<hr class="max-w-7xl mx-auto border-gray-200">
+
 <%# === Featured Articles === %>
 <section data-testid="featured-articles" class="max-w-7xl mx-auto px-4 py-16">
   <h2 class="heading-section !text-2xl md:!text-3xl text-center mb-8">
@@ -49,38 +94,6 @@
         <% end %>
       </div>
     <% end %>
-  <% end %>
-</section>
-
-<hr class="max-w-7xl mx-auto border-gray-200">
-
-<%# === Videos Section === %>
-<section data-testid="videos" class="max-w-7xl mx-auto px-4 py-16">
-  <h2 class="heading-section !text-2xl md:!text-3xl text-center mb-8">
-    <%= t("homepage.videos_title") %>
-  </h2>
-  <% if @youtube_videos&.any? %>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-      <% @youtube_videos.each do |video| %>
-        <div>
-          <div class="aspect-video rounded overflow-hidden">
-            <iframe src="<%= video.embed_url %>"
-                    class="w-full h-full"
-                    frameborder="0"
-                    loading="lazy"
-                    allowfullscreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-            </iframe>
-          </div>
-          <p class="text-xs text-dark mt-2"><%= video.title %></p>
-        </div>
-      <% end %>
-    </div>
-    <div class="text-center">
-      <%= link_to t("homepage.videos_view_channel"), YoutubeVideo::CHANNEL_URL,
-            target: "_blank", rel: "noopener noreferrer",
-            class: "text-sm text-navy font-semibold hover:underline" %>
-    </div>
   <% end %>
 </section>
 

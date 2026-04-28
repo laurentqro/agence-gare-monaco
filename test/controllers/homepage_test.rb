@@ -343,6 +343,23 @@ class HomepageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='videos'] a[href='#{YoutubeVideo::CHANNEL_URL}']"
   end
 
+  test "homepage videos section is a carousel with stimulus controller" do
+    YoutubeVideo.create!(video_id: "abc123", title: "Test", published_at: 1.day.ago)
+
+    get "/"
+    assert_select "[data-testid='videos'][data-controller~='videos-carousel']"
+    assert_select "[data-testid='videos'] [data-videos-carousel-target='track']"
+    assert_select "[data-testid='videos'] button[data-action~='videos-carousel#prev']"
+    assert_select "[data-testid='videos'] button[data-action~='videos-carousel#next']"
+  end
+
+  test "homepage videos carousel slides have one-third width on desktop" do
+    YoutubeVideo.create!(video_id: "abc123", title: "Test", published_at: 1.day.ago)
+
+    get "/"
+    assert_select "[data-testid='videos'] [data-testid='video-slide']"
+  end
+
   test "homepage shows at most 4 videos" do
     5.times { |i| YoutubeVideo.create!(video_id: "vid#{i}", title: "Video #{i}", published_at: i.days.ago) }
 
