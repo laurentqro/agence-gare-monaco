@@ -4,7 +4,7 @@ class PagesController < ApplicationController
   allow_unauthenticated_access
 
   def home
-    @latest_articles = Article.published.order(published_at: :desc).limit(4)
+    @latest_articles = Article.published.order(published_at: :desc).limit(9)
     @youtube_videos = YoutubeVideo.latest
     set_seo(page_type: :homepage)
   end

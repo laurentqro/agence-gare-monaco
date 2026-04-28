@@ -180,7 +180,25 @@ class HomepageTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "homepage shows at most 4 latest articles in 2-column grid" do
+  test "homepage articles section is a carousel with stimulus controller" do
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
+    Article.create!(
+      title: { "fr" => "Article test" },
+      body: { "fr" => "Contenu" },
+      slug: "test-article-carousel",
+      category: category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/"
+    assert_select "[data-testid='featured-articles'][data-controller~='articles-carousel']"
+    assert_select "[data-testid='featured-articles'] [data-articles-carousel-target='track']"
+    assert_select "[data-testid='featured-articles'] button[data-action~='articles-carousel#prev']"
+    assert_select "[data-testid='featured-articles'] button[data-action~='articles-carousel#next']"
+  end
+
+  test "homepage articles carousel uses uniform article cards (no featured split)" do
     category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     5.times do |i|
       Article.create!(
@@ -194,8 +212,8 @@ class HomepageTest < ActionDispatch::IntegrationTest
     end
 
     get "/"
-    assert_select "[data-testid='featured-articles'] .article-card-featured", 1
-    assert_select "[data-testid='featured-articles'] .article-card", 3
+    assert_select "[data-testid='featured-articles'] .article-card-featured", 0
+    assert_select "[data-testid='featured-articles'] .article-card", minimum: 4
   end
 
   test "homepage article cards show cover image when present" do
@@ -210,7 +228,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
     )
 
     get "/"
-    assert_select "[data-testid='featured-articles'] .article-card-featured img[src='https://example.com/photo.jpg']"
+    assert_select "[data-testid='featured-articles'] .article-card img[src='https://example.com/photo.jpg']"
   end
 
   test "homepage article cards prefer cover_image_url over body image" do
@@ -226,12 +244,12 @@ class HomepageTest < ActionDispatch::IntegrationTest
     )
 
     get "/"
-    assert_select "[data-testid='featured-articles'] .article-card-featured img[src='https://example.com/cover.jpg']"
+    assert_select "[data-testid='featured-articles'] .article-card img[src='https://example.com/cover.jpg']"
   end
 
-  test "homepage renders latest article as featured full-width card" do
+  test "homepage renders most recent article first in carousel" do
     category = Category.create!(name: { "fr" => "Actualités", "en" => "News" }, slug: "actualites")
-    older = Article.create!(
+    Article.create!(
       title: { "fr" => "Ancien article" },
       body: { "fr" => "Contenu ancien" },
       slug: "ancien",
@@ -240,7 +258,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
       published_at: 3.days.ago,
       cover_image_url: "https://example.com/old.jpg"
     )
-    latest = Article.create!(
+    Article.create!(
       title: { "fr" => "Dernier article" },
       body: { "fr" => "Contenu récent" },
       slug: "dernier",
@@ -252,9 +270,24 @@ class HomepageTest < ActionDispatch::IntegrationTest
 
     get "/"
 
-    assert_select "[data-testid='featured-articles'] .article-card-featured", count: 1
-    assert_select "[data-testid='featured-articles'] .article-card-featured img[src='https://example.com/new.jpg']"
-    assert_select "[data-testid='featured-articles'] .article-card", count: 1
+    cards = css_select("[data-testid='featured-articles'] .article-card")
+    assert_equal 2, cards.length
+    assert_match "Dernier article", cards.first.to_s
+  end
+
+  test "homepage articles section displays view-all link to articles index" do
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
+    Article.create!(
+      title: { "fr" => "Article" },
+      body: { "fr" => "Contenu" },
+      slug: "article-view-all",
+      category: category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/"
+    assert_select "[data-testid='featured-articles'] a[href='/articles']", minimum: 1
   end
 
   test "homepage article cards show category badge" do
@@ -389,7 +422,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   test "homepage renders when @youtube_videos is nil" do
     PagesController.class_eval do
       def home
-        @latest_articles = Article.published.order(published_at: :desc).limit(4)
+        @latest_articles = Article.published.order(published_at: :desc).limit(9)
         @youtube_videos = nil
         set_seo(page_type: :homepage)
       end
@@ -400,7 +433,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   ensure
     PagesController.class_eval do
       def home
-        @latest_articles = Article.published.order(published_at: :desc).limit(4)
+        @latest_articles = Article.published.order(published_at: :desc).limit(9)
         @youtube_videos = YoutubeVideo.latest
         set_seo(page_type: :homepage)
       end
