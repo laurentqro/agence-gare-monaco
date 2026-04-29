@@ -83,7 +83,7 @@ class Article < ApplicationRecord
   # source changed and the translator hasn't caught up.
   def translation_stale?
     return true if translation_source_hash.blank?
-    Digest::SHA256.hexdigest("#{title_for(:fr)}\n#{body_for(:fr)}") != translation_source_hash
+    current_fr_hash != translation_source_hash
   end
 
   def last_translated_at
@@ -99,6 +99,14 @@ class Article < ApplicationRecord
   end
 
   private
+
+  # Memoized per-instance — index pages render N rows and call
+  # translation_stale? once each, but the hash inputs (FR title+body) don't
+  # change within a request. ActiveRecord re-instantiates the model on each
+  # query, so this lives only as long as the instance.
+  def current_fr_hash
+    @current_fr_hash ||= Digest::SHA256.hexdigest("#{title_for(:fr)}\n#{body_for(:fr)}")
+  end
 
   def generate_slug
     fr_title = title["fr"] || title[I18n.default_locale.to_s] || title.values.first
