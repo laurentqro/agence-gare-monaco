@@ -50,8 +50,9 @@ French is the single source of truth. Non-French locales are populated and manag
 | `app/views/admin/articles/_form.html.erb` | Remove per-locale tabs; render only French title and body fields |
 | `app/views/admin/articles/index.html.erb` | Add per-row translation status badge |
 | `app/views/admin/articles/edit.html.erb` | Add last-translated timestamp + error message block |
-| `app/services/property_translator/prompt_builder.rb` | `glossary_terms` consumes `MonacoGlossary::ALL` (per-record `district.name` / `building.name` still appended) |
+| `app/services/property_translator/prompt_builder.rb` | `glossary_terms` consumes `MonacoGlossary::ALL` (per-property `district&.name` / `building&.name` appending preserved) |
 | `config/locales/admin.fr.yml` | Add labels for translation status / errors |
+| `lib/tasks/articles.rake` | Add `articles:retranslate_all` and `articles:retranslate[ID]` tasks |
 
 ### Component flow
 
@@ -222,15 +223,19 @@ module MonacoGlossary
 end
 ```
 
-`PropertyTranslator::PromptBuilder#glossary_terms` becomes:
+The glossary is hand-curated. No database lookup. Rationale: DB rows are operational data (potentially typos, trailing whitespace, ASCII vs. accented characters), and `.uniq` only deduplicates byte-identical strings — mixing a curated constant with DB strings reliably produces near-duplicate entries (e.g. `"Carré d'Or"` vs. `"Carré d'Or"` with an ASCII apostrophe) that pollute the prompt and undermine the rule's credibility. The constant stays small and slow-changing; new entries are added by hand when the editorial team encounters a name worth preserving.
+
+`PropertyTranslator::PromptBuilder#glossary_terms` keeps its per-property appending — DB-driven coverage for the specific district / building tied to the property:
 
 ```ruby
 (MonacoGlossary::ALL + [@property.district&.name, @property.building&.name]).compact.uniq
 ```
 
-Per-property additions still apply on top so a building name not in the constant still gets covered.
+The narrow per-record scope (one district, one building) makes the near-duplicate risk acceptable here: at most two extra strings, both directly relevant to the property being described.
 
-`ArticleTranslator::PromptBuilder#glossary_terms` returns `MonacoGlossary::ALL` directly (articles aren't tied to a specific district/building).
+`ArticleTranslator::PromptBuilder#glossary_terms` returns `MonacoGlossary::ALL` directly. Articles aren't tied to a specific district / building, and adding a broader DB pluck would reintroduce the dedup risk.
+
+Failure mode: an article mentions a building or street not in the constant, and the translator translates it. Mitigation: add the term to the constant. This is editorial maintenance, deliberate and visible.
 
 ## Idempotency and race handling
 
@@ -256,6 +261,40 @@ rows = Article.where(id: @article.id, translation_source_hash: expected_hash).up
 ```
 
 Concurrent save scenario: editor saves a new FR draft while the previous translation job is mid-flight. The in-flight job's UPDATE matches zero rows because `translation_source_hash` no longer equals `expected_hash`. The job exits silently. The newer job (already enqueued by the second save) wins. No exception, no retry — the stale translation is correctly discarded.
+
+### Operational re-translation
+
+Two rake tasks let an operator force re-translation without editing French text — needed when the prompt or glossary changes:
+
+```ruby
+# lib/tasks/articles.rake
+namespace :articles do
+  desc "Re-translate all articles (nullifies translation_source_hash, enqueues job per article)"
+  task retranslate_all: :environment do
+    count = 0
+    Article.find_each do |article|
+      article.update_columns(translation_source_hash: nil)
+      ArticleTranslationJob.perform_later(article.id)
+      count += 1
+    end
+    puts "Enqueued re-translation for #{count} article(s)"
+  end
+
+  desc "Re-translate one article by id"
+  task :retranslate, [:id] => :environment do |_, args|
+    abort "Usage: rake articles:retranslate[ID]" if args[:id].blank?
+    article = Article.find_by(id: args[:id])
+    abort "Article #{args[:id]} not found" unless article
+    article.update_columns(translation_source_hash: nil)
+    ArticleTranslationJob.perform_later(article.id)
+    puts "Enqueued re-translation for article #{article.id}"
+  end
+end
+```
+
+`update_columns` bypasses callbacks — same reason `record_failure` uses it: avoid re-entering `enqueue_post_save_jobs!` and double-enqueueing.
+
+No confirmation prompt. Operator typed the command; that's the intent signal.
 
 ### `enqueue_post_save_jobs!` logic
 
@@ -348,6 +387,14 @@ end
 
 A request that smuggles `title[en]` is silently dropped — Rails ignores unpermitted nested keys.
 
+## Deployment notes
+
+After the migration runs and the new code is deployed:
+
+1. Run `rake articles:retranslate_all` once. This nullifies `translation_source_hash` on every existing article and enqueues the translation job for each. Cost: roughly $0.75 × number of existing articles (tens, not thousands — total well under $50).
+2. The reason: existing articles may have hand-written non-FR translations from the old admin form. The "FR-only editable, AI-managed everywhere else" model requires those to be regenerated through the new pipeline so the entire catalog has consistent voice.
+3. Solid Queue handles the enqueued jobs at its normal pace. Monitor logs for translation errors during the burst.
+
 ## Cost estimate
 
 Article bodies typically 500–2000 words. At Claude Sonnet 4.6 pricing, a 2000-word FR body translated to 8 languages is roughly ~50k output tokens ≈ \$0.75/article. Editorial cadence (a handful of articles per week) makes total monthly cost negligible. Properties already operate against the same budget envelope.
@@ -389,8 +436,8 @@ TDD (red → green → refactor) per CLAUDE.md. WebMock stubs the Anthropic API.
 ### `test/services/property_translator/prompt_builder_test.rb` (additions)
 
 - System prompt now includes the full `MonacoGlossary::ALL` list (regression)
-- Per-property `district.name` and `building.name` still appended when present
-- No duplicates when district name overlaps with `MonacoGlossary::DISTRICTS`
+- Per-property `district&.name` and `building&.name` are still appended when present
+- No duplicates when a per-property name overlaps with the constant
 
 ### `test/jobs/article_translation_job_test.rb`
 
@@ -418,6 +465,14 @@ TDD (red → green → refactor) per CLAUDE.md. WebMock stubs the Anthropic API.
 - Re-saving without changing FR text does NOT re-enqueue (idempotency)
 - Saving with new FR text DOES re-enqueue
 
+### `test/tasks/articles_rake_test.rb`
+
+- `articles:retranslate_all` nullifies `translation_source_hash` on every article and enqueues `ArticleTranslationJob` once per article
+- `articles:retranslate_all` does not call `enqueue_post_save_jobs!` (uses `update_columns`) — no double-enqueue
+- `articles:retranslate[ID]` enqueues exactly one job for the matching article
+- `articles:retranslate[ID]` aborts with usage message when id is blank
+- `articles:retranslate[ID]` aborts when no article exists with that id
+
 ### `test/controllers/admin/articles_controller_test.rb` (additions)
 
 - `article_params` permits `title: [:fr]` only — passing `title[en]` is silently dropped
@@ -427,7 +482,7 @@ TDD (red → green → refactor) per CLAUDE.md. WebMock stubs the Anthropic API.
 - Index page renders per-row translation status badge
 - Edit page renders last-translated timestamp and error message when present
 
-**Estimated test count:** ~45 new tests, ~3 modifications to existing property tests for the shared glossary.
+**Estimated test count:** ~48 new tests, ~3 modifications to existing property tests for the shared glossary.
 
 ## Decisions log
 
@@ -436,9 +491,12 @@ TDD (red → green → refactor) per CLAUDE.md. WebMock stubs the Anthropic API.
 3. **Manual override:** none — only the French version is editable. Non-FR locales are entirely AI-managed.
 4. **Admin status surface:** minimal — per-row badge on index, last-translated timestamp + error block on edit. Preview and retry deferred.
 5. **Public render:** keep existing FR fallback. Brief async window is acceptable.
-6. **Glossary:** extracted to shared `MonacoGlossary` module. Properties get a real quality lift (broader coverage of inline references); articles use the constant directly.
+6. **Glossary:** extracted to shared `MonacoGlossary` module — hand-curated constant only, no database lookup. Considered combining with `District#name` / `Building#name` plucks but rejected: `.uniq` only deduplicates byte-identical strings, so subtle mismatches between curated terms and DB rows (apostrophe variants, accent variants, whitespace) would produce near-duplicate entries that pollute the prompt. Properties keep their narrow per-property `district&.name` / `building&.name` appending — small enough scope that the dedup risk is tolerable. Articles use `MonacoGlossary::ALL` directly. Editorial maintenance adds new terms to the constant when needed.
 7. **Approach:** parallel `ArticleTranslator` + `ArticleTranslationJob` mirroring property classes. No shared base class — two consumers don't justify abstraction yet.
 8. **Translation fidelity:** explicit "translate, do not rewrite" guardrail in the system prompt to prevent editorial drift.
+9. **No editor proof-reading beyond FR (and some EN/IT):** team can only validate French, English, and Italian. Spec assumes prompt and glossary are the only quality dial for the other 6 locales. No per-locale preview or override surface.
+10. **Operational re-translation:** two rake tasks (`articles:retranslate_all`, `articles:retranslate[ID]`) provide the "fix the prompt and re-trigger" path without forcing FR text edits. Bypass callbacks via `update_columns` to avoid double-enqueue.
+11. **Existing-article backfill:** run `rake articles:retranslate_all` once at deploy time so the existing catalog passes through the new pipeline. Hand-written non-FR translations get replaced with AI translations for consistent voice. One-time spend, tens of dollars.
 
 ## Open questions
 
