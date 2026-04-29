@@ -6,6 +6,8 @@ class ArticleTranslationJob < ApplicationJob
            RubyLLM::ServiceUnavailableError,
            RubyLLM::OverloadedError,
            Net::OpenTimeout,
+           Net::ReadTimeout,
+           Faraday::TimeoutError,
            JSON::ParserError,
            ArticleTranslator::BlankTranslation,
            wait: :polynomially_longer, attempts: 5
