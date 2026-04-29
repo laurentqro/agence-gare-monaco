@@ -27,7 +27,7 @@ class ArticleTranslator
   def translate!
     fr_title = @article.title_for(:fr)
     fr_body = @article.body_for(:fr)
-    new_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_body}")
+    new_hash = @article.current_fr_hash
 
     if new_hash == @article.translation_source_hash
       Rails.logger.info("[ArticleTranslator] article=#{@article.id} skipped (source unchanged)")
@@ -40,8 +40,9 @@ class ArticleTranslator
       "fr_title_chars=#{fr_title.length} fr_body_chars=#{fr_body.length}"
     )
 
+    body_required = fr_body.strip.present?
     LOCALES.each do |locale|
-      translate_locale!(locale, new_hash, fr_body)
+      translate_locale!(locale, new_hash, body_required)
     end
 
     finalize!(new_hash)
@@ -52,7 +53,7 @@ class ArticleTranslator
 
   private
 
-  def translate_locale!(locale, new_hash, fr_body)
+  def translate_locale!(locale, new_hash, body_required)
     if locale_already_current?(locale, new_hash)
       Rails.logger.info("[ArticleTranslator] article=#{@article.id} locale=#{locale} skipped (already translated for current source)")
       return
@@ -69,7 +70,7 @@ class ArticleTranslator
       "in=#{response.input_tokens} out=#{response.output_tokens}"
     )
 
-    fields = parse_locale(response.content, locale, fr_body)
+    fields = parse_locale(response.content, locale, body_required)
     apply_locale!(locale, fields, new_hash)
   end
 
@@ -78,16 +79,14 @@ class ArticleTranslator
     entry.is_a?(Hash) && entry["source_hash"] == new_hash && entry["translated_at"].present?
   end
 
-  def parse_locale(content, locale, fr_body)
+  def parse_locale(content, locale, body_required)
     raise BlankTranslation, "Response is not a hash for #{locale}: #{content.inspect}" unless content.is_a?(Hash)
 
     title = require_string!(content["title"], "title", locale)
-    if fr_body.strip.empty?
-      { title: title }
-    else
-      body = require_string!(content["body"], "body", locale)
-      { title: title, body: body }
-    end
+    return { title: title } unless body_required
+
+    body = require_string!(content["body"], "body", locale)
+    { title: title, body: body }
   end
 
   def require_string!(value, field, locale)
@@ -96,14 +95,8 @@ class ArticleTranslator
     value
   end
 
-  # Persist one locale's translation. We freshly read the row inside the
-  # transaction so we don't clobber a concurrent FR edit (admin saving the FR
-  # text mid-loop). After this row-lock+merge, the only way two writers can
-  # collide is if both translate the same locale at the same instant — and the
-  # source-hash skip at the top of translate_locale! handles that on retry.
   def apply_locale!(locale, fields, new_hash)
-    Article.transaction do
-      row = Article.lock.find(@article.id)
+    with_locked_row do |row|
       title = (row.title || {}).dup
       body = (row.body || {}).dup
       status = (row.translations_status || {}).dup
@@ -115,25 +108,26 @@ class ArticleTranslator
         "source_hash" => new_hash
       }
 
-      row.update_columns(
-        title: title,
-        body: body,
-        translations_status: status,
-        updated_at: Time.current
-      )
+      { title: title, body: body, translations_status: status }
     end
   end
 
   def finalize!(new_hash)
-    Article.transaction do
-      row = Article.lock.find(@article.id)
+    with_locked_row do |row|
       status = (row.translations_status || {}).dup
       status.delete("_error")
-      row.update_columns(
-        translations_status: status,
-        translation_source_hash: new_hash,
-        updated_at: Time.current
-      )
+      { translations_status: status, translation_source_hash: new_hash }
+    end
+  end
+
+  # Yields a freshly-locked row; takes the columns hash returned by the block
+  # and writes it (plus an updated_at bump) inside the same transaction. The
+  # row-lock + fresh re-read protects merges from concurrent FR edits.
+  def with_locked_row
+    Article.transaction do
+      row = Article.lock.find(@article.id)
+      columns = yield(row)
+      row.update_columns(columns.merge(updated_at: Time.current))
     end
   end
 end
