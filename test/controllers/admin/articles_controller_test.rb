@@ -423,4 +423,62 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     article.reload
     assert article.featured
   end
+
+  # AUTO-TRANSLATION
+  test "POST create enqueues ArticleTranslationJob after successful save" do
+    assert_enqueued_with(job: ArticleTranslationJob) do
+      post admin_articles_url, params: {
+        article: {
+          title: { fr: "Nouveau titre" },
+          body: { fr: "Contenu" },
+          slug: "nouveau-titre-trans",
+          category_id: @category.id
+        }
+      }
+    end
+  end
+
+  test "POST create with invalid data does NOT enqueue ArticleTranslationJob" do
+    Article.create!(title: { "fr" => "Existing" }, body: { "fr" => "C" }, slug: "dup-slug", category: @category)
+    assert_no_enqueued_jobs only: ArticleTranslationJob do
+      post admin_articles_url, params: {
+        article: {
+          title: { fr: "Test" },
+          body: { fr: "Content" },
+          slug: "dup-slug",
+          category_id: @category.id
+        }
+      }
+    end
+  end
+
+  test "PATCH update enqueues ArticleTranslationJob after successful save" do
+    article = Article.create!(
+      title: { "fr" => "Old" },
+      body: { "fr" => "Old body" },
+      slug: "old-art",
+      category: @category
+    )
+    assert_enqueued_with(job: ArticleTranslationJob, args: [ article.id ]) do
+      patch admin_article_url(article), params: {
+        article: { title: { fr: "Updated" } }
+      }
+    end
+  end
+
+  test "POST create silently drops non-FR title and body params" do
+    post admin_articles_url, params: {
+      article: {
+        title: { fr: "Titre français", en: "Smuggled English" },
+        body: { fr: "Corps français", en: "Smuggled body" },
+        slug: "drop-non-fr",
+        category_id: @category.id
+      }
+    }
+    article = Article.last
+    assert_equal "Titre français", article.title["fr"]
+    assert_nil article.title["en"], "non-FR title locales should be silently dropped"
+    assert_equal "Corps français", article.body["fr"]
+    assert_nil article.body["en"], "non-FR body locales should be silently dropped"
+  end
 end
