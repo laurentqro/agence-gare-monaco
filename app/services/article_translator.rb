@@ -29,7 +29,17 @@ class ArticleTranslator
     fr_body = @article.body_for(:fr)
     new_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_body}")
     expected_hash = @article.translation_source_hash
-    return if new_hash == expected_hash
+
+    if new_hash == expected_hash
+      Rails.logger.info("[ArticleTranslator] article=#{@article.id} skipped (source unchanged)")
+      return
+    end
+
+    started_at = Time.current
+    Rails.logger.info(
+      "[ArticleTranslator] article=#{@article.id} starting model=#{self.class.model} " \
+      "fr_title_chars=#{fr_title.length} fr_body_chars=#{fr_body.length}"
+    )
 
     builder = PromptBuilder.new(@article)
     chat = RubyLLM.chat(model: self.class.model)
@@ -40,14 +50,21 @@ class ArticleTranslator
     log_usage(response)
 
     translations = parse(response.content, fr_body)
-    apply_translations!(translations, new_hash, expected_hash)
+    applied = apply_translations!(translations, new_hash, expected_hash)
+
+    duration = (Time.current - started_at).round(2)
+    if applied
+      Rails.logger.info("[ArticleTranslator] article=#{@article.id} completed in=#{duration}s")
+    else
+      Rails.logger.warn("[ArticleTranslator] article=#{@article.id} discarded (another worker won the race) duration=#{duration}s")
+    end
   end
 
   private
 
   def log_usage(response)
     Rails.logger.info(
-      "[ArticleTranslator] article=#{@article.id} model=#{self.class.model} " \
+      "[ArticleTranslator] article=#{@article.id} llm_response model=#{self.class.model} " \
       "in=#{response.input_tokens} out=#{response.output_tokens}"
     )
   end
