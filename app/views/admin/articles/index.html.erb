@@ -35,13 +35,14 @@
               <% end %>
             </td>
             <td class="px-4 py-3">
+              <% count_label = "#{article.translated_count}/8" %>
               <% case article.translation_status
                  when :complete %>
-                <span data-translation-status="complete" class="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded"><%= t("admin.articles.translations.complete") %></span>
+                <span data-translation-status="complete" class="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded"><%= count_label %></span>
               <% when :pending %>
-                <span data-translation-status="pending" class="inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded"><%= t("admin.articles.translations.pending") %></span>
+                <span data-translation-status="pending" class="inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded"><%= count_label %></span>
               <% when :error %>
-                <span data-translation-status="error" class="inline-block px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded"><%= t("admin.articles.translations.error") %></span>
+                <span data-translation-status="error" class="inline-block px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded" title="<%= article.translation_error&.dig('class') %>"><%= count_label %></span>
               <% end %>
             </td>
             <td class="px-4 py-3 text-gray-500">

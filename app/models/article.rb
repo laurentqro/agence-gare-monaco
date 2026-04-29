@@ -72,6 +72,12 @@ class Article < ApplicationRecord
     :complete
   end
 
+  def translated_count
+    return 0 unless translations_status.is_a?(Hash)
+    target_locales = (I18n.available_locales.map(&:to_s) - [ "fr" ])
+    target_locales.count { |loc| translations_status.dig(loc, "translated_at").present? }
+  end
+
   def last_translated_at
     return nil unless translations_status.is_a?(Hash)
     timestamps = translations_status.each_with_object([]) do |(key, value), acc|

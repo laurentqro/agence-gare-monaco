@@ -54,9 +54,6 @@ fr:
       draft: "Brouillon"
       translations:
         heading: "Traductions automatiques"
-        complete: "8/8"
-        pending: "En attente"
-        error: "Erreur"
         last_translated_at: "Dernière traduction"
         error_label: "Échec de la traduction"
       form:
