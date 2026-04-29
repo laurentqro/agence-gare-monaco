@@ -42,7 +42,7 @@
           <button class="flex items-center text-navy hover:text-accent transition-colors">
             <%= image_tag "flags/#{flag_image_for(I18n.locale)}.svg", alt: locale_name_for(I18n.locale), class: "w-7 h-5 rounded-sm" %>
           </button>
-          <div data-language-switcher-target="menu" class="absolute -left-4 pt-2 origin-top transition-all duration-200 ease-out opacity-0 scale-y-0 pointer-events-none">
+          <div data-language-switcher-target="menu" class="absolute right-0 pt-2 origin-top transition-all duration-200 ease-out opacity-0 scale-y-0 pointer-events-none">
           <div class="bg-white rounded py-1.5 min-w-[140px]">
             <% I18n.available_locales.each do |locale| %>
               <% next if locale == I18n.locale %>
