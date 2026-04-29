@@ -28,9 +28,8 @@ class ArticleTranslator
     fr_title = @article.title_for(:fr)
     fr_body = @article.body_for(:fr)
     new_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_body}")
-    expected_hash = @article.translation_source_hash
 
-    if new_hash == expected_hash
+    if new_hash == @article.translation_source_hash
       Rails.logger.info("[ArticleTranslator] article=#{@article.id} skipped (source unchanged)")
       return
     end
@@ -41,49 +40,54 @@ class ArticleTranslator
       "fr_title_chars=#{fr_title.length} fr_body_chars=#{fr_body.length}"
     )
 
-    builder = PromptBuilder.new(@article)
+    LOCALES.each do |locale|
+      translate_locale!(locale, new_hash, fr_body)
+    end
+
+    finalize!(new_hash)
+
+    duration = (Time.current - started_at).round(2)
+    Rails.logger.info("[ArticleTranslator] article=#{@article.id} completed in=#{duration}s")
+  end
+
+  private
+
+  def translate_locale!(locale, new_hash, fr_body)
+    if locale_already_current?(locale, new_hash)
+      Rails.logger.info("[ArticleTranslator] article=#{@article.id} locale=#{locale} skipped (already translated for current source)")
+      return
+    end
+
+    builder = PromptBuilder.new(@article, locale)
     chat = RubyLLM.chat(model: self.class.model)
       .with_instructions(builder.system_prompt)
       .with_schema(Schema)
     response = chat.ask(builder.user_prompt)
 
-    log_usage(response)
-
-    translations = parse(response.content, fr_body)
-    applied = apply_translations!(translations, new_hash, expected_hash)
-
-    duration = (Time.current - started_at).round(2)
-    if applied
-      Rails.logger.info("[ArticleTranslator] article=#{@article.id} completed in=#{duration}s")
-    else
-      Rails.logger.warn("[ArticleTranslator] article=#{@article.id} discarded (another worker won the race) duration=#{duration}s")
-    end
-  end
-
-  private
-
-  def log_usage(response)
     Rails.logger.info(
-      "[ArticleTranslator] article=#{@article.id} llm_response model=#{self.class.model} " \
+      "[ArticleTranslator] article=#{@article.id} llm_response locale=#{locale} model=#{self.class.model} " \
       "in=#{response.input_tokens} out=#{response.output_tokens}"
     )
+
+    fields = parse_locale(response.content, locale, fr_body)
+    apply_locale!(locale, fields, new_hash)
   end
 
-  def parse(content, fr_body)
-    raise BlankTranslation, "Response is not a hash: #{content.inspect}" unless content.is_a?(Hash)
+  def locale_already_current?(locale, new_hash)
+    entry = (@article.translations_status || {})[locale]
+    entry.is_a?(Hash) && entry["source_hash"] == new_hash && entry["translated_at"].present?
+  end
 
-    parsed = {}
-    LOCALES.each do |locale|
-      title = require_string!(content["title_#{locale}"], "title", locale)
+  def parse_locale(content, locale, fr_body)
+    raise BlankTranslation, "Response is not a hash for #{locale}: #{content.inspect}" unless content.is_a?(Hash)
 
-      if fr_body.strip.empty?
-        parsed[locale] = { title: title }
-      else
-        body = require_string!(content["body_#{locale}"], "body", locale)
-        parsed[locale] = { title: title, body: body }
-      end
+    title = require_string!(content["title"], "title", locale)
+    if fr_body.strip.empty?
+      { title: title }
+    else
+      body = require_string!(content["body"], "body", locale)
+      { title: title, body: body }
     end
-    parsed
   end
 
   def require_string!(value, field, locale)
@@ -92,28 +96,44 @@ class ArticleTranslator
     value
   end
 
-  # Returns false if a concurrent worker raced ahead — its translations stay,
-  # ours are stale by definition.
-  def apply_translations!(translations, new_hash, expected_hash)
-    title = (@article.title || {}).dup
-    body = (@article.body || {}).dup
-    status = (@article.translations_status || {}).dup
-    status.delete("_error")
-    timestamp = Time.current.iso8601
+  # Persist one locale's translation. We freshly read the row inside the
+  # transaction so we don't clobber a concurrent FR edit (admin saving the FR
+  # text mid-loop). After this row-lock+merge, the only way two writers can
+  # collide is if both translate the same locale at the same instant — and the
+  # source-hash skip at the top of translate_locale! handles that on retry.
+  def apply_locale!(locale, fields, new_hash)
+    Article.transaction do
+      row = Article.lock.find(@article.id)
+      title = (row.title || {}).dup
+      body = (row.body || {}).dup
+      status = (row.translations_status || {}).dup
 
-    translations.each do |locale, fields|
       title[locale] = fields[:title]
       body[locale] = fields[:body] if fields.key?(:body)
-      status[locale] = { "translated_at" => timestamp }
-    end
+      status[locale] = {
+        "translated_at" => Time.current.iso8601,
+        "source_hash" => new_hash
+      }
 
-    rows = Article.where(id: @article.id, translation_source_hash: expected_hash).update_all(
-      title: title,
-      body: body,
-      translations_status: status,
-      translation_source_hash: new_hash,
-      updated_at: Time.current
-    )
-    rows.positive?
+      row.update_columns(
+        title: title,
+        body: body,
+        translations_status: status,
+        updated_at: Time.current
+      )
+    end
+  end
+
+  def finalize!(new_hash)
+    Article.transaction do
+      row = Article.lock.find(@article.id)
+      status = (row.translations_status || {}).dup
+      status.delete("_error")
+      row.update_columns(
+        translations_status: status,
+        translation_source_hash: new_hash,
+        updated_at: Time.current
+      )
+    end
   end
 end

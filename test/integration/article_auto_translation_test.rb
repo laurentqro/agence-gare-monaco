@@ -4,16 +4,31 @@ class ArticleAutoTranslationTest < ActionDispatch::IntegrationTest
   include ActiveJob::TestHelper
 
   class FakeChat
-    def initialize(content, input_tokens: 200, output_tokens: 800)
-      @content = content
+    # content_per_locale: Hash[locale => {"title"=>..., "body"=>...}].
+    # We sniff the target locale from the system prompt passed to with_instructions.
+    def initialize(content_per_locale, input_tokens: 100, output_tokens: 200)
+      @content_per_locale = content_per_locale
       @input_tokens = input_tokens
       @output_tokens = output_tokens
+      @last_locale = nil
     end
-    def with_instructions(_); self; end
+
+    def with_instructions(prompt)
+      ArticleTranslator::LOCALE_NAMES.each do |code, name|
+        if prompt.include?(name)
+          @last_locale = code
+          break
+        end
+      end
+      self
+    end
+
     def with_schema(_); self; end
+
     def ask(_)
+      content = @content_per_locale.fetch(@last_locale)
       Struct.new(:content, :input_tokens, :output_tokens)
-        .new(@content, @input_tokens, @output_tokens)
+        .new(content, @input_tokens, @output_tokens)
     end
   end
 
@@ -24,12 +39,9 @@ class ArticleAutoTranslationTest < ActionDispatch::IntegrationTest
   end
 
   def canned_response(title_prefix: "Title", body_prefix: "Body")
-    fields = {}
-    %w[en it de sv no da fi ru].each do |locale|
-      fields["title_#{locale}"] = "#{title_prefix} #{locale.upcase}"
-      fields["body_#{locale}"] = "#{body_prefix} #{locale.upcase}"
+    %w[en it de sv no da fi ru].each_with_object({}) do |locale, h|
+      h[locale] = { "title" => "#{title_prefix} #{locale.upcase}", "body" => "#{body_prefix} #{locale.upcase}" }
     end
-    fields
   end
 
   def with_stubbed_chat(content:, &block)
@@ -66,14 +78,16 @@ class ArticleAutoTranslationTest < ActionDispatch::IntegrationTest
   test "markdown is preserved through translation: heading, bold, image with alt" do
     markdown_response = {}
     %w[en it de sv no da fi ru].each do |locale|
-      markdown_response["title_#{locale}"] = "Heading #{locale.upcase}"
-      markdown_response["body_#{locale}"] = <<~MD.strip
-        # Heading #{locale.upcase}
+      markdown_response[locale] = {
+        "title" => "Heading #{locale.upcase}",
+        "body" => <<~MD.strip
+          # Heading #{locale.upcase}
 
-        Some **bold** text in #{locale.upcase}.
+          Some **bold** text in #{locale.upcase}.
 
-        ![translated alt #{locale}](https://example.com/photo.jpg)
-      MD
+          ![translated alt #{locale}](https://example.com/photo.jpg)
+        MD
+      }
     end
 
     perform_enqueued_jobs do
