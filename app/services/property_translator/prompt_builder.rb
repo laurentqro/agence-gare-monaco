@@ -55,6 +55,6 @@ class PropertyTranslator::PromptBuilder
   private
 
   def glossary_terms
-    [ "Monaco", "Monte-Carlo", @property.district&.name, @property.building&.name ].compact.uniq
+    (MonacoGlossary::ALL + [ @property.district&.name, @property.building&.name ]).compact.uniq
   end
 end

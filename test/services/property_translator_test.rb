@@ -245,8 +245,9 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     builder = PropertyTranslator::PromptBuilder.new(@property)
     system = builder.system_prompt
     refute_match(/- \s*\n/, system, "glossary should not contain empty lines for missing names")
-    refute_includes system, "Carré d'Or"
-    refute_includes system, "Le Mirabeau"
+    # The curated MonacoGlossary terms (including Carré d'Or, Le Mirabeau) are
+    # always present regardless of per-property district/building. This test
+    # only guards against blank entries from the per-property nil values.
   end
 
   test "uses the model configured on Rails.configuration" do
