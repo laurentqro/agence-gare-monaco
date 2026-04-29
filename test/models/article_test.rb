@@ -322,4 +322,50 @@ class ArticleTest < ActiveSupport::TestCase
     )
     assert_equal 8, article.translated_count
   end
+
+  # translation_stale?
+  test "translation_stale? is true when translation_source_hash is nil" do
+    article = Article.create!(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "stale-nil", category: @category
+    )
+    article.update_columns(translation_source_hash: nil)
+    assert article.translation_stale?
+  end
+
+  test "translation_stale? is true when source hash does not match current FR text" do
+    article = Article.create!(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "stale-mismatch", category: @category
+    )
+    article.update_columns(translation_source_hash: "outdated-hash")
+    assert article.translation_stale?
+  end
+
+  test "translation_stale? is false when source hash matches current FR text" do
+    fr_title = "Titre"
+    fr_body = "Corps"
+    article = Article.create!(
+      title: { "fr" => fr_title }, body: { "fr" => fr_body },
+      slug: "stale-match", category: @category
+    )
+    canonical = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_body}")
+    article.update_columns(translation_source_hash: canonical)
+    refute article.translation_stale?
+  end
+
+  test "translation_stale? recomputes hash after FR text edit" do
+    fr_title = "Titre"
+    fr_body = "Corps"
+    article = Article.create!(
+      title: { "fr" => fr_title }, body: { "fr" => fr_body },
+      slug: "stale-edit", category: @category
+    )
+    canonical = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_body}")
+    article.update_columns(translation_source_hash: canonical)
+    refute article.translation_stale?
+
+    article.update!(body: { "fr" => "Corps modifié" })
+    assert article.translation_stale?
+  end
 end

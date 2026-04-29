@@ -38,13 +38,23 @@
             </td>
             <td class="px-4 py-3">
               <% count_label = "#{article.translated_count}/8" %>
-              <% case article.translation_status
-                 when :complete %>
-                <span data-translation-status="complete" class="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded"><%= count_label %></span>
-              <% when :pending %>
-                <span data-translation-status="pending" class="inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded"><%= count_label %></span>
-              <% when :error %>
-                <span data-translation-status="error" class="inline-block px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded" title="<%= article.translation_error&.dig('class') %>"><%= count_label %></span>
+              <% if article.translation_stale? && article.translated_count.positive? && article.translation_error.nil? %>
+                <span data-translation-status="stale" class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-amber-100 text-amber-700 rounded">
+                  <%= count_label %>
+                  <svg data-role="spinner" class="w-3 h-3 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                  </svg>
+                </span>
+              <% else %>
+                <% case article.translation_status
+                   when :complete %>
+                  <span data-translation-status="complete" class="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded"><%= count_label %></span>
+                <% when :pending %>
+                  <span data-translation-status="pending" class="inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded"><%= count_label %></span>
+                <% when :error %>
+                  <span data-translation-status="error" class="inline-block px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded" title="<%= article.translation_error&.dig('class') %>"><%= count_label %></span>
+                <% end %>
               <% end %>
             </td>
             <td class="px-4 py-3 text-gray-500">
