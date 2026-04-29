@@ -216,4 +216,66 @@ class ArticleTest < ActiveSupport::TestCase
     )
     assert_equal [], article.body_image_urls
   end
+
+  # translated_at
+  test "translated_at parses ISO8601 timestamp from translations_status" do
+    article = Article.new(
+      title: { "fr" => "T" },
+      body: { "fr" => "B" },
+      category: @category,
+      translations_status: { "en" => { "translated_at" => "2026-04-29T10:15:00Z" } }
+    )
+    expected = Time.iso8601("2026-04-29T10:15:00Z")
+    assert_equal expected, article.translated_at(:en)
+  end
+
+  test "translated_at returns nil when locale is missing" do
+    article = Article.new(
+      title: { "fr" => "T" }, body: { "fr" => "B" }, category: @category,
+      translations_status: { "en" => { "translated_at" => "2026-04-29T10:15:00Z" } }
+    )
+    assert_nil article.translated_at(:de)
+  end
+
+  test "translated_at returns nil when translations_status is empty hash" do
+    article = Article.new(
+      title: { "fr" => "T" }, body: { "fr" => "B" }, category: @category,
+      translations_status: {}
+    )
+    assert_nil article.translated_at(:en)
+  end
+
+  test "translated_at returns nil when timestamp is unparseable" do
+    article = Article.new(
+      title: { "fr" => "T" }, body: { "fr" => "B" }, category: @category,
+      translations_status: { "en" => { "translated_at" => "not a date" } }
+    )
+    assert_nil article.translated_at(:en)
+  end
+
+  # translation_error
+  test "translation_error returns the _error hash when present" do
+    err = { "class" => "RubyLLM::ContextLengthExceededError", "message" => "too long", "failed_at" => "2026-04-29T10:00:00Z" }
+    article = Article.new(
+      title: { "fr" => "T" }, body: { "fr" => "B" }, category: @category,
+      translations_status: { "_error" => err }
+    )
+    assert_equal err, article.translation_error
+  end
+
+  test "translation_error returns nil when _error is absent" do
+    article = Article.new(
+      title: { "fr" => "T" }, body: { "fr" => "B" }, category: @category,
+      translations_status: { "en" => { "translated_at" => "2026-04-29T10:15:00Z" } }
+    )
+    assert_nil article.translation_error
+  end
+
+  test "translation_error returns nil when _error has no class key" do
+    article = Article.new(
+      title: { "fr" => "T" }, body: { "fr" => "B" }, category: @category,
+      translations_status: { "_error" => { "message" => "orphan" } }
+    )
+    assert_nil article.translation_error
+  end
 end

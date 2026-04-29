@@ -37,6 +37,20 @@ class Article < ApplicationRecord
     text.scan(/!\[.*?\]\((.+?)\)/).flatten
   end
 
+  def translated_at(locale)
+    entry = translations_status.is_a?(Hash) ? translations_status[locale.to_s] : nil
+    return nil unless entry.is_a?(Hash) && entry["translated_at"].present?
+    Time.iso8601(entry["translated_at"])
+  rescue ArgumentError
+    nil
+  end
+
+  def translation_error
+    return nil unless translations_status.is_a?(Hash)
+    err = translations_status["_error"]
+    err.is_a?(Hash) && err["class"].present? ? err : nil
+  end
+
   private
 
   def generate_slug
