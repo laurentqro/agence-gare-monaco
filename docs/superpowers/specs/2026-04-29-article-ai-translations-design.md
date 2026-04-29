@@ -1,7 +1,67 @@
 # Article AI Translations — Design
 
 **Date:** 2026-04-29
-**Status:** Approved (brainstorming → writing-plans)
+**Status:** Implemented; design partially superseded — see "Post-implementation revisions" below.
+
+## Post-implementation revisions
+
+Production exposed two failure modes the original "single call returns all 8 locales" design did not survive:
+
+1. The model returned `body_X: nil` (most often `body_sv`) on long-form articles after ~3 minutes, causing `BlankTranslation` and discarding the entire response.
+2. Solid Queue claims hung for 45+ minutes on `Net::ReadTimeout` reading stalled responses, and `Faraday::TimeoutError` / `Net::ReadTimeout` were not in the job's `retry_on` list.
+
+Root cause: a structured-output call returning 8 × ~7K-char translations is at the edge of the model's reliable output budget. The implementation diverged from the original design as follows. Sections below referring to the original schema, parse, and apply path are preserved as historical context.
+
+### Per-locale calls (replaces "single call, 16 fields")
+
+`ArticleTranslator#translate!` now iterates over the 8 target locales sequentially. Each iteration makes one LLM call against a slim `{title: string, body: string}` schema (previously 16 fields per call). The locale is conveyed through the prompt — `PromptBuilder.new(article, locale)` produces a system+user prompt that names a single target language. Output per call drops by ~8×, well within the model's reliable range.
+
+Total wall time is comparable to the original (~3 min/article) because calls are sequential, but each individual call is short enough (~20-30s) that a single hung connection no longer dominates.
+
+### Write-as-you-go (replaces "atomic UPDATE merging all 8 at once")
+
+Each per-locale call's result is persisted immediately inside its own row-locked transaction:
+
+```ruby
+Article.transaction do
+  row = Article.lock.find(@article.id)
+  # merge title[locale], body[locale], translations_status[locale]
+  row.update_columns(title: ..., body: ..., translations_status: ..., updated_at: ...)
+end
+```
+
+The row lock + fresh re-read prevents clobbering a concurrent FR edit. `translation_source_hash` is set only after all 8 locales land successfully (via a separate `finalize!` step), so `translation_status :complete` still means "all 8 are present and current".
+
+A failed Swedish call no longer loses Italian — Italian is already persisted. On retry, `translate!` re-iterates and skips any locale whose `translations_status[locale]["source_hash"]` already matches the current FR (per-locale skip predicate `locale_already_current?`).
+
+### `translations_status` schema addition
+
+Each locale entry now stores `source_hash` in addition to `translated_at`:
+
+```json
+{
+  "en": { "translated_at": "2026-04-29T14:32:11Z", "source_hash": "<sha256>" },
+  ...
+}
+```
+
+`source_hash` powers the per-locale skip on retry. `_error` slot unchanged.
+
+### Expanded retry list
+
+`ArticleTranslationJob.retry_on` was extended with three classes that proved load-bearing in production:
+
+- `ArticleTranslator::BlankTranslation` — the model returning `body_X: nil` is transient; re-asking usually produces a complete response.
+- `Net::ReadTimeout` — stalled response reads.
+- `Faraday::TimeoutError` — the RubyLLM transport's wrapper around the same.
+
+All retry with `:polynomially_longer` backoff up to 5 attempts.
+
+### Stale-state badge in admin index
+
+`Article#translation_stale?` returns true when `translation_source_hash` is blank or doesn't match `SHA256(current_fr_title + "\n" + current_fr_body)`. The admin index renders a fourth badge state (`data-translation-status='stale'`) — amber background with a CSS-animated spinner — when stale AND `translated_count.positive?` AND no error is recorded. Bridges the post-save → job-completion window honestly: the badge no longer falsely shows 8/8 green during the ~3 minutes the translator is running.
+
+The hash computation is memoized per `Article` instance (`current_fr_hash` private method) so the index page doesn't SHA256 every body on every render.
 
 ## Overview
 
@@ -111,6 +171,8 @@ The `_error` key is present only after a `discard_on` exception. The translator 
 ## Prompt design
 
 ### Schema (RubyLLM structured output)
+
+> **Superseded by per-locale calls.** See "Post-implementation revisions" at the top. The schema is now `{title: string, body: string}` per call, and one call is made per target locale rather than one call returning all 8.
 
 For each locale in `ArticleTranslator::LOCALES` (= `["en", "it", "de", "sv", "no", "da", "fi", "ru"]`):
 
@@ -250,6 +312,8 @@ Iterative draft saves with unchanged FR text skip the API call. Hash covers titl
 
 ### Atomic update with race guard
 
+> **Superseded.** Race protection is now a row lock (`Article.lock.find`) inside each per-locale write, plus the per-locale `source_hash` skip on retry. See "Post-implementation revisions" at the top.
+
 ```ruby
 rows = Article.where(id: @article.id, translation_source_hash: expected_hash).update_all(
   title: merged_title,
@@ -315,7 +379,7 @@ end
 
 ### Job-level (`ArticleTranslationJob`)
 
-Same retry/discard matrix as `PropertyTranslationJob`:
+Same retry/discard matrix as `PropertyTranslationJob`, **plus three classes added during post-implementation hardening** (`BlankTranslation`, `Net::ReadTimeout`, `Faraday::TimeoutError` — see "Post-implementation revisions" at the top):
 
 ```ruby
 retry_on RubyLLM::RateLimitError,
@@ -323,7 +387,10 @@ retry_on RubyLLM::RateLimitError,
          RubyLLM::ServiceUnavailableError,
          RubyLLM::OverloadedError,
          Net::OpenTimeout,
+         Net::ReadTimeout,
+         Faraday::TimeoutError,
          JSON::ParserError,
+         ArticleTranslator::BlankTranslation,
          wait: :polynomially_longer, attempts: 5
 
 discard_on RubyLLM::UnauthorizedError,
@@ -352,15 +419,16 @@ Minimal — explicit "option A" choice during brainstorming. Defer richer surfac
 
 ### Index page (`admin/articles/index.html.erb`)
 
-Per-row badge:
+Per-row badge. The shipped UI shows the count (`n/8`) inside the badge in all states, and added a fourth "stale" state during the post-save → job-completion window (see "Post-implementation revisions" at the top):
 
 | Condition | Badge |
 | --- | --- |
-| All 8 non-FR locales have a `translated_at` AND `translation_source_hash` is current | green `8/8` |
-| `translation_source_hash` is nil OR not all locales translated | amber `pending` |
-| `translations_status["_error"]` present | red `error` |
+| All 8 non-FR locales translated AND `translation_source_hash` matches current FR | green `8/8` |
+| `translation_stale?` AND `translated_count.positive?` AND no `_error` (post-save in-progress) | amber `n/8 ↻` (CSS-spinning) |
+| `translation_source_hash` is nil OR not all locales translated | gray `n/8` (pending) |
+| `translations_status["_error"]` present | red `n/8` (with error class as title tooltip) |
 
-Badge state precedence: error > pending > complete.
+Badge state precedence: error > stale > pending > complete.
 
 ### Edit page (`admin/articles/edit.html.erb`)
 
