@@ -78,6 +78,14 @@ class Article < ApplicationRecord
     target_locales.count { |loc| translations_status.dig(loc, "translated_at").present? }
   end
 
+  # Stale = current FR text no longer matches the hash that produced the
+  # existing translations. Either nothing has run yet (hash nil) or the FR
+  # source changed and the translator hasn't caught up.
+  def translation_stale?
+    return true if translation_source_hash.blank?
+    Digest::SHA256.hexdigest("#{title_for(:fr)}\n#{body_for(:fr)}") != translation_source_hash
+  end
+
   def last_translated_at
     return nil unless translations_status.is_a?(Hash)
     timestamps = translations_status.each_with_object([]) do |(key, value), acc|

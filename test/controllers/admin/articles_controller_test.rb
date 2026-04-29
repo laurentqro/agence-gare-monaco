@@ -494,7 +494,8 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     %w[en it de sv no da fi ru].each do |loc|
       status[loc] = { "translated_at" => "2026-04-29T10:00:00Z" }
     end
-    article.update_columns(translation_source_hash: "abc", translations_status: status)
+    canonical = Digest::SHA256.hexdigest("Done\nBody")
+    article.update_columns(translation_source_hash: canonical, translations_status: status)
 
     get admin_articles_url
     assert_response :success
@@ -510,7 +511,8 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     %w[en it de].each do |loc|
       status[loc] = { "translated_at" => "2026-04-29T10:00:00Z" }
     end
-    article.update_columns(translation_source_hash: "abc", translations_status: status)
+    canonical = Digest::SHA256.hexdigest("Partial\nBody")
+    article.update_columns(translation_source_hash: canonical, translations_status: status)
 
     get admin_articles_url
     assert_response :success
@@ -527,11 +529,52 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
       "it" => { "translated_at" => "2026-04-29T10:00:00Z" },
       "_error" => { "class" => "RubyLLM::ContextLengthExceededError", "message" => "x", "failed_at" => "2026-04-29T10:00:00Z" }
     }
-    article.update_columns(translation_source_hash: "abc", translations_status: status)
+    canonical = Digest::SHA256.hexdigest("Failed\nBody")
+    article.update_columns(translation_source_hash: canonical, translations_status: status)
 
     get admin_articles_url
     assert_response :success
     assert_select "[data-translation-status='error']", text: "2/8"
+  end
+
+  test "GET index shows stale status with current count and spinner when FR text changed since last translation" do
+    article = Article.create!(
+      title: { "fr" => "Original" }, body: { "fr" => "Original body" },
+      slug: "stale-art", category: @category
+    )
+    status = {}
+    %w[en it de sv no da fi ru].each do |loc|
+      status[loc] = { "translated_at" => "2026-04-29T10:00:00Z" }
+    end
+    article.update_columns(
+      translation_source_hash: Digest::SHA256.hexdigest("Old\nOld body"),
+      translations_status: status
+    )
+
+    get admin_articles_url
+    assert_response :success
+    assert_select "[data-translation-status='stale']", text: /8\/8/
+    assert_select "[data-translation-status='stale'] svg[data-role='spinner']"
+  end
+
+  test "GET index does not show stale status when source hash matches current FR text" do
+    article = Article.create!(
+      title: { "fr" => "Fresh" }, body: { "fr" => "Fresh body" },
+      slug: "fresh-art", category: @category
+    )
+    status = {}
+    %w[en it de sv no da fi ru].each do |loc|
+      status[loc] = { "translated_at" => "2026-04-29T10:00:00Z" }
+    end
+    article.update_columns(
+      translation_source_hash: Digest::SHA256.hexdigest("Fresh\nFresh body"),
+      translations_status: status
+    )
+
+    get admin_articles_url
+    assert_response :success
+    assert_select "[data-translation-status='stale']", false
+    assert_select "[data-translation-status='complete']", text: "8/8"
   end
 
   test "GET edit shows last-translated timestamp when present" do
