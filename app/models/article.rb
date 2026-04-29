@@ -51,6 +51,13 @@ class Article < ApplicationRecord
     err.is_a?(Hash) && err["class"].present? ? err : nil
   end
 
+  def enqueue_post_save_jobs!
+    text_changed = saved_changes.keys.intersect?(%w[title body])
+    if text_changed || translation_source_hash.nil?
+      ArticleTranslationJob.perform_later(id)
+    end
+  end
+
   private
 
   def generate_slug

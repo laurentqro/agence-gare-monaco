@@ -15,6 +15,7 @@ module Admin
       @article = Article.new(article_params)
       set_published_at
       if @article.save
+        @article.enqueue_post_save_jobs!
         redirect_to admin_articles_url, notice: t("admin.articles.flash.created")
       else
         render :new, status: :unprocessable_entity
@@ -28,6 +29,7 @@ module Admin
       @article.assign_attributes(article_params)
       set_published_at
       if @article.save
+        @article.enqueue_post_save_jobs!
         redirect_to admin_articles_url, notice: t("admin.articles.flash.updated")
       else
         render :edit, status: :unprocessable_entity
@@ -52,8 +54,8 @@ module Admin
     def article_params
       params.require(:article).permit(
         :slug, :category_id, :published, :featured, :cover_image_url,
-        title: I18n.available_locales.map(&:to_s),
-        body: I18n.available_locales.map(&:to_s)
+        title: [ :fr ],
+        body: [ :fr ]
       )
     end
 
