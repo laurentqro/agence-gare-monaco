@@ -354,7 +354,7 @@ class ArticleTest < ActiveSupport::TestCase
     refute article.translation_stale?
   end
 
-  test "translation_stale? recomputes hash after FR text edit" do
+  test "translation_stale? recomputes hash after FR text edit (fresh instance)" do
     fr_title = "Titre"
     fr_body = "Corps"
     article = Article.create!(
@@ -366,6 +366,35 @@ class ArticleTest < ActiveSupport::TestCase
     refute article.translation_stale?
 
     article.update!(body: { "fr" => "Corps modifié" })
-    assert article.translation_stale?
+    # Each web request loads a fresh AR instance via `Article.includes(...)`,
+    # so the relevant assertion is that a freshly-loaded instance sees stale.
+    assert Article.find(article.id).translation_stale?
+  end
+
+  test "translation_stale? memoizes the hash across repeated calls on the same instance" do
+    fr_title = "Titre"
+    fr_body = "Corps assez long " * 200 # ~3.4 KB to make the SHA256 cost worth caching
+    article = Article.create!(
+      title: { "fr" => fr_title }, body: { "fr" => fr_body },
+      slug: "memo", category: @category
+    )
+    canonical = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_body}")
+    article.update_columns(translation_source_hash: canonical)
+
+    call_count = 0
+    original = Digest::SHA256.method(:hexdigest)
+    Digest::SHA256.singleton_class.alias_method(:__memo_test_orig, :hexdigest)
+    Digest::SHA256.singleton_class.define_method(:hexdigest) do |arg|
+      call_count += 1
+      original.call(arg)
+    end
+    begin
+      5.times { article.translation_stale? }
+    ensure
+      Digest::SHA256.singleton_class.alias_method(:hexdigest, :__memo_test_orig)
+      Digest::SHA256.singleton_class.remove_method(:__memo_test_orig)
+    end
+
+    assert_equal 1, call_count, "expected the hash to be computed once and memoized for repeated calls"
   end
 end
