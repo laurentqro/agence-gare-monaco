@@ -1,4 +1,24 @@
 <div class="p-8">
   <h1 class="heading-page mb-6"><%= t("admin.articles.edit") %></h1>
   <%= render "form", article: @article %>
+
+  <% last_at = @article.last_translated_at %>
+  <% err = @article.translation_error %>
+  <% if last_at || err %>
+    <div class="mt-6 p-4 bg-gray-50 rounded border border-gray-200 text-sm">
+      <h2 class="font-medium text-gray-700 mb-2"><%= t("admin.articles.translations.heading") %></h2>
+      <% if last_at %>
+        <p data-translation-last-at="<%= last_at.iso8601 %>" class="text-gray-600">
+          <%= t("admin.articles.translations.last_translated_at") %>: <%= l(last_at, format: :long) %>
+        </p>
+      <% end %>
+      <% if err %>
+        <div data-translation-error class="mt-2 text-red-700">
+          <p class="font-medium"><%= t("admin.articles.translations.error_label") %>:</p>
+          <p><%= err["class"] %></p>
+          <p class="mt-1 font-mono text-xs"><%= err["message"] %></p>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
 </div>

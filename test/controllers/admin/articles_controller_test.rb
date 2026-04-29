@@ -466,6 +466,88 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # TRANSLATION STATUS SURFACE
+  test "GET index shows pending status when translation_source_hash is nil" do
+    article = Article.create!(
+      title: { "fr" => "Brand new" }, body: { "fr" => "Body" },
+      slug: "pending-art", category: @category
+    )
+    article.update_columns(translation_source_hash: nil)
+    get admin_articles_url
+    assert_response :success
+    assert_select "[data-translation-status='pending']"
+  end
+
+  test "GET index shows complete status when all 8 locales have translated_at" do
+    article = Article.create!(
+      title: { "fr" => "Done" }, body: { "fr" => "Body" },
+      slug: "complete-art", category: @category
+    )
+    status = {}
+    %w[en it de sv no da fi ru].each do |loc|
+      status[loc] = { "translated_at" => "2026-04-29T10:00:00Z" }
+    end
+    article.update_columns(translation_source_hash: "abc", translations_status: status)
+
+    get admin_articles_url
+    assert_response :success
+    assert_select "[data-translation-status='complete']"
+  end
+
+  test "GET index shows error status when _error is present (overrides others)" do
+    article = Article.create!(
+      title: { "fr" => "Failed" }, body: { "fr" => "Body" },
+      slug: "error-art", category: @category
+    )
+    status = { "_error" => { "class" => "RubyLLM::ContextLengthExceededError", "message" => "x", "failed_at" => "2026-04-29T10:00:00Z" } }
+    article.update_columns(translation_source_hash: "abc", translations_status: status)
+
+    get admin_articles_url
+    assert_response :success
+    assert_select "[data-translation-status='error']"
+  end
+
+  test "GET edit shows last-translated timestamp when present" do
+    article = Article.create!(
+      title: { "fr" => "Done" }, body: { "fr" => "Body" },
+      slug: "edit-done", category: @category
+    )
+    article.update_columns(
+      translation_source_hash: "abc",
+      translations_status: { "en" => { "translated_at" => "2026-04-29T10:15:00Z" } }
+    )
+    get edit_admin_article_url(article)
+    assert_response :success
+    assert_select "[data-translation-last-at]"
+  end
+
+  test "GET edit shows error block when translation_error is present" do
+    article = Article.create!(
+      title: { "fr" => "Failed" }, body: { "fr" => "Body" },
+      slug: "edit-error", category: @category
+    )
+    article.update_columns(
+      translations_status: { "_error" => { "class" => "RubyLLM::UnauthorizedError", "message" => "Bad API key", "failed_at" => "2026-04-29T10:00:00Z" } }
+    )
+    get edit_admin_article_url(article)
+    assert_response :success
+    assert_select "[data-translation-error]" do
+      assert_select "*", /RubyLLM::UnauthorizedError/
+      assert_select "*", /Bad API key/
+    end
+  end
+
+  test "GET edit does not show translation status block when never translated and no error" do
+    article = Article.create!(
+      title: { "fr" => "New" }, body: { "fr" => "Body" },
+      slug: "edit-fresh", category: @category
+    )
+    get edit_admin_article_url(article)
+    assert_response :success
+    assert_select "[data-translation-last-at]", false
+    assert_select "[data-translation-error]", false
+  end
+
   test "POST create silently drops non-FR title and body params" do
     post admin_articles_url, params: {
       article: {

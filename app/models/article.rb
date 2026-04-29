@@ -58,6 +58,32 @@ class Article < ApplicationRecord
     end
   end
 
+  # :error if a permanent failure has been recorded.
+  # :pending if no source hash yet, or any target locale lacks a translated_at.
+  # :complete otherwise.
+  def translation_status
+    return :error if translation_error
+    return :pending if translation_source_hash.blank?
+
+    target_locales = (I18n.available_locales.map(&:to_s) - [ "fr" ])
+    status = translations_status.is_a?(Hash) ? translations_status : {}
+    return :pending unless target_locales.all? { |loc| status.dig(loc, "translated_at").present? }
+
+    :complete
+  end
+
+  def last_translated_at
+    return nil unless translations_status.is_a?(Hash)
+    timestamps = translations_status.each_with_object([]) do |(key, value), acc|
+      next if key == "_error"
+      acc << value["translated_at"] if value.is_a?(Hash) && value["translated_at"].present?
+    end
+    return nil if timestamps.empty?
+    Time.iso8601(timestamps.max)
+  rescue ArgumentError
+    nil
+  end
+
   private
 
   def generate_slug
