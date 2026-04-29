@@ -44,6 +44,19 @@ class ArticleTranslationsRakeTest < ActiveSupport::TestCase
     end
   end
 
+  test "articles:retranslate_all staggers enqueues so a full re-run doesn't fan out simultaneously" do
+    Article.create!(title: { "fr" => "A1" }, body: { "fr" => "B" }, slug: "a1", category: @category)
+    Article.create!(title: { "fr" => "A2" }, body: { "fr" => "B" }, slug: "a2", category: @category)
+    Article.create!(title: { "fr" => "A3" }, body: { "fr" => "B" }, slug: "a3", category: @category)
+
+    silence_stdout { Rake::Task["articles:retranslate_all"].invoke }
+
+    waits = ActiveJob::Base.queue_adapter.enqueued_jobs.map { |j| j[:at] }.compact
+    assert_equal 3, waits.size, "every enqueue should carry a wait/at timestamp"
+    assert_equal waits.sort, waits, "enqueues should be in increasing order"
+    assert_operator waits.last - waits.first, :>=, 30, "spread should be at least ~30s across 3 articles"
+  end
+
   test "articles:retranslate_all reports count to stdout" do
     Article.create!(title: { "fr" => "A1" }, body: { "fr" => "B" }, slug: "a1", category: @category)
     Article.create!(title: { "fr" => "A2" }, body: { "fr" => "B" }, slug: "a2", category: @category)

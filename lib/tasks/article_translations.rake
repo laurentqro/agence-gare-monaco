@@ -1,13 +1,18 @@
 namespace :articles do
-  desc "Re-translate all articles (nullifies translation_source_hash, enqueues job per article)"
+  # Stagger window: each LLM call is ~20s and we make 8 per article. Leaving
+  # 30s between enqueues spaces them so concurrent Solid Queue workers don't
+  # all hammer the Anthropic API at once and trip rate limits.
+  RETRANSLATE_STAGGER_SECONDS = 30
+
+  desc "Re-translate all articles (nullifies translation_source_hash, enqueues a staggered job per article)"
   task retranslate_all: :environment do
     count = 0
-    Article.find_each do |article|
+    Article.find_each.with_index do |article, i|
       article.update_columns(translation_source_hash: nil)
-      ArticleTranslationJob.perform_later(article.id)
+      ArticleTranslationJob.set(wait: (i * RETRANSLATE_STAGGER_SECONDS).seconds).perform_later(article.id)
       count += 1
     end
-    puts "Enqueued re-translation for #{count} article(s)"
+    puts "Enqueued re-translation for #{count} article(s) (staggered every #{RETRANSLATE_STAGGER_SECONDS}s)"
   end
 
   desc "Re-translate one article by id"
