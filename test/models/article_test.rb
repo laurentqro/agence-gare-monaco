@@ -278,4 +278,48 @@ class ArticleTest < ActiveSupport::TestCase
     )
     assert_nil article.translation_error
   end
+
+  # translated_count
+  test "translated_count returns 0 when translations_status is empty" do
+    article = Article.new(
+      title: { "fr" => "T" }, body: { "fr" => "B" }, category: @category,
+      translations_status: {}
+    )
+    assert_equal 0, article.translated_count
+  end
+
+  test "translated_count returns the number of non-FR locales with a translated_at" do
+    article = Article.new(
+      title: { "fr" => "T" }, body: { "fr" => "B" }, category: @category,
+      translations_status: {
+        "en" => { "translated_at" => "2026-04-29T10:00:00Z" },
+        "it" => { "translated_at" => "2026-04-29T10:00:00Z" },
+        "de" => { "translated_at" => "2026-04-29T10:00:00Z" }
+      }
+    )
+    assert_equal 3, article.translated_count
+  end
+
+  test "translated_count ignores _error key" do
+    article = Article.new(
+      title: { "fr" => "T" }, body: { "fr" => "B" }, category: @category,
+      translations_status: {
+        "en" => { "translated_at" => "2026-04-29T10:00:00Z" },
+        "_error" => { "class" => "X" }
+      }
+    )
+    assert_equal 1, article.translated_count
+  end
+
+  test "translated_count returns 8 when all target locales are translated" do
+    status = {}
+    %w[en it de sv no da fi ru].each do |loc|
+      status[loc] = { "translated_at" => "2026-04-29T10:00:00Z" }
+    end
+    article = Article.new(
+      title: { "fr" => "T" }, body: { "fr" => "B" }, category: @category,
+      translations_status: status
+    )
+    assert_equal 8, article.translated_count
+  end
 end

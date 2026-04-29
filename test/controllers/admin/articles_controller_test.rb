@@ -467,7 +467,7 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
   end
 
   # TRANSLATION STATUS SURFACE
-  test "GET index shows pending status when translation_source_hash is nil" do
+  test "GET index shows pending status with 0/8 count when translation_source_hash is nil" do
     article = Article.create!(
       title: { "fr" => "Brand new" }, body: { "fr" => "Body" },
       slug: "pending-art", category: @category
@@ -475,10 +475,10 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     article.update_columns(translation_source_hash: nil)
     get admin_articles_url
     assert_response :success
-    assert_select "[data-translation-status='pending']"
+    assert_select "[data-translation-status='pending']", text: "0/8"
   end
 
-  test "GET index shows complete status when all 8 locales have translated_at" do
+  test "GET index shows complete status with 8/8 count when all locales translated" do
     article = Article.create!(
       title: { "fr" => "Done" }, body: { "fr" => "Body" },
       slug: "complete-art", category: @category
@@ -491,20 +491,40 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
 
     get admin_articles_url
     assert_response :success
-    assert_select "[data-translation-status='complete']"
+    assert_select "[data-translation-status='complete']", text: "8/8"
   end
 
-  test "GET index shows error status when _error is present (overrides others)" do
+  test "GET index shows partial status with n/8 count when some locales translated" do
     article = Article.create!(
-      title: { "fr" => "Failed" }, body: { "fr" => "Body" },
-      slug: "error-art", category: @category
+      title: { "fr" => "Partial" }, body: { "fr" => "Body" },
+      slug: "partial-art", category: @category
     )
-    status = { "_error" => { "class" => "RubyLLM::ContextLengthExceededError", "message" => "x", "failed_at" => "2026-04-29T10:00:00Z" } }
+    status = {}
+    %w[en it de].each do |loc|
+      status[loc] = { "translated_at" => "2026-04-29T10:00:00Z" }
+    end
     article.update_columns(translation_source_hash: "abc", translations_status: status)
 
     get admin_articles_url
     assert_response :success
-    assert_select "[data-translation-status='error']"
+    assert_select "[data-translation-status='pending']", text: "3/8"
+  end
+
+  test "GET index shows error status with count when _error is present" do
+    article = Article.create!(
+      title: { "fr" => "Failed" }, body: { "fr" => "Body" },
+      slug: "error-art", category: @category
+    )
+    status = {
+      "en" => { "translated_at" => "2026-04-29T10:00:00Z" },
+      "it" => { "translated_at" => "2026-04-29T10:00:00Z" },
+      "_error" => { "class" => "RubyLLM::ContextLengthExceededError", "message" => "x", "failed_at" => "2026-04-29T10:00:00Z" }
+    }
+    article.update_columns(translation_source_hash: "abc", translations_status: status)
+
+    get admin_articles_url
+    assert_response :success
+    assert_select "[data-translation-status='error']", text: "2/8"
   end
 
   test "GET edit shows last-translated timestamp when present" do
