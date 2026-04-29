@@ -19,13 +19,21 @@ class ArticleTranslationJob < ApplicationJob
 
   def perform(article_id)
     @article = Article.find_by(id: article_id)
-    return unless @article
+    unless @article
+      Rails.logger.warn("[ArticleTranslationJob] article=#{article_id} not found, skipping")
+      return
+    end
 
     ArticleTranslator.new(@article).translate!
   end
 
   def record_failure(error)
     return unless @article
+
+    Rails.logger.error(
+      "[ArticleTranslationJob] article=#{@article.id} discarded " \
+      "error=#{error.class.name} message=#{error.message.to_s[0, 200]}"
+    )
 
     status = (@article.translations_status || {}).dup
     status["_error"] = {

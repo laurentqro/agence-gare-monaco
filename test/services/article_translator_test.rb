@@ -207,6 +207,61 @@ class ArticleTranslatorTest < ActiveSupport::TestCase
     assert_match(/out=800/, log)
   end
 
+  test "logs start, completion, and skip events" do
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+    begin
+      with_stubbed_chat(content: canned_response) do
+        ArticleTranslator.new(@article).translate!
+      end
+    ensure
+      Rails.logger = original_logger
+    end
+    log = io.string
+    assert_match(/\[ArticleTranslator\] article=#{@article.id} starting/, log)
+    assert_match(/\[ArticleTranslator\] article=#{@article.id} completed/, log)
+  end
+
+  test "logs when source hash matches and translation is skipped" do
+    fr_title = @article.title["fr"]
+    fr_body = @article.body["fr"]
+    expected_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_body}")
+    @article.update_columns(translation_source_hash: expected_hash)
+
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+    begin
+      with_failing_chat do
+        ArticleTranslator.new(@article).translate!
+      end
+    ensure
+      Rails.logger = original_logger
+    end
+    assert_match(/\[ArticleTranslator\] article=#{@article.id} skipped \(source unchanged\)/, io.string)
+  end
+
+  test "logs when concurrent worker won the race (rows.zero?)" do
+    canonical_hash = Digest::SHA256.hexdigest("#{@article.title['fr']}\n#{@article.body['fr']}")
+    @article.update_columns(translation_source_hash: "stale-from-old-load")
+    translator = ArticleTranslator.new(@article)
+
+    Article.where(id: @article.id).update_all(translation_source_hash: canonical_hash)
+
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+    begin
+      with_stubbed_chat(content: canned_response) do
+        translator.translate!
+      end
+    ensure
+      Rails.logger = original_logger
+    end
+    assert_match(/\[ArticleTranslator\] article=#{@article.id} discarded \(another worker won the race\)/, io.string)
+  end
+
   test "bumps updated_at on success" do
     @article.update_columns(updated_at: 2.days.ago)
     original = @article.updated_at

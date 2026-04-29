@@ -79,4 +79,41 @@ class ArticleTranslationJobTest < ActiveJob::TestCase
       end
     end
   end
+
+  test "logs error class and message when a permanent error discards the job" do
+    raising_translator = ->(_article) {
+      Object.new.tap do |t|
+        t.define_singleton_method(:translate!) do
+          raise RubyLLM::UnauthorizedError.new(nil, "Bad API key")
+        end
+      end
+    }
+
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+    begin
+      SingletonStub.with(ArticleTranslator, :new, raising_translator) do
+        ArticleTranslationJob.perform_now(@article.id)
+      end
+    ensure
+      Rails.logger = original_logger
+    end
+
+    assert_match(/\[ArticleTranslationJob\] article=#{@article.id} discarded/, io.string)
+    assert_match(/RubyLLM::UnauthorizedError/, io.string)
+    assert_match(/Bad API key/, io.string)
+  end
+
+  test "logs missing-article no-op at info level" do
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+    begin
+      ArticleTranslationJob.perform_now(9_999_999)
+    ensure
+      Rails.logger = original_logger
+    end
+    assert_match(/\[ArticleTranslationJob\] article=9999999 not found/, io.string)
+  end
 end
