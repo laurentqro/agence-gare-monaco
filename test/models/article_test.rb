@@ -371,6 +371,61 @@ class ArticleTest < ActiveSupport::TestCase
     assert Article.find(article.id).translation_stale?
   end
 
+  # TARGET_LOCALES sourced from translator
+  test "TARGET_LOCALES equals ArticleTranslator::LOCALES" do
+    assert_equal ArticleTranslator::LOCALES.sort, Article::TARGET_LOCALES.sort,
+                 "Article must derive its target-locale list from the translator's LOCALES so the two cannot drift"
+  end
+
+  test "current_fr_hash returns SHA256 of FR title and body, joined by newline" do
+    article = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, category: @category
+    )
+    expected = Digest::SHA256.hexdigest("Titre\nCorps")
+    assert_equal expected, article.current_fr_hash
+  end
+
+  # translation_status :stale
+  test "translation_status returns :stale when FR text changed since last translation and at least one locale has been translated" do
+    fr_title = "Titre"
+    fr_body = "Corps"
+    article = Article.create!(
+      title: { "fr" => fr_title }, body: { "fr" => fr_body },
+      slug: "stale-status", category: @category
+    )
+    article.update_columns(
+      translation_source_hash: "outdated-hash",
+      translations_status: { "en" => { "translated_at" => "2026-04-29T10:00:00Z" } }
+    )
+    assert_equal :stale, article.translation_status
+  end
+
+  test "translation_status returns :pending (not :stale) when source hash is nil and no locales translated yet" do
+    article = Article.create!(
+      title: { "fr" => "T" }, body: { "fr" => "B" },
+      slug: "fresh-zero", category: @category
+    )
+    article.update_columns(translation_source_hash: nil, translations_status: {})
+    assert_equal :pending, article.translation_status
+  end
+
+  test "translation_status returns :error before :stale when both apply" do
+    fr_title = "Titre"
+    fr_body = "Corps"
+    article = Article.create!(
+      title: { "fr" => fr_title }, body: { "fr" => fr_body },
+      slug: "error-and-stale", category: @category
+    )
+    article.update_columns(
+      translation_source_hash: "outdated",
+      translations_status: {
+        "en" => { "translated_at" => "2026-04-29T10:00:00Z" },
+        "_error" => { "class" => "RubyLLM::Error", "message" => "boom", "failed_at" => "2026-04-29T10:00:00Z" }
+      }
+    )
+    assert_equal :error, article.translation_status
+  end
+
   test "translation_stale? memoizes the hash across repeated calls on the same instance" do
     fr_title = "Titre"
     fr_body = "Corps assez long " * 200 # ~3.4 KB to make the SHA256 cost worth caching

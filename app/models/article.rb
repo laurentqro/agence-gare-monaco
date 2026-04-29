@@ -1,4 +1,6 @@
 class Article < ApplicationRecord
+  TARGET_LOCALES = ArticleTranslator::LOCALES
+
   belongs_to :category
 
   validates :slug, presence: true, uniqueness: true
@@ -58,29 +60,24 @@ class Article < ApplicationRecord
     end
   end
 
-  # :error if a permanent failure has been recorded.
-  # :pending if no source hash yet, or any target locale lacks a translated_at.
-  # :complete otherwise.
   def translation_status
     return :error if translation_error
     return :pending if translation_source_hash.blank?
-
-    target_locales = (I18n.available_locales.map(&:to_s) - [ "fr" ])
-    status = translations_status.is_a?(Hash) ? translations_status : {}
-    return :pending unless target_locales.all? { |loc| status.dig(loc, "translated_at").present? }
-
-    :complete
+    return :stale if translation_stale? && translated_count.positive?
+    translated_count == TARGET_LOCALES.size ? :complete : :pending
   end
 
   def translated_count
-    return 0 unless translations_status.is_a?(Hash)
-    target_locales = (I18n.available_locales.map(&:to_s) - [ "fr" ])
-    target_locales.count { |loc| translations_status.dig(loc, "translated_at").present? }
+    return @translated_count if defined?(@translated_count)
+    @translated_count = if translations_status.is_a?(Hash)
+      TARGET_LOCALES.count { |loc| translations_status.dig(loc, "translated_at").present? }
+    else
+      0
+    end
   end
 
-  # Stale = current FR text no longer matches the hash that produced the
-  # existing translations. Either nothing has run yet (hash nil) or the FR
-  # source changed and the translator hasn't caught up.
+  # FR source no longer matches the hash that produced the existing
+  # translations — the translator hasn't caught up yet (or hasn't run).
   def translation_stale?
     return true if translation_source_hash.blank?
     current_fr_hash != translation_source_hash
@@ -98,15 +95,15 @@ class Article < ApplicationRecord
     nil
   end
 
-  private
-
-  # Memoized per-instance — index pages render N rows and call
-  # translation_stale? once each, but the hash inputs (FR title+body) don't
-  # change within a request. ActiveRecord re-instantiates the model on each
-  # query, so this lives only as long as the instance.
+  # Single source of truth for the FR-source hash. Index pages render N rows
+  # and call translation_stale? once each — the inputs don't change within a
+  # request, so memoize. The translator reads the same value to decide whether
+  # to skip the LLM call.
   def current_fr_hash
     @current_fr_hash ||= Digest::SHA256.hexdigest("#{title_for(:fr)}\n#{body_for(:fr)}")
   end
+
+  private
 
   def generate_slug
     fr_title = title["fr"] || title[I18n.default_locale.to_s] || title.values.first
