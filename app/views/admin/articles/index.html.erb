@@ -8,6 +8,7 @@
     <table class="w-full text-sm">
       <thead class="bg-gray-50 text-left">
         <tr>
+          <th class="px-4 py-3 font-medium text-gray-400 w-12">ID</th>
           <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.articles.table.title") %></th>
           <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.articles.table.category") %></th>
           <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.articles.table.status") %></th>
@@ -20,6 +21,7 @@
       <tbody class="divide-y divide-gray-100">
         <% @articles.each do |article| %>
           <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 text-gray-400 font-mono text-xs"><%= article.id %></td>
             <td class="px-4 py-3"><%= article.title_for(:fr) %></td>
             <td class="px-4 py-3"><%= article.category.name_for(:fr) %></td>
             <td class="px-4 py-3">

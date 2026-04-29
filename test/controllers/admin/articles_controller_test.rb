@@ -24,6 +24,13 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "table tbody tr", 2
   end
 
+  test "GET index shows the article id in a leading column" do
+    article = Article.create!(title: { "fr" => "With ID" }, body: { "fr" => "B" }, slug: "with-id", category: @category)
+    get admin_articles_url
+    assert_response :success
+    assert_select "table tbody tr:first-child td:first-child", text: article.id.to_s
+  end
+
   test "GET index shows article details" do
     Article.create!(title: { "fr" => "Mon article" }, body: { "fr" => "Contenu" }, slug: "mon-article", category: @category, published: true)
     get admin_articles_url
