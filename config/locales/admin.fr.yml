@@ -48,9 +48,17 @@ fr:
         category: "Catégorie"
         status: "Statut"
         featured: "À la une"
+        translations: "Traductions"
         date: "Date"
       published: "Publié"
       draft: "Brouillon"
+      translations:
+        heading: "Traductions automatiques"
+        complete: "8/8"
+        pending: "En attente"
+        error: "Erreur"
+        last_translated_at: "Dernière traduction"
+        error_label: "Échec de la traduction"
       form:
         title_legend: "Titre"
         body_legend: "Contenu"
