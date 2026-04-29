@@ -7,6 +7,7 @@ class ArticleTranslationJob < ApplicationJob
            RubyLLM::OverloadedError,
            Net::OpenTimeout,
            JSON::ParserError,
+           ArticleTranslator::BlankTranslation,
            wait: :polynomially_longer, attempts: 5
 
   discard_on RubyLLM::UnauthorizedError,
