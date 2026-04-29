@@ -105,18 +105,18 @@ No index on `translation_source_hash`. Used only inside the conditional UPDATE g
 }
 ```
 
-The `_error` key is present only after a `discard_on` exception. Successful translation does not clear it explicitly — it's overwritten on the next successful run via `translations_status` replacement (the translator merges its 8 locale keys into a fresh hash that omits `_error`). _Decision deferred to implementation:_ if we want stale `_error` keys to be cleared automatically, the translator's `apply_translations!` should drop them. Default behavior in this design is to clear `_error` on success.
+The `_error` key is present only after a `discard_on` exception. The translator drops `_error` on successful application — `apply_translations!` builds the new `translations_status` hash from the existing one minus `_error`, then merges in the 8 locale `translated_at` keys.
 
 ## Prompt design
 
 ### Schema (RubyLLM structured output)
 
-For each locale in `ArticleTranslator::LOCALES` (= `["en", "it", "de", "sv", "no", "da", "fi", "ru"]`), two required string fields:
+For each locale in `ArticleTranslator::LOCALES` (= `["en", "it", "de", "sv", "no", "da", "fi", "ru"]`):
 
-- `title_{locale}` — translated title
-- `body_{locale}` — translated markdown body
+- `title_{locale}` — required string, translated title
+- `body_{locale}` — optional string, translated markdown body. Optional in the schema so the model can legitimately omit it when the FR body is blank (title-only stub article); `parse` enforces presence only when the FR body is non-blank.
 
-Single API call returns 16 fields.
+Single API call returns up to 16 fields.
 
 ### System prompt
 
