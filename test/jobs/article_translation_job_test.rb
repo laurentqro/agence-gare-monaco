@@ -50,6 +50,12 @@ class ArticleTranslationJobTest < ActiveJob::TestCase
     assert_includes handled, "ArticleTranslator::BlankTranslation"
   end
 
+  test "retry_on covers Faraday::TimeoutError and Net::ReadTimeout so stalled LLM reads get retried" do
+    handled = ArticleTranslationJob.rescue_handlers.map(&:first)
+    assert_includes handled, "Faraday::TimeoutError"
+    assert_includes handled, "Net::ReadTimeout"
+  end
+
   test "discard_on covers permanent errors so they do not burn retries" do
     handled = ArticleTranslationJob.rescue_handlers.map(&:first)
     assert_includes handled, "RubyLLM::UnauthorizedError"
