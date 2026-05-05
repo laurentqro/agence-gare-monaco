@@ -353,6 +353,7 @@ fi:
 
   estimate:
     title: "Mitä asuntosi Monacossa on arvoinen?"
+    hero_eyebrow: "Observatoire de l'Immobilier 2025"
     intro: "Saat ohjeellisen arvion IMSEE:n regressiomalliin perustuen (Observatoire de l'Immobilier 2025). Työkalu ottaa huomioon alueen, pinta-alan ja rakennusvuosikymmenen."
     disclaimer: "Tämä arvio on ohjeellinen. IMSEE-malli selittää 51 % havaitusta hintavaihtelusta; kerrosta, näkymää ja kuntoa ei oteta huomioon. Tarkkaa arviota varten ota yhteyttä."
     form:
@@ -374,18 +375,24 @@ fi:
       cta_title: "Haluatko tarkan arvion?"
       cta_text: "Tiimimme voi käydä asunnossasi ja ottaa huomioon kaikki tekijät (kerros, näkymä, kunto). Ota yhteyttä henkilökohtaista arviota varten."
       cta_button: "Pyydä asiantuntija-arvio"
+      source_label: "Lähde:"
+      source_attribution: "Observatoire de l'Immobilier, IMSEE, 2026"
+      delta_baseline_suffix: "vrt. %{district} keskiarvo"
+      range_low: "Alaraja"
+      range_high: "Yläraja"
+      chart_title: "Neliöhinnan kehitys"
+      year_label: "%{year}:"
+      bridge_html: "%{explained} monacolaisen asunnon arvosta selittyy sijainnilla, pinta-alalla ja rakennusvuodella. Jäljelle jäävät %{remainder} — kerros, näkymä, suunta, kunto, varustelu — selviävät vain paikan päällä käymällä."
     expert_form:
       eyebrow: "Asiantuntija-arvio paikan päällä"
       title: "Tarkenna tätä arviota asiantuntijan kanssa"
-      lede: "Neuvonantaja vierailee asunnossasi ja arvioi loput 49 % — kerroksen, näkymän, suunnan, varustelun. Vastaus 24 tunnin sisällä."
+      lede: "Yksi neuvonantajistamme vierailee asunnossasi ja antaa tarkan arvion, jossa otetaan huomioon kerros, näkymä, suunta, varustelu jne."
       name_label: "Koko nimi"
       name_placeholder: "Etu- ja sukunimi"
       email_label: "Sähköposti"
       email_placeholder: "sina@esimerkki.com"
       phone_label: "Puhelin"
       phone_placeholder: "+377 ..."
-      message_label: "Tiedot asunnostasi (kerros, näkymä, kunto)"
-      message_placeholder: "Kuvaile lyhyesti asuntosi ja saatavuutesi käyntiä varten."
       submit: "Pyydä vierailua"
       privacy_note: "Tietojasi käytetään vain pyyntöösi vastaamiseen."
     errors:

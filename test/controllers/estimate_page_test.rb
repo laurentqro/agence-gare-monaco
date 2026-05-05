@@ -154,7 +154,8 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     assert_select "input[name='contact_submission[name]']"
     assert_select "input[name='contact_submission[email]']"
     assert_select "input[name='contact_submission[phone]']"
-    assert_select "textarea[name='contact_submission[message]']"
+    # Form intentionally has no message field — the server fills it from the estimate inputs.
+    assert_select "textarea[name='contact_submission[message]']", false
     # Carries the inputs that produced the estimate so the agent has full context
     assert_select "input[type='hidden'][name='estimate[district]'][value='monte-carlo']"
     assert_select "input[type='hidden'][name='estimate[surface]'][value='100']"
@@ -168,8 +169,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
         contact_submission: {
           name: "Sophie Martin",
           email: "sophie@example.com",
-          phone: "+33 6 12 34 56 78",
-          message: "I'd like an expert to confirm this estimate."
+          phone: "+33 6 12 34 56 78"
         },
         return_to: "estimate",
         estimate: {
@@ -180,18 +180,23 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
         locale: "fr"
       }
     end
+    submission = ContactSubmission.last
+    # The server auto-fills the message body from the estimate inputs so the agent
+    # has full context even though the form only collects name + phone + email.
+    assert_match(/Monte-Carlo/, submission.message)
+    assert_match(/100/, submission.message)
+    assert_match(/2024/, submission.message)
     assert_redirected_to "/estimer"
     follow_redirect!
     assert_match(/estim/i, response.body)
   end
 
-  test "expert contact form submitted with invalid email re-renders the result with errors and preserves the estimate" do
+  test "expert contact form submitted without name or email re-renders the result with errors and preserves the estimate" do
     post "/contact_submissions", params: {
       contact_submission: {
         name: "",
         email: "",
-        phone: "",
-        message: ""
+        phone: ""
       },
       return_to: "estimate",
       estimate: {
@@ -208,6 +213,17 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='form-errors']"
     # Inputs are preserved so the user can fix the broken field without losing context
     assert_select "input[type='hidden'][name='estimate[district]'][value='monte-carlo']"
+  end
+
+  test "result page credits IMSEE Observatoire de l'Immobilier with a link to the source" do
+    post "/estimer", params: {
+      district: "monte-carlo",
+      surface: 100,
+      construction_year: 2024
+    }
+    assert_response :success
+    assert_select "[data-testid='estimate-result'] a[href='https://imsee.mc/thematiques/economie/publications/observatoire-de-l-immobilier'][rel~='noopener']",
+      text: /Observatoire de l'Immobilier.*IMSEE.*2026/m
   end
 
   test "expert form on EN result page submits with EN return_to" do

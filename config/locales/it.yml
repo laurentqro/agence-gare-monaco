@@ -353,6 +353,7 @@ it:
 
   estimate:
     title: "Quanto vale il tuo immobile a Monaco?"
+    hero_eyebrow: "Observatoire de l'Immobilier 2025"
     intro: "Ottieni una stima indicativa basata sul modello di regressione IMSEE (Observatoire de l'Immobilier 2025). Lo strumento considera quartiere, superficie e decennio di costruzione."
     disclaimer: "Questa stima è indicativa. Il modello IMSEE spiega il 51% della variazione dei prezzi osservati; piano, vista e stato generale non sono presi in considerazione. Per una valutazione precisa, contattaci."
     form:
@@ -374,18 +375,24 @@ it:
       cta_title: "Desideri una valutazione precisa?"
       cta_text: "Il nostro team può visitare il tuo immobile e considerare tutti i fattori (piano, vista, stato). Contattaci per una valutazione personalizzata."
       cta_button: "Richiedi una valutazione esperta"
+      source_label: "Fonte:"
+      source_attribution: "Observatoire de l'Immobilier, IMSEE, 2026"
+      delta_baseline_suffix: "vs. media %{district}"
+      range_low: "Basso"
+      range_high: "Alto"
+      chart_title: "Andamento del prezzo al m²"
+      year_label: "%{year}:"
+      bridge_html: "Il %{explained} del valore di un immobile a Monaco dipende da posizione, superficie e anno di costruzione. Il restante %{remainder} — piano, vista, esposizione, stato, finiture — è ciò che emerge da una visita."
     expert_form:
       eyebrow: "Sopralluogo dedicato"
       title: "Affina questa stima con un esperto"
-      lede: "Un consulente visita il tuo immobile e valuta il restante 49% — piano, vista, esposizione, finiture. Risposta entro 24 ore."
+      lede: "Uno dei nostri consulenti visita il tuo immobile per fornirti una stima precisa, tenendo conto di piano, vista, esposizione, finiture, ecc."
       name_label: "Nome completo"
       name_placeholder: "Nome e cognome"
       email_label: "Email"
       email_placeholder: "tu@esempio.com"
       phone_label: "Telefono"
       phone_placeholder: "+377 ..."
-      message_label: "Dettagli sul tuo immobile (piano, vista, stato)"
-      message_placeholder: "Descrivi brevemente il tuo immobile e la tua disponibilita per una visita."
       submit: "Richiedi una visita"
       privacy_note: "I tuoi dati sono utilizzati solo per rispondere alla tua richiesta."
     errors:
