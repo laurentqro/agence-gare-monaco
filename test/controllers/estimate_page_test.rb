@@ -16,14 +16,14 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "FR estimate page renders form at /estimer" do
+  test "FR estimate page renders form at /estimer with localized FR field names" do
     get "/estimer"
     assert_response :success
     assert_select "h1", text: /estim/i
     assert_select "form[action='/estimer']"
-    assert_select "select[name='district']"
+    assert_select "select[name='quartier']"
     assert_select "input[name='surface']"
-    assert_select "input[name='construction_year']"
+    assert_select "input[name='annee-construction']"
   end
 
   test "all 9 locales return 200 on the estimate page" do
@@ -51,32 +51,8 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: /worth/i
   end
 
-  test "POST with valid params displays estimate" do
-    post "/estimer", params: {
-      district: "monte-carlo",
-      surface: 100,
-      construction_year: 2024
-    }
-    assert_response :success
-    assert_select "[data-testid='estimate-result']"
-    # French locale uses U+2009 thin space as thousands separator
-    assert_match(/60\p{Space}?526/, response.body) # price/m²
-    assert_match(/6\p{Space}?052\p{Space}?600/, response.body) # total
-  end
-
-  test "POST with invalid surface re-renders form with error" do
-    post "/estimer", params: {
-      district: "monte-carlo",
-      surface: -5,
-      construction_year: 2024
-    }
-    assert_response :unprocessable_content
-    assert_select "[data-testid='estimate-errors']"
-    assert_select "[data-testid='estimate-result']", false
-  end
-
-  test "POST with unknown district (Monaco-Ville) re-renders form with error" do
-    post "/estimer", params: {
+  test "GET with unknown district (Monaco-Ville) re-renders form with error" do
+    get "/estimer", params: {
       district: "monaco-ville",
       surface: 100,
       construction_year: 2024
@@ -85,23 +61,16 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='estimate-errors']"
   end
 
-  test "POST with missing surface re-renders form with error" do
-    post "/estimer", params: {
+  test "GET with district + missing surface treats it as the empty form (no error, no result)" do
+    # Partial query strings (e.g. someone fiddling with the URL) should not produce a noisy
+    # error page — only fully populated requests trigger validation.
+    get "/estimer", params: {
       district: "monte-carlo",
       construction_year: 2024
     }
-    assert_response :unprocessable_content
-    assert_select "[data-testid='estimate-errors']"
-  end
-
-  test "POST in EN locale routes to /en/valuation and shows result" do
-    post "/en/valuation", params: {
-      district: "larvotto",
-      surface: 150,
-      construction_year: 2022
-    }
     assert_response :success
-    assert_select "[data-testid='estimate-result']"
+    assert_select "[data-testid='estimate-result']", false
+    assert_select "[data-testid='estimate-errors']", false
   end
 
   test "navbar sell link still points to vendre page (estimate is separate)" do
@@ -132,7 +101,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
   end
 
   test "result shows confidence band low and high" do
-    post "/estimer", params: {
+    get "/estimer", params: {
       district: "monte-carlo",
       surface: 100,
       construction_year: 2024
@@ -143,8 +112,129 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     assert_match(/7\p{Space}?565\p{Space}?750/, response.body)
   end
 
+  test "GET /estimer with valid query params renders the result so the URL is shareable" do
+    get "/estimer", params: {
+      district: "monte-carlo",
+      surface: 100,
+      construction_year: 2024
+    }
+    assert_response :success
+    assert_select "[data-testid='estimate-result']"
+    # Same numbers as the POST result
+    assert_match(/60\p{Space}?526/, response.body)
+    assert_match(/6\p{Space}?052\p{Space}?600/, response.body)
+  end
+
+  test "the input form is also rendered above the result, prefilled, so the user can tweak and re-submit" do
+    get "/estimer", params: {
+      "quartier" => "monte-carlo",
+      "surface" => 100,
+      "annee-construction" => 2024
+    }
+    assert_response :success
+    # Form is visible above the result, using FR-localized field names
+    assert_select "form[action='/estimer'][method='get'] select[name='quartier'] option[selected][value='monte-carlo']"
+    assert_select "form[action='/estimer'][method='get'] input[name='surface'][value='100']"
+    assert_select "form[action='/estimer'][method='get'] input[name='annee-construction'][value='2024']"
+    assert_select "[data-testid='estimate-result']"
+  end
+
+  test "GET with no params still renders the empty form (no result)" do
+    get "/estimer"
+    assert_response :success
+    assert_select "[data-testid='estimate-result']", false
+    assert_select "form select[name='quartier']"
+  end
+
+  test "GET with invalid surface re-renders the form with errors" do
+    get "/estimer", params: {
+      district: "monte-carlo",
+      surface: -5,
+      construction_year: 2024
+    }
+    assert_response :unprocessable_content
+    assert_select "[data-testid='estimate-errors']"
+  end
+
+  test "form on the estimate page submits via GET so the result URL is shareable" do
+    get "/estimer"
+    assert_select "form[action='/estimer'][method='get']"
+  end
+
+  test "old English query keys (district/surface/construction_year) still work as a fallback so legacy shared URLs don't break" do
+    get "/estimer", params: {
+      district: "monte-carlo",
+      surface: 100,
+      construction_year: 2024
+    }
+    assert_response :success
+    assert_select "[data-testid='estimate-result']"
+  end
+
+  test "FR uses localized query keys (quartier, surface, annee-construction)" do
+    get "/estimer", params: {
+      "quartier" => "monte-carlo",
+      "surface" => 100,
+      "annee-construction" => 2024
+    }
+    assert_response :success
+    assert_select "[data-testid='estimate-result']"
+    assert_match(/60\p{Space}?526/, response.body)
+    # Form submits with FR-localized field names
+    assert_select "form select[name='quartier']"
+    assert_select "form input[name='surface']"
+    assert_select "form input[name='annee-construction']"
+  end
+
+  test "EN uses EN-localized query keys (district, area, construction-year)" do
+    get "/en/valuation", params: {
+      "district" => "larvotto",
+      "area" => 150,
+      "construction-year" => 2022
+    }
+    assert_response :success
+    assert_select "[data-testid='estimate-result']"
+    assert_select "form select[name='district']"
+    assert_select "form input[name='area']"
+    assert_select "form input[name='construction-year']"
+  end
+
+  test "IT uses IT-localized query keys (quartiere, superficie, anno-costruzione)" do
+    get "/it/stima", params: {
+      "quartiere" => "monte-carlo",
+      "superficie" => 100,
+      "anno-costruzione" => 2024
+    }
+    assert_response :success
+    assert_select "[data-testid='estimate-result']"
+    assert_select "form select[name='quartiere']"
+  end
+
+  test "language switcher rewrites query keys to the target locale so a shared estimate stays the same" do
+    get "/estimer", params: {
+      "quartier" => "monte-carlo",
+      "surface" => 100,
+      "annee-construction" => 2024
+    }
+    assert_response :success
+    # When switching to EN, keys must be rewritten to district/area/construction-year
+    assert_select "a[href='/en/valuation?area=100&construction-year=2024&district=monte-carlo']"
+    # When switching to IT, keys rewrite to quartiere/superficie/anno-costruzione
+    assert_select "a[href='/it/stima?anno-costruzione=2024&quartiere=monte-carlo&superficie=100']"
+  end
+
+  test "GET in EN locale also renders shareable result" do
+    get "/en/valuation", params: {
+      district: "larvotto",
+      surface: 150,
+      construction_year: 2022
+    }
+    assert_response :success
+    assert_select "[data-testid='estimate-result']"
+  end
+
   test "result page renders expert contact form posting to contact_submissions" do
-    post "/estimer", params: {
+    get "/estimer", params: {
       district: "monte-carlo",
       surface: 100,
       construction_year: 2024
@@ -216,7 +306,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
   end
 
   test "result page credits IMSEE Observatoire de l'Immobilier with a link to the source" do
-    post "/estimer", params: {
+    get "/estimer", params: {
       district: "monte-carlo",
       surface: 100,
       construction_year: 2024
@@ -227,7 +317,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
   end
 
   test "expert form on EN result page submits with EN return_to" do
-    post "/en/valuation", params: {
+    get "/en/valuation", params: {
       district: "larvotto",
       surface: 150,
       construction_year: 2022

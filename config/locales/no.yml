@@ -354,16 +354,18 @@
   estimate:
     title: "Hva er eiendommen din i Monaco verdt?"
     hero_eyebrow: "Observatoire de l'Immobilier 2025"
+    param:
+      district: "bydel"
+      surface: "areal"
+      construction_year: "byggear"
     intro: "Få en veiledende verdivurdering basert på IMSEEs regresjonsmodell (Observatoire de l'Immobilier 2025). Verktøyet tar hensyn til bydel, areal og byggetiår."
     disclaimer: "Denne vurderingen er veiledende. IMSEE-modellen forklarer 51 % av den observerte prisvariasjonen; etasje, utsikt og tilstand tas ikke med. For en presis vurdering, kontakt oss."
     form:
       district_label: "Bydel"
-      district_placeholder: "Velg en bydel"
       surface_label: "Areal (m²)"
-      surface_placeholder: "f.eks. 100"
       construction_year_label: "Byggeår"
-      construction_year_placeholder: "f.eks. 2015"
       submit: "Få min verdivurdering"
+      recompute: "Beregn på nytt"
       edit: "Endre"
       summary_label: "Din eiendom"
     result:

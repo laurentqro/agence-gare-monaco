@@ -354,16 +354,18 @@ de:
   estimate:
     title: "Was ist Ihre Immobilie in Monaco wert?"
     hero_eyebrow: "Observatoire de l'Immobilier 2025"
+    param:
+      district: "stadtteil"
+      surface: "flaeche"
+      construction_year: "baujahr"
     intro: "Erhalten Sie eine indikative Schätzung auf Basis des IMSEE-Regressionsmodells (Observatoire de l'Immobilier 2025). Berücksichtigt werden Stadtteil, Fläche und Baujahrzehnt."
     disclaimer: "Diese Schätzung ist indikativ. Das IMSEE-Modell erklärt 51 % der beobachteten Preisvariation; Etage, Aussicht und Zustand werden nicht berücksichtigt. Für eine präzise Bewertung kontaktieren Sie uns."
     form:
       district_label: "Stadtteil"
-      district_placeholder: "Wählen Sie einen Stadtteil"
       surface_label: "Fläche (m²)"
-      surface_placeholder: "z. B. 100"
       construction_year_label: "Baujahr"
-      construction_year_placeholder: "z. B. 2015"
       submit: "Bewertung anfordern"
+      recompute: "Neu berechnen"
       edit: "Bearbeiten"
       summary_label: "Ihre Immobilie"
     result:

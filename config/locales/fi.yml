@@ -354,16 +354,18 @@ fi:
   estimate:
     title: "Mitä asuntosi Monacossa on arvoinen?"
     hero_eyebrow: "Observatoire de l'Immobilier 2025"
+    param:
+      district: "kaupunginosa"
+      surface: "pinta-ala"
+      construction_year: "rakennusvuosi"
     intro: "Saat ohjeellisen arvion IMSEE:n regressiomalliin perustuen (Observatoire de l'Immobilier 2025). Työkalu ottaa huomioon alueen, pinta-alan ja rakennusvuosikymmenen."
     disclaimer: "Tämä arvio on ohjeellinen. IMSEE-malli selittää 51 % havaitusta hintavaihtelusta; kerrosta, näkymää ja kuntoa ei oteta huomioon. Tarkkaa arviota varten ota yhteyttä."
     form:
       district_label: "Alue"
-      district_placeholder: "Valitse alue"
       surface_label: "Pinta-ala (m²)"
-      surface_placeholder: "esim. 100"
       construction_year_label: "Rakennusvuosi"
-      construction_year_placeholder: "esim. 2015"
       submit: "Pyydä arviointi"
+      recompute: "Laske uudelleen"
       edit: "Muokkaa"
       summary_label: "Asuntosi"
     result:

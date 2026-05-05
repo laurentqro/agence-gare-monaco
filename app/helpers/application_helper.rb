@@ -91,8 +91,20 @@ module ApplicationHelper
       locale_faq_path(locale)
     when "pages#team_member"
       locale_team_member_path(params[:member], locale)
-    when "estimates#new", "estimates#create"
-      locale_estimate_path(locale)
+    when "estimates#new"
+      # Preserve estimate inputs across locale switches by reading the current locale's
+      # localized query keys and writing the target locale's keys, so a shared estimate
+      # stays the same property when the recipient flips languages.
+      query = {}
+      [ :district, :surface, :construction_year ].each do |canonical|
+        from_key = I18n.t("estimate.param.#{canonical}")
+        to_key   = I18n.t("estimate.param.#{canonical}", locale: locale)
+        # Accept localized first, fall back to English canonical (legacy URLs)
+        value = params[from_key].presence || params[canonical].presence
+        query[to_key] = value if value.present?
+      end
+      base = locale_estimate_path(locale)
+      query.any? ? "#{base}?#{query.to_query}" : base
     else
       locale_root_path(locale)
     end

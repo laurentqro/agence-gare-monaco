@@ -354,16 +354,18 @@ it:
   estimate:
     title: "Quanto vale il tuo immobile a Monaco?"
     hero_eyebrow: "Observatoire de l'Immobilier 2025"
+    param:
+      district: "quartiere"
+      surface: "superficie"
+      construction_year: "anno-costruzione"
     intro: "Ottieni una stima indicativa basata sul modello di regressione IMSEE (Observatoire de l'Immobilier 2025). Lo strumento considera quartiere, superficie e decennio di costruzione."
     disclaimer: "Questa stima è indicativa. Il modello IMSEE spiega il 51% della variazione dei prezzi osservati; piano, vista e stato generale non sono presi in considerazione. Per una valutazione precisa, contattaci."
     form:
       district_label: "Quartiere"
-      district_placeholder: "Seleziona un quartiere"
       surface_label: "Superficie (m²)"
-      surface_placeholder: "Es. 100"
       construction_year_label: "Anno di costruzione"
-      construction_year_placeholder: "Es. 2015"
       submit: "Ottieni la mia stima"
+      recompute: "Ricalcola"
       edit: "Modifica"
       summary_label: "Il tuo bene"
     result:

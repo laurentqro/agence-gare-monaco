@@ -364,16 +364,18 @@ en:
   estimate:
     title: "What is your Monaco property worth?"
     hero_eyebrow: "Observatoire de l'Immobilier 2025"
+    param:
+      district: "district"
+      surface: "area"
+      construction_year: "construction-year"
     intro: "Get a free indicative valuation based on IMSEE's regression model (Observatoire de l'Immobilier 2025). The tool considers the district, surface area, and construction decade."
     disclaimer: "This valuation is indicative. The IMSEE model explains 51% of observed price variation; floor, view, and condition are not factored in. For a precise valuation, contact us."
     form:
       district_label: "District"
-      district_placeholder: "Select a district"
       surface_label: "Surface area (m²)"
-      surface_placeholder: "e.g. 100"
       construction_year_label: "Construction year"
-      construction_year_placeholder: "e.g. 2015"
       submit: "Get my valuation"
+      recompute: "Recalculate"
       edit: "Edit"
       summary_label: "Your property"
     result:
