@@ -20,6 +20,10 @@ class ContactSubmissionsController < ApplicationController
       if @submission.property_id.present?
         load_property_data
         render "properties/show", status: :unprocessable_entity
+      elsif params[:return_to] == "estimate"
+        rebuild_estimate_for_rerender
+        set_seo(page_type: :estimate)
+        render "estimates/new", status: :unprocessable_entity
       elsif params[:return_to].in?(%w[gestion vendre])
         set_seo(page_type: params[:return_to].to_sym)
         render "pages/#{params[:return_to]}", status: :unprocessable_entity
@@ -44,9 +48,35 @@ class ContactSubmissionsController < ApplicationController
       helpers.locale_gestion_path
     elsif params[:return_to] == "vendre"
       helpers.locale_vendre_path
+    elsif params[:return_to] == "estimate"
+      helpers.locale_estimate_path
     else
       helpers.locale_contact_path
     end
+  end
+
+  # Re-runs the IMSEE valuation from the hidden estimate inputs so the result
+  # billboard (and the form sitting under it) renders identically when the
+  # contact form fails validation.
+  def rebuild_estimate_for_rerender
+    estimate_params = params[:estimate] || {}
+    @form = {
+      district: estimate_params[:district].to_s,
+      surface: estimate_params[:surface],
+      construction_year: estimate_params[:construction_year]
+    }
+    surface = Float(estimate_params[:surface], exception: false)&.to_i
+    year    = Float(estimate_params[:construction_year], exception: false)&.to_i
+    return unless surface&.positive? && year&.between?(1880, Date.current.year)
+
+    @result = PropertyValuator.estimate(
+      district: @form[:district],
+      surface: surface,
+      construction_year: year,
+      transaction_year: Date.current.year
+    )
+  rescue PropertyValuator::UnknownDistrictError, ArgumentError
+    @result = nil
   end
 
   def deliver_email(submission)
