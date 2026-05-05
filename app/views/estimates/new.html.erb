@@ -14,7 +14,7 @@
     </div>
   <% end %>
 
-  <form action="<%= form_action %>" method="post" class="bg-gray-50 border border-gray-200 p-6 md:p-8 rounded">
+  <form action="<%= form_action %>" method="post" data-turbo="false" class="bg-gray-50 border border-gray-200 p-6 md:p-8 rounded">
     <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
 
     <div class="mb-5">
