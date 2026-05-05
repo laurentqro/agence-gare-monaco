@@ -1,112 +1,388 @@
 <% districts = PropertyValuator::DISTRICT_NAMES.sort_by { |_, name| name }
-   form_action = locale_estimate_path %>
+   form_action = locale_estimate_path
+   font_sans = "font-['Montserrat',ui-sans-serif,system-ui,sans-serif]"
+   has_result = @result.present? %>
 
-<div class="max-w-3xl mx-auto px-4 py-16" data-testid="estimate-page">
-  <h1 class="heading-page mb-4"><%= t("estimate.title") %></h1>
-  <p class="text-body mb-10"><%= t("estimate.intro") %></p>
+<% if has_result
+     district_slug = @result[:inputs][:district]
+     district_name = PropertyValuator::DISTRICT_NAMES[district_slug]
+     district_baseline = PropertyValuator::CURRENT_PRICES[district_slug]
+     history = PropertyValuator::PRICE_HISTORY[district_slug]
+     years = PropertyValuator::HISTORY_YEARS
 
-  <% if @errors.present? %>
-    <div data-testid="estimate-errors" class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 mb-6 rounded">
-      <p class="font-bold text-sm mb-1"><%= t("estimate.errors.title") %></p>
-      <ul class="text-xs list-disc list-inside">
-        <% @errors.each do |err| %><li><%= err %></li><% end %>
-      </ul>
-    </div>
-  <% end %>
+     spark_w = 600
+     spark_h = 80
+     min_h, max_h = history.minmax
+     span = (max_h - min_h).nonzero? || 1
+     points = history.each_with_index.map do |v, i|
+       x = (i.to_f / (history.size - 1) * spark_w).round(1)
+       y = (spark_h - ((v - min_h).to_f / span) * spark_h).round(1)
+       [ x, y ]
+     end
+     polyline = points.map { |x, y| "#{x},#{y}" }.join(" ")
+     last_x, last_y = points.last
+     growth_pct = (((history.last - history.first).to_f / history.first) * 100).round(1)
 
-  <form action="<%= form_action %>" method="post" data-turbo="false" class="bg-gray-50 border border-gray-200 p-6 md:p-8 rounded">
-    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+     low = @result[:low_estimate]
+     high = @result[:high_estimate]
+     mid = @result[:total_estimate]
+     mid_pct = ((mid - low).to_f / (high - low) * 100).round(1)
+     uncertainty = high - low
 
-    <div class="mb-5">
-      <label for="district" class="block text-xs font-bold uppercase tracking-wide text-navy mb-2">
-        <%= t("estimate.form.district_label") %>
-      </label>
-      <div class="relative">
-        <select name="district" id="district" required
-                class="appearance-none w-full px-3 py-2 pr-10 border border-gray-300 rounded text-sm bg-white text-dark focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy">
-          <option value=""><%= t("estimate.form.district_placeholder") %></option>
-          <% districts.each do |slug, name| %>
-            <option value="<%= slug %>" <%= "selected" if @form && @form[:district] == slug %>>
-              <%= name %>
-            </option>
-          <% end %>
-        </select>
-        <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </div>
-    </div>
+     # Delta vs district baseline: how the user's price/m² compares to district avg
+     delta_vs_baseline = ((@result[:price_per_m2] - district_baseline).to_f / district_baseline * 100).round(1)
+     start_price = history.first
+     end_price = history.last
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-      <div>
-        <label for="surface" class="block text-xs font-bold uppercase tracking-wide text-navy mb-2">
-          <%= t("estimate.form.surface_label") %>
-        </label>
-        <input type="number" name="surface" id="surface" min="1" step="1" required
-               value="<%= @form && @form[:surface] %>"
-               placeholder="<%= t("estimate.form.surface_placeholder") %>"
-               class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white text-dark focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy">
-      </div>
-      <div>
-        <label for="construction_year" class="block text-xs font-bold uppercase tracking-wide text-navy mb-2">
-          <%= t("estimate.form.construction_year_label") %>
-        </label>
-        <input type="number" name="construction_year" id="construction_year"
-               min="1880" max="<%= Date.current.year %>" step="1" required
-               value="<%= @form && @form[:construction_year] %>"
-               placeholder="<%= t("estimate.form.construction_year_placeholder") %>"
-               class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white text-dark focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy">
-      </div>
-    </div>
+     surface = @result[:inputs][:surface]
+     construction_year = @result[:inputs][:construction_year]
+%>
+  <%# ========================================================================
+      RESULT STATE — compact summary band, then full billboard.
+      Above-the-fold: result starts within ~150px of the page top.
+  ======================================================================== %>
 
-    <button type="submit"
-            class="w-full bg-gold text-white text-sm font-medium uppercase tracking-wide px-5 py-3 rounded hover:bg-gold/85 transition-colors">
-      <%= t("estimate.form.submit") %>
-    </button>
-  </form>
-
-  <% if @result.present? %>
-    <div data-testid="estimate-result" class="mt-10 bg-navy text-white p-6 md:p-8 rounded">
-      <h2 class="text-xl font-bold mb-6 uppercase tracking-wide"><%= t("estimate.result.title") %></h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div>
-          <p class="text-xs uppercase tracking-wide text-white/60 mb-1"><%= t("estimate.result.price_per_m2") %></p>
-          <p class="text-2xl font-bold">
-            <%= number_with_delimiter(@result[:price_per_m2], delimiter: " ") %> €/m²
-          </p>
-        </div>
-        <div>
-          <p class="text-xs uppercase tracking-wide text-white/60 mb-1"><%= t("estimate.result.total") %></p>
-          <p class="text-2xl font-bold">
-            <%= number_with_delimiter(@result[:total_estimate], delimiter: " ") %> €
-          </p>
-        </div>
-      </div>
-
-      <div class="border-t border-white/20 pt-4 mb-6">
-        <p class="text-xs uppercase tracking-wide text-white/60 mb-2"><%= t("estimate.result.band_label") %></p>
-        <p class="text-sm">
-          <%= number_with_delimiter(@result[:low_estimate], delimiter: " ") %> €
-          &nbsp;—&nbsp;
-          <%= number_with_delimiter(@result[:high_estimate], delimiter: " ") %> €
-        </p>
-      </div>
-
-      <p class="text-xs text-white/70 italic mb-6">
-        <%= t("estimate.disclaimer") %>
+  <%# Compact summary band — your inputs, with edit affordance %>
+  <section class="bg-[#FAF8F4] border-b border-navy/5">
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 py-6 flex flex-wrap items-center gap-x-8 gap-y-3">
+      <p class="<%= font_sans %> text-[10px] font-semibold tracking-[0.3em] uppercase text-gold">
+        <%= t("estimate.form.summary_label") %>
       </p>
+      <div class="flex items-baseline flex-wrap gap-x-6 gap-y-1 flex-1">
+        <span class="font-['Domine',serif] text-base text-navy"><%= district_name %></span>
+        <span class="text-navy/20">·</span>
+        <span class="font-['Domine',serif] text-base text-navy"><%= surface %> m²</span>
+        <span class="text-navy/20">·</span>
+        <span class="font-['Domine',serif] text-base text-navy"><%= construction_year %></span>
+      </div>
+      <a href="<%= form_action %>"
+         class="<%= font_sans %> group inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.25em] uppercase text-navy/60 hover:text-gold transition-colors">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        <span><%= t("estimate.form.edit") %></span>
+      </a>
+    </div>
+  </section>
 
-      <div class="bg-white/10 border border-white/20 p-5 rounded">
-        <h3 class="text-sm font-bold uppercase tracking-wide mb-2">
-          <%= t("estimate.result.cta_title") %>
-        </h3>
-        <p class="text-xs text-white/85 mb-4"><%= t("estimate.result.cta_text") %></p>
+  <%# RESULT BILLBOARD %>
+  <section data-testid="estimate-result"
+           class="relative bg-navy text-white overflow-hidden">
+    <%# Decorative grid background %>
+    <div class="absolute inset-0 opacity-[0.04] pointer-events-none"
+         style="background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 80px 80px;">
+    </div>
+
+    <%# Subtle inner vignette so the block has its own atmosphere distinct from footer navy %>
+    <div class="absolute inset-0 pointer-events-none"
+         style="background: radial-gradient(ellipse at center, transparent 0%, transparent 55%, rgba(0,0,0,0.35) 100%);"></div>
+
+    <div class="relative max-w-6xl mx-auto px-6 lg:px-10 py-16 md:py-20">
+
+      <%# Eyebrow %>
+      <div class="flex items-baseline gap-6 mb-10">
+        <p class="<%= font_sans %> text-[10px] font-semibold tracking-[0.3em] uppercase text-gold">
+          <%= t("estimate.result.title") %>
+        </p>
+        <span class="text-white/30 text-xs"><%= district_name %></span>
+      </div>
+
+      <%# === HERO ROW: Total + Price/m² === %>
+      <div class="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-y-12 gap-x-12 lg:gap-x-16 mb-16 items-end">
+        <%# Total estimate %>
+        <%# Font size shrinks for 8-digit values so 100M+ properties don't wrap. %>
+        <% total_size_class = mid >= 100_000_000 ? "text-4xl md:text-5xl lg:text-6xl" :
+                              mid >= 10_000_000  ? "text-5xl md:text-6xl lg:text-7xl" :
+                                                   "text-6xl md:text-7xl lg:text-8xl" %>
+        <div class="min-w-0">
+          <p class="<%= font_sans %> text-[10px] font-semibold tracking-[0.3em] uppercase text-white/50 mb-4">
+            <%= t("estimate.result.total") %>
+          </p>
+          <p class="font-['Domine',serif] <%= total_size_class %> leading-[0.95] tracking-tight font-medium whitespace-nowrap">
+            <%= number_with_delimiter(mid, delimiter: " ") %><span class="text-white/40 ml-2" style="font-size: 0.6em;">€</span>
+          </p>
+        </div>
+
+        <%# Price/m² + delta %>
+        <div class="lg:border-l lg:border-white/10 lg:pl-12">
+          <p class="<%= font_sans %> text-[10px] font-semibold tracking-[0.3em] uppercase text-white/50 mb-4">
+            <%= t("estimate.result.price_per_m2") %>
+          </p>
+          <p class="font-['Domine',serif] text-3xl md:text-4xl leading-tight tracking-tight font-medium whitespace-nowrap">
+            <%= number_with_delimiter(@result[:price_per_m2], delimiter: " ") %><span class="<%= font_sans %> text-white/50 text-sm font-normal tracking-wide ml-2">€/m²</span>
+          </p>
+          <%# Delta vs district baseline — the comparison, not the raw number %>
+          <% delta_color = delta_vs_baseline >= 0 ? "text-gold" : "text-white/70" %>
+          <% delta_arrow = delta_vs_baseline >= 0 ? "↑" : "↓" %>
+          <p class="<%= font_sans %> mt-4 text-xs leading-relaxed">
+            <span class="<%= delta_color %> font-semibold tracking-wide">
+              <%= delta_arrow %> <%= delta_vs_baseline.abs %>&thinsp;%
+            </span>
+            <span class="text-white/40">vs. moyenne <%= district_name %></span>
+          </p>
+        </div>
+
+      </div>
+
+      <%# === RANGE BAR — full width, with uncertainty story === %>
+      <div class="mb-20">
+        <p class="<%= font_sans %> text-[10px] font-semibold tracking-[0.3em] uppercase text-white/50 mb-4">
+          <%= t("estimate.result.band_label") %>
+        </p>
+
+        <div class="relative h-px bg-white/15">
+          <div class="absolute inset-y-0 left-0 right-0 bg-gradient-to-r from-white/10 via-gold/40 to-white/10"></div>
+          <div class="absolute -top-1.5 w-3 h-3 bg-gold rounded-full ring-4 ring-navy"
+               style="left: <%= mid_pct %>%; transform: translateX(-50%);"></div>
+          <div class="absolute -top-1 left-0 w-1.5 h-1.5 bg-white/40 rounded-full"></div>
+          <div class="absolute -top-1 right-0 w-1.5 h-1.5 bg-white/40 rounded-full"
+               style="transform: translateX(50%);"></div>
+        </div>
+
+        <div class="<%= font_sans %> mt-5 flex items-baseline justify-between text-sm">
+          <div>
+            <span class="text-white/40 text-[10px] tracking-[0.2em] uppercase">Bas</span>
+            <span class="font-['Domine',serif] text-xl ml-3"><%= number_with_delimiter(low, delimiter: " ") %> €</span>
+          </div>
+          <div class="text-right">
+            <span class="text-white/40 text-[10px] tracking-[0.2em] uppercase">Haut</span>
+            <span class="font-['Domine',serif] text-xl ml-3"><%= number_with_delimiter(high, delimiter: " ") %> €</span>
+          </div>
+        </div>
+      </div>
+
+      <%# === SPARKLINE — full width, with annotated endpoints === %>
+      <div class="mb-16">
+        <div class="flex items-baseline justify-between mb-6">
+          <p class="<%= font_sans %> text-[10px] font-semibold tracking-[0.3em] uppercase text-white/50">
+            <%= district_name %> · Évolution du prix au m²
+          </p>
+          <p class="<%= font_sans %> text-sm">
+            <span class="text-white/40">2016 :</span>
+            <span class="font-['Domine',serif] text-base ml-1"><%= number_with_delimiter(start_price, delimiter: " ") %> €</span>
+            <span class="text-white/30 mx-3">→</span>
+            <span class="text-white/40">2025 :</span>
+            <span class="font-['Domine',serif] text-base text-gold ml-1"><%= number_with_delimiter(end_price, delimiter: " ") %> €</span>
+            <span class="<%= font_sans %> text-gold ml-3 font-semibold">
+              <%= growth_pct >= 0 ? "+" : "" %><%= growth_pct %>&thinsp;%
+            </span>
+          </p>
+        </div>
+
+        <div class="relative" data-controller="price-chart">
+          <svg viewBox="0 0 <%= spark_w %> <%= spark_h + 30 %>"
+               preserveAspectRatio="none"
+               class="w-full h-32"
+               data-price-chart-target="svg"
+               xmlns="http://www.w3.org/2000/svg">
+            <polygon
+              points="0,<%= spark_h %> <%= polyline %> <%= spark_w %>,<%= spark_h %>"
+              fill="url(#sparkGradient)" opacity="0.4" />
+            <polyline points="<%= polyline %>" fill="none" stroke="#C5A355" stroke-width="2.5"
+                      stroke-linecap="round" stroke-linejoin="round" />
+            <%# Start marker %>
+            <circle cx="<%= points.first[0] %>" cy="<%= points.first[1] %>" r="3" fill="#C5A355" opacity="0.5" />
+            <%# End marker %>
+            <circle cx="<%= last_x %>" cy="<%= last_y %>" r="5" fill="#C5A355" />
+            <circle cx="<%= last_x %>" cy="<%= last_y %>" r="10" fill="#C5A355" opacity="0.25" />
+
+            <%# Hover guide line (vertical, follows cursor's year) %>
+            <line data-price-chart-target="guide"
+                  x1="0" y1="0" x2="0" y2="<%= spark_h %>"
+                  stroke="#C5A355" stroke-width="1" stroke-dasharray="2,3"
+                  opacity="0.5" class="opacity-0 transition-opacity pointer-events-none" />
+
+            <%# Hover dot (highlights the active data point) %>
+            <circle data-price-chart-target="dot"
+                    r="5" fill="#C5A355" stroke="#090956" stroke-width="2"
+                    class="opacity-0 transition-opacity pointer-events-none" />
+
+            <%# Invisible hit zones — one per year, full chart height %>
+            <% points.each_with_index do |(x, y), i|
+                 prev_x = i == 0 ? 0 : (points[i-1][0] + x) / 2.0
+                 next_x = i == points.size - 1 ? spark_w : (x + points[i+1][0]) / 2.0
+                 width = (next_x - prev_x).round(2)
+            %>
+              <rect x="<%= prev_x.round(2) %>" y="0"
+                    width="<%= width %>" height="<%= spark_h %>"
+                    fill="transparent"
+                    data-cx="<%= x %>"
+                    data-cy="<%= y %>"
+                    data-year="<%= years[i] %>"
+                    data-price="<%= number_with_delimiter(history[i], delimiter: " ") %> €/m²"
+                    data-action="mouseenter->price-chart#show mouseleave->price-chart#hide touchstart->price-chart#show"
+                    style="cursor: pointer;" />
+            <% end %>
+
+            <defs>
+              <linearGradient id="sparkGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#C5A355" stop-opacity="0.5" />
+                <stop offset="100%" stop-color="#C5A355" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <%# Floating tooltip — anchored to cursor's data point, positioned in JS %>
+          <div data-price-chart-target="tooltip"
+               class="<%= font_sans %> opacity-0 transition-opacity duration-150 pointer-events-none
+                      absolute -translate-x-1/2 -translate-y-[140%]
+                      bg-navy border border-gold/40 px-3 py-2 shadow-xl whitespace-nowrap z-10">
+            <p class="text-[9px] tracking-[0.25em] uppercase text-gold mb-1"
+               data-price-chart-target="tooltipYear">2025</p>
+            <p class="font-['Domine',serif] text-base text-white"
+               data-price-chart-target="tooltipPrice">71 167 €/m²</p>
+          </div>
+
+          <div class="<%= font_sans %> flex justify-between mt-2 text-[10px] text-white/40 tracking-wide">
+            <span>2016</span>
+            <span>2020</span>
+            <span class="text-gold">2025</span>
+          </div>
+        </div>
+      </div>
+
+      <%# === DISCLAIMER AS BRIDGE + CTA — closing row === %>
+      <%# The 51%/49% bridge frames the limitation as the reason to talk to an expert,
+          and the gold CTA sits next to it as the answer to that prompt. %>
+      <div class="pt-12 border-t border-white/10 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-x-12 gap-y-8 items-center">
+        <p class="<%= font_sans %> text-sm text-white/70 leading-relaxed max-w-2xl">
+          <span class="text-gold font-semibold">51&thinsp;%</span>
+          de la valeur d'un bien à Monaco s'explique par sa localisation, sa surface et son année de construction.
+          Les <span class="text-gold font-semibold">49&thinsp;%</span> restants —
+          étage, vue, exposition, état général, prestations — c'est ce qu'apporte une visite.
+        </p>
+
         <a href="<%= locale_contact_path %>"
-           class="inline-block bg-gold text-white text-xs font-medium uppercase tracking-wide px-4 py-2 rounded hover:bg-gold/85 transition-colors">
-          <%= t("estimate.result.cta_button") %>
+           class="<%= font_sans %> group inline-flex items-center gap-3 bg-gold text-navy
+                  text-[11px] font-semibold tracking-[0.25em] uppercase
+                  px-7 py-4 hover:bg-white transition-colors duration-300 whitespace-nowrap justify-self-start md:justify-self-end">
+          <span><%= t("estimate.result.cta_button") %></span>
+          <svg class="w-3 h-3 transition-transform group-hover:translate-x-1"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
         </a>
       </div>
+
     </div>
-  <% end %>
-</div>
+  </section>
+
+<% else %>
+  <%# ========================================================================
+      FORM STATE — full editorial hero. Conversion surface.
+  ======================================================================== %>
+  <section class="relative bg-navy text-white overflow-hidden">
+    <div class="absolute inset-0">
+      <%= image_tag "monaco-panorama.jpg", alt: "", "aria-hidden": "true",
+                    class: "w-full h-full object-cover opacity-25" %>
+      <div class="absolute inset-0 bg-gradient-to-b from-navy/85 via-navy/75 to-navy"></div>
+    </div>
+
+    <div class="relative max-w-6xl mx-auto px-6 lg:px-10 pt-20 pb-28">
+      <p class="<%= font_sans %> text-[11px] font-semibold tracking-[0.3em] uppercase text-gold mb-6">
+        Observatoire de l'Immobilier 2025
+      </p>
+      <h1 class="font-['Domine',Georgia,serif] text-5xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight font-medium max-w-4xl">
+        <%= t("estimate.title") %>
+      </h1>
+      <div class="mt-10 w-16 h-px bg-gold"></div>
+      <p class="<%= font_sans %> mt-10 max-w-2xl text-base text-white/75 leading-relaxed font-light">
+        <%= t("estimate.intro") %>
+      </p>
+    </div>
+  </section>
+
+  <section class="relative bg-[#FAF8F4] pb-20 flex-grow">
+    <div class="max-w-4xl mx-auto px-6 lg:px-10 -mt-20 relative z-10">
+
+      <% if @errors.present? %>
+        <div data-testid="estimate-errors"
+             class="mb-6 bg-white border-l-4 border-red-500 px-6 py-4 shadow-sm">
+          <p class="<%= font_sans %> text-[11px] font-semibold tracking-[0.25em] uppercase text-red-600 mb-1">
+            <%= t("estimate.errors.title") %>
+          </p>
+          <ul class="text-sm text-dark/85 space-y-1">
+            <% @errors.each do |err| %><li><%= err %></li><% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <form action="<%= form_action %>" method="post" data-turbo="false"
+            class="bg-white shadow-[0_30px_60px_-20px_rgba(9,9,86,0.15)] border border-gray-100 px-8 md:px-12 py-10 md:py-12">
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+        <p class="<%= font_sans %> text-[10px] font-semibold tracking-[0.3em] uppercase text-gold mb-8">
+          Renseignez votre bien
+        </p>
+
+        <div class="mb-8">
+          <label for="district"
+                 class="<%= font_sans %> block text-[10px] font-semibold tracking-[0.25em] uppercase text-navy/60 mb-3">
+            <%= t("estimate.form.district_label") %>
+          </label>
+          <div class="relative">
+            <select name="district" id="district" required
+                    class="appearance-none w-full bg-transparent border-0 border-b border-navy/20
+                           pb-2 pt-1 pr-8 text-lg text-navy font-['Domine',serif]
+                           focus:outline-none focus:border-gold transition-colors">
+              <option value=""><%= t("estimate.form.district_placeholder") %></option>
+              <% districts.each do |slug, name| %>
+                <option value="<%= slug %>" <%= "selected" if @form && @form[:district] == slug %>>
+                  <%= name %>
+                </option>
+              <% end %>
+            </select>
+            <svg class="pointer-events-none absolute right-1 bottom-3 w-3 h-3 text-navy/50"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mb-12">
+          <div>
+            <label for="surface"
+                   class="<%= font_sans %> block text-[10px] font-semibold tracking-[0.25em] uppercase text-navy/60 mb-3">
+              <%= t("estimate.form.surface_label") %>
+            </label>
+            <input type="number" name="surface" id="surface" min="1" step="1" required
+                   value="<%= @form && @form[:surface] %>"
+                   placeholder="<%= t("estimate.form.surface_placeholder") %>"
+                   class="w-full bg-transparent border-0 border-b border-navy/20
+                          pb-2 pt-1 text-lg text-navy font-['Domine',serif]
+                          placeholder:text-navy/25 placeholder:font-light
+                          focus:outline-none focus:border-gold transition-colors">
+          </div>
+          <div>
+            <label for="construction_year"
+                   class="<%= font_sans %> block text-[10px] font-semibold tracking-[0.25em] uppercase text-navy/60 mb-3">
+              <%= t("estimate.form.construction_year_label") %>
+            </label>
+            <input type="number" name="construction_year" id="construction_year"
+                   min="1880" max="<%= Date.current.year %>" step="1" required
+                   value="<%= @form && @form[:construction_year] %>"
+                   placeholder="<%= t("estimate.form.construction_year_placeholder") %>"
+                   class="w-full bg-transparent border-0 border-b border-navy/20
+                          pb-2 pt-1 text-lg text-navy font-['Domine',serif]
+                          placeholder:text-navy/25 placeholder:font-light
+                          focus:outline-none focus:border-gold transition-colors">
+          </div>
+        </div>
+
+        <div class="flex justify-end">
+          <button type="submit"
+                  class="<%= font_sans %> group inline-flex items-center gap-3 bg-navy text-white
+                         text-[11px] font-semibold tracking-[0.25em] uppercase
+                         px-8 py-4 hover:bg-gold transition-colors duration-300">
+            <span><%= t("estimate.form.submit") %></span>
+            <svg class="w-3 h-3 transition-transform group-hover:translate-x-1"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+<% end %>

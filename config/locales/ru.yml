@@ -369,8 +369,11 @@ ru:
       construction_year_label: "Год постройки"
       construction_year_placeholder: "напр. 2015"
       submit: "Получить оценку"
+      edit: "Изменить"
+      summary_label: "Ваша недвижимость"
     result:
       title: "Оценка вашей недвижимости"
+      end_mark: "Конец оценки"
       price_per_m2: "Оценочная цена за м²"
       total: "Оценочная стоимость"
       band_label: "Диапазон оценки (±25 %)"

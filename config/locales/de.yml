@@ -363,8 +363,11 @@ de:
       construction_year_label: "Baujahr"
       construction_year_placeholder: "z. B. 2015"
       submit: "Bewertung anfordern"
+      edit: "Bearbeiten"
+      summary_label: "Ihre Immobilie"
     result:
       title: "Schätzung für Ihre Immobilie"
+      end_mark: "Ende der Bewertung"
       price_per_m2: "Geschätzter Preis pro m²"
       total: "Geschätzter Wert"
       band_label: "Schätzungsspanne (±25 %)"

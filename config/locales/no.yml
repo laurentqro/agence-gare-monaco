@@ -363,8 +363,11 @@
       construction_year_label: "Byggeår"
       construction_year_placeholder: "f.eks. 2015"
       submit: "Få min verdivurdering"
+      edit: "Endre"
+      summary_label: "Din eiendom"
     result:
       title: "Verdivurdering av eiendommen din"
+      end_mark: "Slutt på vurderingen"
       price_per_m2: "Estimert pris per m²"
       total: "Estimert verdi"
       band_label: "Estimatområde (±25 %)"

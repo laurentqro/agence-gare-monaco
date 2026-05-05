@@ -373,8 +373,11 @@ en:
       construction_year_label: "Construction year"
       construction_year_placeholder: "e.g. 2015"
       submit: "Get my valuation"
+      edit: "Edit"
+      summary_label: "Your property"
     result:
       title: "Indicative valuation"
+      end_mark: "End of valuation"
       price_per_m2: "Estimated price per m²"
       total: "Estimated value"
       band_label: "Valuation range (±25%)"

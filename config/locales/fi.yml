@@ -363,8 +363,11 @@ fi:
       construction_year_label: "Rakennusvuosi"
       construction_year_placeholder: "esim. 2015"
       submit: "Pyydä arviointi"
+      edit: "Muokkaa"
+      summary_label: "Asuntosi"
     result:
       title: "Asuntosi arvio"
+      end_mark: "Arvioinnin loppu"
       price_per_m2: "Arvioitu hinta per m²"
       total: "Arvioitu arvo"
       band_label: "Arviointiväli (±25 %)"

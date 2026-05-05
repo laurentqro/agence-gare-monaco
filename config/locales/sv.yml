@@ -363,8 +363,11 @@ sv:
       construction_year_label: "Byggår"
       construction_year_placeholder: "t.ex. 2015"
       submit: "Få min värdering"
+      edit: "Ändra"
+      summary_label: "Din bostad"
     result:
       title: "Värdering av din bostad"
+      end_mark: "Slut på värderingen"
       price_per_m2: "Uppskattat pris per m²"
       total: "Uppskattat värde"
       band_label: "Uppskattningsintervall (±25 %)"

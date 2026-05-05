@@ -363,8 +363,11 @@ it:
       construction_year_label: "Anno di costruzione"
       construction_year_placeholder: "Es. 2015"
       submit: "Ottieni la mia stima"
+      edit: "Modifica"
+      summary_label: "Il tuo bene"
     result:
       title: "Stima per il tuo immobile"
+      end_mark: "Fine della stima"
       price_per_m2: "Prezzo al m² stimato"
       total: "Valore stimato"
       band_label: "Fascia di stima (±25%)"

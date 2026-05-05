@@ -363,8 +363,11 @@ fr:
       construction_year_label: "Année de construction"
       construction_year_placeholder: "Ex. 2015"
       submit: "Estimer"
+      edit: "Modifier"
+      summary_label: "Votre bien"
     result:
       title: "Estimation pour votre bien"
+      end_mark: "Fin de l'estimation"
       price_per_m2: "Prix au m² estimé"
       total: "Valeur estimée"
       band_label: "Fourchette d'estimation (±25 %)"
