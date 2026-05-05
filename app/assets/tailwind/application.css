@@ -10,9 +10,12 @@
   --color-dark: #212529;
 }
 
+.nav-link {
+  border-bottom: 2px solid transparent;
+}
+
 .nav-active {
-  border-bottom: 2px solid var(--color-gold);
-  padding-bottom: 2px;
+  border-bottom-color: var(--color-gold);
 }
 
 /* === Design System: Typography === */
