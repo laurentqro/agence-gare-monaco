@@ -12,6 +12,7 @@ da:
     contact: "Kontakt"
     privacy: "Privatlivspolitik"
     faq: "FAQ"
+    estimate: "Boligvurdering"
 
   footer:
     contact: "Kontakt"
@@ -178,6 +179,8 @@ da:
     vendre_description: "Sælg din ejendom i Monaco med Agence Immobilière de la Gare, uafhængigt bureau siden 1942. Vurdering, mandat, foreløbig kontrakt og notariel bekræftelse."
     faq_title: "FAQ | Agence Immobilière de la Gare"
     faq_description: "Ofte stillede spørgsmål om ejendomme i Monaco. Agence Immobilière de la Gare, uafhængigt familiebureau siden 1942, besvarer dine spørgsmål."
+    estimate_title: "Vurder din ejendom i Monaco | Agence Immobilière de la Gare"
+    estimate_description: "Vurder værdien af din ejendom i Monaco med vores værktøj baseret på IMSEE-data 2025. Pris per m² per kvarter og estimatinterval."
 
   gestion:
     title: "Ejendomsadministration i Monaco"
@@ -348,6 +351,33 @@ da:
     security_text: "Agence de la Gare træffer passende tekniske og organisatoriske foranstaltninger for at sikre sikkerheden, fortroligheden og integriteten af dine personoplysninger i overensstemmelse med artikel 31 i Loi n° 1.565 du 3 décembre 2024."
     last_updated: "Sidst opdateret: marts 2026"
 
+  estimate:
+    title: "Hvad er din bolig i Monaco værd?"
+    intro: "Få en vejledende vurdering baseret på IMSEEs regressionsmodel (Observatoire de l'Immobilier 2025). Værktøjet tager hensyn til kvarter, areal og byggeårti."
+    disclaimer: "Denne vurdering er vejledende. IMSEE-modellen forklarer 51 % af den observerede prisvariation; etage, udsigt og stand er ikke medregnet. Kontakt os for en præcis vurdering."
+    form:
+      district_label: "Kvarter"
+      district_placeholder: "Vælg et kvarter"
+      surface_label: "Areal (m²)"
+      surface_placeholder: "f.eks. 100"
+      construction_year_label: "Byggeår"
+      construction_year_placeholder: "f.eks. 2015"
+      submit: "Få min vurdering"
+    result:
+      title: "Vurdering af din ejendom"
+      price_per_m2: "Estimeret pris per m²"
+      total: "Estimeret værdi"
+      band_label: "Estimatinterval (±25 %)"
+      cta_title: "Ønsker du en præcis vurdering?"
+      cta_text: "Vores team kan besøge din ejendom og tage højde for alle faktorer (etage, udsigt, stand). Kontakt os for en personlig vurdering."
+      cta_button: "Anmod om en ekspertvurdering"
+    errors:
+      title: "Kan ikke producere et estimat"
+      invalid: "Kontrollér de oplysninger, du har indtastet."
+      district_unavailable: "Ingen IMSEE-data tilgængelig for dette kvarter (Monaco-Ville er udelukket fra modellen)."
+      surface_required: "Arealet skal være et positivt tal."
+      construction_year_required: "Byggeåret skal være mellem 1880 og %{year}."
+
   routes:
     sales: "salg"
     rentals: "udlejning"
@@ -361,3 +391,4 @@ da:
     vendre: "saelg"
     faq: "faq"
     team: "team"
+    estimate: "vurdering"

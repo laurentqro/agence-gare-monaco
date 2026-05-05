@@ -12,6 +12,7 @@
     contact: "Kontakt"
     privacy: "Personvern"
     faq: "FAQ"
+    estimate: "Verdivurdering"
 
   footer:
     contact: "Kontakt"
@@ -178,6 +179,8 @@
     vendre_description: "Selg eiendommen din i Monaco med Agence Immobilière de la Gare, uavhengig byrå siden 1942. Verdivurdering, mandat, foreløpig kontrakt og notarialbekreftelse."
     faq_title: "FAQ | Agence Immobilière de la Gare"
     faq_description: "Ofte stilte spørsmål om eiendom i Monaco. Agence Immobilière de la Gare, uavhengig familiebyrå siden 1942, svarer på dine spørsmål."
+    estimate_title: "Verdivurder eiendommen din i Monaco | Agence Immobilière de la Gare"
+    estimate_description: "Verdivurder eiendommen din i Monaco med vårt verktøy basert på IMSEE-data 2025. Pris per m² per bydel og estimatområde."
 
   gestion:
     title: "Eiendomsforvaltning i Monaco"
@@ -348,6 +351,33 @@
     security_text: "Agence de la Gare iverksetter egnede tekniske og organisatoriske tiltak for å sikre sikkerheten, konfidensialiteten og integriteten til dine personopplysninger, i samsvar med artikkel 31 i Loi n° 1.565 du 3 décembre 2024."
     last_updated: "Sist oppdatert: mars 2026"
 
+  estimate:
+    title: "Hva er eiendommen din i Monaco verdt?"
+    intro: "Få en veiledende verdivurdering basert på IMSEEs regresjonsmodell (Observatoire de l'Immobilier 2025). Verktøyet tar hensyn til bydel, areal og byggetiår."
+    disclaimer: "Denne vurderingen er veiledende. IMSEE-modellen forklarer 51 % av den observerte prisvariasjonen; etasje, utsikt og tilstand tas ikke med. For en presis vurdering, kontakt oss."
+    form:
+      district_label: "Bydel"
+      district_placeholder: "Velg en bydel"
+      surface_label: "Areal (m²)"
+      surface_placeholder: "f.eks. 100"
+      construction_year_label: "Byggeår"
+      construction_year_placeholder: "f.eks. 2015"
+      submit: "Få min verdivurdering"
+    result:
+      title: "Verdivurdering av eiendommen din"
+      price_per_m2: "Estimert pris per m²"
+      total: "Estimert verdi"
+      band_label: "Estimatområde (±25 %)"
+      cta_title: "Ønsker du en presis verdivurdering?"
+      cta_text: "Teamet vårt kan besøke eiendommen din og ta hensyn til alle faktorer (etasje, utsikt, tilstand). Kontakt oss for en personlig vurdering."
+      cta_button: "Be om en ekspertvurdering"
+    errors:
+      title: "Kan ikke produsere et estimat"
+      invalid: "Kontroller informasjonen du oppga."
+      district_unavailable: "Ingen IMSEE-data tilgjengelig for denne bydelen (Monaco-Ville er ekskludert fra modellen)."
+      surface_required: "Arealet må være et positivt tall."
+      construction_year_required: "Byggeåret må være mellom 1880 og %{year}."
+
   routes:
     sales: "salg"
     rentals: "utleie"
@@ -361,3 +391,4 @@
     vendre: "selge"
     faq: "faq"
     team: "team"
+    estimate: "verdivurdering"

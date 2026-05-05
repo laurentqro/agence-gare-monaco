@@ -52,6 +52,11 @@ module ApplicationHelper
     "#{locale_prefix(locale)}/#{faq}"
   end
 
+  def locale_estimate_path(locale = I18n.locale)
+    estimate = I18n.t("routes.estimate", locale: locale)
+    "#{locale_prefix(locale)}/#{estimate}"
+  end
+
   def locale_team_member_path(member_slug, locale = I18n.locale)
     team = I18n.t("routes.team", locale: locale)
     "#{locale_prefix(locale)}/#{team}/#{member_slug}"
@@ -86,6 +91,8 @@ module ApplicationHelper
       locale_faq_path(locale)
     when "pages#team_member"
       locale_team_member_path(params[:member], locale)
+    when "estimates#new", "estimates#create"
+      locale_estimate_path(locale)
     else
       locale_root_path(locale)
     end

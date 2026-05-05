@@ -29,6 +29,7 @@ Rails.application.routes.draw do
     vendre   = I18n.t("routes.vendre", locale: locale)
     faq      = I18n.t("routes.faq", locale: locale)
     team     = I18n.t("routes.team", locale: locale)
+    estimate = I18n.t("routes.estimate", locale: locale)
 
     prefix = locale == :fr ? "" : "/#{locale}"
     sales_target = "#{prefix}/#{sales}"
@@ -77,6 +78,10 @@ Rails.application.routes.draw do
 
       # Team member pages
       get "/#{team}/:member", to: "pages#team_member", as: :"#{locale}_team_member"
+
+      # Property valuation tool (IMSEE-based estimator)
+      get  "/#{estimate}", to: "estimates#new",    as: :"#{locale}_estimate"
+      post "/#{estimate}", to: "estimates#create", as: :"#{locale}_estimate_create"
     end
   end
 

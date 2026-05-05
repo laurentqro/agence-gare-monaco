@@ -73,6 +73,8 @@ module SeoHelper
       t("seo.vendre_description")
     when :faq
       t("seo.faq_description")
+    when :estimate
+      t("seo.estimate_description")
     when :team_member
       member = opts[:member]
       t("homepage.team.#{member[:key]}_bio")
@@ -113,6 +115,8 @@ module SeoHelper
       "#{t('nav.sell')} | #{t('site_name')}"
     when :faq
       t("seo.faq_title")
+    when :estimate
+      t("seo.estimate_title")
     when :team_member
       member = opts[:member]
       "#{member[:name]} | #{t('site_name')}"
@@ -410,6 +414,8 @@ module SeoHelper
       locale_vendre_path(locale)
     when :faq
       locale_faq_path(locale)
+    when :estimate
+      locale_estimate_path(locale)
     when :team_member
       team_segment = I18n.t("routes.team", locale: locale)
       prefix = locale.to_sym == :fr ? "" : "/#{locale}"
@@ -447,7 +453,7 @@ module SeoHelper
     when :property
       img = opts[:property]&.cover_image
       img&.large_url || img&.remote_url
-    when :homepage, :listings, :articles, :contact, :privacy, :offmarket, :gestion, :vendre, :faq, :team_member
+    when :homepage, :listings, :articles, :contact, :privacy, :offmarket, :gestion, :vendre, :faq, :estimate, :team_member
       "#{SITE_HOST}/images/og-default.jpg"
     when :article
       opts[:article]&.cover_image_display_url

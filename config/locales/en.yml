@@ -12,6 +12,7 @@ en:
     contact: "Contact"
     privacy: "Privacy"
     faq: "FAQ"
+    estimate: "Property valuation"
 
   footer:
     contact: "Contact"
@@ -178,6 +179,8 @@ en:
     vendre_description: "Sell your property in Monaco with Agence Immobilière de la Gare, independent agency since 1942. Valuation, mandate, contract and notarial deed."
     faq_title: "FAQ | Agence Immobilière de la Gare"
     faq_description: "Frequently asked questions about real estate in Monaco. Agence Immobilière de la Gare, independent family agency since 1942, answers your questions."
+    estimate_title: "Monaco property valuation | Agence Immobilière de la Gare"
+    estimate_description: "What is your Monaco property worth? Free indicative valuation based on the official IMSEE 2025 regression model — per-district price/m² and confidence range."
 
   gestion:
     title: "Property Management in Monaco"
@@ -358,6 +361,33 @@ en:
     security_text: "Agence de la Gare implements appropriate technical and organisational measures to ensure the security, confidentiality and integrity of your personal data, in accordance with article 31 of Loi n° 1.565 du 3 décembre 2024."
     last_updated: "Last updated: March 2026"
 
+  estimate:
+    title: "What is your Monaco property worth?"
+    intro: "Get a free indicative valuation based on IMSEE's regression model (Observatoire de l'Immobilier 2025). The tool considers the district, surface area, and construction decade."
+    disclaimer: "This valuation is indicative. The IMSEE model explains 51% of observed price variation; floor, view, and condition are not factored in. For a precise valuation, contact us."
+    form:
+      district_label: "District"
+      district_placeholder: "Select a district"
+      surface_label: "Surface area (m²)"
+      surface_placeholder: "e.g. 100"
+      construction_year_label: "Construction year"
+      construction_year_placeholder: "e.g. 2015"
+      submit: "Get my valuation"
+    result:
+      title: "Indicative valuation"
+      price_per_m2: "Estimated price per m²"
+      total: "Estimated value"
+      band_label: "Valuation range (±25%)"
+      cta_title: "Want a precise valuation?"
+      cta_text: "Our team can visit your property and account for every factor (floor, view, condition). Contact us for a personalised valuation."
+      cta_button: "Request an expert valuation"
+    errors:
+      title: "Unable to produce a valuation"
+      invalid: "Please check the information you entered."
+      district_unavailable: "No IMSEE data available for this district (Monaco-Ville is excluded from the model)."
+      surface_required: "Surface must be a positive number."
+      construction_year_required: "Construction year must be between 1880 and %{year}."
+
   routes:
     sales: "sales"
     rentals: "rentals"
@@ -371,3 +401,4 @@ en:
     vendre: "sell"
     faq: "faq"
     team: "team"
+    estimate: "valuation"

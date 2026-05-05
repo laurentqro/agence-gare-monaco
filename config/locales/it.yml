@@ -12,6 +12,7 @@ it:
     contact: "Contatto"
     privacy: "Privacy"
     faq: "FAQ"
+    estimate: "Stima immobiliare"
 
   footer:
     contact: "Contatto"
@@ -178,6 +179,8 @@ it:
     vendre_description: "Vendete il vostro immobile a Monaco con l'Agence Immobilière de la Gare, agenzia indipendente dal 1942. Stima, mandato, compromesso e atto notarile."
     faq_title: "FAQ | Agence Immobilière de la Gare"
     faq_description: "Domande frequenti sull'immobiliare a Monaco. L'Agence Immobilière de la Gare, agenzia familiare indipendente dal 1942, risponde alle vostre domande."
+    estimate_title: "Stima il tuo immobile a Monaco | Agence Immobilière de la Gare"
+    estimate_description: "Stima il valore del tuo immobile a Monaco con il nostro strumento basato sui dati IMSEE 2025. Prezzo al m² per quartiere e fascia di stima."
 
   gestion:
     title: "Gestione locativa a Monaco"
@@ -348,6 +351,33 @@ it:
     security_text: "L'Agence de la Gare adotta le misure tecniche e organizzative appropriate per garantire la sicurezza, la riservatezza e l'integrità dei vostri dati personali, conformemente all'articolo 31 della Loi n° 1.565 du 3 décembre 2024."
     last_updated: "Ultimo aggiornamento: marzo 2026"
 
+  estimate:
+    title: "Quanto vale il tuo immobile a Monaco?"
+    intro: "Ottieni una stima indicativa basata sul modello di regressione IMSEE (Observatoire de l'Immobilier 2025). Lo strumento considera quartiere, superficie e decennio di costruzione."
+    disclaimer: "Questa stima è indicativa. Il modello IMSEE spiega il 51% della variazione dei prezzi osservati; piano, vista e stato generale non sono presi in considerazione. Per una valutazione precisa, contattaci."
+    form:
+      district_label: "Quartiere"
+      district_placeholder: "Seleziona un quartiere"
+      surface_label: "Superficie (m²)"
+      surface_placeholder: "Es. 100"
+      construction_year_label: "Anno di costruzione"
+      construction_year_placeholder: "Es. 2015"
+      submit: "Ottieni la mia stima"
+    result:
+      title: "Stima per il tuo immobile"
+      price_per_m2: "Prezzo al m² stimato"
+      total: "Valore stimato"
+      band_label: "Fascia di stima (±25%)"
+      cta_title: "Desideri una valutazione precisa?"
+      cta_text: "Il nostro team può visitare il tuo immobile e considerare tutti i fattori (piano, vista, stato). Contattaci per una valutazione personalizzata."
+      cta_button: "Richiedi una valutazione esperta"
+    errors:
+      title: "Impossibile produrre una stima"
+      invalid: "Verifica le informazioni inserite."
+      district_unavailable: "Nessun dato IMSEE disponibile per questo quartiere (Monaco-Ville escluso dal modello)."
+      surface_required: "La superficie deve essere un numero positivo."
+      construction_year_required: "L'anno di costruzione deve essere compreso tra 1880 e %{year}."
+
   routes:
     sales: "vendite"
     rentals: "affitti"
@@ -361,3 +391,4 @@ it:
     vendre: "vendere"
     faq: "faq"
     team: "team"
+    estimate: "stima"
