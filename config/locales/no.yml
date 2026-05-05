@@ -353,6 +353,7 @@
 
   estimate:
     title: "Hva er eiendommen din i Monaco verdt?"
+    hero_eyebrow: "Observatoire de l'Immobilier 2025"
     intro: "Få en veiledende verdivurdering basert på IMSEEs regresjonsmodell (Observatoire de l'Immobilier 2025). Verktøyet tar hensyn til bydel, areal og byggetiår."
     disclaimer: "Denne vurderingen er veiledende. IMSEE-modellen forklarer 51 % av den observerte prisvariasjonen; etasje, utsikt og tilstand tas ikke med. For en presis vurdering, kontakt oss."
     form:
@@ -374,18 +375,24 @@
       cta_title: "Ønsker du en presis verdivurdering?"
       cta_text: "Teamet vårt kan besøke eiendommen din og ta hensyn til alle faktorer (etasje, utsikt, tilstand). Kontakt oss for en personlig vurdering."
       cta_button: "Be om en ekspertvurdering"
+      source_label: "Kilde:"
+      source_attribution: "Observatoire de l'Immobilier, IMSEE, 2026"
+      delta_baseline_suffix: "mot snittet i %{district}"
+      range_low: "Lav"
+      range_high: "Høy"
+      chart_title: "Prisutvikling per m²"
+      year_label: "%{year}:"
+      bridge_html: "%{explained} av en eiendoms verdi i Monaco forklares av beliggenhet, areal og byggeår. De resterende %{remainder} — etasje, utsikt, retning, tilstand, standard — er det et besøk på stedet avdekker."
     expert_form:
       eyebrow: "Vurdering på stedet"
       title: "Forfin denne vurderingen med en ekspert"
-      lede: "En rådgiver besøker eiendommen din og vurderer de resterende 49 % — etasje, utsikt, beliggenhet, standard. Svar innen 24 timer."
+      lede: "En av våre rådgivere besøker eiendommen din og gir en presis vurdering som tar hensyn til etasje, utsikt, beliggenhet, standard osv."
       name_label: "Fullt navn"
       name_placeholder: "For- og etternavn"
       email_label: "E-post"
       email_placeholder: "du@eksempel.com"
       phone_label: "Telefon"
       phone_placeholder: "+377 ..."
-      message_label: "Detaljer om eiendommen din (etasje, utsikt, tilstand)"
-      message_placeholder: "Beskriv kort eiendommen din og din tilgjengelighet for et besøk."
       submit: "Be om et besøk"
       privacy_note: "Dine opplysninger brukes kun til å svare på henvendelsen din."
     errors:

@@ -353,6 +353,7 @@ sv:
 
   estimate:
     title: "Vad är din bostad i Monaco värd?"
+    hero_eyebrow: "Observatoire de l'Immobilier 2025"
     intro: "Få en vägledande värdering baserad på IMSEE:s regressionsmodell (Observatoire de l'Immobilier 2025). Verktyget tar hänsyn till stadsdel, yta och byggdecennium."
     disclaimer: "Denna värdering är vägledande. IMSEE-modellen förklarar 51 % av den observerade prisvariationen; våning, utsikt och skick beaktas inte. För en exakt värdering, kontakta oss."
     form:
@@ -374,18 +375,24 @@ sv:
       cta_title: "Vill du ha en exakt värdering?"
       cta_text: "Vårt team kan besöka din bostad och ta hänsyn till alla faktorer (våning, utsikt, skick). Kontakta oss för en personlig värdering."
       cta_button: "Begär en expertvärdering"
+      source_label: "Källa:"
+      source_attribution: "Observatoire de l'Immobilier, IMSEE, 2026"
+      delta_baseline_suffix: "jämfört med snittet i %{district}"
+      range_low: "Lågt"
+      range_high: "Högt"
+      chart_title: "Prisutveckling per m²"
+      year_label: "%{year}:"
+      bridge_html: "%{explained} av en bostads värde i Monaco förklaras av läge, yta och byggår. De återstående %{remainder} — våning, utsikt, läge, skick, finish — är vad ett besök på plats visar."
     expert_form:
       eyebrow: "Värdering på plats"
       title: "Förfina värderingen med en expert"
-      lede: "En rådgivare besöker din bostad och bedömer de återstående 49 % — våning, utsikt, läge, finish. Svar inom 24 timmar."
+      lede: "En av våra rådgivare besöker din bostad och ger en exakt värdering med hänsyn till våning, utsikt, läge, finish m.m."
       name_label: "Fullständigt namn"
       name_placeholder: "För- och efternamn"
       email_label: "E-post"
       email_placeholder: "du@exempel.com"
       phone_label: "Telefon"
       phone_placeholder: "+377 ..."
-      message_label: "Detaljer om din bostad (våning, utsikt, skick)"
-      message_placeholder: "Beskriv kort din bostad och din tillgänglighet för ett besök."
       submit: "Begär ett besök"
       privacy_note: "Dina uppgifter används endast för att svara på din förfrågan."
     errors:

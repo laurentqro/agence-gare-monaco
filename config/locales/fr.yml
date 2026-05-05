@@ -353,6 +353,7 @@ fr:
 
   estimate:
     title: "Estimer la valeur de votre bien à Monaco"
+    hero_eyebrow: "Observatoire de l'Immobilier 2025"
     intro: "Obtenez une estimation indicative basée sur le modèle de régression de l'IMSEE (Observatoire de l'Immobilier 2025). L'outil prend en compte le quartier, la surface et la décennie de construction."
     disclaimer: "Cette estimation est indicative. Le modèle IMSEE explique 51 % de la variation des prix observés ; l'étage, la vue et l'état général ne sont pas pris en compte. Pour une expertise précise, contactez-nous."
     form:
@@ -374,18 +375,24 @@ fr:
       cta_title: "Vous souhaitez une expertise précise ?"
       cta_text: "Notre équipe peut visiter votre bien et tenir compte de tous les facteurs (étage, vue, état). Contactez-nous pour un avis personnalisé."
       cta_button: "Demander une estimation par un expert"
+      source_label: "Source :"
+      source_attribution: "Observatoire de l'Immobilier, IMSEE, 2026"
+      delta_baseline_suffix: "vs. moyenne %{district}"
+      range_low: "Bas"
+      range_high: "Haut"
+      chart_title: "Évolution du prix au m²"
+      year_label: "%{year} :"
+      bridge_html: "%{explained} de la valeur d'un bien à Monaco s'explique par sa localisation, sa surface et son année de construction. Les %{remainder} restants — étage, vue, exposition, état général, prestations — c'est ce qu'apporte une visite."
     expert_form:
       eyebrow: "Expertise sur place"
       title: "Affinez cette estimation avec un expert"
-      lede: "Un de nos agents visite votre bien et chiffre les 49 % restants — étage, vue, exposition, prestations. Réponse sous 24 h."
+      lede: "Un de nos agents visite votre bien pour vous fournir une estimation précise, prenant en compte étage, vue, exposition, prestations, etc."
       name_label: "Nom complet"
       name_placeholder: "Prénom et nom"
       email_label: "Email"
       email_placeholder: "vous@exemple.com"
       phone_label: "Téléphone"
       phone_placeholder: "+377 ..."
-      message_label: "Précisions sur votre bien (étage, vue, état)"
-      message_placeholder: "Décrivez brièvement votre bien et vos disponibilités pour une visite."
       submit: "Demander une visite"
       privacy_note: "Vos données ne sont utilisées que pour répondre à votre demande."
     errors:

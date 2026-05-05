@@ -353,6 +353,7 @@ de:
 
   estimate:
     title: "Was ist Ihre Immobilie in Monaco wert?"
+    hero_eyebrow: "Observatoire de l'Immobilier 2025"
     intro: "Erhalten Sie eine indikative Schätzung auf Basis des IMSEE-Regressionsmodells (Observatoire de l'Immobilier 2025). Berücksichtigt werden Stadtteil, Fläche und Baujahrzehnt."
     disclaimer: "Diese Schätzung ist indikativ. Das IMSEE-Modell erklärt 51 % der beobachteten Preisvariation; Etage, Aussicht und Zustand werden nicht berücksichtigt. Für eine präzise Bewertung kontaktieren Sie uns."
     form:
@@ -374,18 +375,24 @@ de:
       cta_title: "Möchten Sie eine präzise Bewertung?"
       cta_text: "Unser Team kann Ihre Immobilie besichtigen und alle Faktoren berücksichtigen (Etage, Aussicht, Zustand). Kontaktieren Sie uns für eine persönliche Bewertung."
       cta_button: "Expertenbewertung anfordern"
+      source_label: "Quelle:"
+      source_attribution: "Observatoire de l'Immobilier, IMSEE, 2026"
+      delta_baseline_suffix: "vs. Durchschnitt %{district}"
+      range_low: "Niedrig"
+      range_high: "Hoch"
+      chart_title: "Preisentwicklung pro m²"
+      year_label: "%{year}:"
+      bridge_html: "%{explained} des Werts einer Immobilie in Monaco erklären sich aus Lage, Fläche und Baujahr. Die übrigen %{remainder} — Etage, Aussicht, Ausrichtung, Zustand, Ausstattung — zeigt erst eine Besichtigung."
     expert_form:
       eyebrow: "Bewertung vor Ort"
       title: "Verfeinern Sie diese Schätzung mit einem Experten"
-      lede: "Ein Berater besichtigt Ihre Immobilie und bewertet die verbleibenden 49 % — Etage, Aussicht, Ausrichtung, Ausstattung. Antwort innerhalb von 24 Stunden."
+      lede: "Einer unserer Berater besichtigt Ihre Immobilie und erstellt eine präzise Bewertung unter Berücksichtigung von Etage, Aussicht, Ausrichtung, Ausstattung usw."
       name_label: "Vollständiger Name"
       name_placeholder: "Vor- und Nachname"
       email_label: "E-Mail"
       email_placeholder: "sie@beispiel.com"
       phone_label: "Telefon"
       phone_placeholder: "+377 ..."
-      message_label: "Details zu Ihrer Immobilie (Etage, Aussicht, Zustand)"
-      message_placeholder: "Beschreiben Sie kurz Ihre Immobilie und Ihre Verfügbarkeit für einen Besuch."
       submit: "Besichtigung anfragen"
       privacy_note: "Ihre Daten werden ausschliesslich zur Beantwortung Ihrer Anfrage verwendet."
     errors:

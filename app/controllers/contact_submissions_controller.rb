@@ -13,6 +13,13 @@ class ContactSubmissionsController < ApplicationController
     @submission = ContactSubmission.new(submission_params)
     @submission.form_type = @submission.property_id.present? ? "enquiry" : "contact"
 
+    # The valuation form has no message field — derive one from the estimate inputs
+    # so the agent receives the IMSEE context and the model's presence validation passes.
+    if params[:return_to] == "estimate" && @submission.message.blank?
+      @submission.message = build_estimate_message
+      @submission.subject ||= "Demande d'estimation par un expert"
+    end
+
     if @submission.save
       deliver_email(@submission)
       redirect_to redirect_path_after_submission, flash: { notice: t("contact_form.success") }
@@ -53,6 +60,23 @@ class ContactSubmissionsController < ApplicationController
     else
       helpers.locale_contact_path
     end
+  end
+
+  # Server-side message body built from the hidden estimate[*] inputs, so the
+  # agent receives the IMSEE context even though the form only collects
+  # name + phone + email.
+  def build_estimate_message
+    estimate_params = params[:estimate] || {}
+    district_slug = estimate_params[:district].to_s
+    district_name = PropertyValuator::DISTRICT_NAMES[district_slug] || district_slug
+    surface = estimate_params[:surface]
+    year    = estimate_params[:construction_year]
+    [
+      "Demande d'estimation par un expert",
+      "Quartier : #{district_name}",
+      "Surface : #{surface} m²",
+      "Année de construction : #{year}"
+    ].join("\n")
   end
 
   # Re-runs the IMSEE valuation from the hidden estimate inputs so the result

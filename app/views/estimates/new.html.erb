@@ -119,7 +119,7 @@
             <span class="<%= delta_color %> font-semibold tracking-wide">
               <%= delta_arrow %> <%= delta_vs_baseline.abs %>&thinsp;%
             </span>
-            <span class="text-white/40">vs. moyenne <%= district_name %></span>
+            <span class="text-white/40"><%= t("estimate.result.delta_baseline_suffix", district: district_name) %></span>
           </p>
         </div>
 
@@ -142,11 +142,11 @@
 
         <div class="<%= font_sans %> mt-5 flex items-baseline justify-between text-sm">
           <div>
-            <span class="text-white/40 text-[10px] tracking-[0.2em] uppercase">Bas</span>
+            <span class="text-white/40 text-[10px] tracking-[0.2em] uppercase"><%= t("estimate.result.range_low") %></span>
             <span class="font-['Domine',serif] text-xl ml-3"><%= number_with_delimiter(low, delimiter: " ") %> €</span>
           </div>
           <div class="text-right">
-            <span class="text-white/40 text-[10px] tracking-[0.2em] uppercase">Haut</span>
+            <span class="text-white/40 text-[10px] tracking-[0.2em] uppercase"><%= t("estimate.result.range_high") %></span>
             <span class="font-['Domine',serif] text-xl ml-3"><%= number_with_delimiter(high, delimiter: " ") %> €</span>
           </div>
         </div>
@@ -156,13 +156,13 @@
       <div class="mb-16">
         <div class="flex items-baseline justify-between mb-6">
           <p class="<%= font_sans %> text-[10px] font-semibold tracking-[0.3em] uppercase text-white/50">
-            <%= district_name %> · Évolution du prix au m²
+            <%= district_name %> · <%= t("estimate.result.chart_title") %>
           </p>
           <p class="<%= font_sans %> text-sm">
-            <span class="text-white/40">2016 :</span>
+            <span class="text-white/40"><%= t("estimate.result.year_label", year: years.first) %></span>
             <span class="font-['Domine',serif] text-base ml-1"><%= number_with_delimiter(start_price, delimiter: " ") %> €</span>
             <span class="text-white/30 mx-3">→</span>
-            <span class="text-white/40">2025 :</span>
+            <span class="text-white/40"><%= t("estimate.result.year_label", year: years.last) %></span>
             <span class="font-['Domine',serif] text-base text-gold ml-1"><%= number_with_delimiter(end_price, delimiter: " ") %> €</span>
             <span class="<%= font_sans %> text-gold ml-3 font-semibold">
               <%= growth_pct >= 0 ? "+" : "" %><%= growth_pct %>&thinsp;%
@@ -245,10 +245,17 @@
       <%# === BRIDGE — the 51%/49% statistic frames why a visit matters === %>
       <div class="pt-12 border-t border-white/10">
         <p class="<%= font_sans %> text-sm text-white/70 leading-relaxed max-w-3xl">
-          <span class="text-gold font-semibold">51&thinsp;%</span>
-          de la valeur d'un bien à Monaco s'explique par sa localisation, sa surface et son année de construction.
-          Les <span class="text-gold font-semibold">49&thinsp;%</span> restants —
-          étage, vue, exposition, état général, prestations — c'est ce qu'apporte une visite.
+          <%= t("estimate.result.bridge_html",
+                explained: '<span class="text-gold font-semibold">51&thinsp;%</span>'.html_safe,
+                remainder: '<span class="text-gold font-semibold">49&thinsp;%</span>'.html_safe) %>
+        </p>
+        <p class="<%= font_sans %> mt-6 text-[10px] tracking-[0.2em] uppercase text-white/30">
+          <%= t("estimate.result.source_label") %>
+          <a href="https://imsee.mc/thematiques/economie/publications/observatoire-de-l-immobilier"
+             target="_blank" rel="noopener noreferrer"
+             class="hover:text-gold transition-colors underline decoration-white/20 underline-offset-4">
+            <%= t("estimate.result.source_attribution") %>
+          </a>
         </p>
       </div>
     </div>
@@ -304,13 +311,6 @@
             <input type="hidden" name="estimate[surface]" value="<%= @result[:inputs][:surface] %>">
             <input type="hidden" name="estimate[construction_year]" value="<%= @result[:inputs][:construction_year] %>">
 
-            <%# Pre-fills the message body with the auto-estimate so the agent walks in with the IMSEE
-                number already in hand. The user can overwrite it freely. %>
-            <% prefill_message = "Quartier : #{district_name}\n" \
-                                  "Surface : #{surface} m²\n" \
-                                  "Année de construction : #{construction_year}\n" \
-                                  "Estimation IMSEE : #{number_with_delimiter(mid, delimiter: ' ')} € (#{number_with_delimiter(@result[:price_per_m2], delimiter: ' ')} €/m²)\n\n" %>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
               <div>
                 <label for="contact_submission_name"
@@ -351,20 +351,6 @@
                             focus:outline-none focus:border-gold transition-colors" %>
             </div>
 
-            <div>
-              <label for="contact_submission_message"
-                     class="<%= font_sans %> block text-[10px] font-semibold tracking-[0.25em] uppercase text-navy/60 mb-2">
-                <%= t("estimate.expert_form.message_label") %>
-              </label>
-              <%= f.text_area :message, rows: 5, required: true,
-                    value: expert_submission.message.presence || prefill_message,
-                    placeholder: t("estimate.expert_form.message_placeholder"),
-                    class: "w-full bg-transparent border border-navy/15
-                            px-3 py-3 text-sm text-navy font-['Domine',serif] leading-relaxed
-                            placeholder:text-navy/25 placeholder:font-light
-                            focus:outline-none focus:border-gold transition-colors" %>
-            </div>
-
             <div class="pt-2 flex justify-end">
               <%= f.submit t("estimate.expert_form.submit"),
                     class: "#{font_sans} group inline-flex items-center gap-3 bg-navy text-white
@@ -390,7 +376,7 @@
 
     <div class="relative max-w-6xl mx-auto px-6 lg:px-10 pt-20 pb-28">
       <p class="<%= font_sans %> text-[11px] font-semibold tracking-[0.3em] uppercase text-gold mb-6">
-        Observatoire de l'Immobilier 2025
+        <%= t("estimate.hero_eyebrow") %>
       </p>
       <h1 class="font-['Domine',Georgia,serif] text-5xl md:text-6xl lg:text-7xl leading-[1.05] tracking-tight font-medium max-w-4xl">
         <%= t("estimate.title") %>
