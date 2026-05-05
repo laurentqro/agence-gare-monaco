@@ -363,8 +363,11 @@ da:
       construction_year_label: "Byggeår"
       construction_year_placeholder: "f.eks. 2015"
       submit: "Få min vurdering"
+      edit: "Rediger"
+      summary_label: "Din ejendom"
     result:
       title: "Vurdering af din ejendom"
+      end_mark: "Slut på vurderingen"
       price_per_m2: "Estimeret pris per m²"
       total: "Estimeret værdi"
       band_label: "Estimatinterval (±25 %)"

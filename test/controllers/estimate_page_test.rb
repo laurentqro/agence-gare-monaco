@@ -59,8 +59,9 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     }
     assert_response :success
     assert_select "[data-testid='estimate-result']"
-    assert_match(/60[\s ]?526/, response.body) # price/m²
-    assert_match(/6[\s ]?052[\s ]?600/, response.body) # total
+    # French locale uses U+2009 thin space as thousands separator
+    assert_match(/60\p{Space}?526/, response.body) # price/m²
+    assert_match(/6\p{Space}?052\p{Space}?600/, response.body) # total
   end
 
   test "POST with invalid surface re-renders form with error" do
@@ -137,8 +138,8 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
       construction_year: 2024
     }
     assert_response :success
-    # low = 4_539_450, high = 7_565_750
-    assert_match(/4[\s ]?539[\s ]?450/, response.body)
-    assert_match(/7[\s ]?565[\s ]?750/, response.body)
+    # low = 4_539_450, high = 7_565_750 (French locale uses U+2009 thin space)
+    assert_match(/4\p{Space}?539\p{Space}?450/, response.body)
+    assert_match(/7\p{Space}?565\p{Space}?750/, response.body)
   end
 end

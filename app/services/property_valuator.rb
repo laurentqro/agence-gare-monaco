@@ -27,6 +27,29 @@ class PropertyValuator
     "jardin-exotique" => "Jardin Exotique"
   }.freeze
 
+  # 2025 estimated price/m² per district (IMSEE Tableau 16)
+  CURRENT_PRICES = {
+    "larvotto"        => 71_167,
+    "monte-carlo"     => 54_009,
+    "fontvieille"     => 52_518,
+    "la-condamine"    => 52_104,
+    "la-rousse"       => 51_265,
+    "jardin-exotique" => 45_168,
+    "les-moneghetti"  => 43_797
+  }.freeze
+
+  # 10-year price/m² evolution per district (IMSEE Tableau 16, 2016–2025)
+  PRICE_HISTORY = {
+    "larvotto"        => [ 55_234, 56_765, 58_531, 62_987, 63_357, 62_419, 67_514, 67_355, 69_611, 71_167 ],
+    "monte-carlo"     => [ 43_343, 43_049, 47_526, 48_630, 49_301, 50_495, 49_863, 50_002, 51_547, 54_009 ],
+    "fontvieille"     => [ 41_331, 42_124, 47_502, 48_897, 47_403, 47_202, 50_300, 49_435, 50_271, 52_518 ],
+    "la-condamine"    => [ 43_520, 45_758, 47_018, 48_585, 48_026, 48_681, 54_689, 49_234, 52_456, 52_104 ],
+    "la-rousse"       => [ 40_885, 38_296, 43_223, 42_997, 43_772, 47_736, 48_552, 46_930, 49_665, 51_265 ],
+    "jardin-exotique" => [ 32_835, 35_141, 39_570, 40_053, 40_481, 38_329, 43_207, 40_808, 46_886, 45_168 ],
+    "les-moneghetti"  => [ 33_686, 31_822, 43_207, 40_971, 41_758, 38_859, 43_238, 44_488, 42_380, 43_797 ]
+  }.freeze
+  HISTORY_YEARS = (2016..2025).to_a.freeze
+
   YEAR_COEFFICIENTS = {
     2011 => 0,     2012 => 0,     2013 => 0,
     2014 => 5_265, 2015 => 7_881, 2016 => 10_887,
