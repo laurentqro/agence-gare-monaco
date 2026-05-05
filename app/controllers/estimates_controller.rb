@@ -3,21 +3,27 @@ class EstimatesController < ApplicationController
   include SeoConfigurable
   allow_unauthenticated_access
 
+  # Single GET endpoint so the result URL is shareable.
+  # Query keys are localized (e.g. /estimer?quartier=...&surface=...&annee-construction=...
+  # in FR, /en/valuation?district=...&area=...&construction-year=... in EN), but English
+  # keys are accepted as a fallback so older shared URLs and the language switcher's
+  # cross-locale rewrites both work.
   def new
-    @form = blank_form
-    set_seo(page_type: :estimate)
-  end
+    district = read_param(:district)
+    surface_raw = read_param(:surface)
+    year_raw = read_param(:construction_year)
 
-  def create
     @form = {
-      district: params[:district].to_s,
-      surface: params[:surface],
-      construction_year: params[:construction_year]
+      district: district.to_s,
+      surface: surface_raw,
+      construction_year: year_raw
     }
     set_seo(page_type: :estimate)
 
-    surface = parse_positive(params[:surface])
-    year    = parse_positive(params[:construction_year])
+    return if @form.values.any?(&:blank?)
+
+    surface = parse_positive(surface_raw)
+    year    = parse_positive(year_raw)
 
     if surface.nil?
       @errors = [ t("estimate.errors.surface_required") ]
@@ -35,7 +41,6 @@ class EstimatesController < ApplicationController
       construction_year: year,
       transaction_year: Date.current.year
     )
-    render :new
   rescue PropertyValuator::UnknownDistrictError
     @errors = [ t("estimate.errors.district_unavailable") ]
     render :new, status: :unprocessable_content
@@ -46,8 +51,11 @@ class EstimatesController < ApplicationController
 
   private
 
-  def blank_form
-    { district: "", surface: "", construction_year: "" }
+  # Read a canonical estimate input under its locale-localized query key, falling back
+  # to the English key (district/surface/construction_year) so legacy URLs keep working.
+  def read_param(canonical)
+    localized_key = I18n.t("estimate.param.#{canonical}", default: canonical.to_s)
+    params[localized_key].presence || params[canonical]
   end
 
   def parse_positive(value)

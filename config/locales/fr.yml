@@ -354,16 +354,18 @@ fr:
   estimate:
     title: "Estimer la valeur de votre bien à Monaco"
     hero_eyebrow: "Observatoire de l'Immobilier 2025"
+    param:
+      district: "quartier"
+      surface: "surface"
+      construction_year: "annee-construction"
     intro: "Obtenez une estimation indicative basée sur le modèle de régression de l'IMSEE (Observatoire de l'Immobilier 2025). L'outil prend en compte le quartier, la surface et la décennie de construction."
     disclaimer: "Cette estimation est indicative. Le modèle IMSEE explique 51 % de la variation des prix observés ; l'étage, la vue et l'état général ne sont pas pris en compte. Pour une expertise précise, contactez-nous."
     form:
       district_label: "Quartier"
-      district_placeholder: "Sélectionnez un quartier"
       surface_label: "Surface (m²)"
-      surface_placeholder: "Ex. 100"
       construction_year_label: "Année de construction"
-      construction_year_placeholder: "Ex. 2015"
       submit: "Estimer"
+      recompute: "Recalculer"
       edit: "Modifier"
       summary_label: "Votre bien"
     result:

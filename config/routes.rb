@@ -79,9 +79,8 @@ Rails.application.routes.draw do
       # Team member pages
       get "/#{team}/:member", to: "pages#team_member", as: :"#{locale}_team_member"
 
-      # Property valuation tool (IMSEE-based estimator)
-      get  "/#{estimate}", to: "estimates#new",    as: :"#{locale}_estimate"
-      post "/#{estimate}", to: "estimates#create", as: :"#{locale}_estimate_create"
+      # Property valuation tool (IMSEE-based estimator) — single GET so result URLs are shareable
+      get "/#{estimate}", to: "estimates#new", as: :"#{locale}_estimate"
     end
   end
 

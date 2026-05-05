@@ -354,16 +354,18 @@ da:
   estimate:
     title: "Hvad er din bolig i Monaco værd?"
     hero_eyebrow: "Observatoire de l'Immobilier 2025"
+    param:
+      district: "kvarter"
+      surface: "areal"
+      construction_year: "byggeaar"
     intro: "Få en vejledende vurdering baseret på IMSEEs regressionsmodel (Observatoire de l'Immobilier 2025). Værktøjet tager hensyn til kvarter, areal og byggeårti."
     disclaimer: "Denne vurdering er vejledende. IMSEE-modellen forklarer 51 % af den observerede prisvariation; etage, udsigt og stand er ikke medregnet. Kontakt os for en præcis vurdering."
     form:
       district_label: "Kvarter"
-      district_placeholder: "Vælg et kvarter"
       surface_label: "Areal (m²)"
-      surface_placeholder: "f.eks. 100"
       construction_year_label: "Byggeår"
-      construction_year_placeholder: "f.eks. 2015"
       submit: "Få min vurdering"
+      recompute: "Beregn igen"
       edit: "Rediger"
       summary_label: "Din ejendom"
     result:
