@@ -12,6 +12,7 @@ fr:
     contact: "Nous contacter"
     privacy: "Confidentialité"
     faq: "FAQ"
+    estimate: "Estimer mon bien"
 
   footer:
     contact: "Contact"
@@ -178,6 +179,8 @@ fr:
     vendre_description: "Vendez votre bien à Monaco avec l'Agence Immobilière de la Gare, agence indépendante depuis 1942. Estimation, mandat, compromis et acte authentique."
     faq_title: "FAQ | Agence Immobilière de la Gare"
     faq_description: "Questions fréquentes sur l'immobilier à Monaco. L'Agence Immobilière de la Gare, agence familiale indépendante depuis 1942, répond à vos questions."
+    estimate_title: "Estimer son bien à Monaco | Agence Immobilière de la Gare"
+    estimate_description: "Estimez la valeur de votre bien immobilier à Monaco avec notre outil basé sur les données IMSEE 2025. Prix au m² par quartier et fourchette d'estimation."
 
   gestion:
     title: "Gestion locative à Monaco"
@@ -348,6 +351,33 @@ fr:
     security_text: "L'Agence de la Gare met en œuvre les mesures techniques et organisationnelles appropriées pour garantir la sécurité, la confidentialité et l'intégrité de vos données personnelles, conformément à l'article 31 de la Loi n° 1.565 du 3 décembre 2024."
     last_updated: "Dernière mise à jour : mars 2026"
 
+  estimate:
+    title: "Estimer la valeur de votre bien à Monaco"
+    intro: "Obtenez une estimation indicative basée sur le modèle de régression de l'IMSEE (Observatoire de l'Immobilier 2025). L'outil prend en compte le quartier, la surface et la décennie de construction."
+    disclaimer: "Cette estimation est indicative. Le modèle IMSEE explique 51 % de la variation des prix observés ; l'étage, la vue et l'état général ne sont pas pris en compte. Pour une expertise précise, contactez-nous."
+    form:
+      district_label: "Quartier"
+      district_placeholder: "Sélectionnez un quartier"
+      surface_label: "Surface (m²)"
+      surface_placeholder: "Ex. 100"
+      construction_year_label: "Année de construction"
+      construction_year_placeholder: "Ex. 2015"
+      submit: "Estimer"
+    result:
+      title: "Estimation pour votre bien"
+      price_per_m2: "Prix au m² estimé"
+      total: "Valeur estimée"
+      band_label: "Fourchette d'estimation (±25 %)"
+      cta_title: "Vous souhaitez une expertise précise ?"
+      cta_text: "Notre équipe peut visiter votre bien et tenir compte de tous les facteurs (étage, vue, état). Contactez-nous pour un avis personnalisé."
+      cta_button: "Demander une estimation par un expert"
+    errors:
+      title: "Impossible d'établir une estimation"
+      invalid: "Veuillez vérifier les informations saisies."
+      district_unavailable: "Aucune donnée IMSEE disponible pour ce quartier (Monaco-Ville exclu du modèle)."
+      surface_required: "La surface doit être un nombre positif."
+      construction_year_required: "L'année de construction doit être comprise entre 1880 et %{year}."
+
   routes:
     sales: "ventes"
     rentals: "locations"
@@ -361,3 +391,4 @@ fr:
     vendre: "vendre"
     faq: "faq"
     team: "equipe"
+    estimate: "estimer"

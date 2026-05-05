@@ -1,0 +1,114 @@
+<% supported_districts = PropertyValuator::DISTRICT_COEFFICIENTS.keys
+   districts = District.where(slug: supported_districts).order(:name)
+   form_action = locale_estimate_path %>
+
+<div class="bg-navy text-white" data-testid="estimate-page">
+  <div class="max-w-3xl mx-auto px-4 py-16">
+    <h1 class="text-3xl md:text-4xl font-bold mb-4 leading-tight">
+      <%= t("estimate.title") %>
+    </h1>
+    <p class="text-sm text-white/80 mb-8 max-w-2xl">
+      <%= t("estimate.intro") %>
+    </p>
+
+    <% if @errors.present? %>
+      <div data-testid="estimate-errors" class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 mb-6 rounded">
+        <p class="font-bold text-sm mb-1"><%= t("estimate.errors.title") %></p>
+        <ul class="text-xs list-disc list-inside">
+          <% @errors.each do |err| %><li><%= err %></li><% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <form action="<%= form_action %>" method="post" class="bg-white text-dark p-6 md:p-8 rounded shadow-lg">
+      <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+      <div class="mb-5">
+        <label for="district" class="block text-xs font-bold uppercase tracking-wide text-navy mb-2">
+          <%= t("estimate.form.district_label") %>
+        </label>
+        <select name="district" id="district" required
+                class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-navy">
+          <option value=""><%= t("estimate.form.district_placeholder") %></option>
+          <% districts.each do |d| %>
+            <option value="<%= d.slug %>" <%= "selected" if @form && @form[:district] == d.slug %>>
+              <%= d.name %>
+            </option>
+          <% end %>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+        <div>
+          <label for="surface" class="block text-xs font-bold uppercase tracking-wide text-navy mb-2">
+            <%= t("estimate.form.surface_label") %>
+          </label>
+          <input type="number" name="surface" id="surface" min="1" step="1" required
+                 value="<%= @form && @form[:surface] %>"
+                 placeholder="<%= t("estimate.form.surface_placeholder") %>"
+                 class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-navy">
+        </div>
+        <div>
+          <label for="construction_year" class="block text-xs font-bold uppercase tracking-wide text-navy mb-2">
+            <%= t("estimate.form.construction_year_label") %>
+          </label>
+          <input type="number" name="construction_year" id="construction_year"
+                 min="1880" max="<%= Date.current.year %>" step="1" required
+                 value="<%= @form && @form[:construction_year] %>"
+                 placeholder="<%= t("estimate.form.construction_year_placeholder") %>"
+                 class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-navy">
+        </div>
+      </div>
+
+      <button type="submit"
+              class="w-full bg-gold text-white text-sm font-medium uppercase tracking-wide px-5 py-3 rounded hover:bg-gold/85 transition-colors">
+        <%= t("estimate.form.submit") %>
+      </button>
+    </form>
+
+    <% if @result.present? %>
+      <div data-testid="estimate-result" class="mt-10 bg-white text-dark p-6 md:p-8 rounded shadow-lg">
+        <h2 class="text-xl font-bold text-navy mb-6 uppercase tracking-wide"><%= t("estimate.result.title") %></h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <p class="text-xs uppercase tracking-wide text-gray-500 mb-1"><%= t("estimate.result.price_per_m2") %></p>
+            <p class="text-2xl font-bold text-navy">
+              <%= number_with_delimiter(@result[:price_per_m2], delimiter: " ") %> €/m²
+            </p>
+          </div>
+          <div>
+            <p class="text-xs uppercase tracking-wide text-gray-500 mb-1"><%= t("estimate.result.total") %></p>
+            <p class="text-2xl font-bold text-navy">
+              <%= number_with_delimiter(@result[:total_estimate], delimiter: " ") %> €
+            </p>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-4 mb-6">
+          <p class="text-xs uppercase tracking-wide text-gray-500 mb-2"><%= t("estimate.result.band_label") %></p>
+          <p class="text-sm text-dark">
+            <%= number_with_delimiter(@result[:low_estimate], delimiter: " ") %> €
+            &nbsp;—&nbsp;
+            <%= number_with_delimiter(@result[:high_estimate], delimiter: " ") %> €
+          </p>
+        </div>
+
+        <p class="text-xs text-gray-600 italic mb-6">
+          <%= t("estimate.disclaimer") %>
+        </p>
+
+        <div class="bg-navy/5 border border-navy/10 p-5 rounded">
+          <h3 class="text-sm font-bold text-navy uppercase tracking-wide mb-2">
+            <%= t("estimate.result.cta_title") %>
+          </h3>
+          <p class="text-xs text-dark mb-4"><%= t("estimate.result.cta_text") %></p>
+          <a href="<%= locale_contact_path %>"
+             class="inline-block bg-gold text-white text-xs font-medium uppercase tracking-wide px-4 py-2 rounded hover:bg-gold/85 transition-colors">
+            <%= t("estimate.result.cta_button") %>
+          </a>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

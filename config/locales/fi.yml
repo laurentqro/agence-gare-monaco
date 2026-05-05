@@ -12,6 +12,7 @@ fi:
     contact: "Yhteystiedot"
     privacy: "Tietosuoja"
     faq: "FAQ"
+    estimate: "Asunnon arviointi"
 
   footer:
     contact: "Yhteystiedot"
@@ -178,6 +179,8 @@ fi:
     vendre_description: "Myy kiinteistösi Monacossa Agence Immobilière de la Garen kanssa, itsenäinen toimisto vuodesta 1942. Arviointi, toimeksianto, esisopimus ja notaarin vahvistama kauppakirja."
     faq_title: "FAQ | Agence Immobilière de la Gare"
     faq_description: "Usein kysytyt kysymykset kiinteistöistä Monacossa. Agence Immobilière de la Gare, itsenäinen perhetoimisto vuodesta 1942, vastaa kysymyksiisi."
+    estimate_title: "Arvioi asuntosi arvo Monacossa | Agence Immobilière de la Gare"
+    estimate_description: "Arvioi asuntosi arvo Monacossa työkalullamme, joka perustuu IMSEE-tietoihin 2025. Hinta per m² alueittain ja arviointiväli."
 
   gestion:
     title: "Kiinteistöhallinta Monacossa"
@@ -348,6 +351,33 @@ fi:
     security_text: "Agence de la Gare toteuttaa asianmukaiset tekniset ja organisatoriset toimenpiteet henkilötietojesi turvallisuuden, luottamuksellisuuden ja eheyden varmistamiseksi Loi n° 1.565 du 3 décembre 2024 -lain artiklan 31 mukaisesti."
     last_updated: "Viimeksi päivitetty: maaliskuu 2026"
 
+  estimate:
+    title: "Mitä asuntosi Monacossa on arvoinen?"
+    intro: "Saat ohjeellisen arvion IMSEE:n regressiomalliin perustuen (Observatoire de l'Immobilier 2025). Työkalu ottaa huomioon alueen, pinta-alan ja rakennusvuosikymmenen."
+    disclaimer: "Tämä arvio on ohjeellinen. IMSEE-malli selittää 51 % havaitusta hintavaihtelusta; kerrosta, näkymää ja kuntoa ei oteta huomioon. Tarkkaa arviota varten ota yhteyttä."
+    form:
+      district_label: "Alue"
+      district_placeholder: "Valitse alue"
+      surface_label: "Pinta-ala (m²)"
+      surface_placeholder: "esim. 100"
+      construction_year_label: "Rakennusvuosi"
+      construction_year_placeholder: "esim. 2015"
+      submit: "Pyydä arviointi"
+    result:
+      title: "Asuntosi arvio"
+      price_per_m2: "Arvioitu hinta per m²"
+      total: "Arvioitu arvo"
+      band_label: "Arviointiväli (±25 %)"
+      cta_title: "Haluatko tarkan arvion?"
+      cta_text: "Tiimimme voi käydä asunnossasi ja ottaa huomioon kaikki tekijät (kerros, näkymä, kunto). Ota yhteyttä henkilökohtaista arviota varten."
+      cta_button: "Pyydä asiantuntija-arvio"
+    errors:
+      title: "Arviota ei voida muodostaa"
+      invalid: "Tarkista syöttämäsi tiedot."
+      district_unavailable: "IMSEE-tietoja ei ole saatavilla tälle alueelle (Monaco-Ville ei ole mukana mallissa)."
+      surface_required: "Pinta-alan on oltava positiivinen luku."
+      construction_year_required: "Rakennusvuoden on oltava välillä 1880 ja %{year}."
+
   routes:
     sales: "myynti"
     rentals: "vuokraus"
@@ -361,3 +391,4 @@ fi:
     vendre: "myy"
     faq: "faq"
     team: "team"
+    estimate: "arviointi"

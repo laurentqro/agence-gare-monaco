@@ -89,6 +89,16 @@
   <% end %>
 </url>
 
+<%# Property valuation tool %>
+<% estimate_segment = I18n.t("routes.estimate", locale: @locale) %>
+<url>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{estimate_segment}" %></loc>
+  <% I18n.available_locales.each do |alt_locale| %>
+  <% alt_estimate = I18n.t("routes.estimate", locale: alt_locale) %>
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_estimate}" %>" />
+  <% end %>
+</url>
+
 <%# Gestion (property management) page %>
 <% gestion_segment = I18n.t("routes.gestion", locale: @locale) %>
 <url>

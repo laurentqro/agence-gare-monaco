@@ -12,6 +12,7 @@ de:
     contact: "Kontakt"
     privacy: "Datenschutz"
     faq: "FAQ"
+    estimate: "Immobilienbewertung"
 
   footer:
     contact: "Kontakt"
@@ -178,6 +179,8 @@ de:
     vendre_description: "Verkaufen Sie Ihre Immobilie in Monaco mit der Agence Immobilière de la Gare, unabhängige Agentur seit 1942. Bewertung, Mandat, Vorvertrag und notarielle Urkunde."
     faq_title: "FAQ | Agence Immobilière de la Gare"
     faq_description: "Häufig gestellte Fragen über Immobilien in Monaco. Die Agence Immobilière de la Gare, unabhängige Familienagentur seit 1942, beantwortet Ihre Fragen."
+    estimate_title: "Immobilienwert in Monaco ermitteln | Agence Immobilière de la Gare"
+    estimate_description: "Schätzen Sie den Wert Ihrer Immobilie in Monaco mit unserem Tool auf Basis der IMSEE-Daten 2025. Preis pro m² je Stadtteil und Schätzungsspanne."
 
   gestion:
     title: "Immobilienverwaltung in Monaco"
@@ -348,6 +351,33 @@ de:
     security_text: "Die Agence de la Gare ergreift geeignete technische und organisatorische Maßnahmen, um die Sicherheit, Vertraulichkeit und Integrität Ihrer personenbezogenen Daten gemäß Artikel 31 der Loi n° 1.565 du 3 décembre 2024 zu gewährleisten."
     last_updated: "Letzte Aktualisierung: März 2026"
 
+  estimate:
+    title: "Was ist Ihre Immobilie in Monaco wert?"
+    intro: "Erhalten Sie eine indikative Schätzung auf Basis des IMSEE-Regressionsmodells (Observatoire de l'Immobilier 2025). Berücksichtigt werden Stadtteil, Fläche und Baujahrzehnt."
+    disclaimer: "Diese Schätzung ist indikativ. Das IMSEE-Modell erklärt 51 % der beobachteten Preisvariation; Etage, Aussicht und Zustand werden nicht berücksichtigt. Für eine präzise Bewertung kontaktieren Sie uns."
+    form:
+      district_label: "Stadtteil"
+      district_placeholder: "Wählen Sie einen Stadtteil"
+      surface_label: "Fläche (m²)"
+      surface_placeholder: "z. B. 100"
+      construction_year_label: "Baujahr"
+      construction_year_placeholder: "z. B. 2015"
+      submit: "Bewertung anfordern"
+    result:
+      title: "Schätzung für Ihre Immobilie"
+      price_per_m2: "Geschätzter Preis pro m²"
+      total: "Geschätzter Wert"
+      band_label: "Schätzungsspanne (±25 %)"
+      cta_title: "Möchten Sie eine präzise Bewertung?"
+      cta_text: "Unser Team kann Ihre Immobilie besichtigen und alle Faktoren berücksichtigen (Etage, Aussicht, Zustand). Kontaktieren Sie uns für eine persönliche Bewertung."
+      cta_button: "Expertenbewertung anfordern"
+    errors:
+      title: "Schätzung nicht möglich"
+      invalid: "Bitte überprüfen Sie die eingegebenen Informationen."
+      district_unavailable: "Keine IMSEE-Daten für diesen Stadtteil verfügbar (Monaco-Ville ist vom Modell ausgeschlossen)."
+      surface_required: "Die Fläche muss eine positive Zahl sein."
+      construction_year_required: "Das Baujahr muss zwischen 1880 und %{year} liegen."
+
   routes:
     sales: "verkauf"
     rentals: "vermietung"
@@ -361,3 +391,4 @@ de:
     vendre: "verkaufen"
     faq: "faq"
     team: "team"
+    estimate: "bewertung"

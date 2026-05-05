@@ -12,6 +12,7 @@ sv:
     contact: "Kontakt"
     privacy: "Integritet"
     faq: "FAQ"
+    estimate: "Bostadsvärdering"
 
   footer:
     contact: "Kontakt"
@@ -178,6 +179,8 @@ sv:
     vendre_description: "Sälj din fastighet i Monaco med Agence Immobilière de la Gare, oberoende byrå sedan 1942. Värdering, mandat, förhandsavtal och notariellt köpebrev."
     faq_title: "FAQ | Agence Immobilière de la Gare"
     faq_description: "Vanliga frågor om fastigheter i Monaco. Agence Immobilière de la Gare, oberoende familjebyrå sedan 1942, svarar på dina frågor."
+    estimate_title: "Värdera din bostad i Monaco | Agence Immobilière de la Gare"
+    estimate_description: "Värdera din bostad i Monaco med vårt verktyg baserat på IMSEE-data 2025. Pris per m² per stadsdel och uppskattningsintervall."
 
   gestion:
     title: "Fastighetsförvaltning i Monaco"
@@ -348,6 +351,33 @@ sv:
     security_text: "Agence de la Gare vidtar lämpliga tekniska och organisatoriska åtgärder för att säkerställa säkerheten, konfidentialiteten och integriteten för dina personuppgifter, i enlighet med artikel 31 i Loi n° 1.565 du 3 décembre 2024."
     last_updated: "Senast uppdaterad: mars 2026"
 
+  estimate:
+    title: "Vad är din bostad i Monaco värd?"
+    intro: "Få en vägledande värdering baserad på IMSEE:s regressionsmodell (Observatoire de l'Immobilier 2025). Verktyget tar hänsyn till stadsdel, yta och byggdecennium."
+    disclaimer: "Denna värdering är vägledande. IMSEE-modellen förklarar 51 % av den observerade prisvariationen; våning, utsikt och skick beaktas inte. För en exakt värdering, kontakta oss."
+    form:
+      district_label: "Stadsdel"
+      district_placeholder: "Välj en stadsdel"
+      surface_label: "Yta (m²)"
+      surface_placeholder: "t.ex. 100"
+      construction_year_label: "Byggår"
+      construction_year_placeholder: "t.ex. 2015"
+      submit: "Få min värdering"
+    result:
+      title: "Värdering av din bostad"
+      price_per_m2: "Uppskattat pris per m²"
+      total: "Uppskattat värde"
+      band_label: "Uppskattningsintervall (±25 %)"
+      cta_title: "Vill du ha en exakt värdering?"
+      cta_text: "Vårt team kan besöka din bostad och ta hänsyn till alla faktorer (våning, utsikt, skick). Kontakta oss för en personlig värdering."
+      cta_button: "Begär en expertvärdering"
+    errors:
+      title: "Värderingen kan inte slutföras"
+      invalid: "Kontrollera den information du angav."
+      district_unavailable: "Ingen IMSEE-data tillgänglig för denna stadsdel (Monaco-Ville ingår inte i modellen)."
+      surface_required: "Ytan måste vara ett positivt tal."
+      construction_year_required: "Byggåret måste vara mellan 1880 och %{year}."
+
   routes:
     sales: "forsaljning"
     rentals: "uthyrning"
@@ -361,3 +391,4 @@ sv:
     vendre: "salja"
     faq: "faq"
     team: "team"
+    estimate: "vardering"
