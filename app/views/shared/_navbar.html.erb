@@ -4,11 +4,11 @@
     <div class="flex items-center justify-between h-24">
       <%# Logo %>
       <a href="<%= locale_root_path %>" class="flex-shrink-0">
-        <%= image_tag "logo.png", alt: "Agence Immobilière de la Gare", class: "h-16" %>
+        <%= image_tag "logo.png", alt: "Agence Immobilière de la Gare", class: "h-14" %>
       </a>
 
       <%# Desktop Navigation %>
-      <div class="hidden lg:flex items-center space-x-6">
+      <div class="hidden lg:flex items-center space-x-4">
         <a href="<%= locale_sales_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_sales_path) %>">
           <%= t("nav.buy") %>
         </a>
@@ -30,7 +30,7 @@
         <a href="<%= locale_articles_path %>" class="text-navy hover:text-accent text-sm font-medium uppercase tracking-wide transition-colors <%= nav_active_class(locale_articles_path) %>">
           <%= t("nav.articles") %>
         </a>
-        <a href="<%= locale_contact_path %>" class="bg-gold text-white text-sm font-medium uppercase tracking-wide px-5 py-2.5 rounded hover:bg-gold/85 transition-colors">
+        <a href="<%= locale_contact_path %>" class="ml-2 bg-gold text-white text-sm font-medium uppercase tracking-wide px-5 py-2.5 rounded hover:bg-gold/85 transition-colors">
           <%= t("nav.contact") %>
         </a>
 
