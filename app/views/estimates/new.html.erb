@@ -1,5 +1,4 @@
-<% supported_districts = PropertyValuator::DISTRICT_COEFFICIENTS.keys
-   districts = District.where(slug: supported_districts).order(:name)
+<% districts = PropertyValuator::DISTRICT_NAMES.sort_by { |_, name| name }
    form_action = locale_estimate_path %>
 
 <div class="max-w-3xl mx-auto px-4 py-16" data-testid="estimate-page">
@@ -22,15 +21,20 @@
       <label for="district" class="block text-xs font-bold uppercase tracking-wide text-navy mb-2">
         <%= t("estimate.form.district_label") %>
       </label>
-      <select name="district" id="district" required
-              class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-navy">
-        <option value=""><%= t("estimate.form.district_placeholder") %></option>
-        <% districts.each do |d| %>
-          <option value="<%= d.slug %>" <%= "selected" if @form && @form[:district] == d.slug %>>
-            <%= d.name %>
-          </option>
-        <% end %>
-      </select>
+      <div class="relative">
+        <select name="district" id="district" required
+                class="appearance-none w-full px-3 py-2 pr-10 border border-gray-300 rounded text-sm bg-white text-dark focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy">
+          <option value=""><%= t("estimate.form.district_placeholder") %></option>
+          <% districts.each do |slug, name| %>
+            <option value="<%= slug %>" <%= "selected" if @form && @form[:district] == slug %>>
+              <%= name %>
+            </option>
+          <% end %>
+        </select>
+        <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
@@ -41,7 +45,7 @@
         <input type="number" name="surface" id="surface" min="1" step="1" required
                value="<%= @form && @form[:surface] %>"
                placeholder="<%= t("estimate.form.surface_placeholder") %>"
-               class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-navy">
+               class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white text-dark focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy">
       </div>
       <div>
         <label for="construction_year" class="block text-xs font-bold uppercase tracking-wide text-navy mb-2">
@@ -51,7 +55,7 @@
                min="1880" max="<%= Date.current.year %>" step="1" required
                value="<%= @form && @form[:construction_year] %>"
                placeholder="<%= t("estimate.form.construction_year_placeholder") %>"
-               class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-navy">
+               class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white text-dark focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy">
       </div>
     </div>
 

@@ -17,6 +17,16 @@ class PropertyValuator
     "jardin-exotique" => -12_726
   }.freeze
 
+  DISTRICT_NAMES = {
+    "monte-carlo"     => "Monte-Carlo",
+    "larvotto"        => "Larvotto",
+    "la-condamine"    => "La Condamine",
+    "fontvieille"     => "Fontvieille",
+    "la-rousse"       => "La Rousse",
+    "les-moneghetti"  => "Les Moneghetti",
+    "jardin-exotique" => "Jardin Exotique"
+  }.freeze
+
   YEAR_COEFFICIENTS = {
     2011 => 0,     2012 => 0,     2013 => 0,
     2014 => 5_265, 2015 => 7_881, 2016 => 10_887,
