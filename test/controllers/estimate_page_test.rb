@@ -142,4 +142,82 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     assert_match(/4\p{Space}?539\p{Space}?450/, response.body)
     assert_match(/7\p{Space}?565\p{Space}?750/, response.body)
   end
+
+  test "result page renders expert contact form posting to contact_submissions" do
+    post "/estimer", params: {
+      district: "monte-carlo",
+      surface: 100,
+      construction_year: 2024
+    }
+    assert_response :success
+    assert_select "[data-testid='estimate-expert-form'] form[action^='/contact_submissions']"
+    assert_select "input[name='contact_submission[name]']"
+    assert_select "input[name='contact_submission[email]']"
+    assert_select "input[name='contact_submission[phone]']"
+    assert_select "textarea[name='contact_submission[message]']"
+    # Carries the inputs that produced the estimate so the agent has full context
+    assert_select "input[type='hidden'][name='estimate[district]'][value='monte-carlo']"
+    assert_select "input[type='hidden'][name='estimate[surface]'][value='100']"
+    assert_select "input[type='hidden'][name='estimate[construction_year]'][value='2024']"
+    assert_select "input[type='hidden'][name='return_to'][value='estimate']"
+  end
+
+  test "submitting the expert contact form from estimate creates a submission and redirects back to the estimate page" do
+    assert_difference -> { ContactSubmission.count }, 1 do
+      post "/contact_submissions", params: {
+        contact_submission: {
+          name: "Sophie Martin",
+          email: "sophie@example.com",
+          phone: "+33 6 12 34 56 78",
+          message: "I'd like an expert to confirm this estimate."
+        },
+        return_to: "estimate",
+        estimate: {
+          district: "monte-carlo",
+          surface: "100",
+          construction_year: "2024"
+        },
+        locale: "fr"
+      }
+    end
+    assert_redirected_to "/estimer"
+    follow_redirect!
+    assert_match(/estim/i, response.body)
+  end
+
+  test "expert contact form submitted with invalid email re-renders the result with errors and preserves the estimate" do
+    post "/contact_submissions", params: {
+      contact_submission: {
+        name: "",
+        email: "",
+        phone: "",
+        message: ""
+      },
+      return_to: "estimate",
+      estimate: {
+        district: "monte-carlo",
+        surface: "100",
+        construction_year: "2024"
+      },
+      locale: "fr"
+    }
+    assert_response :unprocessable_content
+    # The estimate result is restored alongside the form errors
+    assert_select "[data-testid='estimate-result']"
+    assert_select "[data-testid='estimate-expert-form']"
+    assert_select "[data-testid='form-errors']"
+    # Inputs are preserved so the user can fix the broken field without losing context
+    assert_select "input[type='hidden'][name='estimate[district]'][value='monte-carlo']"
+  end
+
+  test "expert form on EN result page submits with EN return_to" do
+    post "/en/valuation", params: {
+      district: "larvotto",
+      surface: 150,
+      construction_year: 2022
+    }
+    assert_response :success
+    assert_select "[data-testid='estimate-expert-form']"
+    assert_select "input[type='hidden'][name='return_to'][value='estimate']"
+  end
 end
