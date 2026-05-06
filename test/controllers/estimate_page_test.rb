@@ -370,6 +370,63 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "canonical link on a result URL points to bare /estimer (consolidates SEO weight)" do
+    get "/estimer", params: {
+      district: "monte-carlo",
+      surface: 100,
+      construction_year: 2024
+    }
+    assert_response :success
+    assert_select "link[rel='canonical'][href='https://agencegaremonaco.com/estimer']"
+  end
+
+  test "empty estimate page emits FAQPage JSON-LD with the same questions as the visible FAQ" do
+    get "/estimer"
+    assert_response :success
+    json_ld = css_select("script[type='application/ld+json']")
+              .map(&:text)
+              .find { |s| s.include?('"FAQPage"') }
+    assert json_ld, "Expected an FAQPage JSON-LD script tag on /estimer"
+    parsed = JSON.parse(json_ld)
+    assert_equal "FAQPage", parsed["@type"]
+    assert_equal 7, parsed["mainEntity"].length, "Expected 7 FAQ entries"
+    parsed["mainEntity"].each do |entry|
+      assert_equal "Question", entry["@type"]
+      assert entry["name"].present?, "FAQ question must have a name"
+      assert_equal "Answer", entry["acceptedAnswer"]["@type"]
+      assert entry["acceptedAnswer"]["text"].present?, "FAQ answer must have text"
+    end
+    # Spot-check one localised question made it into the structured data
+    questions = parsed["mainEntity"].map { |e| e["name"] }
+    assert questions.any? { |q| q.include?("estimation en ligne") || q.include?("précision") },
+      "Expected the FR accuracy question in the FAQPage JSON-LD"
+  end
+
+  test "EN estimate page emits FAQPage JSON-LD in English" do
+    get "/en/valuation"
+    assert_response :success
+    json_ld = css_select("script[type='application/ld+json']")
+              .map(&:text)
+              .find { |s| s.include?('"FAQPage"') }
+    assert json_ld, "Expected FAQPage JSON-LD on /en/valuation"
+    parsed = JSON.parse(json_ld)
+    questions = parsed["mainEntity"].map { |e| e["name"] }
+    assert questions.any? { |q| q.downcase.include?("online") },
+      "Expected EN-language questions in JSON-LD"
+  end
+
+  test "result view does NOT emit FAQPage JSON-LD (the bare /estimer is the canonical FAQ page)" do
+    get "/estimer", params: {
+      district: "monte-carlo",
+      surface: 100,
+      construction_year: 2024
+    }
+    assert_response :success
+    json_ld_scripts = css_select("script[type='application/ld+json']").map(&:text)
+    refute json_ld_scripts.any? { |s| s.include?('"FAQPage"') },
+      "Result URL should not duplicate the FAQPage JSON-LD"
+  end
+
   test "result view does NOT render the editorial content + FAQ (keeps the result page focused)" do
     get "/estimer", params: {
       district: "monte-carlo",

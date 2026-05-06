@@ -8,6 +8,9 @@
 <% if seo_config[:page_type] == :faq %>
 <%= json_ld_faq(t("homepage.faqs").map { |faq| { question: faq[:question], answer: faq[:answer] } }) %>
 <% end %>
+<% if seo_config[:page_type] == :estimate && seo_config[:with_faq] != false %>
+<%= json_ld_faq(t("estimate.faq.items").values.map { |faq| { question: faq[:q], answer: faq[:a] } }) %>
+<% end %>
 <% if seo_config[:page_type] == :homepage %>
 <%= json_ld_website %>
 <% if defined?(@youtube_videos) && @youtube_videos&.any? %>
