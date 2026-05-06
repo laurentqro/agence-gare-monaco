@@ -41,6 +41,9 @@ class EstimatesController < ApplicationController
       construction_year: year,
       transaction_year: Date.current.year
     )
+    # The bare landing page (no result) is the canonical FAQ resource — don't
+    # duplicate the FAQPage JSON-LD on result URLs.
+    set_seo(page_type: :estimate, with_faq: false)
   rescue PropertyValuator::UnknownDistrictError
     @errors = [ t("estimate.errors.district_unavailable") ]
     render :new, status: :unprocessable_content
