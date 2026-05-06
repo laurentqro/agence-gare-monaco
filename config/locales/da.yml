@@ -403,6 +403,57 @@ da:
       district_unavailable: "Ingen IMSEE-data tilgængelig for dette kvarter (Monaco-Ville er udelukket fra modellen)."
       surface_required: "Arealet skal være et positivt tal."
       construction_year_required: "Byggeåret skal være mellem 1880 og %{year}."
+    content:
+      eyebrow: "Vores metode"
+      title: "Sådan vurderer vi din ejendom"
+      intro: "Monacos boligmarked offentliggør ikke sine handler: færre end tusind salg om året, betydelige forskelle mellem bygninger og enestående ejendomme, der ikke følger nogen almen regel. En præcis prissætning kræver både pålidelige data og en nøjagtig fornemmelse for terrænet."
+      method:
+        eyebrow: "Metode"
+        title: "Tre trin, fra modellen til besøget"
+        step1_title: "IMSEE's hedoniske model"
+        step1_body: "Observatoire de l'Immobilier offentliggør hvert år en regressionsmodel, der bygger på samtlige handler registreret i Fyrstendømmet. Modellen isolerer effekten af tre variabler — kvarter, areal og opførelsesårti — og leverer en referenceværdi."
+        step2_title: "Sammenlignelige handler"
+        step2_body: "Vi krydsrefererer dette benchmark med nylige salg af tilsvarende lejligheder i samme bygning eller gade. Det er disse — og ikke udbudspriserne — der afslører det reelle marked."
+        step3_title: "Ekspertise på stedet"
+        step3_body: "Endelig besøger vores agenter din ejendom for at vurdere det, ingen model kan indfange: etage, havudsigt, eksponering, kvaliteten af finishen, terrasse, parkering. Det er dette trin, der forvandler et vejledende tal til en holdbar vurdering af værdien."
+      factors:
+        eyebrow: "Hvad rykker prisen"
+        title: "Hvad bestemmer værdien af en Monaco-ejendom"
+        location_title: "Beliggenhed"
+        location_body: "Kvarteret afgør i vid udstrækning kvadratmeterprisen. Carré d'Or, Monte-Carlo og Larvotto ligger i toppen af skalaen; Fontvieille og Jardin Exotique tilbyder mere overkommelige indgangspriser. Selv inden for et og samme kvarter skaber nærhed til havnefronten eller butikkerne fortsat betydelige forskelle."
+        property_title: "Karakteristika"
+        property_body: "Areal, opførelsesår, etage, eksponering, udsigt, almindelig stand og bekvemmeligheder (klimaanlæg, parkering, kælder, terrasse) påvirker alle tallet mærkbart. En renoveret lejlighed med havudsigt kan opnå 30 til 40 % mere end en sammenlignelig bolig uden udsigt i samme bygning."
+        market_title: "Marked"
+        market_body: "Monacos marked bevæger sig i cyklusser. Udsving i udbuddet, beslutninger fra store institutionelle ejere, international beskatning og udenlandsk efterspørgsel forskyder priserne fra år til år. En reel vurdering tager højde for markedets øjeblik, ikke kun ejendommen."
+      expert:
+        eyebrow: "Hvorfor et besøg"
+        title: "En præcis vurdering kræver et besøg"
+        body: "IMSEE-modellen forklarer 51 % af variationen i de observerede priser. De resterende 49 % afhænger af faktorer, ingen database kan indfange: kvaliteten af en renovering, en gades stilhed, lyset fra en sydvendt eksponering, en bygnings karakter. Det er det, vores besøg måler — og det er det, der adskiller et vejledende estimat fra en opnåelig salgspris."
+    faq:
+      eyebrow: "Ofte stillede"
+      title: "Dine spørgsmål om ejendomsvurdering i Monaco"
+      items:
+        accuracy:
+          q: "Hvor præcist er online-estimatet?"
+          a: "Vores værktøj returnerer et interval på ±25 % omkring IMSEE-referenceprisen. For en almindelig lejlighed i et velrepræsenteret kvarter er spændet sædvanligvis snævert. For enestående ejendomme — penthouses, boliger med havudsigt, ikoniske bygninger — kan kun et besøg på stedet levere et holdbart tal."
+        free:
+          q: "Er ekspertvurderingen gratis?"
+          a: "Ja. Vores besøg og skriftlige værdivurdering er fuldstændig gratis og uden forpligtelse. Vi opkræver kun honorar, hvis du vælger at give os mandat til at varetage salget."
+        difference:
+          q: "Hvad er forskellen mellem online-estimatet og et ekspertbesøg?"
+          a: "Online-estimatet bruger tre variabler — kvarter, areal og opførelsesår — og giver en størrelsesorden. Ekspertbesøget tager højde for etage, udsigt, eksponering, stand, finish og selve bygningen. Det er dette kvalitative lag, der frembringer en realistisk udbudspris."
+        why:
+          q: "Hvorfor bør jeg få min Monaco-ejendom vurderet?"
+          a: "For at sælge til den rette pris, omlægge finansieringen, planlægge et arveskifte eller blot kende værdien af dit aktiv. I Monaco, hvor handler ikke er offentlige, er en professionel vurdering ofte den eneste måde at få et pålideligt benchmark på."
+        method:
+          q: "Hvordan beregner I prisen på en lejlighed i Monaco?"
+          a: "Vi kombinerer tre kilder: den hedoniske regressionsmodel, der hvert år offentliggøres af IMSEE (Observatoire de l'Immobilier), nylige sammenlignelige handler i samme bygning eller kvarter samt vores direkte aflæsning af markedet — ejendomme, der aktuelt udbydes, signaler om udbuddet og efterspørgsel fra internationale købere."
+        factors:
+          q: "Hvilke kriterier rykker prisen mest?"
+          a: "I grov rækkefølge: beliggenhed (kvarter og præcis adresse), etage og udsigt, anvendeligt areal og indretning, stand og finishens kvalitet, opførelsesår og orientering. Kun de to sidste indfanges af IMSEE-modellen — og det er netop derfor et besøg er afgørende."
+        time:
+          q: "Hvor lang tid tager det at få en ekspertvurdering?"
+          a: "Et besøg inden for 24 til 48 timer og en skriftlig værdivurdering inden for ugen. Har du brug for et øjeblikkeligt vejledende tal, er værktøjet ovenfor tilstrækkeligt."
 
   routes:
     sales: "salg"

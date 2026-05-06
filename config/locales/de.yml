@@ -403,6 +403,57 @@ de:
       district_unavailable: "Keine IMSEE-Daten für diesen Stadtteil verfügbar (Monaco-Ville ist vom Modell ausgeschlossen)."
       surface_required: "Die Fläche muss eine positive Zahl sein."
       construction_year_required: "Das Baujahr muss zwischen 1880 und %{year} liegen."
+    content:
+      eyebrow: "Unsere Methode"
+      title: "Wie wir Ihre Immobilie bewerten"
+      intro: "Der Monegassische Immobilienmarkt veröffentlicht seine Transaktionen nicht: weniger als tausend Verkäufe pro Jahr, erhebliche Unterschiede zwischen den Gebäuden und außergewöhnliche Objekte, die keiner allgemeinen Regel folgen. Eine präzise Preisfindung erfordert sowohl belastbare Daten als auch ein feines Gespür für die Lage vor Ort."
+      method:
+        eyebrow: "Methodik"
+        title: "Drei Schritte, vom Modell bis zur Besichtigung"
+        step1_title: "Das hedonische Modell des IMSEE"
+        step1_body: "Das Observatoire de l'Immobilier veröffentlicht jährlich ein Regressionsmodell, das auf sämtlichen im Fürstentum erfassten Transaktionen basiert. Das Modell isoliert den Effekt dreier Variablen — Stadtteil, Fläche, Baujahrzehnt — und liefert einen Referenzwert."
+        step2_title: "Vergleichbare Transaktionen"
+        step2_body: "Diesen Referenzwert gleichen wir mit jüngsten Verkäufen ähnlicher Wohnungen im selben Gebäude oder in derselben Straße ab. Diese — nicht die Angebotspreise — zeigen den realen Markt."
+        step3_title: "Vor-Ort-Expertise"
+        step3_body: "Schließlich besichtigen unsere Berater Ihre Immobilie, um zu erfassen, was kein Modell abbilden kann: Stockwerk, Meerblick, Ausrichtung, Ausstattungsqualität, Terrasse, Stellplatz. Dieser Schritt verwandelt eine indikative Größenordnung in eine fundierte Wertindikation."
+      factors:
+        eyebrow: "Was den Preis bewegt"
+        title: "Was den Wert einer Monegassischen Immobilie bestimmt"
+        location_title: "Lage"
+        location_body: "Der Stadtteil bestimmt weitgehend den Quadratmeterpreis. Carré d'Or, Monte-Carlo und Larvotto stehen an der Spitze der Skala; Fontvieille und Jardin Exotique bieten zugänglichere Einstiegsniveaus. Selbst innerhalb desselben Stadtteils erzeugt die Nähe zur Küste oder zum Einzelhandel weiterhin spürbare Unterschiede."
+        property_title: "Eigenschaften"
+        property_body: "Fläche, Baujahr, Stockwerk, Ausrichtung, Aussicht, Allgemeinzustand und Ausstattung (Klimaanlage, Stellplatz, Keller, Terrasse) verändern den Wert merklich. Eine renovierte Wohnung mit Meerblick kann 30 bis 40% mehr erzielen als eine vergleichbare Einheit ohne Aussicht im selben Gebäude."
+        market_title: "Markt"
+        market_body: "Der Monegassische Markt bewegt sich in Zyklen. Schwankungen des Angebots, Entscheidungen der großen institutionellen Eigentümer, internationale Steuerpolitik und ausländische Nachfrage verschieben die Preise von Jahr zu Jahr. Eine seriöse Bewertung berücksichtigt nicht nur die Immobilie, sondern auch den Marktmoment."
+      expert:
+        eyebrow: "Warum eine Besichtigung"
+        title: "Eine genaue Bewertung erfordert eine Besichtigung"
+        body: "Das IMSEE-Modell erklärt 51% der Schwankungen der beobachteten Preise. Die verbleibenden 49% hängen von Faktoren ab, die keine Datenbank erfassen kann: die Qualität einer Renovierung, die Ruhe einer Straße, das Licht einer Südausrichtung, der Charakter eines Gebäudes. Genau das erfasst unsere Besichtigung — und genau das unterscheidet eine indikative Schätzung von einem erzielbaren Verkaufspreis."
+    faq:
+      eyebrow: "Häufig gestellt"
+      title: "Ihre Fragen zur Immobilienbewertung in Monaco"
+      items:
+        accuracy:
+          q: "Wie genau ist die Online-Schätzung?"
+          a: "Unser Tool liefert eine Bandbreite von ±25% um den IMSEE-Referenzpreis. Für eine Standardwohnung in einem gut repräsentierten Stadtteil ist die Spanne in der Regel eng. Bei außergewöhnlichen Objekten — Penthouses, Wohnungen mit Meerblick, herausragende Gebäude — liefert nur eine Vor-Ort-Besichtigung einen belastbaren Wert."
+        free:
+          q: "Ist die Expertenbewertung kostenlos?"
+          a: "Ja. Unsere Besichtigung und die schriftliche Wertindikation sind vollkommen kostenlos und unverbindlich. Eine Provision fällt nur an, wenn Sie uns mit dem Verkauf beauftragen."
+        difference:
+          q: "Worin unterscheiden sich Online-Schätzung und Expertenbesichtigung?"
+          a: "Die Online-Schätzung stützt sich auf drei Variablen — Stadtteil, Fläche, Baujahr — und gibt eine Größenordnung an. Die Expertenbesichtigung berücksichtigt zusätzlich Stockwerk, Aussicht, Ausrichtung, Zustand, Ausstattung und das Gebäude selbst. Diese qualitative Ebene ist es, die einen realistischen Angebotspreis erst ermöglicht."
+        why:
+          q: "Warum sollte ich meine Monegassische Immobilie bewerten lassen?"
+          a: "Um zum richtigen Preis zu verkaufen, eine Refinanzierung vorzubereiten, eine Nachlassplanung zu erstellen oder schlicht den Wert Ihres Vermögens zu kennen. In Monaco, wo Transaktionen nicht öffentlich sind, ist eine professionelle Bewertung oft die einzige Möglichkeit, eine verlässliche Referenz zu erhalten."
+        method:
+          q: "Wie berechnen Sie den Preis einer Monegassischen Wohnung?"
+          a: "Wir kombinieren drei Quellen: das jährlich vom IMSEE (Observatoire de l'Immobilier) veröffentlichte hedonische Regressionsmodell, jüngste vergleichbare Transaktionen im selben Gebäude oder Stadtteil sowie unsere unmittelbare Marktkenntnis — derzeit vermarktete Objekte, Angebotssignale und die Nachfrage internationaler Käufer."
+        factors:
+          q: "Welche Kriterien beeinflussen den Preis am stärksten?"
+          a: "In grober Reihenfolge: Lage (Stadtteil und genaue Adresse), Stockwerk und Aussicht, nutzbare Fläche und Grundriss, Zustand und Qualität der Ausstattung, Baujahr und Ausrichtung. Nur die letzten beiden werden vom IMSEE-Modell erfasst — gerade deshalb ist eine Besichtigung wesentlich."
+        time:
+          q: "Wie schnell erhalte ich eine Expertenmeinung?"
+          a: "Eine Besichtigung innerhalb von 24 bis 48 Stunden und eine schriftliche Wertindikation innerhalb einer Woche. Für eine sofortige indikative Größenordnung genügt das Tool oben."
 
   routes:
     sales: "verkauf"

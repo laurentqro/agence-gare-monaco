@@ -403,6 +403,57 @@ it:
       district_unavailable: "Nessun dato IMSEE disponibile per questo quartiere (Monaco-Ville escluso dal modello)."
       surface_required: "La superficie deve essere un numero positivo."
       construction_year_required: "L'anno di costruzione deve essere compreso tra 1880 e %{year}."
+    content:
+      eyebrow: "Il nostro metodo"
+      title: "Come valutiamo il vostro immobile"
+      intro: "Il mercato immobiliare di Monaco non rende pubbliche le sue transazioni: meno di mille compravendite all'anno, scarti notevoli tra un edificio e l'altro e immobili eccezionali che sfuggono a ogni regola generale. Stabilire il giusto prezzo richiede dati affidabili e una conoscenza precisa del territorio."
+      method:
+        eyebrow: "Metodologia"
+        title: "Tre fasi, dal modello al sopralluogo"
+        step1_title: "Il modello edonico dell'IMSEE"
+        step1_body: "L'Osservatorio Immobiliare (IMSEE) pubblica ogni anno un modello di regressione costruito su tutte le transazioni registrate nel Principato. Il modello isola l'effetto di tre variabili — quartiere, superficie, decennio di costruzione — e restituisce un valore di riferimento."
+        step2_title: "Transazioni comparabili"
+        step2_body: "Confrontiamo questo riferimento con le vendite recenti di appartamenti simili nello stesso edificio o nella stessa via. Sono queste — non i prezzi richiesti — a rivelare il mercato reale."
+        step3_title: "Competenza sul posto"
+        step3_body: "Infine, i nostri agenti visitano il vostro immobile per valutare ciò che nessun modello può cogliere: piano, vista mare, esposizione, qualità delle finiture, terrazza, posto auto. È questa la fase che trasforma un dato indicativo in un'opinione di valore solidamente argomentata."
+      factors:
+        eyebrow: "Cosa sposta il prezzo"
+        title: "Cosa determina il valore di un immobile a Monaco"
+        location_title: "Posizione"
+        location_body: "Il quartiere definisce in larga misura il prezzo al metro quadrato. Il Carré d'Or, Monte-Carlo e Larvotto si collocano al vertice della scala; Fontvieille e Jardin Exotique offrono soglie d'ingresso più accessibili. All'interno di uno stesso quartiere, la prossimità al lungomare o alle vie commerciali genera comunque scarti significativi."
+        property_title: "Caratteristiche"
+        property_body: "Superficie, anno di costruzione, piano, esposizione, vista, stato generale e dotazioni (climatizzazione, posto auto, cantina, terrazza) incidono in modo apprezzabile. Un appartamento ristrutturato con vista mare può valere dal 30 al 40% in più rispetto a un'unità comparabile senza vista nello stesso edificio."
+        market_title: "Mercato"
+        market_body: "Il mercato monegasco si muove per cicli. Le variazioni dell'offerta, le scelte dei grandi proprietari istituzionali, la fiscalità internazionale e la domanda estera orientano i prezzi di anno in anno. Una valutazione corretta tiene conto del momento di mercato, non soltanto dell'immobile."
+      expert:
+        eyebrow: "Perché il sopralluogo"
+        title: "Una valutazione accurata richiede un sopralluogo"
+        body: "Il modello IMSEE spiega il 51% della variazione dei prezzi osservati. Il restante 49% dipende da fattori che nessuna banca dati può registrare: la qualità di una ristrutturazione, la quiete di una via, la luce di un'esposizione a sud, il carattere di un edificio. È questo che misuriamo durante il sopralluogo — ed è ciò che distingue una stima indicativa da un prezzo di vendita realmente conseguibile."
+    faq:
+      eyebrow: "Domande frequenti"
+      title: "Le vostre domande sulla valutazione di un immobile a Monaco"
+      items:
+        accuracy:
+          q: "Quanto è precisa la stima online?"
+          a: "Il nostro strumento restituisce un intervallo di ±25% intorno al prezzo di riferimento IMSEE. Per un appartamento standard in un quartiere ben rappresentato, lo scarto è in genere contenuto. Per gli immobili eccezionali — attici, unità con vista mare, edifici di prestigio — soltanto un sopralluogo permette di ottenere una cifra solidamente argomentata."
+        free:
+          q: "La valutazione di un nostro esperto è gratuita?"
+          a: "Sì. Il sopralluogo e l'opinione di valore scritta sono interamente gratuiti e senza alcun impegno. Applichiamo una commissione soltanto se sceglierete di affidarci la vendita."
+        difference:
+          q: "Qual è la differenza tra la stima online e la valutazione di un esperto?"
+          a: "La stima online si basa su tre variabili — quartiere, superficie, anno di costruzione — e fornisce un ordine di grandezza. La valutazione di un esperto considera anche piano, vista, esposizione, stato di conservazione, finiture e l'edificio stesso. È questo livello qualitativo a determinare un prezzo di richiesta realistico."
+        why:
+          q: "Perché far valutare il mio immobile a Monaco?"
+          a: "Per vendere al giusto prezzo, rifinanziare, pianificare una successione o semplicemente conoscere il valore del proprio patrimonio. A Monaco, dove le transazioni non sono pubbliche, una valutazione professionale è spesso l'unico modo per disporre di un riferimento affidabile."
+        method:
+          q: "Come calcolate il prezzo di un appartamento a Monaco?"
+          a: "Combiniamo tre fonti: il modello di regressione edonica pubblicato ogni anno dall'IMSEE (Osservatorio Immobiliare), le transazioni comparabili recenti nello stesso edificio o quartiere e la nostra lettura diretta del mercato — gli immobili attualmente in commercializzazione, i segnali dal lato dell'offerta e la domanda dei compratori internazionali."
+        factors:
+          q: "Quali criteri incidono di più sul prezzo?"
+          a: "In ordine indicativo: posizione (quartiere e indirizzo esatto), piano e vista, superficie utile e disposizione, stato di conservazione e qualità delle finiture, anno di costruzione ed esposizione. Soltanto gli ultimi due elementi sono colti dal modello IMSEE — ed è per questo che il sopralluogo resta indispensabile."
+        time:
+          q: "In quanto tempo si ottiene il parere di un esperto?"
+          a: "Un sopralluogo entro 24-48 ore e un'opinione di valore scritta nel corso della settimana. Per una cifra indicativa immediata è sufficiente lo strumento qui sopra."
 
   routes:
     sales: "vendite"

@@ -413,6 +413,57 @@ en:
       district_unavailable: "No IMSEE data available for this district (Monaco-Ville is excluded from the model)."
       surface_required: "Surface must be a positive number."
       construction_year_required: "Construction year must be between 1880 and %{year}."
+    content:
+      eyebrow: "Our method"
+      title: "How we value your property"
+      intro: "Monaco's real estate market doesn't publish its transactions: fewer than a thousand sales each year, considerable variation between buildings, and exceptional properties that follow no general rule. Pricing a property accurately requires both reliable data and a precise feel for the ground."
+      method:
+        eyebrow: "Methodology"
+        title: "Three steps, from the model to the visit"
+        step1_title: "The IMSEE hedonic model"
+        step1_body: "The Observatoire de l'Immobilier publishes a yearly regression model built on every transaction recorded in the Principality. The model isolates the effect of three variables — district, surface, decade of construction — and returns a reference value."
+        step2_title: "Comparable transactions"
+        step2_body: "We cross-reference that benchmark with recent sales of similar apartments in the same building or street. These — not asking prices — reveal the real market."
+        step3_title: "On-site expertise"
+        step3_body: "Finally, our agents visit your property to gauge what no model can capture: floor, sea view, exposure, finish quality, terrace, parking. This is the step that turns an indicative figure into a defensible opinion of value."
+      factors:
+        eyebrow: "What moves the price"
+        title: "What drives the value of a Monaco property"
+        location_title: "Location"
+        location_body: "The district largely sets the price per square metre. The Carré d'Or, Monte-Carlo and Larvotto sit at the top of the scale; Fontvieille and Jardin Exotique offer more accessible entry points. Within a single district, proximity to the seafront or to retail still produces meaningful gaps."
+        property_title: "Characteristics"
+        property_body: "Surface, year of construction, floor, exposure, view, overall condition and amenities (air conditioning, parking, cellar, terrace) all move the figure noticeably. A renovated apartment with a sea view can command 30 to 40% more than a comparable unit without view in the same building."
+        market_title: "Market"
+        market_body: "Monaco's market moves in cycles. Supply variations, decisions by major institutional owners, international taxation and foreign demand all shift prices year on year. A proper valuation accounts for the moment of the market, not just the property."
+      expert:
+        eyebrow: "Why a visit"
+        title: "An accurate valuation requires a visit"
+        body: "The IMSEE model explains 51% of the variation in observed prices. The remaining 49% depends on factors no database can capture: the quality of a renovation, the quiet of a street, the light of a southern exposure, the character of a building. That is what our visit measures — and that is what separates an indicative estimate from an achievable sale price."
+    faq:
+      eyebrow: "Frequently asked"
+      title: "Your questions about valuing property in Monaco"
+      items:
+        accuracy:
+          q: "How accurate is the online estimate?"
+          a: "Our tool returns a ±25% range around the IMSEE reference price. For a standard apartment in a well-represented district, the spread is usually narrow. For exceptional properties — penthouses, sea-view units, landmark buildings — only an on-site visit produces a defensible figure."
+        free:
+          q: "Is the expert valuation free of charge?"
+          a: "Yes. Our visit and written opinion of value are entirely free and come with no obligation. We charge a fee only if you choose to instruct us to handle the sale."
+        difference:
+          q: "What's the difference between the online estimate and an expert visit?"
+          a: "The online estimate uses three variables — district, surface, year of construction — and gives an order of magnitude. The expert visit factors in floor, view, exposure, condition, finishes and the building itself. That qualitative layer is what produces a realistic asking price."
+        why:
+          q: "Why should I have my Monaco property valued?"
+          a: "To sell at the right price, refinance, plan an estate, or simply know the value of your asset. In Monaco, where transactions are not public, a professional valuation is often the only way to obtain a reliable benchmark."
+        method:
+          q: "How do you calculate the price of a Monaco apartment?"
+          a: "We combine three sources: the hedonic regression model published yearly by IMSEE (Observatoire de l'Immobilier), recent comparable transactions in the same building or district, and our direct read of the market — properties currently being marketed, supply signals, and demand from international buyers."
+        factors:
+          q: "Which criteria move the price the most?"
+          a: "In rough order: location (district and exact address), floor and view, usable surface and layout, condition and quality of finishes, year of construction and orientation. Only the last two are captured by the IMSEE model — which is why a visit matters."
+        time:
+          q: "How long does it take to get an expert opinion?"
+          a: "A visit within 24 to 48 hours, and a written opinion of value within the week. For an immediate indicative figure, the tool above is enough."
 
   routes:
     sales: "sales"

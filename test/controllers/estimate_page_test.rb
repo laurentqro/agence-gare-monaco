@@ -326,4 +326,59 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='estimate-expert-form']"
     assert_select "input[type='hidden'][name='return_to'][value='estimate']"
   end
+
+  # ---------------------------------------------------------------------------
+  # Editorial content + FAQ (rendered on the empty form view, before submission)
+  # ---------------------------------------------------------------------------
+
+  test "empty estimate page renders the editorial content section explaining the methodology" do
+    get "/estimer"
+    assert_response :success
+    # Methodology: data, comparables, expertise on the ground
+    assert_select "[data-testid='estimate-content']"
+    assert_select "[data-testid='estimate-content-method']"
+    assert_select "[data-testid='estimate-content-factors']"
+    assert_select "[data-testid='estimate-content-expert']"
+  end
+
+  test "empty estimate page renders an FAQ section with collapsible questions" do
+    get "/estimer"
+    assert_response :success
+    assert_select "[data-testid='estimate-faq']"
+    # Native disclosure widget so the page degrades without JS
+    assert_select "[data-testid='estimate-faq'] details", minimum: 5
+    assert_select "[data-testid='estimate-faq'] details summary", minimum: 5
+  end
+
+  test "FAQ renders in all 9 locales" do
+    locale_paths = {
+      fr: "/estimer",
+      en: "/en/valuation",
+      it: "/it/stima",
+      de: "/de/bewertung",
+      sv: "/sv/vardering",
+      no: "/no/verdivurdering",
+      da: "/da/vurdering",
+      fi: "/fi/arviointi",
+      ru: "/ru/otsenka"
+    }
+    locale_paths.each do |locale, path|
+      get path
+      assert_response :success
+      assert_select "[data-testid='estimate-faq']", { count: 1 }, "Expected FAQ section on #{locale} (#{path})"
+      assert_select "[data-testid='estimate-faq'] details", { minimum: 5 }, "Expected >=5 FAQ items on #{locale}"
+    end
+  end
+
+  test "result view does NOT render the editorial content + FAQ (keeps the result page focused)" do
+    get "/estimer", params: {
+      district: "monte-carlo",
+      surface: 100,
+      construction_year: 2024
+    }
+    assert_response :success
+    assert_select "[data-testid='estimate-result']"
+    assert_select "[data-testid='estimate-content']", false
+    assert_select "[data-testid='estimate-faq']", false
+  end
 end
