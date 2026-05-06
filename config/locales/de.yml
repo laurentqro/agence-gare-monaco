@@ -401,7 +401,7 @@ de:
       title: "Schätzung nicht möglich"
       invalid: "Bitte überprüfen Sie die eingegebenen Informationen."
       district_unavailable: "Keine IMSEE-Daten für diesen Stadtteil verfügbar (Monaco-Ville ist vom Modell ausgeschlossen)."
-      surface_required: "Die Fläche muss eine positive Zahl sein."
+      surface_required: "Die Fläche muss zwischen 1 und %{max} m² liegen."
       construction_year_required: "Das Baujahr muss zwischen 1880 und %{year} liegen."
     content:
       eyebrow: "Unsere Methode"

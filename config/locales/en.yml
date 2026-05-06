@@ -411,7 +411,7 @@ en:
       title: "Unable to produce a valuation"
       invalid: "Please check the information you entered."
       district_unavailable: "No IMSEE data available for this district (Monaco-Ville is excluded from the model)."
-      surface_required: "Surface must be a positive number."
+      surface_required: "Surface must be between 1 and %{max} m²."
       construction_year_required: "Construction year must be between 1880 and %{year}."
     content:
       eyebrow: "Our method"

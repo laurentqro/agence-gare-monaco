@@ -401,7 +401,7 @@ it:
       title: "Impossibile produrre una stima"
       invalid: "Verifica le informazioni inserite."
       district_unavailable: "Nessun dato IMSEE disponibile per questo quartiere (Monaco-Ville escluso dal modello)."
-      surface_required: "La superficie deve essere un numero positivo."
+      surface_required: "La superficie deve essere compresa tra 1 e %{max} m²."
       construction_year_required: "L'anno di costruzione deve essere compreso tra 1880 e %{year}."
     content:
       eyebrow: "Il nostro metodo"

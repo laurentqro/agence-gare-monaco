@@ -401,7 +401,7 @@ sv:
       title: "Värderingen kan inte slutföras"
       invalid: "Kontrollera den information du angav."
       district_unavailable: "Ingen IMSEE-data tillgänglig för denna stadsdel (Monaco-Ville ingår inte i modellen)."
-      surface_required: "Ytan måste vara ett positivt tal."
+      surface_required: "Ytan måste vara mellan 1 och %{max} m²."
       construction_year_required: "Byggåret måste vara mellan 1880 och %{year}."
     content:
       eyebrow: "Vår metod"

@@ -401,7 +401,7 @@
       title: "Kan ikke produsere et estimat"
       invalid: "Kontroller informasjonen du oppga."
       district_unavailable: "Ingen IMSEE-data tilgjengelig for denne bydelen (Monaco-Ville er ekskludert fra modellen)."
-      surface_required: "Arealet må være et positivt tall."
+      surface_required: "Arealet må være mellom 1 og %{max} m²."
       construction_year_required: "Byggeåret må være mellom 1880 og %{year}."
     content:
       eyebrow: "Vår metode"
