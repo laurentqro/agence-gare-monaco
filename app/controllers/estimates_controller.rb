@@ -3,6 +3,11 @@ class EstimatesController < ApplicationController
   include SeoConfigurable
   allow_unauthenticated_access
 
+  # Even Monaco's largest single-floor properties are well under this — the
+  # bound exists to reject `1e10`-style adversarial inputs before they reach
+  # the layout (which can't render trillion-euro numbers gracefully).
+  MAX_SURFACE_M2 = 100_000
+
   # Single GET endpoint so the result URL is shareable.
   # Query keys are localized (e.g. /estimer?quartier=...&surface=...&annee-construction=...
   # in FR, /en/valuation?district=...&area=...&construction-year=... in EN), but English
@@ -25,8 +30,8 @@ class EstimatesController < ApplicationController
     surface = parse_positive(surface_raw)
     year    = parse_positive(year_raw)
 
-    if surface.nil?
-      @errors = [ t("estimate.errors.surface_required") ]
+    if surface.nil? || surface < 1 || surface > MAX_SURFACE_M2
+      @errors = [ t("estimate.errors.surface_required", max: MAX_SURFACE_M2) ]
       return render :new, status: :unprocessable_content
     end
 

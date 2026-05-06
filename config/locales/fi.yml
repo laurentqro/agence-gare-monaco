@@ -401,7 +401,7 @@ fi:
       title: "Arviota ei voida muodostaa"
       invalid: "Tarkista syöttämäsi tiedot."
       district_unavailable: "IMSEE-tietoja ei ole saatavilla tälle alueelle (Monaco-Ville ei ole mukana mallissa)."
-      surface_required: "Pinta-alan on oltava positiivinen luku."
+      surface_required: "Pinta-alan on oltava 1 ja %{max} m² välillä."
       construction_year_required: "Rakennusvuoden on oltava välillä 1880 ja %{year}."
     content:
       eyebrow: "Menetelmämme"

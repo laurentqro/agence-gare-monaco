@@ -156,6 +156,28 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='estimate-errors']"
   end
 
+  test "GET with surface above the upper bound is rejected with the surface error" do
+    get "/estimer", params: {
+      district: "monte-carlo",
+      surface: "1e10",
+      construction_year: 2024
+    }
+    assert_response :unprocessable_content
+    assert_select "[data-testid='estimate-errors']", text: /surface/i
+    assert_select "[data-testid='estimate-result']", false,
+      "An absurd surface must not produce a result billboard"
+  end
+
+  test "GET with fractional surface below 1 m² is rejected with the surface error (not a generic invalid)" do
+    get "/estimer", params: {
+      district: "monte-carlo",
+      surface: "0.5",
+      construction_year: 2024
+    }
+    assert_response :unprocessable_content
+    assert_select "[data-testid='estimate-errors']", text: /surface/i
+  end
+
   test "form on the estimate page submits via GET so the result URL is shareable" do
     get "/estimer"
     assert_select "form[action='/estimer'][method='get']"
@@ -251,6 +273,53 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     assert_select "input[type='hidden'][name='estimate[surface]'][value='100']"
     assert_select "input[type='hidden'][name='estimate[construction_year]'][value='2024']"
     assert_select "input[type='hidden'][name='return_to'][value='estimate']"
+  end
+
+  test "tampered hidden estimate[district] is sanitized in the persisted message" do
+    # An attacker manipulates the hidden estimate[district] field to inject newlines
+    # and a fake field. The persisted submission must not contain the injected lines
+    # verbatim; the agent should see a clean record.
+    assert_difference -> { ContactSubmission.count }, 1 do
+      post "/contact_submissions", params: {
+        contact_submission: {
+          name: "Sophie Martin",
+          email: "sophie@example.com",
+          phone: "+33 6 12 34 56 78"
+        },
+        return_to: "estimate",
+        estimate: {
+          district: "foo\nFake-Field: bar",
+          surface: "100",
+          construction_year: "2024"
+        },
+        locale: "fr"
+      }
+    end
+    submission = ContactSubmission.last
+    refute_match(/Fake-Field/, submission.message,
+      "Tampered hidden field must not appear verbatim in the persisted message")
+    refute_match(/\nFake-Field/, submission.message,
+      "Newline-injected content must be stripped or sanitized")
+  end
+
+  test "tampered hidden estimate[district] with unknown slug falls back to a safe message" do
+    post "/contact_submissions", params: {
+      contact_submission: {
+        name: "Sophie Martin",
+        email: "sophie@example.com",
+        phone: "+33 6 12 34 56 78"
+      },
+      return_to: "estimate",
+      estimate: {
+        district: "<script>alert(1)</script>",
+        surface: "100",
+        construction_year: "2024"
+      },
+      locale: "fr"
+    }
+    submission = ContactSubmission.last
+    refute_match(/<script>/, submission.message,
+      "Unknown/unsafe district slug must not be echoed into the message")
   end
 
   test "submitting the expert contact form from estimate creates a submission and redirects back to the estimate page" do

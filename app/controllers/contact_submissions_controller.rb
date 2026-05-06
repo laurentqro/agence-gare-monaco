@@ -64,19 +64,23 @@ class ContactSubmissionsController < ApplicationController
 
   # Server-side message body built from the hidden estimate[*] inputs, so the
   # agent receives the IMSEE context even though the form only collects
-  # name + phone + email.
+  # name + phone + email. Hidden fields are attacker-controllable, so each
+  # value is validated against an allowlist (district) or coerced to an
+  # integer (surface, construction_year). Anything that doesn't validate is
+  # dropped — the agent gets a generic message rather than attacker-shaped
+  # text in the persisted submission and email.
   def build_estimate_message
     estimate_params = params[:estimate] || {}
     district_slug = estimate_params[:district].to_s
-    district_name = PropertyValuator::DISTRICT_NAMES[district_slug] || district_slug
-    surface = estimate_params[:surface]
-    year    = estimate_params[:construction_year]
-    [
-      "Demande d'estimation par un expert",
-      "Quartier : #{district_name}",
-      "Surface : #{surface} m²",
-      "Année de construction : #{year}"
-    ].join("\n")
+    district_name = PropertyValuator::DISTRICT_NAMES[district_slug]
+    surface = Integer(estimate_params[:surface], exception: false)
+    year    = Integer(estimate_params[:construction_year], exception: false)
+
+    lines = [ "Demande d'estimation par un expert" ]
+    lines << "Quartier : #{district_name}" if district_name
+    lines << "Surface : #{surface} m²" if surface&.positive?
+    lines << "Année de construction : #{year}" if year&.between?(1880, Date.current.year)
+    lines.join("\n")
   end
 
   # Re-runs the IMSEE valuation from the hidden estimate inputs so the result
