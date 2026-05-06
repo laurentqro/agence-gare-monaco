@@ -403,6 +403,57 @@ fr:
       district_unavailable: "Aucune donnée IMSEE disponible pour ce quartier (Monaco-Ville exclu du modèle)."
       surface_required: "La surface doit être un nombre positif."
       construction_year_required: "L'année de construction doit être comprise entre 1880 et %{year}."
+    content:
+      eyebrow: "Notre méthode"
+      title: "Comment nous évaluons votre bien"
+      intro: "Le marché monégasque ne publie pas ses transactions au grand jour : moins de mille ventes par an, des écarts de prix considérables d'un immeuble à l'autre, et des biens d'exception qui ne suivent aucune règle générale. Estimer correctement demande à la fois une donnée fiable et une connaissance fine du terrain."
+      method:
+        eyebrow: "Méthodologie"
+        title: "Trois étapes, du modèle à la visite"
+        step1_title: "Le modèle hédoniste de l'IMSEE"
+        step1_body: "L'Observatoire de l'Immobilier publie chaque année un modèle de régression construit sur l'ensemble des transactions enregistrées en Principauté. Ce modèle isole l'effet de trois variables — quartier, surface, décennie de construction — et restitue une valeur de référence."
+        step2_title: "Les transactions comparables"
+        step2_body: "Nous croisons cette référence avec les ventes récentes d'appartements similaires dans le même immeuble ou la même rue. Ce sont elles, et non les prix affichés, qui révèlent le marché réel."
+        step3_title: "L'expertise sur place"
+        step3_body: "Enfin, nos agents visitent votre bien pour mesurer ce qu'aucun modèle ne capture : étage, vue mer, exposition, état des prestations, terrasse, parking. C'est l'étape qui transforme une estimation indicative en avis de valeur défendable."
+      factors:
+        eyebrow: "Les variables qui comptent"
+        title: "Ce qui fait varier le prix d'un bien à Monaco"
+        location_title: "Localisation"
+        location_body: "Le quartier détermine en grande partie le prix au mètre carré. Le Carré d'Or, Monte-Carlo et le Larvotto figurent en haut de l'échelle ; Fontvieille et le Jardin Exotique offrent des points d'entrée plus accessibles. Au sein d'un même quartier, la proximité du front de mer ou des commerces crée encore des écarts importants."
+        property_title: "Caractéristiques"
+        property_body: "La surface, l'année de construction, l'étage, l'exposition, la vue, l'état général et les prestations (climatisation, parking, cave, terrasse) modifient sensiblement la valeur. Un appartement rénové avec vue mer peut valoir 30 à 40 % de plus qu'un bien comparable sans vue dans le même immeuble."
+        market_title: "Marché"
+        market_body: "Le marché monégasque évolue par cycles. Les variations de l'offre, les arbitrages des grands propriétaires institutionnels, la fiscalité internationale et la demande étrangère influencent les prix d'une année sur l'autre. Une estimation tient compte du moment du marché, pas seulement du bien."
+      expert:
+        eyebrow: "Pourquoi une visite"
+        title: "Une estimation juste passe par une visite"
+        body: "Le modèle de l'IMSEE explique 51 % de la variation des prix observés. Les 49 % restants tiennent à des facteurs qu'aucune base de données ne peut saisir : la qualité d'une rénovation, le silence d'une rue, la lumière d'une exposition sud, le caractère d'un immeuble. C'est ce que mesure notre passage sur place — et c'est aussi ce qui sépare une estimation indicative d'un prix de vente atteignable."
+    faq:
+      eyebrow: "Questions fréquentes"
+      title: "Vos questions sur l'estimation immobilière à Monaco"
+      items:
+        accuracy:
+          q: "Quelle est la précision de l'estimation en ligne ?"
+          a: "Notre outil donne une fourchette indicative à ±25 % autour du prix de référence IMSEE. Pour un bien classique dans un quartier bien représenté, l'écart est généralement faible. Pour un bien d'exception — penthouse, vue mer, immeuble emblématique — seule une expertise sur place permet d'établir un prix défendable."
+        free:
+          q: "L'estimation par un expert est-elle gratuite ?"
+          a: "Oui. Notre visite et notre avis de valeur sont entièrement gratuits, sans engagement. Nous ne facturons que si vous décidez de nous confier la commercialisation du bien."
+        difference:
+          q: "Quelle différence entre l'estimation en ligne et la visite d'un expert ?"
+          a: "L'estimation en ligne s'appuie sur trois variables — quartier, surface, année de construction — et donne un ordre de grandeur. La visite d'un expert prend en compte l'étage, la vue, l'exposition, l'état du bien, ses prestations et son immeuble. C'est cette dimension qualitative qui produit un prix de vente réaliste."
+        why:
+          q: "Pourquoi faire estimer mon bien à Monaco ?"
+          a: "Pour vendre au juste prix, refinancer, anticiper une succession, ou simplement connaître la valeur de votre patrimoine. À Monaco, où les transactions ne sont pas publiques, une estimation professionnelle est souvent le seul moyen d'obtenir un repère fiable."
+        method:
+          q: "Comment calculez-vous le prix d'un appartement à Monaco ?"
+          a: "Nous combinons trois sources : le modèle de régression hédoniste publié chaque année par l'IMSEE (Observatoire de l'Immobilier), les transactions récentes comparables dans le même immeuble ou le même quartier, et notre connaissance directe du marché — biens en cours de commercialisation, signaux de l'offre, demande des acquéreurs internationaux."
+        factors:
+          q: "Quels critères font le plus varier le prix ?"
+          a: "Dans l'ordre d'importance : la localisation (quartier et adresse exacte), l'étage et la vue, la surface utile et son agencement, l'état général et la qualité des prestations, l'année de construction et l'orientation. Les deux derniers critères sont les seuls capturés par le modèle IMSEE — d'où l'intérêt d'une visite."
+        time:
+          q: "Combien de temps faut-il pour obtenir un avis d'expert ?"
+          a: "Sous 24 à 48 heures pour la visite, et un avis de valeur écrit dans la semaine. Pour une estimation indicative immédiate, l'outil ci-dessus suffit."
 
   routes:
     sales: "ventes"

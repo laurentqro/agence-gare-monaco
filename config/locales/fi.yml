@@ -403,6 +403,57 @@ fi:
       district_unavailable: "IMSEE-tietoja ei ole saatavilla tälle alueelle (Monaco-Ville ei ole mukana mallissa)."
       surface_required: "Pinta-alan on oltava positiivinen luku."
       construction_year_required: "Rakennusvuoden on oltava välillä 1880 ja %{year}."
+    content:
+      eyebrow: "Menetelmämme"
+      title: "Näin arvioimme kiinteistösi"
+      intro: "Monacon kiinteistömarkkinat eivät julkista kauppojaan: alle tuhat kauppaa vuodessa, huomattavia eroja rakennusten välillä ja poikkeuksellisia kohteita, jotka eivät noudata yleisiä sääntöjä. Kiinteistön tarkka hinnoittelu vaatii sekä luotettavaa dataa että hienostunutta tuntumaa kentältä."
+      method:
+        eyebrow: "Metodologia"
+        title: "Kolme vaihetta, mallista vierailuun"
+        step1_title: "IMSEE:n hedoninen malli"
+        step1_body: "Observatoire de l'Immobilier julkaisee vuosittain regressiomallin, joka rakentuu jokaisesta Ruhtinaskunnassa rekisteröidystä kaupasta. Malli erottaa kolmen muuttujan — alueen, pinta-alan ja rakennusvuosikymmenen — vaikutuksen ja palauttaa viitearvon."
+        step2_title: "Vertailukelpoiset kaupat"
+        step2_body: "Vertaamme tätä viitearvoa saman rakennuksen tai kadun samankaltaisten asuntojen tuoreisiin kauppahintoihin. Juuri nämä — eivät pyyntihinnat — paljastavat todelliset markkinat."
+        step3_title: "Asiantuntemus paikan päällä"
+        step3_body: "Lopuksi välittäjämme käyvät kiinteistössäsi arvioidakseen sen, mitä mikään malli ei tavoita: kerros, merinäköala, ilmansuunnat, viimeistelyn taso, terassi, autopaikka. Tämä vaihe muuttaa suuntaa-antavan luvun perustelluksi arvolausunnoksi."
+      factors:
+        eyebrow: "Mikä hintaa liikuttaa"
+        title: "Mikä määrittää monacolaisen kiinteistön arvon"
+        location_title: "Sijainti"
+        location_body: "Alue määrittää pitkälti neliöhinnan. Carré d'Or, Monte-Carlo ja Larvotto ovat asteikon huipulla; Fontvieille ja Jardin Exotique tarjoavat helpommin saavutettavia lähtökohtia. Yksittäisen alueen sisällä läheisyys merenrantaan tai liikkeisiin tuottaa edelleen merkittäviä eroja."
+        property_title: "Ominaisuudet"
+        property_body: "Pinta-ala, rakennusvuosi, kerros, ilmansuunnat, näkymä, yleiskunto ja varustelu (ilmastointi, autopaikka, kellarikomero, terassi) liikuttavat lukua tuntuvasti. Saneerattu merinäköalalla varustettu asunto voi nostaa hintaa 30–40 % verrattuna vastaavaan ilman näkymää saman rakennuksen sisällä."
+        market_title: "Markkinat"
+        market_body: "Monacon markkinat liikkuvat sykleissä. Tarjonnan vaihtelut, suurten institutionaalisten omistajien päätökset, kansainvälinen verotus ja ulkomainen kysyntä siirtävät hintoja vuodesta toiseen. Asianmukainen arviointi ottaa huomioon markkinan hetken — ei pelkästään kiinteistöä."
+      expert:
+        eyebrow: "Miksi vierailu"
+        title: "Tarkka arviointi vaatii vierailun"
+        body: "IMSEE-malli selittää 51 % havaittujen hintojen vaihtelusta. Loput 49 % riippuvat tekijöistä, joita mikään tietokanta ei tavoita: saneerauksen laatu, kadun rauhallisuus, eteläisen ilmansuunnan valo, rakennuksen luonne. Juuri tätä vierailumme mittaa — ja juuri tämä erottaa suuntaa-antavan arvion saavutettavasta myyntihinnasta."
+    faq:
+      eyebrow: "Usein kysyttyä"
+      title: "Kysymyksiäsi monacolaisen kiinteistön arvioinnista"
+      items:
+        accuracy:
+          q: "Kuinka tarkka verkkoarvio on?"
+          a: "Työkalumme palauttaa ±25 %:n vaihteluvälin IMSEE-viitehinnan ympärille. Tavanomaiselle asunnolle hyvin edustetulla alueella vaihteluväli on yleensä kapea. Poikkeuksellisille kohteille — kattohuoneistoille, merinäköala-asunnoille, maamerkkirakennuksille — vain vierailu paikan päällä tuottaa perustellun luvun."
+        free:
+          q: "Onko asiantuntija-arvio maksuton?"
+          a: "Kyllä. Vierailumme ja kirjallinen arvolausuntomme ovat täysin maksuttomia eivätkä sido mihinkään. Veloitamme palkkion vain, jos päätät antaa myynnin tehtäväksemme."
+        difference:
+          q: "Mikä erottaa verkkoarvion ja asiantuntijan vierailun?"
+          a: "Verkkoarvio käyttää kolmea muuttujaa — alue, pinta-ala, rakennusvuosi — ja antaa suuruusluokan. Asiantuntijan vierailu huomioi kerroksen, näkymän, ilmansuunnat, kunnon, viimeistelyn ja itse rakennuksen. Tämä laadullinen kerros tuottaa realistisen pyyntihinnan."
+        why:
+          q: "Miksi kannattaa arvioituttaa monacolainen kiinteistöni?"
+          a: "Myydäksesi oikealla hinnalla, järjestelläksesi rahoituksen, suunnitellaksesi perinnönjakoa tai yksinkertaisesti tietääksesi omaisuutesi arvon. Monacossa, jossa kaupat eivät ole julkisia, ammattilaisen arviointi on usein ainoa tapa saada luotettava viitearvo."
+        method:
+          q: "Miten laskette monacolaisen asunnon hinnan?"
+          a: "Yhdistämme kolme lähdettä: IMSEE:n (Observatoire de l'Immobilier) vuosittain julkaiseman hedonisen regressiomallin, saman rakennuksen tai alueen tuoreet vertailukelpoiset kaupat sekä oman suoran lukemamme markkinasta — parhaillaan myynnissä olevat kohteet, tarjontasignaalit ja kansainvälisten ostajien kysynnän."
+        factors:
+          q: "Mitkä kriteerit liikuttavat hintaa eniten?"
+          a: "Karkeasti tärkeysjärjestyksessä: sijainti (alue ja tarkka osoite), kerros ja näkymä, käyttökelpoinen pinta-ala ja pohjaratkaisu, kunto ja viimeistelyn laatu, rakennusvuosi ja ilmansuunnat. Vain kaksi viimeistä sisältyy IMSEE-malliin — siksi vierailu on olennainen."
+        time:
+          q: "Kuinka kauan asiantuntija-arvion saaminen kestää?"
+          a: "Vierailu 24–48 tunnin sisällä ja kirjallinen arvolausunto viikon kuluessa. Välittömään suuntaa-antavaan lukuun yllä oleva työkalu riittää."
 
   routes:
     sales: "myynti"
