@@ -81,7 +81,7 @@ class PropertyValuator
     @district_slug = district.is_a?(District) ? district.slug : district.to_s
     @surface = surface
     @construction_year = construction_year.to_i
-    @transaction_year = [transaction_year.to_i, LATEST_YEAR].min
+    @transaction_year = [ transaction_year.to_i, LATEST_YEAR ].min
     validate!
   end
 
