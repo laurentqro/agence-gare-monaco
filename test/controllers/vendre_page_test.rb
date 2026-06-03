@@ -11,11 +11,11 @@ class VendrePageTest < ActionDispatch::IntegrationTest
   test "vendre page includes key sections" do
     get "/vendre"
     assert_response :success
-    assert_select "h2", text: /estimer la valeur/i
-    assert_select "h2", text: /documents.*nécessaires/i
+    assert_select "h2", text: /Estimez la valeur de votre bien/i
+    assert_select "h2", text: /partie administrative de la vente/i
     assert_select "h2", text: /mandat de vente/i
     assert_select "h2", text: /Comment vendons-nous/i
-    assert_select "h2", text: /fonds sont-ils versés/i
+    assert_select "h2", text: /Le versement des fonds/i
   end
 
   test "all 9 locales return 200" do
@@ -73,6 +73,24 @@ class VendrePageTest < ActionDispatch::IntegrationTest
     get "/sitemaps/fr.xml"
     assert_response :success
     assert_includes response.body, "/vendre"
+  end
+
+  test "FR vendre page uses verbatim article content" do
+    get "/vendre"
+    assert_response :success
+    body = response.body
+    assert_includes body, "Une bonne estimation de votre bien permettra de conclure une vente rapide"
+    assert_includes body, "Nous prenons tout en charge pour que votre expérience soit la plus agréable possible."
+    assert_includes body, "votre attestation de propriété du bien à vendre,"
+    assert_includes body, "les trois derniers procès-verbaux de l&#39;assemblée générale de copropriété,"
+    assert_includes body, "Ce type de mandat vous permet de confier la vente de votre bien à plusieurs agences immobilières"
+    assert_includes body, "Le mandat de vente exclusif confie la vente du bien à une seule agence immobilière."
+    assert_includes body, "Le mandat co-exclusif peut être la solution hybride"
+    assert_includes body, "vidéos HD et photos HD en 360°"
+    assert_includes body, "les fonds vous seront versés par l&#39;étude notariale sous 15 jours"
+    assert_select "h2", text: /Estimez la valeur de votre bien/i
+    assert_select "h2", text: /Nous gérons toute la partie administrative/i
+    assert_select "h2", text: /Le versement des fonds/i
   end
 
   test "vendre page includes FAQPage JSON-LD schema" do
