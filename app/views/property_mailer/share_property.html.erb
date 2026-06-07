@@ -1,86 +1,156 @@
-<div style="font-family: 'Domine', Georgia, 'Times New Roman', serif; max-width: 600px; margin: 0 auto; color: #212529;">
-  <div style="background-color: #090956; padding: 20px; text-align: center;">
-    <h1 style="color: #ffffff; margin: 0; font-size: 18px;">Agence Immobilière de la Gare</h1>
-    <p style="color: #ffffff; opacity: 0.8; margin: 5px 0 0; font-size: 12px;">L'Immobilier à Monaco depuis 1942</p>
+<%
+  property_url = "https://agencegaremonaco.com/fr/biens/#{@property.id}-#{@property.slug_for(:fr)}"
+  navy   = "#090956"
+  accent = "#6E8297"
+  ink    = "#212529"
+  hero   = @hero_image && (@hero_image.large_url.presence || @hero_image.medium_url.presence || @hero_image.remote_url)
+  rental = @property.transaction_type == "rental"
+
+  # (svg, value) pairs for the stat strip — only rendered when the value is present.
+  stat = ->(path) {
+    %(<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;">#{path}</svg>)
+  }
+  icon_rooms    = stat.call(%(<path d="M3 11 12 4l9 7M5 10v10h14V10" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>))
+  icon_bedrooms = stat.call(%(<path d="M3 18v-5h18v5M3 13V8a2 2 0 0 1 2-2h6v7M11 13V6h6a2 2 0 0 1 2 2v5M3 18v2M21 18v2" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>))
+  icon_baths    = stat.call(%(<path d="M4 12V6a2 2 0 0 1 2-2 2 2 0 0 1 2 2M3 12h18v3a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-3ZM6 19l-1 2M18 19l1 2" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>))
+  icon_parking  = stat.call(%(<path d="M5 17v-5l2-5h10l2 5v5M5 17v2M19 17v2M5 12h14M8 12.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM19 12.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>))
+  icon_area     = stat.call(%(<path d="M4 4h16v16H4zM4 9h3M4 14h3M9 20v-3M14 20v-3" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>))
+
+  stats = []
+  stats << [icon_rooms,    @property.num_rooms]                                  if @property.num_rooms.to_i.positive?
+  stats << [icon_bedrooms, @property.num_bedrooms]                              if @property.num_bedrooms.to_i.positive?
+  stats << [icon_baths,    @property.num_bathrooms]                             if @property.num_bathrooms.to_i.positive?
+  stats << [icon_parking,  @property.num_parkings]                              if @property.num_parkings.to_i.positive?
+  stats << [icon_area,     "#{@property.living_area.to_i} m&sup2;".html_safe]   if @property.living_area.to_f.positive?
+%>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title><%= @property.title_for(:fr) %></title>
+</head>
+<body style="margin:0; padding:0; background-color:#f1f1f1; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+  <!-- preview text -->
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0;">
+    <%= @property.title_for(:fr) %><% if @property.formatted_price %> — <%= @property.formatted_price %> €<% end %>
   </div>
 
-  <div style="padding: 20px;">
-    <p style="color: #212529; font-size: 14px;">Bonjour<%= " #{@contact.first_name}" if @contact %>,</p>
-    <p style="color: #212529; font-size: 14px;">&nbsp;</p>
-    <p style="color: #212529; font-size: 14px;">Nous avons le plaisir de vous présenter ce bien :</p>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f1f1f1;">
+    <tr>
+      <td align="center" style="padding:24px 12px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#ffffff;">
 
-    <h2 style="color: #090956; font-size: 18px; margin-top: 20px;"><%= @property.title_for(:fr) %></h2>
+          <!-- logo -->
+          <tr>
+            <td align="center" style="padding:32px 24px 24px;">
+              <%= image_tag image_url("logo.png"),
+                    alt: "Agence Immobilière de la Gare",
+                    width: 280,
+                    style: "display:block; width:280px; max-width:80%; height:auto; border:0;" %>
+            </td>
+          </tr>
 
-    <% if @images.any? %>
-      <div style="margin: 15px 0;">
-        <% @images.each do |image| %>
-          <img src="<%= image.medium_url.presence || image.remote_url %>" alt="<%= @property.title_for(:fr) %>" style="width: 100%; max-width: 560px; height: auto; border-radius: 4px; margin-bottom: 10px; display: block;" />
-        <% end %>
-      </div>
-    <% end %>
+          <!-- agent block -->
+          <tr>
+            <td style="padding:8px 32px 28px; font-family:Arial, Helvetica, sans-serif; color:<%= accent %>; font-size:14px; line-height:1.6;">
+              <span style="color:<%= ink %>;"><%= @agent[:name] %></span><br>
+              <a href="mailto:<%= @agent[:email] %>" style="color:<%= accent %>; text-decoration:none;"><%= @agent[:email] %></a><br>
+              T: <a href="tel:<%= @agent[:phone].delete(' ') %>" style="color:<%= accent %>; text-decoration:none;"><%= @agent[:phone] %></a>
+            </td>
+          </tr>
 
-    <table cellpadding="8" cellspacing="0" border="0" style="border-collapse: collapse; width: 100%; max-width: 560px; margin: 15px 0;">
-      <tr>
-        <td style="font-weight: bold; color: #6E8297; vertical-align: top; width: 140px; font-size: 13px;">Référence :</td>
-        <td style="color: #212529; font-size: 13px;"><%= @property.reference %></td>
-      </tr>
-      <% if @property.price.present? %>
-      <tr>
-        <td style="font-weight: bold; color: #6E8297; vertical-align: top; font-size: 13px;">Prix :</td>
-        <td style="color: #212529; font-size: 13px; font-weight: bold;"><%= @property.formatted_price %> €<%= " /mois" if @property.transaction_type == "rental" %></td>
-      </tr>
-      <% end %>
-      <% if @property.property_type.present? %>
-      <tr>
-        <td style="font-weight: bold; color: #6E8297; vertical-align: top; font-size: 13px;">Type :</td>
-        <td style="color: #212529; font-size: 13px;"><%= @property.property_type.capitalize %></td>
-      </tr>
-      <% end %>
-      <% if @property.num_rooms.to_i > 0 %>
-      <tr>
-        <td style="font-weight: bold; color: #6E8297; vertical-align: top; font-size: 13px;">Pièces :</td>
-        <td style="color: #212529; font-size: 13px;"><%= @property.num_rooms %></td>
-      </tr>
-      <% end %>
-      <% if @property.num_bedrooms.to_i > 0 %>
-      <tr>
-        <td style="font-weight: bold; color: #6E8297; vertical-align: top; font-size: 13px;">Chambres :</td>
-        <td style="color: #212529; font-size: 13px;"><%= @property.num_bedrooms %></td>
-      </tr>
-      <% end %>
-      <% if @property.living_area.to_f > 0 %>
-      <tr>
-        <td style="font-weight: bold; color: #6E8297; vertical-align: top; font-size: 13px;">Surface :</td>
-        <td style="color: #212529; font-size: 13px;"><%= @property.living_area %> m²</td>
-      </tr>
-      <% end %>
-    </table>
+          <!-- hero image -->
+          <% if hero %>
+          <tr>
+            <td style="padding:0 32px;">
+              <a href="<%= property_url %>" style="text-decoration:none;">
+                <%= image_tag hero,
+                      alt: @property.title_for(:fr),
+                      width: 536,
+                      style: "display:block; width:100%; max-width:536px; height:auto; border:0;" %>
+              </a>
+            </td>
+          </tr>
+          <% end %>
 
-    <% if @property.description_for(:fr).present? %>
-    <div style="margin: 15px 0; padding: 15px; background-color: #f9fafb; border-radius: 4px;">
-      <p style="color: #212529; font-size: 13px; line-height: 1.6; margin: 0;"><%= @property.description_for(:fr) %></p>
-    </div>
-    <% end %>
+          <!-- navy detail card -->
+          <tr>
+            <td style="padding:0 32px 32px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:<%= navy %>; background-image:linear-gradient(135deg,#0d0d6e 0%,<%= navy %> 55%,#060638 100%);">
+                <tr>
+                  <td style="padding:32px 28px;">
 
-    <p style="margin-top: 20px; text-align: center;">
-      <a href="<%= "https://agencegaremonaco.com/fr/biens/#{@property.id}-#{@property.title_for(:fr).parameterize}" %>"
-         style="display: inline-block; background-color: #090956; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: 600;">
-        Voir le bien sur notre site
-      </a>
-    </p>
-  </div>
+                    <!-- title -->
+                    <h1 style="margin:0; font-family:Arial, Helvetica, sans-serif; color:#ffffff; font-size:20px; line-height:1.35; font-weight:bold; text-align:center;">
+                      <%= @property.title_for(:fr) %>
+                    </h1>
 
-  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0; padding-top:20px;">&nbsp;</td></tr>
+                    </table>
 
-  <div style="padding: 0 20px 20px; text-align: center;">
-    <p style="color: #090956; font-weight: bold; font-size: 13px; margin-bottom: 5px;">Agence Immobilière de la Gare</p>
-    <p style="color: #6E8297; font-size: 12px; margin: 3px 0;">3, Rue Langlé — MC 98000 Monaco</p>
-    <p style="color: #6E8297; font-size: 12px; margin: 3px 0;">Tél. +377 93 30 22 36 — Fax +377 93 25 05 34</p>
-    <p style="color: #6E8297; font-size: 12px; margin: 3px 0;">
-      <a href="mailto:info@agencegaremonaco.com" style="color: #6E8297;">info@agencegaremonaco.com</a>
-    </p>
-    <p style="color: #6E8297; font-size: 12px; margin: 3px 0;">
-      <a href="https://agencegaremonaco.com" style="color: #6E8297;">agencegaremonaco.com</a>
-    </p>
-  </div>
-</div>
+                    <!-- intro -->
+                    <% if @property.intro_for(:fr).present? %>
+                      <p style="margin:20px 0 0; font-family:Arial, Helvetica, sans-serif; color:rgba(255,255,255,0.88); font-size:14px; line-height:1.7; text-align:center;">
+                        <%= truncate(@property.intro_for(:fr), length: 240, separator: " ") %>
+                      </p>
+                    <% end %>
+
+                    <% if stats.any? %>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0; padding-top:22px;">&nbsp;</td></tr>
+                    </table>
+
+                    <!-- stats strip -->
+                    <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:22px auto 0;">
+                      <tr>
+                        <% stats.each do |svg, value| %>
+                          <td style="padding:0 10px; font-family:Arial, Helvetica, sans-serif; color:#ffffff; font-size:14px; white-space:nowrap;" valign="middle">
+                            <%= svg.html_safe %>&nbsp;<span style="vertical-align:middle;"><%= value %></span>
+                          </td>
+                        <% end %>
+                      </tr>
+                    </table>
+                    <% end %>
+
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0; padding-top:26px;">&nbsp;</td></tr>
+                    </table>
+
+                    <!-- CTA button -->
+                    <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:26px auto 0;">
+                      <tr>
+                        <td align="center" style="background-color:#ffffff;">
+                          <a href="<%= property_url %>"
+                             style="display:inline-block; padding:13px 38px; font-family:Arial, Helvetica, sans-serif; color:<%= navy %>; font-size:14px; font-weight:bold; text-decoration:none;">
+                            Détails
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- footer -->
+          <tr>
+            <td align="center" style="padding:8px 32px 40px; font-family:Arial, Helvetica, sans-serif; color:<%= accent %>; font-size:12px; line-height:1.7;">
+              <strong style="color:<%= accent %>;">Agence de la Gare</strong><br>
+              3, Rue Langlé<br>
+              MC 98000 Monaco<br><br>
+              (+377) 93 30 22 36<br>
+              <a href="https://agencegaremonaco.com" style="color:<%= accent %>; text-decoration:none;">agencegaremonaco.com</a>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

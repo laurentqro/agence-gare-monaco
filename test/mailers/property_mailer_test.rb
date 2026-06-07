@@ -5,15 +5,18 @@ class PropertyMailerTest < ActionMailer::TestCase
     @property = Property.create!(
       reference: "MC-TEST-001",
       title: { "fr" => "Studio Carré d'Or", "en" => "Studio Carré d'Or" },
+      intro: { "fr" => "Un écrin rare au coeur de Monaco", "en" => "A rare gem in the heart of Monaco" },
       description: { "fr" => "Magnifique studio avec vue mer", "en" => "Beautiful sea-view studio" },
       transaction_type: "sale",
       property_type: "apartment",
       country: "MC",
       city: "Monaco",
       price: 1_290_000,
-      num_rooms: 2,
-      num_bedrooms: 1,
-      living_area: 45.0
+      num_rooms: 3,
+      num_bedrooms: 2,
+      num_bathrooms: 2,
+      num_parkings: 1,
+      living_area: 157.0
     )
 
     @property.property_images.create!(
@@ -44,49 +47,80 @@ class PropertyMailerTest < ActionMailer::TestCase
     assert_equal [ "info@agencegaremonaco.com" ], email.from
   end
 
+  test "share property reply-to is the sending agent" do
+    email = PropertyMailer.share_property(@property, @contact)
+    assert_equal [ "adrien@agencegaremonaco.com" ], email.reply_to
+  end
+
   test "share property subject includes property reference and title" do
     email = PropertyMailer.share_property(@property, @contact)
     assert_includes email.subject, "MC-TEST-001"
     assert_includes email.subject, "Studio"
   end
 
-  test "share property body contains property details" do
+  test "share property body contains property title and intro" do
     email = PropertyMailer.share_property(@property, @contact)
     body = email.body.encoded
-    assert_includes body, "MC-TEST-001"
-    assert_includes body, "1.290.000"
-    assert_includes body, "Magnifique studio"
+    assert_includes body, "Studio Carré d&#39;Or"
+    assert_includes body, "Un écrin rare au coeur de Monaco"
   end
 
-  test "share property body contains property photos" do
+  test "share property body shows the intro, not the description" do
     email = PropertyMailer.share_property(@property, @contact)
     body = email.body.encoded
-    assert_includes body, "https://cdn.immotoolbox.com/medium/photo1.jpg"
+    refute_includes body, "Magnifique studio"
+  end
+
+  test "share property body contains formatted price" do
+    email = PropertyMailer.share_property(@property, @contact)
+    assert_includes email.body.encoded, "1.290.000"
+  end
+
+  test "share property body contains the hero photo" do
+    email = PropertyMailer.share_property(@property, @contact)
+    assert_includes email.body.encoded, "https://cdn.immotoolbox.com/large/photo1.jpg"
+  end
+
+  test "share property body contains the property stats" do
+    email = PropertyMailer.share_property(@property, @contact)
+    body = email.body.encoded
+    assert_includes body, "157" # living area
+    # rooms / bedrooms / bathrooms / parking values
+    %w[3 2 1].each { |n| assert_includes body, n }
   end
 
   test "share property body contains link to property page" do
     email = PropertyMailer.share_property(@property, @contact)
-    body = email.body.encoded
-    assert_includes body, "/fr/biens/#{@property.id}"
+    assert_includes email.body.encoded, "/fr/biens/#{@property.id}"
   end
 
-  test "share property body contains contact first name" do
+  test "share property body contains the sending agent block" do
     email = PropertyMailer.share_property(@property, @contact)
     body = email.body.encoded
-    assert_includes body, "Jean"
+    assert_includes body, "Adrien Maré"
+    assert_includes body, "adrien@agencegaremonaco.com"
+    assert_includes body, "+33 6 62 39 20 65"
   end
 
-  test "share property body contains agency contact info" do
+  test "share property body contains agency footer info" do
     email = PropertyMailer.share_property(@property, @contact)
     body = email.body.encoded
-    assert_includes body, "info@agencegaremonaco.com"
-    assert_includes body, "+377 93 30 22 36"
+    assert_includes body, "3, Rue Langlé"
+    assert_includes body, "(+377) 93 30 22 36"
+    assert_includes body, "agencegaremonaco.com"
   end
 
-  test "share property with nil contact renders generic greeting" do
+  test "share property body contains the agency logo" do
+    email = PropertyMailer.share_property(@property, @contact)
+    # Host is prepended in production via action_mailer.asset_host; here we just
+    # assert the logo asset is referenced.
+    assert_match %r{/assets/logo[^"]*\.png}, email.body.encoded
+  end
+
+  test "share property with nil contact still renders" do
     email = PropertyMailer.share_property(@property, nil)
-    body = email.body.decoded
-    assert_includes body, "Bonjour,"
-    assert_not_includes body, "Bonjour Jean"
+    body = email.body.encoded
+    assert_includes body, "Studio Carré d&#39;Or"
+    assert_includes body, "Adrien Maré"
   end
 end
