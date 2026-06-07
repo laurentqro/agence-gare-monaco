@@ -71,6 +71,41 @@ class PropertyPdfGeneratorTest < ActiveSupport::TestCase
     assert_includes text, "panoramic sea view"
   end
 
+  test "fits title, intro, description and full details table on page 1 even with a long description" do
+    long = (1..20).map { |i| "Ligne descriptive numéro #{i} avec un contenu assez détaillé pour remplir l'espace vertical disponible." }.join("\n")
+    @property.update!(
+      intro: { "fr" => "Une introduction relativement longue qui occupe deux lignes entières sur la page pour tester la mise en page." },
+      description: { "fr" => long }
+    )
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr).generate
+
+    # generate returns only page 1; if content overflows, the tail is dropped.
+    # Everything below must still be present, proving it all fit on page 1.
+    reader = PDF::Reader.new(StringIO.new(pdf_bytes))
+    assert_equal 1, reader.page_count
+    text = reader.pages.first.text
+
+    # The tail of the description must survive (not be pushed off-page).
+    assert_includes text, "Ligne descriptive numéro 20"
+    # The bottom-most detail rows must survive too.
+    assert_includes text, I18n.t("property_detail.reference", locale: :fr)
+    assert_includes text, "MC-PDF-001"
+    assert_includes text, I18n.t("pdf_brochure.price_label", locale: :fr)
+  end
+
+  test "never truncates an extremely long description, scaling text as a last resort" do
+    very_long = (1..40).map { |i| "Ligne descriptive numéro #{i} avec un contenu vraiment très détaillé destiné à dépasser largement la hauteur d'une page A4 même sans photo." }.join("\n")
+    @property.update!(description: { "fr" => very_long })
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr).generate
+
+    reader = PDF::Reader.new(StringIO.new(pdf_bytes))
+    assert_equal 1, reader.page_count
+    text = reader.pages.first.text
+    # First and last lines both present — the whole description fit, scaled down.
+    assert_includes text, "Ligne descriptive numéro 1 "
+    assert_includes text, "Ligne descriptive numéro 40"
+  end
+
   test "preserves line breaks and bullet structure in the description" do
     @property.update!(description: {
       "fr" => "Au coeur de Monaco.\nL'appartement se compose de :\n- Un hall d'entrée\n- Une cuisine équipée\nLivraison 2022."

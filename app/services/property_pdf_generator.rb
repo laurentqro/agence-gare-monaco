@@ -29,11 +29,18 @@ class PropertyPdfGenerator
       #{header_footer_functions}
 
       // ── Page 1: Content ──
-      #{hero_image_markup}
-      #{title_markup}
-      #{intro_markup}
-      #{badges_markup}
-      #{content_columns_markup}
+      // All text is shown at full size; the hero photo flexes to fill whatever
+      // vertical space the text leaves, so everything fits on one page and
+      // nothing is ever truncated.
+      #fit-page(
+        hero: #{hero_image_markup_fn},
+        body: [
+          #{title_markup}
+          #{intro_markup}
+          #{badges_markup}
+          #{content_columns_markup}
+        ],
+      )
 
       #{photo_pages_markup}
     TYPST
@@ -69,6 +76,42 @@ class PropertyPdfGenerator
       #set text(font: "Montserrat", size: 9pt, fill: rgb("#{TEXT_COLOR}"))
       #set smartquote(enabled: false)
       #set par(leading: 0.6em)
+
+      // Keep all text at full size and let the hero photo flex to fill the
+      // leftover vertical space, so the whole page-1 content fits without
+      // truncation. `hero` is a function (height) => content; `body` is the
+      // text block rendered below it.
+      #let fit-page(hero: none, body: []) = layout(size => {
+        let avail = size.height
+        let gap = 6pt
+        let body-height = measure(width: size.width, body).height
+        let has-hero = hero != none
+        let hero-min = 45mm
+        let hero-max = avail * 0.58
+        // First choice: keep all text at full size and let the photo flex into
+        // the leftover space (clamped between a readable min and ~58% of page).
+        let hero-space = avail - body-height - (if has-hero { gap } else { 0pt })
+        let hero-height = calc.max(hero-min, calc.min(hero-space, hero-max))
+        // Fallback for pathologically long text: if even the smallest photo
+        // can't leave room for all the text, scale the text down too so nothing
+        // is ever truncated. Text shrinks only when the photo alone won't do.
+        let reserved = (if has-hero { hero-min + gap } else { 0pt })
+        let text-avail = avail - reserved
+        let factor = if body-height > text-avail and body-height > 0pt {
+          text-avail / body-height
+        } else { 1.0 }
+        block(width: 100%, height: avail, {
+          if has-hero {
+            hero(hero-height)
+            v(gap)
+          }
+          if factor < 1.0 {
+            scale(x: factor * 100%, y: factor * 100%, origin: top + left, reflow: true, body)
+          } else {
+            body
+          }
+        })
+      })
     TYPST
   end
 
@@ -122,22 +165,29 @@ class PropertyPdfGenerator
     end
   end
 
-  def hero_image_markup
+  # Returns a Typst function `(h) => content` that renders the hero photo at a
+  # caller-supplied height (chosen by fit-page to fill leftover space), full
+  # width, cropped to fill. Returns the literal `none` when there's no cover.
+  def hero_image_markup_fn
     cover = @property.cover_image
-    return "" unless cover
+    return "none" unless cover
 
     image_data = fetch_image(cover.large_url || cover.remote_url)
-    return "" unless image_data
+    return "none" unless image_data
 
     ext = image_extension(image_data)
     key = "hero.#{ext}"
     @dependencies[key] = image_data
-    <<~TYPST
-      #image("#{key}", width: 100%)
-      #v(6pt)
+    <<~TYPST.strip
+      (h) => block(
+        width: 100%,
+        height: h,
+        clip: true,
+        image("#{key}", width: 100%, height: h, fit: "cover"),
+      )
     TYPST
   rescue StandardError
-    ""
+    "none"
   end
 
   def title_markup
