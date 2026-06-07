@@ -72,6 +72,11 @@ class LegacyRedirectsController < ApplicationController
     redirect_to "/#{locale}/#{articles_segment}", status: :moved_permanently
   end
 
+  # FR: /fr/biens-off-market/(vente|location) → /off-market
+  def off_market_listing_fr
+    redirect_to "/off-market", status: :moved_permanently
+  end
+
   # EN: /en/properties-off-market/sale → /en/sales
   # EN: /en/properties-off-market/rental → /en/rentals
   def off_market_listing

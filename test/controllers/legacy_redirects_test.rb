@@ -34,6 +34,24 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
     assert_redirected_to "/locations"
   end
 
+  test "FR legacy /fr/location/monaco/+5-pieces redirects to /locations" do
+    get "/fr/location/monaco/+5-pieces"
+    assert_response :moved_permanently
+    assert_redirected_to "/locations"
+  end
+
+  test "FR legacy /fr/biens-off-market/vente redirects to /off-market" do
+    get "/fr/biens-off-market/vente"
+    assert_response :moved_permanently
+    assert_redirected_to "/off-market"
+  end
+
+  test "FR legacy /fr/biens-off-market/location redirects to /off-market" do
+    get "/fr/biens-off-market/location"
+    assert_response :moved_permanently
+    assert_redirected_to "/off-market"
+  end
+
   test "FR legacy /fr/bien/{id} redirects to property detail" do
     get "/fr/bien/12345"
     assert_response :moved_permanently
@@ -145,6 +163,23 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
     get "/en/article/42/mon-article-test"
     assert_response :moved_permanently
     assert_redirected_to "/en/articles/mon-article-test"
+  end
+
+  test "EN legacy /en/post/{id}/{slug} redirects to article" do
+    get "/en/post/42/mon-article-test"
+    assert_response :moved_permanently
+    assert_redirected_to "/en/articles/mon-article-test"
+  end
+
+  test "EN legacy /en/property-off-market/{id} redirects to property detail when published" do
+    get "/en/property-off-market/12345"
+    assert_response :moved_permanently
+    assert_redirected_to "/en/properties/#{@property.id}-studio-carre-d-or"
+  end
+
+  test "EN legacy /en/property-off-market/{id} returns 410 when not found" do
+    get "/en/property-off-market/99999"
+    assert_response :gone
   end
 
   # === Italian Legacy Routes ===

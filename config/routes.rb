@@ -88,8 +88,10 @@ Rails.application.routes.draw do
   # French legacy routes (must come before the /fr wildcard redirect below)
   scope "/fr", defaults: { locale: "fr" } do
     get "location/monaco", to: redirect("/locations", status: 301)
+    get "location/monaco/*filters", to: redirect("/locations", status: 301)
     get "bien/:legacy_id",            to: "legacy_redirects#property"
     get "bien-off-market/:legacy_id", to: "legacy_redirects#off_market_property"
+    get "biens-off-market/:transaction", to: "legacy_redirects#off_market_listing_fr"
     get "pdf-download/:legacy_id",    to: "legacy_redirects#pdf_download", constraints: { legacy_id: /\d+\.pdf/ }
     get "pdf-download-nologo/:legacy_id", to: "legacy_redirects#pdf_download", constraints: { legacy_id: /\d+\.pdf/ }
     get "posts/:category_slug",       to: "legacy_redirects#posts_category"
@@ -106,9 +108,11 @@ Rails.application.routes.draw do
   scope "/en", defaults: { locale: "en" } do
     get "rental/monaco", to: redirect("/en/rentals", status: 301)
     get "property/:legacy_id",                to: "legacy_redirects#property"
+    get "property-off-market/:legacy_id",     to: "legacy_redirects#off_market_property"
     get "properties-off-market/:transaction", to: "legacy_redirects#off_market_listing"
     get "news",                               to: "legacy_redirects#news"
     get "article/:id/:slug",                  to: "legacy_redirects#article"
+    get "post/:id/:slug",                     to: "legacy_redirects#article"
   end
 
   # Italian legacy routes
