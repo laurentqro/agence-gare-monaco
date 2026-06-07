@@ -4,7 +4,10 @@ module Admin
 
     def new
       @contacts = Contact.order(:last_name, :first_name)
-      @email_preview = PropertyMailer.share_property(@property, nil).body.decoded
+      # decoded returns a SafeBuffer; coerce to a plain String so the view can
+      # HTML-escape it into the iframe srcdoc attribute (otherwise the inline
+      # style double-quotes truncate the attribute and the preview is blank).
+      @email_preview = PropertyMailer.share_property(@property, nil).body.decoded.to_str
     end
 
     def create

@@ -39,8 +39,11 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
   test "GET new shows email preview with property details" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_includes response.body, "MC-TEST-001"
-    assert_includes response.body, "Bonjour,"
+    # The preview HTML is escaped into the iframe srcdoc; decode it to inspect
+    # the email the user actually sees.
+    srcdoc = CGI.unescapeHTML(css_select("iframe[srcdoc]").first["srcdoc"])
+    assert_includes srcdoc, "Studio Carré d'Or"
+    assert_includes srcdoc, "Adrien Maré"
   end
 
   test "GET new renders email preview inside a sandboxed iframe, not inline HTML" do
@@ -50,6 +53,18 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     # property fields can't manipulate admin DOM / cookies. An iframe with
     # sandbox and srcdoc achieves that.
     assert_select "iframe[sandbox][srcdoc]", 1
+  end
+
+  test "GET new email preview srcdoc contains the full email document" do
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    # The email HTML uses double quotes throughout (inline styles); it must be
+    # HTML-escaped into the srcdoc attribute so the iframe receives the WHOLE
+    # document, not a fragment truncated at the first inner quote.
+    srcdoc = css_select("iframe[srcdoc]").first["srcdoc"]
+    assert_includes srcdoc, "Studio Carré d&#39;Or" # body content (escaped apostrophe)
+    assert_includes srcdoc, "Adrien Maré"
+    assert_includes srcdoc, "</html>"               # the document is not truncated
   end
 
   test "GET new lists all contacts with checkboxes" do

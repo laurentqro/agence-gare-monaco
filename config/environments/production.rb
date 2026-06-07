@@ -58,7 +58,11 @@ Rails.application.configure do
 
   # Set host to be used by links generated in mailer templates.
   # SITE_HOST env var controls both SEO URLs and mailer links (staging vs production).
-  config.action_mailer.default_url_options = { host: ENV.fetch("SITE_HOST", "https://agencegaremonaco.com").delete_prefix("https://").delete_prefix("http://") }
+  site_host = ENV.fetch("SITE_HOST", "https://agencegaremonaco.com")
+  config.action_mailer.default_url_options = { host: site_host.delete_prefix("https://").delete_prefix("http://") }
+  # Render asset-pipeline images (logo, etc.) as absolute URLs so they load in
+  # email clients — relative /assets paths can't be resolved from an inbox.
+  config.action_mailer.asset_host = site_host
 
   # Brevo SMTP relay. Add smtp/server, smtp/login, smtp/password via bin/rails credentials:edit.
   config.action_mailer.delivery_method = :smtp

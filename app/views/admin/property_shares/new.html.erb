@@ -31,7 +31,7 @@
   <div class="bg-white rounded shadow p-6 mt-6">
     <h2 class="heading-section mb-3"><%= t("admin.property_shares.email_preview") %></h2>
     <div class="border border-gray-200 rounded bg-white" style="max-width: 640px; margin: 0 auto;">
-      <iframe sandbox srcdoc="<%= @email_preview %>"
+      <iframe sandbox srcdoc="<%= html_escape(@email_preview) %>"
               style="width: 100%; min-height: 800px; border: 0; display: block;"
               title="<%= t("admin.property_shares.email_preview") %>"></iframe>
     </div>
