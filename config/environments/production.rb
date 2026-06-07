@@ -53,15 +53,15 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  # Surface email delivery failures (contact-form leads are business-critical).
+  config.action_mailer.raise_delivery_errors = true
 
   # Set host to be used by links generated in mailer templates.
   # SITE_HOST env var controls both SEO URLs and mailer links (staging vs production).
   config.action_mailer.default_url_options = { host: ENV.fetch("SITE_HOST", "https://agencegaremonaco.com").delete_prefix("https://").delete_prefix("http://") }
 
   # Brevo SMTP relay. Add smtp/server, smtp/login, smtp/password via bin/rails credentials:edit.
+  config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address: "smtp-relay.brevo.com",
     user_name: Rails.application.credentials.dig(:smtp, :login),
