@@ -94,7 +94,7 @@
                     <!-- intro -->
                     <% if @property.intro_for(:fr).present? %>
                       <p style="margin:20px 0 0; font-family:Arial, Helvetica, sans-serif; color:rgba(255,255,255,0.88); font-size:14px; line-height:1.7; text-align:center;">
-                        <%= truncate(@property.intro_for(:fr), length: 240, separator: " ") %>
+                        <%= @property.intro_for(:fr) %>
                       </p>
                     <% end %>
 

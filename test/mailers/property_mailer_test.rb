@@ -71,6 +71,17 @@ class PropertyMailerTest < ActionMailer::TestCase
     refute_includes body, "Magnifique studio"
   end
 
+  test "share property body shows the full intro without truncation" do
+    long_intro = "Situé au coeur du quartier historique de Monaco, ce bien d'exception offre des prestations rares et un emplacement privilégié à deux pas du Port Hercule, des commerces et des écoles internationales, dans une résidence sécurisée avec gardien et services haut de gamme."
+    @property.update!(intro: { "fr" => long_intro })
+    email = PropertyMailer.share_property(@property, @contact)
+    body = email.body.encoded
+    # The whole intro must render — including its tail — and no ellipsis.
+    assert_includes body, "services haut de gamme."
+    refute_includes body, "…"
+    refute_includes body, "..."
+  end
+
   test "share property body contains formatted price" do
     email = PropertyMailer.share_property(@property, @contact)
     assert_includes email.body.encoded, "1.290.000"
