@@ -88,7 +88,7 @@ class ImmotoolboxSync
       if fr_texts.is_a?(Hash)
         title["fr"] = sanitize_html(fr_texts["title"]) if fr_texts["title"].present?
         intro["fr"] = sanitize_html(fr_texts["intro"]) if fr_texts["intro"].present?
-        description["fr"] = sanitize_html(fr_texts["description"]) if fr_texts["description"].present?
+        description["fr"] = sanitize_description_html(fr_texts["description"]) if fr_texts["description"].present?
       end
 
       district = districts_by_id[data.dig("district", "id")]
@@ -175,8 +175,33 @@ class ImmotoolboxSync
     end
   end
 
+  # For single-line fields (title, intro): strip all tags and collapse whitespace.
   def sanitize_html(text)
     Nokogiri::HTML.fragment(text).text.gsub("\u00A0", " ").squish
+  end
+
+  # For the description: preserve the API's line structure (paragraphs, <br>
+  # line breaks, "- " bullet lists) as newlines while stripping tags/entities.
+  def sanitize_description_html(html)
+    text = html.to_s
+    # Normalize source newlines: the API wraps tags with literal CRLFs that would
+    # otherwise survive as extra blank lines once <br> also becomes a newline.
+    text = text.gsub(/\r\n?/, "\n")
+    # Decode &nbsp; up front (the sanitizer leaves it as a literal space entity).
+    text = text.gsub("&nbsp;", " ")
+    # Line-breaking tags become newlines (swallowing any source newline that
+    # already trails the tag, so one <br> yields exactly one line break).
+    text = text.gsub(/<br\s*\/?>\n?/i, "\n")
+    text = text.gsub(%r{</(?:p|div|li|h[1-6])>\n?}i, "\n")
+    # List items start a new bulleted line.
+    text = text.gsub(/\n?<li[^>]*>/i, "\n- ")
+    # Strip the remaining tags and decode HTML entities (&eacute;, &#39;, \u2026).
+    text = Rails::HTML5::FullSanitizer.new.sanitize(text)
+    # Collapse runs of horizontal whitespace but keep newlines.
+    text = text.gsub(/[^\S\n]+/, " ")
+    # Trim trailing spaces on each line, then collapse 3+ newlines to a blank line.
+    text = text.gsub(/ *\n/, "\n").gsub(/\n{3,}/, "\n\n")
+    text.strip
   end
 
   def parse_integer(value)

@@ -89,28 +89,31 @@
       </div>
 
       <%# Title %>
-      <h1 data-testid="property-title" class="heading-page mb-2"><%= title %></h1>
+      <h1 data-testid="property-title" class="heading-page leading-tight mb-5"><%= title %></h1>
 
-      <%# Intro %>
+      <%# Intro — editorial lead paragraph %>
       <% if @property.intro_for(I18n.locale).present? %>
-        <p data-testid="property-intro" class="text-accent text-base mb-4">
+        <p data-testid="property-intro" class="text-accent text-lg italic font-light leading-relaxed max-w-2xl mb-8">
           <%= @property.intro_for(I18n.locale) %>
         </p>
       <% end %>
 
-      <%# Price %>
-      <p data-testid="property-price" class="text-xl font-bold text-navy mb-6">
-        <% if @property.price.present? %>
-          <%= @property.formatted_price %> €<%= @property.transaction_type == "rental" ? t("property_detail.per_month") : "" %>
-          <% if (converted = converted_price_tag(@property.price)) %>
-            <span data-testid="converted-price" class="text-sm font-normal text-accent"><%= converted %></span>
+      <%# Price — set apart, emphasized %>
+      <div class="mb-8">
+        <div class="w-12 h-px bg-accent/40 mb-4"></div>
+        <p data-testid="property-price" class="text-3xl font-extrabold text-navy tracking-tight">
+          <% if @property.price.present? %>
+            <%= @property.formatted_price %>&nbsp;€<span class="text-lg font-semibold text-accent"><%= @property.transaction_type == "rental" ? t("property_detail.per_month") : "" %></span>
+            <% if (converted = converted_price_tag(@property.price)) %>
+              <span data-testid="converted-price" class="block text-base font-normal text-accent mt-1"><%= converted %></span>
+            <% end %>
+          <% else %>
+            <span class="text-2xl"><%= t("listings.price_on_request") %></span>
           <% end %>
-        <% else %>
-          <%= t("listings.price_on_request") %>
-        <% end %>
-      </p>
+        </p>
+      </div>
 
-      <hr class="border-gray-200 mb-6">
+      <hr class="border-gray-200 mb-8">
 
       <%# Description %>
       <div data-testid="property-description" class="text-body mb-8">

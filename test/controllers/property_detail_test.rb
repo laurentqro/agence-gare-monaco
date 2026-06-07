@@ -131,6 +131,16 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='property-description']", text: /Beautiful sea view studio/
   end
 
+  test "renders multi-line description with paragraph and line breaks" do
+    @property.update!(description: { "en" => "First paragraph.\n\nIntro line:\n- Bullet one\n- Bullet two" })
+    get "/en/properties/#{@property.id}-slug"
+    # Blank line becomes a separate paragraph.
+    assert_select "[data-testid='property-description'] p", minimum: 2
+    # Single newlines within a paragraph become <br> line breaks.
+    assert_select "[data-testid='property-description'] br", minimum: 2
+    assert_select "[data-testid='property-description']", text: /Bullet one/
+  end
+
   test "displays property intro in current locale" do
     get "/en/properties/#{@property.id}-slug"
     assert_select "[data-testid='property-intro']", text: /A rare gem in the heart of Monaco/

@@ -132,7 +132,7 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     refute property.intro.key?("en"), "EN intro from API should be discarded"
   end
 
-  test "sync strips HTML tags from French description" do
+  test "sync strips HTML tags from French description but keeps paragraph breaks" do
     setup_districts_and_buildings
 
     WebMock.reset!
@@ -162,6 +162,43 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     refute_includes property.description["fr"], "<p>"
     assert_includes property.description["fr"], "Magnifique studio"
     assert_includes property.description["fr"], "au coeur de Monaco"
+    # The two paragraphs must remain on separate lines, not be squished together.
+    refute_includes property.description["fr"], "Magnifique studio au coeur"
+    assert_match(/Magnifique studio\nau coeur de Monaco/, property.description["fr"])
+  end
+
+  test "sync preserves <br> line breaks and bullet lists in French description" do
+    setup_districts_and_buildings
+
+    WebMock.reset!
+    api_html = "<p>Intro paragraph.<br />\r\nDeuxi&egrave;me ligne.<br />\r\n" \
+               "L&#39;appartement se compose de&nbsp;:<br />\r\n" \
+               "- Un hall d&#39;entr&eacute;e,<br />\r\n- Une cuisine &eacute;quip&eacute;e</p>"
+    html_property = property_data(
+      "texts" => {
+        "fr" => { "id" => 300, "title" => "Studio Monte-Carlo", "description" => api_html, "languageCode" => "FR" }
+      }
+    )
+    stub_request(:get, "#{@base_url}/properties")
+      .with(query: { "status" => "published", "page" => "1" })
+      .to_return(status: 200, body: [ html_property ].to_json, headers: { "Content-Type" => "application/json" })
+    stub_request(:get, "#{@base_url}/properties")
+      .with(query: { "status" => "published", "page" => "2" })
+      .to_return(status: 200, body: [].to_json, headers: { "Content-Type" => "application/json" })
+
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+
+    desc = Property.find_by(immotoolbox_id: 100).description["fr"]
+    refute_includes desc, "<br"
+    refute_includes desc, "&nbsp;"
+    refute_includes desc, "&#39;"
+    refute_includes desc, "&eacute;"
+    assert_includes desc, "deuxième ligne".sub("deuxième", "Deuxième")
+    # Each <br> becomes a newline; the bullet lines stay on their own lines.
+    assert_match(/Intro paragraph\.\nDeuxième ligne\./, desc)
+    assert_match(/- Un hall d'entrée,\n- Une cuisine équipée/, desc)
+    # No run of 3+ newlines.
+    refute_match(/\n{3,}/, desc)
   end
 
   test "sync strips HTML entities from French title and description" do

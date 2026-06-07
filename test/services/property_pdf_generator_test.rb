@@ -71,6 +71,20 @@ class PropertyPdfGeneratorTest < ActiveSupport::TestCase
     assert_includes text, "panoramic sea view"
   end
 
+  test "preserves line breaks and bullet structure in the description" do
+    @property.update!(description: {
+      "fr" => "Au coeur de Monaco.\nL'appartement se compose de :\n- Un hall d'entrée\n- Une cuisine équipée\nLivraison 2022."
+    })
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr).generate
+    text = extract_text(pdf_bytes)
+    # Each line lands on its own line in the PDF rather than one run-on blob.
+    # Typst renders "- " list markers as bullet glyphs.
+    assert_match(/[-•]\s*Un hall d'entrée/, text)
+    assert_match(/[-•]\s*Une cuisine équipée/, text)
+    refute_includes text, "Un hall d'entrée - Une cuisine"
+    refute_includes text, "Un hall d'entrée • Une cuisine"
+  end
+
   test "contains localized intro" do
     pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr).generate
     text = extract_text(pdf_bytes)
