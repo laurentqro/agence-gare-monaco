@@ -31,6 +31,7 @@ class PropertyPdfGenerator
       // ── Page 1: Content ──
       #{hero_image_markup}
       #{title_markup}
+      #{intro_markup}
       #{badges_markup}
       #{content_columns_markup}
 
@@ -144,6 +145,18 @@ class PropertyPdfGenerator
     <<~TYPST
       #align(center)[
         #text(size: 16pt, weight: "bold", fill: rgb("#{NAVY}"))[#{escape(title)}]
+      ]
+    TYPST
+  end
+
+  def intro_markup
+    intro = @property.intro_for(@locale)
+    return "" if intro.blank?
+
+    <<~TYPST
+      #v(4pt)
+      #align(center)[
+        #text(size: 10pt, style: "italic", fill: rgb("#{ACCENT}"))[#{escape(strip_html(intro))}]
       ]
     TYPST
   end

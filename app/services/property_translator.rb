@@ -28,8 +28,9 @@ class PropertyTranslator
 
   def translate!
     fr_title = @property.title_for(:fr)
+    fr_intro = @property.intro_for(:fr)
     fr_description = @property.description_for(:fr)
-    new_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_description}")
+    new_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_intro}\n#{fr_description}")
     expected_hash = @property.translation_source_hash
     return if new_hash == expected_hash
 
@@ -41,7 +42,7 @@ class PropertyTranslator
 
     log_usage(response)
 
-    translations = parse(response.content, fr_description)
+    translations = parse(response.content, fr_intro, fr_description)
     return unless apply_translations!(translations, new_hash, expected_hash)
 
     PropertyBrochureGenerationJob.perform_later(@property.id)
@@ -56,19 +57,22 @@ class PropertyTranslator
     )
   end
 
-  def parse(content, fr_description)
+  def parse(content, fr_intro, fr_description)
     raise BlankTranslation, "Response is not a hash: #{content.inspect}" unless content.is_a?(Hash)
 
     parsed = {}
     LOCALES.each do |locale|
-      title = require_string!(content["title_#{locale}"], "title", locale)
+      fields = { title: require_string!(content["title_#{locale}"], "title", locale) }
 
-      if fr_description.strip.empty?
-        parsed[locale] = { title: title }
-      else
-        description = require_string!(content["description_#{locale}"], "description", locale)
-        parsed[locale] = { title: title, description: description }
+      unless fr_intro.strip.empty?
+        fields[:intro] = require_string!(content["intro_#{locale}"], "intro", locale)
       end
+
+      unless fr_description.strip.empty?
+        fields[:description] = require_string!(content["description_#{locale}"], "description", locale)
+      end
+
+      parsed[locale] = fields
     end
     parsed
   end
@@ -83,18 +87,21 @@ class PropertyTranslator
   # ours are stale by definition.
   def apply_translations!(translations, new_hash, expected_hash)
     title = (@property.title || {}).dup
+    intro = (@property.intro || {}).dup
     description = (@property.description || {}).dup
     status = (@property.translations_status || {}).dup
     timestamp = Time.current.iso8601
 
     translations.each do |locale, fields|
       title[locale] = fields[:title]
+      intro[locale] = fields[:intro] if fields.key?(:intro)
       description[locale] = fields[:description] if fields.key?(:description)
       status[locale] = { "translated_at" => timestamp }
     end
 
     rows = Property.where(id: @property.id, translation_source_hash: expected_hash).update_all(
       title: title,
+      intro: intro,
       description: description,
       translations_status: status,
       translation_source_hash: new_hash,

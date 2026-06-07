@@ -6,6 +6,7 @@ class PropertyPdfGeneratorTest < ActiveSupport::TestCase
     @property = Property.create!(
       reference: "MC-PDF-001",
       title: { "fr" => "Magnifique penthouse Carré d'Or", "en" => "Stunning Carré d'Or penthouse" },
+      intro: { "fr" => "Un écrin rare au coeur de Monaco.", "en" => "A rare gem in the heart of Monaco." },
       description: { "fr" => "Superbe penthouse avec vue mer panoramique.", "en" => "Superb penthouse with panoramic sea view." },
       transaction_type: "sale",
       property_type: "penthouse",
@@ -68,6 +69,24 @@ class PropertyPdfGeneratorTest < ActiveSupport::TestCase
     pdf_bytes = PropertyPdfGenerator.new(@property, locale: :en).generate
     text = extract_text(pdf_bytes)
     assert_includes text, "panoramic sea view"
+  end
+
+  test "contains localized intro" do
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr).generate
+    text = extract_text(pdf_bytes)
+    assert_includes text, "écrin rare au coeur de Monaco"
+  end
+
+  test "contains intro in requested locale" do
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: :en).generate
+    text = extract_text(pdf_bytes)
+    assert_includes text, "rare gem in the heart of Monaco"
+  end
+
+  test "omits intro gracefully when property has no intro" do
+    @property.update!(intro: { "fr" => "", "en" => "" })
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr).generate
+    assert pdf_bytes.start_with?("%PDF")
   end
 
   test "contains agency contact info" do

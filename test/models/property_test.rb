@@ -213,6 +213,29 @@ class PropertyTest < ActiveSupport::TestCase
     assert_equal "Beau studio", property.description_for(:it)
   end
 
+  test "intro is stored as JSON" do
+    property = Property.create!(
+      reference: "MC-I1",
+      title: { "fr" => "Studio" },
+      intro: { "fr" => "Vue mer", "en" => "Sea view" },
+      transaction_type: "sale",
+      property_type: "apartment",
+      country: "MC",
+      city: "Monaco"
+    )
+    property.reload
+    assert_equal "Vue mer", property.intro["fr"]
+  end
+
+  test "intro_for skips empty string and falls back to French" do
+    property = Property.new(
+      reference: "MC-I2", transaction_type: "sale", property_type: "apartment", country: "MC", city: "Monaco",
+      title: { "fr" => "Studio" },
+      intro: { "fr" => "Vue mer", "it" => "" }
+    )
+    assert_equal "Vue mer", property.intro_for(:it)
+  end
+
   test "location_label returns building name and district name" do
     property = Property.new(
       reference: "MC-LOC1", transaction_type: "sale", property_type: "apartment",

@@ -91,6 +91,13 @@
       <%# Title %>
       <h1 data-testid="property-title" class="heading-page mb-2"><%= title %></h1>
 
+      <%# Intro %>
+      <% if @property.intro_for(I18n.locale).present? %>
+        <p data-testid="property-intro" class="text-accent text-base mb-4">
+          <%= @property.intro_for(I18n.locale) %>
+        </p>
+      <% end %>
+
       <%# Price %>
       <p data-testid="property-price" class="text-xl font-bold text-navy mb-6">
         <% if @property.price.present? %>

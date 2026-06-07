@@ -35,6 +35,10 @@ class Property < ApplicationRecord
     description&.dig(locale.to_s).presence || description&.dig(I18n.default_locale.to_s).presence || ""
   end
 
+  def intro_for(locale)
+    intro&.dig(locale.to_s).presence || intro&.dig(I18n.default_locale.to_s).presence || ""
+  end
+
   def cover_image
     property_images.order(:position).first
   end
@@ -99,7 +103,7 @@ class Property < ApplicationRecord
   # The translation job enqueues brochure regen itself on success, so the
   # brochure branch only fires when translations aren't being re-run.
   def enqueue_post_save_jobs!
-    text_changed = saved_changes.keys.intersect?(%w[title description])
+    text_changed = saved_changes.keys.intersect?(%w[title intro description])
     if text_changed || translation_source_hash.nil?
       PropertyTranslationJob.perform_later(id)
     elsif saved_changes.keys.intersect?(BROCHURE_TRIGGER_COLUMNS)

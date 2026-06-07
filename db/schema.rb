@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_29_091622) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_29_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -144,6 +144,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_29_091622) do
     t.decimal "garden_area", precision: 10, scale: 2
     t.boolean "has_360_tour", default: false
     t.integer "immotoolbox_id"
+    t.json "intro"
     t.decimal "land_area", precision: 10, scale: 2
     t.decimal "latitude", precision: 10, scale: 7
     t.decimal "living_area", precision: 10, scale: 2

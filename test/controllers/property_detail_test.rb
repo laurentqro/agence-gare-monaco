@@ -8,6 +8,7 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     @property = Property.create!(
       reference: "MC-100",
       title: { "fr" => "Studio vue mer Carré d'Or", "en" => "Sea view studio Carré d'Or" },
+      intro: { "fr" => "Un écrin rare au coeur de Monaco.", "en" => "A rare gem in the heart of Monaco." },
       description: { "fr" => "Magnifique studio avec vue mer dans le prestigieux Carré d'Or.", "en" => "Beautiful sea view studio in the prestigious Carré d'Or." },
       transaction_type: "sale",
       property_type: "apartment",
@@ -128,6 +129,22 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
   test "displays property description in current locale" do
     get "/en/properties/#{@property.id}-slug"
     assert_select "[data-testid='property-description']", text: /Beautiful sea view studio/
+  end
+
+  test "displays property intro in current locale" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-intro']", text: /A rare gem in the heart of Monaco/
+  end
+
+  test "displays property intro in French locale" do
+    get "/biens/#{@property.id}-slug"
+    assert_select "[data-testid='property-intro']", text: /Un écrin rare au coeur de Monaco/
+  end
+
+  test "omits intro element when property has no intro" do
+    @property.update!(intro: { "fr" => "", "en" => "" })
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-intro']", false
   end
 
   # === Price display ===

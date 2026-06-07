@@ -9,6 +9,7 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     @property = Property.create!(
       reference: "MC-TR-001",
       title: { "fr" => "Penthouse vue mer" },
+      intro: { "fr" => "Un penthouse d'exception au Carré d'Or." },
       description: { "fr" => "Superbe penthouse avec vue panoramique sur le port." },
       transaction_type: "sale",
       property_type: "apartment",
@@ -25,6 +26,7 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     fields = {}
     %w[en it de sv no da fi ru].each do |locale|
       fields["title_#{locale}"] = "Title in #{locale.upcase}"
+      fields["intro_#{locale}"] = "Intro in #{locale.upcase}"
       fields["description_#{locale}"] = "Description in #{locale.upcase}"
     end
     fields
@@ -79,18 +81,21 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     @property.reload
     %w[en it de sv no da fi ru].each do |locale|
       assert_equal "Title in #{locale.upcase}", @property.title[locale]
+      assert_equal "Intro in #{locale.upcase}", @property.intro[locale]
       assert_equal "Description in #{locale.upcase}", @property.description[locale]
       assert @property.translations_status[locale]["translated_at"].present?
     end
     assert_equal "Penthouse vue mer", @property.title["fr"]
+    assert_equal "Un penthouse d'exception au Carré d'Or.", @property.intro["fr"]
     assert_equal "Superbe penthouse avec vue panoramique sur le port.", @property.description["fr"]
     assert @property.translation_source_hash.present?
   end
 
   test "returns early when content hash is unchanged" do
     fr_title = @property.title["fr"]
+    fr_intro = @property.intro["fr"]
     fr_description = @property.description["fr"]
-    expected_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_description}")
+    expected_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_intro}\n#{fr_description}")
     @property.update_columns(translation_source_hash: expected_hash)
 
     called = with_failing_chat do
@@ -138,7 +143,7 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
   end
 
   test "does not overwrite when another job updated the hash between load and write" do
-    original_hash = Digest::SHA256.hexdigest("#{@property.title['fr']}\n#{@property.description['fr']}")
+    original_hash = Digest::SHA256.hexdigest("#{@property.title['fr']}\n#{@property.intro['fr']}\n#{@property.description['fr']}")
     @property.update_columns(translation_source_hash: "stale-from-old-load")
     translator = PropertyTranslator.new(@property)
 
@@ -184,6 +189,27 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     @property.reload
     assert_equal "existing en description", @property.description["en"]
     assert_equal "Title in EN", @property.title["en"]
+  end
+
+  test "empty FR intro preserves existing intros and still translates titles" do
+    @property.update_columns(
+      intro: { "fr" => "", "en" => "existing en intro" }
+    )
+    with_stubbed_chat(content: canned_response) do
+      PropertyTranslator.new(@property).translate!
+    end
+
+    @property.reload
+    assert_equal "existing en intro", @property.intro["en"]
+    assert_equal "Title in EN", @property.title["en"]
+  end
+
+  test "non-string intro field raises BlankTranslation" do
+    with_stubbed_chat(content: canned_response.merge("intro_it" => [ "lista" ])) do
+      assert_raises(PropertyTranslator::BlankTranslation) do
+        PropertyTranslator.new(@property).translate!
+      end
+    end
   end
 
   test "glossary includes district and building names" do

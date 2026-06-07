@@ -82,10 +82,12 @@ class ImmotoolboxSync
       # Only ingest French text from Immotoolbox — English arrives inconsistent
       # in quality. All 8 non-FR locales are machine-translated from FR.
       title = (property.title || {}).dup
+      intro = (property.intro || {}).dup
       description = (property.description || {}).dup
       fr_texts = data.dig("texts", "fr")
       if fr_texts.is_a?(Hash)
         title["fr"] = sanitize_html(fr_texts["title"]) if fr_texts["title"].present?
+        intro["fr"] = sanitize_html(fr_texts["intro"]) if fr_texts["intro"].present?
         description["fr"] = sanitize_html(fr_texts["description"]) if fr_texts["description"].present?
       end
 
@@ -95,6 +97,7 @@ class ImmotoolboxSync
       property.assign_attributes(
         reference: data["reference"],
         title: title,
+        intro: intro,
         description: description,
         price: data["price"],
         currency: data["currency"] || "EUR",

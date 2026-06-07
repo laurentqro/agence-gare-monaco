@@ -122,6 +122,16 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     refute property.description.key?("en"), "EN description from API should be discarded"
   end
 
+  test "sync stores French intro only; discards English from API" do
+    setup_districts_and_buildings
+
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+
+    property = Property.find_by(immotoolbox_id: 100)
+    assert_equal "Vue mer panoramique", property.intro["fr"]
+    refute property.intro.key?("en"), "EN intro from API should be discarded"
+  end
+
   test "sync strips HTML tags from French description" do
     setup_districts_and_buildings
 
@@ -246,6 +256,7 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
       country: "MC", city: "Monaco", price: 999_999, immotoolbox_id: 100,
       num_rooms: 1,
       title: { "fr" => "Studio Monte-Carlo" },
+      intro: { "fr" => "Vue mer panoramique" },
       description: { "fr" => "Magnifique studio" }
     )
     prop.update_columns(translation_source_hash: "seeded-hash")
@@ -520,8 +531,8 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
       "urlVideo" => "https://youtube.com/watch?v=abc123",
       "urlVirtual" => "https://my.matterport.com/show?m=xyz",
       "texts" => {
-        "fr" => { "id" => 300, "title" => "Studio Monte-Carlo", "description" => "Magnifique studio", "languageCode" => "FR" },
-        "en" => { "id" => 301, "title" => "Studio Monte-Carlo EN", "description" => "Beautiful studio", "languageCode" => "EN" }
+        "fr" => { "id" => 300, "title" => "Studio Monte-Carlo", "intro" => "Vue mer panoramique", "description" => "Magnifique studio", "languageCode" => "FR" },
+        "en" => { "id" => 301, "title" => "Studio Monte-Carlo EN", "intro" => "Panoramic sea view", "description" => "Beautiful studio", "languageCode" => "EN" }
       },
       "images" => [
         {
