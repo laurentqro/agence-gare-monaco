@@ -86,7 +86,7 @@ class ImmotoolboxSync
       description = (property.description || {}).dup
       fr_texts = data.dig("texts", "fr")
       if fr_texts.is_a?(Hash)
-        title["fr"] = deshout_title(sanitize_html(fr_texts["title"])) if fr_texts["title"].present?
+        title["fr"] = sanitize_html(fr_texts["title"]) if fr_texts["title"].present?
         intro["fr"] = sanitize_html(fr_texts["intro"]) if fr_texts["intro"].present?
         description["fr"] = sanitize_description_html(fr_texts["description"]) if fr_texts["description"].present?
       end
@@ -173,46 +173,6 @@ class ImmotoolboxSync
     when "land", "terrain" then "land"
     else api_type&.downcase || "apartment"
     end
-  end
-
-  # French small words kept lowercase in title case (unless they're the first word).
-  TITLE_LOWERCASE_WORDS = %w[
-    a à au aux de des du en et la le les l un une sur sous dans avec par pour
-    ou ne ni que qui se sa son ses
-  ].freeze
-
-  # The API occasionally sends SHOUTING titles. When a title is entirely
-  # upper-case, convert it to French title case (capitalize significant words,
-  # keep small words lowercase). Mixed-case titles — including ones with an
-  # all-caps parenthetical like "(SOUS OFFRE)" — are left exactly as-is.
-  def deshout_title(title)
-    return title if title.blank?
-
-    letters = title.gsub(/[^[:alpha:]]/, "")
-    return title if letters.empty? || letters != letters.upcase
-
-    words = title.downcase.split(/(\s+)/) # keep the whitespace separators
-    first_word_seen = false
-    words.map do |token|
-      next token if token.match?(/\A\s*\z/) # untouched whitespace run
-
-      is_first = !first_word_seen
-      first_word_seen = true
-      if !is_first && TITLE_LOWERCASE_WORDS.include?(token)
-        token
-      else
-        capitalize_word(token)
-      end
-    end.join
-  end
-
-  # Capitalize the first letter of a token, leaving the rest as-is. Handles a
-  # leading non-letter (e.g. "-millefiori" -> "-Millefiori") and is diacritic-aware.
-  def capitalize_word(token)
-    idx = token.index(/[[:alpha:]]/)
-    return token if idx.nil?
-
-    token[0...idx] + token[idx].upcase + token[(idx + 1)..]
   end
 
   # For single-line fields (title, intro): strip all tags and collapse whitespace.

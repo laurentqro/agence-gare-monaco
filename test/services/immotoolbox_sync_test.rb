@@ -235,56 +235,6 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     assert_includes property.description["fr"], "proche du port"
   end
 
-  test "deshout_title converts an all-caps title to French title case" do
-    sync = ImmotoolboxSync.new(api_token: "test-token")
-    assert_equal "Rare Ermanno Palace : Grand Double Box avec Bel Espace de Stockage Attenant !",
-                 sync.send(:deshout_title, "RARE ERMANNO PALACE : GRAND DOUBLE BOX AVEC BEL ESPACE DE STOCKAGE ATTENANT !")
-    assert_equal "Exclusivite - Bureaux Patio Palace",
-                 sync.send(:deshout_title, "EXCLUSIVITE - BUREAUX PATIO PALACE")
-  end
-
-  test "deshout_title keeps French small words lowercase except the first word" do
-    sync = ImmotoolboxSync.new(api_token: "test-token")
-    assert_equal "De la Cave au Grenier", sync.send(:deshout_title, "DE LA CAVE AU GRENIER")
-    assert_equal "Studio avec Vue sur le Port", sync.send(:deshout_title, "STUDIO AVEC VUE SUR LE PORT")
-  end
-
-  test "deshout_title leaves a normally-cased title untouched" do
-    sync = ImmotoolboxSync.new(api_token: "test-token")
-    untouched = "Joli studio en étage élevé avec belle vue ! (SOUS OFFRE)"
-    assert_equal untouched, sync.send(:deshout_title, untouched)
-    assert_equal "Magnifique duplex / penthouse rénové !",
-                 sync.send(:deshout_title, "Magnifique duplex / penthouse rénové !")
-  end
-
-  test "deshout_title preserves non-letter tokens and is blank-safe" do
-    sync = ImmotoolboxSync.new(api_token: "test-token")
-    assert_equal "Parking -Millefiori", sync.send(:deshout_title, "Parking -Millefiori")
-    assert_equal "", sync.send(:deshout_title, "")
-    assert_nil sync.send(:deshout_title, nil)
-  end
-
-  test "sync title-cases an all-caps French title from the API" do
-    setup_districts_and_buildings
-
-    WebMock.reset!
-    html_property = property_data(
-      "texts" => {
-        "fr" => { "id" => 300, "title" => "RARE ERMANNO PALACE : GRAND DOUBLE BOX", "description" => "Texte", "languageCode" => "FR" }
-      }
-    )
-    stub_request(:get, "#{@base_url}/properties")
-      .with(query: { "status" => "published", "page" => "1" })
-      .to_return(status: 200, body: [ html_property ].to_json, headers: { "Content-Type" => "application/json" })
-    stub_request(:get, "#{@base_url}/properties")
-      .with(query: { "status" => "published", "page" => "2" })
-      .to_return(status: 200, body: [].to_json, headers: { "Content-Type" => "application/json" })
-
-    ImmotoolboxSync.new(api_token: "test-token").sync_properties
-
-    assert_equal "Rare Ermanno Palace : Grand Double Box", Property.find_by(immotoolbox_id: 100).title["fr"]
-  end
-
   test "sync creates property images from inline images" do
     setup_districts_and_buildings
 
