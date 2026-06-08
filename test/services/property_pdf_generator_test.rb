@@ -294,6 +294,18 @@ class PropertyPdfGeneratorTest < ActiveSupport::TestCase
     assert_includes text, "appartement"
   end
 
+  test "decodes ampersand entities in description" do
+    @property.update!(description: {
+      "fr" => "<p>Largeur 8.5M &amp; profondeur 4,8M, &lt;exclusif&gt;.</p>"
+    })
+    pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr).generate
+    text = extract_text(pdf_bytes)
+    refute_includes text, "&amp;"
+    refute_includes text, "&lt;"
+    refute_includes text, "&gt;"
+    assert_includes text, "8.5M & profondeur"
+  end
+
   test "strips nbsp entities from description" do
     @property.update!(description: {
       "fr" => "Deux&nbsp;&nbsp;chambres avec parquet,&nbsp;proche du port."

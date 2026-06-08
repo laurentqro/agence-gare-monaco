@@ -438,6 +438,9 @@ class PropertyPdfGenerator
     text = text.gsub(/<li[^>]*>/i, "\n- ")
     # Strip remaining tags and decode HTML entities
     text = Rails::HTML5::FullSanitizer.new.sanitize(text)
+    # The sanitizer decodes most entities but re-escapes the HTML-significant
+    # ones (& < >); decode those so they don't leak into the PDF as &amp; etc.
+    text = CGI.unescapeHTML(text)
     # Collapse runs of spaces (but preserve newlines)
     text = text.gsub(/[^\S\n]+/, " ")
     # Collapse 3+ consecutive newlines to 2
