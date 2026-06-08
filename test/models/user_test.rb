@@ -63,6 +63,19 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "Doe", user.last_name
   end
 
+  test "display_name returns first_name when present" do
+    user = User.new(email_address: "user@example.com", first_name: "Jane")
+    assert_equal "Jane", user.display_name
+  end
+
+  test "display_name falls back to email_address when first_name is blank" do
+    user = User.new(email_address: "user@example.com", first_name: "")
+    assert_equal "user@example.com", user.display_name
+
+    user_nil = User.new(email_address: "user@example.com")
+    assert_equal "user@example.com", user_nil.display_name
+  end
+
   private
 
   def assert_reflect_on_association(klass, association_name)

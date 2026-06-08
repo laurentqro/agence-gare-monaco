@@ -17,7 +17,7 @@ fr:
       rate_limited: "Veuillez réessayer plus tard."
     dashboard:
       title: "Tableau de bord"
-      welcome: "Bienvenue, %{email}"
+      welcome: "Bienvenue, %{name}"
       quick_links:
         title: "Actions rapides"
         new_article: "Rédiger un article"
