@@ -7,7 +7,7 @@ fr:
       articles: "Articles"
       categories: "Catégories"
       contacts: "Contacts"
-      contact_submissions: "Demandes"
+      information_requests: "Demandes"
       logout: "Déconnexion"
     sessions:
       title: "Administration"
@@ -26,7 +26,7 @@ fr:
         new_contact: "Ajouter un contact"
         all_properties: "Voir tous les biens"
         all_contacts: "Voir tous les contacts"
-        contact_submissions: "Demandes de renseignements"
+        information_requests: "Demandes de renseignements"
     shared:
       edit: "Modifier"
       view: "Voir"
@@ -135,7 +135,7 @@ fr:
         created: "Contact créé."
         updated: "Contact mis à jour."
         deleted: "Contact supprimé."
-    contact_submissions:
+    information_requests:
       title: "Demandes de renseignements"
       empty: "Aucune demande pour le moment."
       unread: "Non lue"

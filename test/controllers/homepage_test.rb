@@ -327,7 +327,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
   test "homepage does not include a contact form" do
     get "/"
     assert_select "[data-testid='contact-section']", count: 0
-    assert_select "form[action*='contact_submissions']", count: 0
+    assert_select "form[action*='information_requests']", count: 0
   end
 
   # === Image Carousel ===

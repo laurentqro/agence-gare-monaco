@@ -1,7 +1,7 @@
 <%# Reusable contact form partial
-     Locals: submission (ContactSubmission), return_to (String, optional), dark (Boolean, optional)
+     Locals: submission (InformationRequest), return_to (String, optional), dark (Boolean, optional)
 %>
-<% submission ||= ContactSubmission.new %>
+<% submission ||= InformationRequest.new %>
 <% dark = local_assigns.fetch(:dark, false) %>
 <% return_to_value = local_assigns[:return_to] %>
 
@@ -20,7 +20,7 @@
     </div>
   <% end %>
 
-  <%= form_with(model: submission, url: contact_submissions_path, method: :post, local: true, class: "space-y-4") do |f| %>
+  <%= form_with(model: submission, url: information_requests_path, method: :post, local: true, class: "space-y-4") do |f| %>
     <%# Honeypot field %>
     <div class="absolute -left-[9999px]">
       <label for="website">Website</label>

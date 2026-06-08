@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_08_200221) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_08_210000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -79,23 +79,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_200221) do
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 
-  create_table "contact_submissions", force: :cascade do |t|
-    t.string "country"
-    t.datetime "created_at", null: false
-    t.string "email", null: false
-    t.string "form_type", null: false
-    t.text "message", null: false
-    t.string "name", null: false
-    t.string "phone"
-    t.integer "property_id"
-    t.boolean "read", default: false
-    t.string "subject"
-    t.datetime "updated_at", null: false
-    t.index ["form_type"], name: "index_contact_submissions_on_form_type"
-    t.index ["property_id"], name: "index_contact_submissions_on_property_id"
-    t.index ["read"], name: "index_contact_submissions_on_read"
-  end
-
   create_table "contacts", force: :cascade do |t|
     t.string "address"
     t.string "city"
@@ -135,6 +118,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_200221) do
     t.decimal "rate", precision: 12, scale: 6, null: false
     t.datetime "updated_at", null: false
     t.index ["currency"], name: "index_exchange_rates_on_currency", unique: true
+  end
+
+  create_table "information_requests", force: :cascade do |t|
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.string "form_type", null: false
+    t.text "message", null: false
+    t.string "name", null: false
+    t.string "phone"
+    t.integer "property_id"
+    t.boolean "read", default: false
+    t.string "subject"
+    t.datetime "updated_at", null: false
+    t.index ["form_type"], name: "index_information_requests_on_form_type"
+    t.index ["property_id"], name: "index_information_requests_on_property_id"
+    t.index ["read"], name: "index_information_requests_on_read"
   end
 
   create_table "properties", force: :cascade do |t|
@@ -251,7 +251,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_200221) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "articles", "categories"
   add_foreign_key "buildings", "districts"
-  add_foreign_key "contact_submissions", "properties"
+  add_foreign_key "information_requests", "properties"
   add_foreign_key "properties", "buildings"
   add_foreign_key "properties", "districts"
   add_foreign_key "property_documents", "properties"

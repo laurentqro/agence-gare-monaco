@@ -9,7 +9,7 @@ class Property < ApplicationRecord
   belongs_to :building, optional: true
   has_many :property_images, dependent: :destroy
   has_many :property_documents, dependent: :destroy
-  has_many :contact_submissions, dependent: :nullify
+  has_many :information_requests, dependent: :nullify
   has_many_attached :brochures
 
   validates :reference, presence: true, uniqueness: true

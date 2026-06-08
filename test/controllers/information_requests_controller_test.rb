@@ -1,6 +1,6 @@
 require "test_helper"
 
-class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
+class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @property = Property.create!(
       reference: "MC-FORM-001",
@@ -17,10 +17,10 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
   # === Homepage contact form submission ===
 
   test "successful contact form submission creates record and sends email" do
-    assert_difference "ContactSubmission.count", 1 do
+    assert_difference "InformationRequest.count", 1 do
       assert_emails 1 do
-        post contact_submissions_url, params: {
-          contact_submission: {
+        post information_requests_url, params: {
+          information_request: {
             name: "Jean Dupont",
             email: "jean@example.com",
             subject: "General enquiry",
@@ -31,7 +31,7 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    submission = ContactSubmission.last
+    submission = InformationRequest.last
     assert_equal "contact", submission.form_type
     assert_equal "Jean Dupont", submission.name
     assert_equal "jean@example.com", submission.email
@@ -46,9 +46,9 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "contact form submission with validation errors re-renders contact page" do
-    assert_no_difference "ContactSubmission.count" do
-      post contact_submissions_url, params: {
-        contact_submission: {
+    assert_no_difference "InformationRequest.count" do
+      post information_requests_url, params: {
+        information_request: {
           name: "",
           email: "",
           message: ""
@@ -58,14 +58,14 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
-    assert_select "form[action^='/contact_submissions']"
+    assert_select "form[action^='/information_requests']"
   end
 
   test "contact form submission with honeypot filled is rejected silently" do
-    assert_no_difference "ContactSubmission.count" do
+    assert_no_difference "InformationRequest.count" do
       assert_no_emails do
-        post contact_submissions_url, params: {
-          contact_submission: {
+        post information_requests_url, params: {
+          information_request: {
             name: "Bot User",
             email: "bot@spam.com",
             subject: "Buy now",
@@ -84,10 +84,10 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
   # === Property enquiry form submission ===
 
   test "successful enquiry form submission creates record and sends email" do
-    assert_difference "ContactSubmission.count", 1 do
+    assert_difference "InformationRequest.count", 1 do
       assert_emails 1 do
-        post contact_submissions_url, params: {
-          contact_submission: {
+        post information_requests_url, params: {
+          information_request: {
             name: "Pierre Martin",
             email: "pierre@example.com",
             phone: "+33 6 12 34 56 78",
@@ -100,7 +100,7 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    submission = ContactSubmission.last
+    submission = InformationRequest.last
     assert_equal "enquiry", submission.form_type
     assert_equal "Pierre Martin", submission.name
     assert_equal "pierre@example.com", submission.email
@@ -110,8 +110,8 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "enquiry form redirects back to property page on success" do
-    post contact_submissions_url, params: {
-      contact_submission: {
+    post information_requests_url, params: {
+      information_request: {
         name: "Pierre Martin",
         email: "pierre@example.com",
         message: "I am interested.",
@@ -126,9 +126,9 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "enquiry form with validation errors re-renders property page" do
-    assert_no_difference "ContactSubmission.count" do
-      post contact_submissions_url, params: {
-        contact_submission: {
+    assert_no_difference "InformationRequest.count" do
+      post information_requests_url, params: {
+        information_request: {
           name: "",
           email: "",
           message: "",
@@ -142,10 +142,10 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "enquiry form with honeypot filled is rejected silently" do
-    assert_no_difference "ContactSubmission.count" do
+    assert_no_difference "InformationRequest.count" do
       assert_no_emails do
-        post contact_submissions_url, params: {
-          contact_submission: {
+        post information_requests_url, params: {
+          information_request: {
             name: "Bot User",
             email: "bot@spam.com",
             message: "Click here",
@@ -165,11 +165,11 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
   test "contact page renders contact form" do
     get "/en/contact"
     assert_response :success
-    assert_select "[data-testid='contact-form'] form[action^='/contact_submissions']"
-    assert_select "input[name='contact_submission[name]']"
-    assert_select "input[name='contact_submission[email]']"
-    assert_select "input[name='contact_submission[subject]']"
-    assert_select "textarea[name='contact_submission[message]']"
+    assert_select "[data-testid='contact-form'] form[action^='/information_requests']"
+    assert_select "input[name='information_request[name]']"
+    assert_select "input[name='information_request[email]']"
+    assert_select "input[name='information_request[subject]']"
+    assert_select "textarea[name='information_request[message]']"
   end
 
   test "contact page renders honeypot field" do
@@ -246,13 +246,13 @@ class ContactSubmissionsControllerTest < ActionDispatch::IntegrationTest
   test "property page renders enquiry form" do
     get "/en/properties/#{@property.id}-test-studio"
     assert_response :success
-    assert_select "[data-testid='enquiry-form'] form[action^='/contact_submissions']"
-    assert_select "input[name='contact_submission[name]']"
-    assert_select "input[name='contact_submission[email]']"
-    assert_select "input[name='contact_submission[phone]']"
-    assert_select "input[name='contact_submission[country]']"
-    assert_select "textarea[name='contact_submission[message]']"
-    assert_select "input[name='contact_submission[property_id]'][type='hidden'][value='#{@property.id}']"
+    assert_select "[data-testid='enquiry-form'] form[action^='/information_requests']"
+    assert_select "input[name='information_request[name]']"
+    assert_select "input[name='information_request[email]']"
+    assert_select "input[name='information_request[phone]']"
+    assert_select "input[name='information_request[country]']"
+    assert_select "textarea[name='information_request[message]']"
+    assert_select "input[name='information_request[property_id]'][type='hidden'][value='#{@property.id}']"
   end
 
   test "property page enquiry form shows property reference" do

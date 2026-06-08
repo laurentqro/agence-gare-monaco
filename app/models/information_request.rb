@@ -1,4 +1,4 @@
-class ContactSubmission < ApplicationRecord
+class InformationRequest < ApplicationRecord
   belongs_to :property, optional: true
 
   validates :form_type, presence: true, inclusion: { in: %w[contact enquiry] }
