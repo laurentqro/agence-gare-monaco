@@ -31,12 +31,8 @@
               <div class="font-medium text-navy leading-snug max-w-md"><%= property.title_for(:fr) %></div>
               <div class="font-mono text-xs text-gray-400 mt-0.5"><%= property.reference %></div>
             </td>
-            <td class="px-4 py-3 align-middle whitespace-nowrap">
-              <% transaction_classes = property.transaction_type.to_s == "rental" ? "bg-amber-50 text-amber-700" : "bg-sky-50 text-sky-700" %>
-              <span class="inline-flex items-center gap-1.5">
-                <span class="inline-block rounded px-1.5 py-0.5 text-xs font-medium <%= transaction_classes %>"><%= admin_transaction_label(property) %></span>
-                <span class="text-gray-500 text-xs"><%= admin_property_type_only_label(property) %></span>
-              </span>
+            <td class="px-4 py-3 align-middle whitespace-nowrap text-gray-600">
+              <%= admin_transaction_label(property) %> - <%= admin_property_type_only_label(property) %>
             </td>
             <td class="px-4 py-3 align-middle text-right font-semibold text-gray-800 tabular-nums whitespace-nowrap">
               <%= property.formatted_price ? "#{property.formatted_price} €" : "—" %>
