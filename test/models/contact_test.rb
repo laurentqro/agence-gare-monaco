@@ -43,6 +43,23 @@ class ContactTest < ActiveSupport::TestCase
     assert duplicate.valid?
   end
 
+  test "defaults to the client kind" do
+    contact = Contact.create!(first_name: "Jean", last_name: "Dupont")
+    assert_equal "client", contact.kind
+  end
+
+  test "can be flagged as a peer (confrère)" do
+    contact = Contact.create!(company: "La Costa Properties", email: "a@b.mc", kind: "peer")
+    assert_equal "peer", contact.kind
+  end
+
+  test "legacy_id is unique only within a kind" do
+    Contact.create!(company: "Client SCI", legacy_id: 2, kind: "client")
+    peer = Contact.new(company: "Peer Agency", legacy_id: 2, kind: "peer")
+    assert peer.valid?, peer.errors.full_messages.to_sentence
+    assert peer.save
+  end
+
   test "stores extended legacy fields" do
     contact = Contact.create!(
       first_name: "Anna",

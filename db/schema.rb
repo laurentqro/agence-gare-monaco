@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_08_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_08_130000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -104,13 +104,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_120000) do
     t.datetime "created_at", null: false
     t.string "email"
     t.string "first_name"
+    t.string "kind", default: "client", null: false
     t.string "last_name"
     t.integer "legacy_id"
     t.text "notes"
     t.string "phone"
     t.string "postcode"
     t.datetime "updated_at", null: false
-    t.index ["legacy_id"], name: "index_contacts_on_legacy_id", unique: true
+    t.index ["kind", "legacy_id"], name: "index_contacts_on_kind_and_legacy_id", unique: true
+    t.index ["kind"], name: "index_contacts_on_kind"
   end
 
   create_table "districts", force: :cascade do |t|
