@@ -43,17 +43,17 @@
         <% if @contacts.any? %>
           <div class="overflow-x-auto border border-gray-200 rounded">
             <table class="w-full text-sm">
-              <thead class="bg-gray-50 text-left">
+              <thead class="bg-gray-100 text-left text-xs uppercase tracking-wider border-b-2 border-gray-200">
                 <tr>
-                  <th class="px-3 py-2 font-medium text-gray-600 w-10"><span class="sr-only"><%= t("admin.property_shares.select_column") %></span></th>
-                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "last_name", t("admin.contacts.table.last_name"), url: url, frame: frame %></th>
-                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "first_name", t("admin.contacts.table.first_name"), url: url, frame: frame %></th>
-                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "company", t("admin.contacts.table.company"), url: url, frame: frame %></th>
-                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "email", t("admin.contacts.table.email"), url: url, frame: frame %></th>
-                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "phone", t("admin.contacts.table.phone"), url: url, frame: frame %></th>
-                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "city", t("admin.contacts.table.city"), url: url, frame: frame %></th>
-                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "country", t("admin.contacts.table.country"), url: url, frame: frame %></th>
-                  <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.type") %></th>
+                  <th class="px-3 py-2 font-semibold text-gray-700 w-10"><span class="sr-only"><%= t("admin.property_shares.select_column") %></span></th>
+                  <th class="px-3 py-2 font-semibold text-gray-700"><%= sort_link "last_name", t("admin.contacts.table.last_name"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-semibold text-gray-700"><%= sort_link "first_name", t("admin.contacts.table.first_name"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-semibold text-gray-700"><%= sort_link "company", t("admin.contacts.table.company"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-semibold text-gray-700"><%= sort_link "email", t("admin.contacts.table.email"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-semibold text-gray-700"><%= sort_link "phone", t("admin.contacts.table.phone"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-semibold text-gray-700"><%= sort_link "city", t("admin.contacts.table.city"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-semibold text-gray-700"><%= sort_link "country", t("admin.contacts.table.country"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-semibold text-gray-700"><%= t("admin.contacts.table.type") %></th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-100">

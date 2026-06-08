@@ -38,15 +38,15 @@
     <% frame = "contacts_table" %>
     <div class="bg-white rounded shadow overflow-hidden">
       <table class="w-full text-sm">
-        <thead class="bg-gray-50 text-left">
+        <thead class="bg-gray-100 text-left text-xs uppercase tracking-wider border-b-2 border-gray-200">
           <tr>
-            <th class="px-4 py-3 font-medium text-gray-600"><%= sort_link "last_name", t("admin.contacts.table.last_name"), url: url, frame: frame %></th>
-            <th class="px-4 py-3 font-medium text-gray-600"><%= sort_link "first_name", t("admin.contacts.table.first_name"), url: url, frame: frame %></th>
-            <th class="px-4 py-3 font-medium text-gray-600"><%= sort_link "company", t("admin.contacts.table.company"), url: url, frame: frame %></th>
-            <th class="px-4 py-3 font-medium text-gray-600"><%= sort_link "email", t("admin.contacts.table.email"), url: url, frame: frame %></th>
-            <th class="px-4 py-3 font-medium text-gray-600"><%= sort_link "phone", t("admin.contacts.table.phone"), url: url, frame: frame %></th>
-            <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.contacts.table.type") %></th>
-            <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.shared.actions") %></th>
+            <th class="px-4 py-3 font-semibold text-gray-700"><%= sort_link "last_name", t("admin.contacts.table.last_name"), url: url, frame: frame %></th>
+            <th class="px-4 py-3 font-semibold text-gray-700"><%= sort_link "first_name", t("admin.contacts.table.first_name"), url: url, frame: frame %></th>
+            <th class="px-4 py-3 font-semibold text-gray-700"><%= sort_link "company", t("admin.contacts.table.company"), url: url, frame: frame %></th>
+            <th class="px-4 py-3 font-semibold text-gray-700"><%= sort_link "email", t("admin.contacts.table.email"), url: url, frame: frame %></th>
+            <th class="px-4 py-3 font-semibold text-gray-700"><%= sort_link "phone", t("admin.contacts.table.phone"), url: url, frame: frame %></th>
+            <th class="px-4 py-3 font-semibold text-gray-700"><%= t("admin.contacts.table.type") %></th>
+            <th class="px-4 py-3 font-semibold text-gray-700"><%= t("admin.shared.actions") %></th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
