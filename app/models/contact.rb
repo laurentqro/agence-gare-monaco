@@ -1,7 +1,25 @@
 class Contact < ApplicationRecord
   IDENTIFYING_FIELDS = %i[first_name last_name company email phone].freeze
 
+  SEARCHABLE_FIELDS = %i[first_name last_name company email].freeze
+
   validate :must_have_identifying_field
+
+  # peer: true = confrères (agents at other agencies we share listings with);
+  # peer: false = our own contacts/leads.
+  scope :peers, -> { where(peer: true) }
+  scope :contacts_only, -> { where(peer: false) }
+
+  # Case-insensitive match across name, company, and email. Blank query returns
+  # the full relation.
+  scope :search, ->(query) {
+    query = query.to_s.strip
+    next all if query.blank?
+
+    pattern = "%#{sanitize_sql_like(query)}%"
+    clause = SEARCHABLE_FIELDS.map { |f| "#{f} LIKE :pattern" }.join(" OR ")
+    where(clause, pattern: pattern)
+  }
 
   private
 

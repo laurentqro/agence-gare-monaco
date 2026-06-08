@@ -7,7 +7,17 @@ module Admin
     before_action :set_contact, only: %i[edit update destroy]
 
     def index
-      @contacts = sort_scope(Contact.all, columns: SORT_COLUMNS, default: "last_name")
+      @filter = params[:filter]
+      @query = params[:q]
+
+      scope = filtered_scope.search(@query)
+      @contacts = sort_scope(scope, columns: SORT_COLUMNS, default: "last_name")
+
+      @counts = {
+        all: Contact.count,
+        contacts: Contact.contacts_only.count,
+        peers: Contact.peers.count
+      }
     end
 
     def new
@@ -42,6 +52,14 @@ module Admin
 
     private
 
+    def filtered_scope
+      case params[:filter]
+      when "peers" then Contact.peers
+      when "contacts" then Contact.contacts_only
+      else Contact.all
+      end
+    end
+
     def set_contact
       @contact = Contact.find(params[:id])
     end
@@ -49,7 +67,7 @@ module Admin
     def contact_params
       params.require(:contact).permit(
         :first_name, :last_name, :email, :phone,
-        :company, :address, :city, :postcode, :country, :notes
+        :company, :address, :city, :postcode, :country, :notes, :peer
       )
     end
   end

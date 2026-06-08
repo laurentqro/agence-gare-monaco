@@ -11,8 +11,10 @@ module SortHelper
     next_direction = (active && current_direction == "asc") ? "desc" : "asc"
     arrow = active ? (current_direction == "asc" ? " ↑" : " ↓") : ""
 
-    params = { sort: column, direction: next_direction }
-    href = url + (url.include?("?") ? "&" : "?") + params.to_query
+    # Preserve any active filter/search params so sort composes with them.
+    carried = request.query_parameters.except("sort", "direction")
+    query = carried.merge(sort: column, direction: next_direction)
+    href = url + (url.include?("?") ? "&" : "?") + query.to_query
 
     link_to "#{label}#{arrow}".html_safe, href,
             data: frame ? { turbo_frame: frame } : {},

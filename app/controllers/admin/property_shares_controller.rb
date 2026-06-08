@@ -7,8 +7,19 @@ module Admin
     before_action :set_property
 
     def new
+      @filter = params[:filter]
+      @query = params[:q]
+
       # Sharing is email-only, so only contacts with an email can be selected.
-      @contacts = sort_scope(Contact.where.not(email: nil), columns: SORT_COLUMNS, default: "last_name")
+      shareable = Contact.where.not(email: nil)
+      scope = filtered_scope(shareable).search(@query)
+      @contacts = sort_scope(scope, columns: SORT_COLUMNS, default: "last_name")
+
+      @counts = {
+        all: shareable.count,
+        contacts: shareable.contacts_only.count,
+        peers: shareable.peers.count
+      }
       # decoded returns a SafeBuffer; coerce to a plain String so the view can
       # HTML-escape it into the iframe srcdoc attribute (otherwise the inline
       # style double-quotes truncate the attribute and the preview is blank).
@@ -32,6 +43,14 @@ module Admin
     end
 
     private
+
+    def filtered_scope(relation)
+      case params[:filter]
+      when "peers" then relation.peers
+      when "contacts" then relation.contacts_only
+      else relation
+      end
+    end
 
     def set_property
       @property = Property.find(params[:property_id])

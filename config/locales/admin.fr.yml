@@ -96,6 +96,13 @@ fr:
       new: "Nouveau contact"
       edit: "Modifier le contact"
       new_action: "Nouveau contact"
+      search_placeholder: "Rechercher un nom, une société, un email…"
+      filters:
+        all: "Tous"
+        contacts: "Contacts"
+        peers: "Confrères"
+        peer_badge: "Confrère"
+        contact_badge: "Contact"
       table:
         last_name: "Nom"
         first_name: "Prénom"
@@ -104,6 +111,7 @@ fr:
         phone: "Téléphone"
         city: "Ville"
         country: "Pays"
+        type: "Type"
       form:
         first_name: "Prénom"
         last_name: "Nom"
@@ -116,6 +124,7 @@ fr:
         postcode: "Code postal"
         country: "Pays"
         notes: "Commentaires"
+        peer: "Confrère (agent d'une autre agence)"
         contact_details: "Coordonnées"
         location: "Localisation"
         create: "Créer le contact"

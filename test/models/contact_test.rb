@@ -43,21 +43,47 @@ class ContactTest < ActiveSupport::TestCase
     assert duplicate.valid?
   end
 
-  test "defaults to the client kind" do
+  test "defaults to a non-peer (ordinary) contact" do
     contact = Contact.create!(first_name: "Jean", last_name: "Dupont")
-    assert_equal "client", contact.kind
+    assert_not contact.peer
   end
 
   test "can be flagged as a peer (confrère)" do
-    contact = Contact.create!(company: "La Costa Properties", email: "a@b.mc", kind: "peer")
-    assert_equal "peer", contact.kind
+    contact = Contact.create!(company: "La Costa Properties", email: "a@b.mc", peer: true)
+    assert contact.peer
   end
 
-  test "legacy_id is unique only within a kind" do
-    Contact.create!(company: "Client SCI", legacy_id: 2, kind: "client")
-    peer = Contact.new(company: "Peer Agency", legacy_id: 2, kind: "peer")
+  test "legacy_id is unique only within the peer / non-peer split" do
+    Contact.create!(company: "Client SCI", legacy_id: 2, peer: false)
+    peer = Contact.new(company: "Peer Agency", legacy_id: 2, peer: true)
     assert peer.valid?, peer.errors.full_messages.to_sentence
     assert peer.save
+  end
+
+  test "search matches first name, last name, company, or email (case-insensitive)" do
+    berg = Contact.create!(first_name: "Anna", last_name: "Berg", email: "anna@acme.com", company: "Acme SCI")
+    dupont = Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@other.com")
+
+    assert_equal [berg], Contact.search("anna").to_a
+    assert_equal [berg], Contact.search("BERG").to_a
+    assert_equal [berg], Contact.search("acme").to_a
+    assert_equal [dupont], Contact.search("other.com").to_a
+    assert_equal [], Contact.search("nomatch").to_a
+  end
+
+  test "search returns all when query is blank" do
+    Contact.create!(first_name: "Anna", last_name: "Berg")
+    Contact.create!(first_name: "Jean", last_name: "Dupont")
+    assert_equal 2, Contact.search(nil).count
+    assert_equal 2, Contact.search("  ").count
+  end
+
+  test "peers and contacts_only scopes split on the peer flag" do
+    contact = Contact.create!(last_name: "Ordinary", peer: false)
+    peer = Contact.create!(last_name: "Confrère", peer: true)
+
+    assert_equal [peer], Contact.peers.to_a
+    assert_equal [contact], Contact.contacts_only.to_a
   end
 
   test "stores extended legacy fields" do

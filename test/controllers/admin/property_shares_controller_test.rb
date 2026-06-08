@@ -146,6 +146,43 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_select "table tbody td", text: "Martin"
   end
 
+  test "GET new renders filter tabs with counts" do
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    assert_select "a[href*='filter=peers']"
+    assert_select "a[href*='filter=contacts']"
+  end
+
+  test "GET new renders a search field" do
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    assert_select "input[type='search'][name='q']"
+  end
+
+  test "GET new filters to peers only" do
+    peer = Contact.create!(last_name: "Confrère", company: "Agency", email: "peer@agency.mc", peer: true)
+    get new_admin_property_share_url(@property, filter: "peers")
+    assert_response :success
+    assert_select "input[type='checkbox'][value='#{peer.id}']", 1
+    assert_select "input[type='checkbox'][value='#{@contact1.id}']", 0
+    assert_select "table tbody tr", 1
+  end
+
+  test "GET new searches within the email-bearing contacts" do
+    Contact.create!(first_name: "Anna", last_name: "Berg", email: "anna@acme.com", company: "Acme")
+    get new_admin_property_share_url(@property, q: "acme")
+    assert_response :success
+    assert_select "table tbody tr", 1
+    assert_select "table tbody td", text: /Berg/
+  end
+
+  test "GET new shows a peer badge on confrère rows" do
+    Contact.create!(last_name: "Confrère", company: "Agency", email: "peer@agency.mc", peer: true)
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    assert_select "table tbody tr td span", text: /Confrère/
+  end
+
   # CREATE (send sharing emails)
   test "POST create sends emails to selected contacts" do
     assert_emails 2 do

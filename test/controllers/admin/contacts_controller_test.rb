@@ -77,6 +77,72 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#contacts_table table tbody tr", 1
   end
 
+  # FILTER + SEARCH
+  test "GET index defaults to showing all contacts and peers" do
+    Contact.create!(last_name: "Ordinary", peer: false)
+    Contact.create!(last_name: "Confrère", company: "Agency", peer: true)
+    get admin_contacts_url
+    assert_response :success
+    assert_select "table tbody tr", 2
+  end
+
+  test "GET index filters to peers only" do
+    Contact.create!(last_name: "Ordinary", peer: false)
+    Contact.create!(last_name: "Confrère", company: "Agency", peer: true)
+    get admin_contacts_url(filter: "peers")
+    assert_response :success
+    assert_select "table tbody tr", 1
+    assert_select "table tbody td", text: /Confrère/
+  end
+
+  test "GET index filters to ordinary contacts only" do
+    Contact.create!(last_name: "Ordinary", peer: false)
+    Contact.create!(last_name: "Confrère", company: "Agency", peer: true)
+    get admin_contacts_url(filter: "contacts")
+    assert_response :success
+    assert_select "table tbody tr", 1
+    assert_select "table tbody td", text: /Ordinary/
+  end
+
+  test "GET index searches by name, company, or email" do
+    Contact.create!(first_name: "Anna", last_name: "Berg", email: "anna@acme.com", company: "Acme SCI")
+    Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@other.com")
+    get admin_contacts_url(q: "acme")
+    assert_response :success
+    assert_select "table tbody tr", 1
+    assert_select "table tbody td", text: /Berg/
+  end
+
+  test "GET index combines filter and search" do
+    Contact.create!(last_name: "Berg", company: "Acme", peer: true)
+    Contact.create!(last_name: "Berg", company: "Acme", peer: false)
+    get admin_contacts_url(filter: "peers", q: "berg")
+    assert_response :success
+    assert_select "table tbody tr", 1
+  end
+
+  test "GET index renders filter tabs with counts" do
+    Contact.create!(last_name: "Ordinary", peer: false)
+    Contact.create!(last_name: "Confrère", company: "Agency", peer: true)
+    get admin_contacts_url
+    assert_response :success
+    assert_select "a[href*='filter=peers']"
+    assert_select "a[href*='filter=contacts']"
+  end
+
+  test "GET index renders a search field" do
+    get admin_contacts_url
+    assert_response :success
+    assert_select "input[type='search'][name='q']"
+  end
+
+  test "GET index shows a peer badge on confrère rows" do
+    Contact.create!(last_name: "Confrère", company: "Agency", peer: true)
+    get admin_contacts_url
+    assert_response :success
+    assert_select "table tbody tr td", text: /Confrère/
+  end
+
   # NEW
   test "GET new renders contact form" do
     get new_admin_contact_url
