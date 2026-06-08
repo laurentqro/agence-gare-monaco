@@ -1,44 +1,48 @@
 <div class="p-8">
   <h1 class="heading-page mb-6"><%= t("admin.property_shares.title") %></h1>
 
-  <%= form_with(url: admin_property_share_path(@property), method: :post, class: "space-y-6") do |f| %>
+  <%= form_with(url: admin_property_share_path(@property), method: :post, id: "share_form", class: "space-y-6") do |f| %>
     <div class="bg-white rounded shadow p-6">
       <h2 class="heading-section mb-3"><%= t("admin.property_shares.select_contacts") %></h2>
 
       <% if @contacts.any? %>
-        <div class="overflow-x-auto border border-gray-200 rounded">
-          <table class="w-full text-sm">
-            <thead class="bg-gray-50 text-left">
-              <tr>
-                <th class="px-3 py-2 font-medium text-gray-600 w-10"><span class="sr-only"><%= t("admin.property_shares.select_column") %></span></th>
-                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.last_name") %></th>
-                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.first_name") %></th>
-                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.company") %></th>
-                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.email") %></th>
-                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.phone") %></th>
-                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.city") %></th>
-                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.country") %></th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-              <% @contacts.each do |contact| %>
-                <tr class="hover:bg-gray-50">
-                  <td class="px-3 py-2">
-                    <input type="checkbox" name="contact_ids[]" value="<%= contact.id %>"
-                           class="rounded border-gray-300 text-navy focus:ring-navy">
-                  </td>
-                  <td class="px-3 py-2 font-medium"><%= contact.last_name %></td>
-                  <td class="px-3 py-2"><%= contact.first_name %></td>
-                  <td class="px-3 py-2"><%= contact.company %></td>
-                  <td class="px-3 py-2"><%= contact.email %></td>
-                  <td class="px-3 py-2"><%= contact.phone %></td>
-                  <td class="px-3 py-2"><%= contact.city %></td>
-                  <td class="px-3 py-2"><%= contact.country %></td>
+        <%= turbo_frame_tag "share_contacts_table" do %>
+          <% url = new_admin_property_share_path(@property) %>
+          <% frame = "share_contacts_table" %>
+          <div class="overflow-x-auto border border-gray-200 rounded">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-left">
+                <tr>
+                  <th class="px-3 py-2 font-medium text-gray-600 w-10"><span class="sr-only"><%= t("admin.property_shares.select_column") %></span></th>
+                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "last_name", t("admin.contacts.table.last_name"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "first_name", t("admin.contacts.table.first_name"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "company", t("admin.contacts.table.company"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "email", t("admin.contacts.table.email"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "phone", t("admin.contacts.table.phone"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "city", t("admin.contacts.table.city"), url: url, frame: frame %></th>
+                  <th class="px-3 py-2 font-medium text-gray-600"><%= sort_link "country", t("admin.contacts.table.country"), url: url, frame: frame %></th>
                 </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <% @contacts.each do |contact| %>
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-3 py-2">
+                      <input type="checkbox" name="contact_ids[]" value="<%= contact.id %>" form="share_form"
+                             class="rounded border-gray-300 text-navy focus:ring-navy">
+                    </td>
+                    <td class="px-3 py-2 font-medium"><%= contact.last_name %></td>
+                    <td class="px-3 py-2"><%= contact.first_name %></td>
+                    <td class="px-3 py-2"><%= contact.company %></td>
+                    <td class="px-3 py-2"><%= contact.email %></td>
+                    <td class="px-3 py-2"><%= contact.phone %></td>
+                    <td class="px-3 py-2"><%= contact.city %></td>
+                    <td class="px-3 py-2"><%= contact.country %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% end %>
       <% else %>
         <p class="text-gray-500 text-sm"><%= t("admin.property_shares.no_contacts") %> <%= link_to t("admin.property_shares.add_contact"), new_admin_contact_path, class: "text-accent hover:underline" %></p>
       <% end %>

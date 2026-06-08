@@ -4,33 +4,37 @@
     <%= link_to t("admin.contacts.new_action"), new_admin_contact_path, class: "bg-navy text-white px-4 py-2 rounded hover:bg-navy/90" %>
   </div>
 
-  <div class="bg-white rounded shadow overflow-hidden">
-    <table class="w-full text-sm">
-      <thead class="bg-gray-50 text-left">
-        <tr>
-          <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.contacts.table.last_name") %></th>
-          <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.contacts.table.first_name") %></th>
-          <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.contacts.table.company") %></th>
-          <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.contacts.table.email") %></th>
-          <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.contacts.table.phone") %></th>
-          <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.shared.actions") %></th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-100">
-        <% @contacts.each do |contact| %>
-          <tr class="hover:bg-gray-50">
-            <td class="px-4 py-3 font-medium"><%= contact.last_name %></td>
-            <td class="px-4 py-3"><%= contact.first_name %></td>
-            <td class="px-4 py-3 text-gray-500"><%= contact.company %></td>
-            <td class="px-4 py-3 text-gray-500"><%= contact.email %></td>
-            <td class="px-4 py-3 text-gray-500"><%= contact.phone %></td>
-            <td class="px-4 py-3 space-x-2">
-              <%= link_to t("admin.shared.edit"), edit_admin_contact_path(contact), class: "text-accent hover:underline" %>
-              <%= link_to t("admin.shared.delete"), admin_contact_path(contact), data: { turbo_method: :delete, turbo_confirm: t("admin.shared.confirm_delete") }, class: "text-red-600 hover:underline" %>
-            </td>
+  <%= turbo_frame_tag "contacts_table" do %>
+    <% url = admin_contacts_path %>
+    <% frame = "contacts_table" %>
+    <div class="bg-white rounded shadow overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-left">
+          <tr>
+            <th class="px-4 py-3 font-medium text-gray-600"><%= sort_link "last_name", t("admin.contacts.table.last_name"), url: url, frame: frame %></th>
+            <th class="px-4 py-3 font-medium text-gray-600"><%= sort_link "first_name", t("admin.contacts.table.first_name"), url: url, frame: frame %></th>
+            <th class="px-4 py-3 font-medium text-gray-600"><%= sort_link "company", t("admin.contacts.table.company"), url: url, frame: frame %></th>
+            <th class="px-4 py-3 font-medium text-gray-600"><%= sort_link "email", t("admin.contacts.table.email"), url: url, frame: frame %></th>
+            <th class="px-4 py-3 font-medium text-gray-600"><%= sort_link "phone", t("admin.contacts.table.phone"), url: url, frame: frame %></th>
+            <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.shared.actions") %></th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% @contacts.each do |contact| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 font-medium"><%= contact.last_name %></td>
+              <td class="px-4 py-3"><%= contact.first_name %></td>
+              <td class="px-4 py-3 text-gray-500"><%= contact.company %></td>
+              <td class="px-4 py-3 text-gray-500"><%= contact.email %></td>
+              <td class="px-4 py-3 text-gray-500"><%= contact.phone %></td>
+              <td class="px-4 py-3 space-x-2">
+                <%= link_to t("admin.shared.edit"), edit_admin_contact_path(contact), class: "text-accent hover:underline" %>
+                <%= link_to t("admin.shared.delete"), admin_contact_path(contact), data: { turbo_method: :delete, turbo_confirm: t("admin.shared.confirm_delete") }, class: "text-red-600 hover:underline" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
 </div>

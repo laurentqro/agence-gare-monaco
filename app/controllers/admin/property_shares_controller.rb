@@ -1,10 +1,14 @@
 module Admin
   class PropertySharesController < BaseController
+    include Sortable
+
+    SORT_COLUMNS = %w[last_name first_name company email phone city country].freeze
+
     before_action :set_property
 
     def new
       # Sharing is email-only, so only contacts with an email can be selected.
-      @contacts = Contact.where.not(email: nil).order(:last_name, :first_name)
+      @contacts = sort_scope(Contact.where.not(email: nil), columns: SORT_COLUMNS, default: "last_name")
       # decoded returns a SafeBuffer; coerce to a plain String so the view can
       # HTML-escape it into the iframe srcdoc attribute (otherwise the inline
       # style double-quotes truncate the attribute and the preview is blank).

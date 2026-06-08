@@ -1,9 +1,13 @@
 module Admin
   class ContactsController < BaseController
+    include Sortable
+
+    SORT_COLUMNS = %w[last_name first_name company email phone].freeze
+
     before_action :set_contact, only: %i[edit update destroy]
 
     def index
-      @contacts = Contact.order(:last_name, :first_name)
+      @contacts = sort_scope(Contact.all, columns: SORT_COLUMNS, default: "last_name")
     end
 
     def new

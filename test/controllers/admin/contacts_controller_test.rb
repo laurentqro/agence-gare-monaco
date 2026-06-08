@@ -40,6 +40,43 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_select "table tbody tr:first-child td", /Dupont/
   end
 
+  test "GET index sorts by a requested column ascending" do
+    Contact.create!(first_name: "Zoe", last_name: "Martin", email: "b@example.com", company: "Zeta")
+    Contact.create!(first_name: "Amy", last_name: "Dupont", email: "a@example.com", company: "Alpha")
+    get admin_contacts_url(sort: "company", direction: "asc")
+    assert_response :success
+    assert_select "table tbody tr:first-child td", /Alpha/
+  end
+
+  test "GET index sorts by a requested column descending" do
+    Contact.create!(first_name: "Amy", last_name: "Dupont", email: "a@example.com", company: "Alpha")
+    Contact.create!(first_name: "Zoe", last_name: "Martin", email: "b@example.com", company: "Zeta")
+    get admin_contacts_url(sort: "company", direction: "desc")
+    assert_response :success
+    assert_select "table tbody tr:first-child td", /Zeta/
+  end
+
+  test "GET index ignores an unknown sort column (no SQL injection)" do
+    Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@example.com")
+    get admin_contacts_url(sort: "phone); DROP TABLE contacts;--", direction: "asc")
+    assert_response :success
+    assert_select "table tbody tr", 1
+  end
+
+  test "GET index headers are sort links targeting the turbo frame" do
+    get admin_contacts_url
+    assert_response :success
+    assert_select "turbo-frame#contacts_table"
+    assert_select "thead th a[href*='sort=company']"
+  end
+
+  test "GET index table frame can be requested directly via turbo frame" do
+    Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@example.com")
+    get admin_contacts_url, headers: { "Turbo-Frame" => "contacts_table" }
+    assert_response :success
+    assert_select "turbo-frame#contacts_table table tbody tr", 1
+  end
+
   # NEW
   test "GET new renders contact form" do
     get new_admin_contact_url

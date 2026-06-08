@@ -41,9 +41,32 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     # Header row exposes the full contact columns, with name split in two
     ["Nom", "Prénom", "Société", "Email", "Téléphone", "Ville", "Pays"].each do |col|
-      assert_select "table thead th", text: col
+      assert_select "table thead th a", text: /#{Regexp.escape(col)}/
     end
     # One data row per contact
+    assert_select "table tbody tr", 2
+  end
+
+  test "GET new headers are sort links targeting the turbo frame" do
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    assert_select "turbo-frame#share_contacts_table"
+    assert_select "thead th a[href*='sort=company']"
+  end
+
+  test "GET new sorts contacts by a requested column" do
+    Contact.where.not(id: nil).update_all(company: nil)
+    @contact1.update!(company: "Zeta")
+    @contact2.update!(company: "Alpha")
+    get new_admin_property_share_url(@property, sort: "company", direction: "asc")
+    assert_response :success
+    companies = css_select("table tbody td:nth-child(4)").map { |td| td.text.strip }.reject(&:empty?)
+    assert_equal %w[Alpha Zeta], companies
+  end
+
+  test "GET new ignores an unknown sort column" do
+    get new_admin_property_share_url(@property, sort: "evil); DROP TABLE contacts;--")
+    assert_response :success
     assert_select "table tbody tr", 2
   end
 
