@@ -29,7 +29,11 @@
       <% if authenticated? %>
         <aside class="w-64 bg-navy text-white flex flex-col flex-shrink-0">
           <div class="p-4 border-b border-white/10">
-            <a href="<%= admin_root_path %>" class="text-lg font-bold">Agence de la Gare</a>
+            <a href="<%= admin_root_path %>" class="inline-flex items-center">
+              <span class="bg-white rounded-lg p-1.5 inline-flex">
+                <%= image_tag "logo-monogram.png", alt: "Agence Immobilière de la Gare", class: "h-9 w-9" %>
+              </span>
+            </a>
           </div>
           <nav class="flex-1 overflow-y-auto p-4 space-y-1">
             <a href="<%= admin_root_path %>" class="block px-3 py-2 rounded hover:bg-white/10"><%= t("admin.layout.dashboard") %></a>
