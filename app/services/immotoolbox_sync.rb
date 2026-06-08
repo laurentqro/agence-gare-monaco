@@ -135,7 +135,9 @@ class ImmotoolboxSync
         synced_at: Time.current
       )
       property.save!
-      enqueued = property.enqueue_post_save_jobs!
+      # Defer the brochure job: it must be enqueued AFTER images are synced so an
+      # async worker can't regenerate brochures against the old image set.
+      enqueued = property.enqueue_post_save_jobs!(defer_brochure: true)
 
       # Sync images from inline images array. Suppress the per-image brochure
       # enqueue so a property with many images produces one job, not one per
@@ -145,10 +147,10 @@ class ImmotoolboxSync
         sync_property_images(property, images)
       end
 
-      # Enqueue exactly one brochure job per property. Skip if enqueue_post_save_jobs!
-      # already queued one (:brochure) or queued a translation (:translation) that
-      # will regenerate brochures on success.
-      PropertyBrochureGenerationJob.perform_later(property.id) if enqueued.nil?
+      # Now that images are current, enqueue exactly one brochure job per
+      # property. Skip only when a translation job was enqueued — that job
+      # regenerates brochures on success, and it runs after this sync.
+      PropertyBrochureGenerationJob.perform_later(property.id) unless enqueued == :translation
 
       synced_ids << data["id"]
       is_new ? stats[:created] += 1 : stats[:updated] += 1

@@ -286,6 +286,50 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
                  "expected a single brochure job for the property, not one per image"
   end
 
+  test "brochure job is enqueued only after images are synced (no stale image set)" do
+    setup_districts_and_buildings
+    # Same direct-brochure setup as above: metadata changes but FR text does not,
+    # so enqueue_post_save_jobs! takes the :brochure path. The brochure job MUST
+    # be enqueued after sync_property_images so an async worker can't regenerate
+    # with the old image set.
+    prop = Property.create!(
+      reference: "AG-001", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", price: 999_999, immotoolbox_id: 100,
+      num_rooms: 1,
+      title: { "fr" => "Studio Monte-Carlo" },
+      intro: { "fr" => "Vue mer panoramique" },
+      description: { "fr" => "Magnifique studio" }
+    )
+    prop.update_columns(translation_source_hash: "seeded-hash")
+    # Pre-seed a stale image that the API response does NOT include, so it should
+    # be gone by the time the brochure job is enqueued.
+    prop.property_images.create!(immotoolbox_id: 999_999, remote_url: "https://old.example.com/stale.jpg", position: 99)
+    clear_enqueued_jobs
+
+    images_at_enqueue = nil
+    stale_present_at_enqueue = nil
+    target_id = prop.id
+    original = PropertyBrochureGenerationJob.method(:perform_later)
+    PropertyBrochureGenerationJob.define_singleton_method(:perform_later) do |property_id|
+      if property_id == target_id
+        images_at_enqueue = Property.find(target_id).property_images.count
+        stale_present_at_enqueue = PropertyImage.exists?(immotoolbox_id: 999_999, property_id: target_id)
+      end
+      original.call(property_id)
+    end
+    begin
+      ImmotoolboxSync.new(api_token: "test-token").sync_properties
+    ensure
+      PropertyBrochureGenerationJob.singleton_class.send(:remove_method, :perform_later)
+    end
+
+    refute_nil images_at_enqueue, "brochure job should have been enqueued for the property"
+    assert_equal prop.property_images.reload.count, images_at_enqueue,
+                 "image set must be fully synced before the brochure job is enqueued"
+    assert_equal false, stale_present_at_enqueue,
+                 "stale image must be removed before the brochure job is enqueued"
+  end
+
   test "sync updates existing properties" do
     setup_districts_and_buildings
     Property.create!(
