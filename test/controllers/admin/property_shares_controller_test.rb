@@ -54,6 +54,14 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_select "thead th a[href*='sort=company']"
   end
 
+  test "GET new wraps the frame in the selection-preserving controller" do
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    # The controller element must sit OUTSIDE the frame so it survives the
+    # swap on sort, with the frame nested inside it.
+    assert_select "[data-controller='share-selection'] turbo-frame#share_contacts_table"
+  end
+
   test "GET new sorts contacts by a requested column" do
     Contact.where.not(id: nil).update_all(company: nil)
     @contact1.update!(company: "Zeta")

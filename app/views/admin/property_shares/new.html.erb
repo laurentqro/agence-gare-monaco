@@ -6,6 +6,7 @@
       <h2 class="heading-section mb-3"><%= t("admin.property_shares.select_contacts") %></h2>
 
       <% if @contacts.any? %>
+        <div data-controller="share-selection">
         <%= turbo_frame_tag "share_contacts_table" do %>
           <% url = new_admin_property_share_path(@property) %>
           <% frame = "share_contacts_table" %>
@@ -43,6 +44,7 @@
             </table>
           </div>
         <% end %>
+        </div>
       <% else %>
         <p class="text-gray-500 text-sm"><%= t("admin.property_shares.no_contacts") %> <%= link_to t("admin.property_shares.add_contact"), new_admin_contact_path, class: "text-accent hover:underline" %></p>
       <% end %>
