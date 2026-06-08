@@ -21,8 +21,11 @@ Rails.application.configure do
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
-  # Store uploaded files in Hetzner S3-compatible object storage (see config/storage.yml).
-  config.active_storage.service = :hetzner
+  # Store uploaded files on the local disk, backed by the persistent Docker
+  # volume mounted at /rails/storage (see config/deploy.yml). The OVH host has
+  # no S3-compatible object storage, and brochures/documents are streamed via
+  # send_data rather than redirected to a blob URL, so Disk serves fine.
+  config.active_storage.service = :local
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = true
