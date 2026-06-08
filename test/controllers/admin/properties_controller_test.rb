@@ -305,6 +305,16 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "Biens"
   end
 
+  # URL path
+  test "admin properties are served under /admin/biens" do
+    assert_equal "/admin/biens", admin_properties_path
+  end
+
+  test "admin property member path uses biens segment" do
+    prop = create_property
+    assert_equal "/admin/biens/#{prop.id}", admin_property_path(prop)
+  end
+
   private
 
   def property_params
