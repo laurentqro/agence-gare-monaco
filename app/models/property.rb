@@ -102,12 +102,21 @@ class Property < ApplicationRecord
 
   # The translation job enqueues brochure regen itself on success, so the
   # brochure branch only fires when translations aren't being re-run.
-  def enqueue_post_save_jobs!
+  # Returns a symbol naming what is needed (:translation, :brochure, or nil).
+  #
+  # Pass defer_brochure: true when the caller will sync images afterwards and
+  # must enqueue the brochure job itself once images are current (otherwise an
+  # async worker could regenerate brochures against a stale image set). In that
+  # mode the :brochure branch returns its symbol WITHOUT enqueuing, leaving the
+  # caller responsible for the brochure job.
+  def enqueue_post_save_jobs!(defer_brochure: false)
     text_changed = saved_changes.keys.intersect?(%w[title intro description])
     if text_changed || translation_source_hash.nil?
       PropertyTranslationJob.perform_later(id)
+      :translation
     elsif saved_changes.keys.intersect?(BROCHURE_TRIGGER_COLUMNS)
-      PropertyBrochureGenerationJob.perform_later(id)
+      PropertyBrochureGenerationJob.perform_later(id) unless defer_brochure
+      :brochure
     end
   end
 end
