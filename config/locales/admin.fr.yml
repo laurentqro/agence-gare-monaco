@@ -7,6 +7,7 @@ fr:
       articles: "Articles"
       categories: "Catégories"
       contacts: "Contacts"
+      contact_submissions: "Demandes"
       logout: "Déconnexion"
     sessions:
       title: "Administration"
@@ -25,6 +26,7 @@ fr:
         new_contact: "Ajouter un contact"
         all_properties: "Voir tous les biens"
         all_contacts: "Voir tous les contacts"
+        contact_submissions: "Demandes de renseignements"
     shared:
       edit: "Modifier"
       view: "Voir"
@@ -133,6 +135,31 @@ fr:
         created: "Contact créé."
         updated: "Contact mis à jour."
         deleted: "Contact supprimé."
+    contact_submissions:
+      title: "Demandes de renseignements"
+      empty: "Aucune demande pour le moment."
+      unread: "Non lue"
+      filters:
+        all: "Toutes"
+        unread: "Non lues"
+        enquiry: "Bien"
+        contact: "Contact"
+      table:
+        type: "Type"
+        name: "Nom"
+        email: "Email"
+        subject: "Objet"
+        date: "Date"
+      detail:
+        phone: "Téléphone"
+        country: "Pays"
+        property: "Bien concerné"
+        message: "Message"
+      actions:
+        mark_unread: "Marquer comme non lue"
+      flash:
+        updated: "Demande mise à jour."
+        deleted: "Demande supprimée."
     properties:
       title: "Biens"
       new: "Nouveau bien"
