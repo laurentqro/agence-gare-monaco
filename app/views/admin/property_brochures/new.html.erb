@@ -21,7 +21,7 @@
     </table>
   </div>
 
-  <%= form_with(url: admin_property_brochure_path(@property), method: :post, class: "space-y-6") do |f| %>
+  <%= form_with(url: admin_property_brochure_path(@property), method: :post, class: "space-y-6", data: { turbo: false }) do |f| %>
     <div class="bg-white rounded shadow p-6">
       <h2 class="heading-section mb-3"><%= t("admin.property_brochures.options") %></h2>
 

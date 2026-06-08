@@ -61,6 +61,14 @@ class Admin::PropertyBrochuresControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type='checkbox'][name='include_logo']"
   end
 
+  test "GET new form opts out of Turbo so the PDF download reaches the browser" do
+    # The create action streams a PDF attachment; Turbo would intercept the
+    # response and silently drop it, so the form must do a native submit.
+    get new_admin_property_brochure_url(@property)
+    assert_response :success
+    assert_select "form[data-turbo='false']"
+  end
+
   # CREATE (generate PDF)
   test "POST create returns PDF with correct content type" do
     post admin_property_brochure_url(@property), params: { locale: "fr" }
