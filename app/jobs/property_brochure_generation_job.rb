@@ -1,6 +1,11 @@
 class PropertyBrochureGenerationJob < ApplicationJob
   queue_as :default
 
+  # Many jobs for one property are enqueued during a sync (one per saved image).
+  # Serialize them per property so the purge+attach sequence can't interleave and
+  # collide on the active_storage_attachments UNIQUE index (RecordNotUnique).
+  limits_concurrency to: 1, key: ->(property_id) { property_id }
+
   LOCALES = %i[fr en it de sv no da fi ru].freeze
   LOGO_VARIANTS = [ true, false ].freeze
 

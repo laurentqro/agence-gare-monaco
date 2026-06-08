@@ -53,6 +53,23 @@ class PropertyBrochureGenerationJobTest < ActiveJob::TestCase
       PropertyBrochureGenerationJob.perform_now(-1)
     end
   end
+
+  test "serializes concurrent runs per property to avoid attachment races" do
+    # Many jobs for the same property are enqueued during a sync (one per saved
+    # PropertyImage). Without per-property concurrency control they interleave
+    # purge+attach and collide on the active_storage_attachments UNIQUE index,
+    # raising ActiveRecord::RecordNotUnique. The concurrency key must be scoped
+    # to the property so only one runs at a time and the rest queue.
+    assert_equal 1, PropertyBrochureGenerationJob.concurrency_limit,
+                 "expected per-property serialization (concurrency limit 1)"
+
+    # The instance #concurrency_key computes the final key string from the
+    # configured proc and the job arguments.
+    key = PropertyBrochureGenerationJob.new(@property.id).concurrency_key
+    assert key.present?, "expected a concurrency key scoped to the property"
+    assert_includes key.to_s, @property.id.to_s,
+                    "concurrency key must include the property id so distinct properties run in parallel"
+  end
 end
 
 unless PropertyPdfGenerator.respond_to?(:stub_any_instance)
