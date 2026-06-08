@@ -159,6 +159,16 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type='search'][name='q']"
   end
 
+  test "GET new highlights the active filter tab inside the frame" do
+    Contact.create!(last_name: "Confrère", company: "Agency", email: "peer@agency.mc", peer: true)
+    get new_admin_property_share_url(@property, filter: "peers")
+    assert_response :success
+    # Tabs live inside the frame so the active highlight tracks the filter
+    # while preserving checkbox selection across swaps.
+    assert_select "turbo-frame#share_contacts_table nav a[href*='filter=peers'].bg-navy"
+    assert_select "turbo-frame#share_contacts_table nav a[href*='filter=contacts'].bg-navy", false
+  end
+
   test "GET new filters to peers only" do
     peer = Contact.create!(last_name: "Confrère", company: "Agency", email: "peer@agency.mc", peer: true)
     get new_admin_property_share_url(@property, filter: "peers")

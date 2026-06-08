@@ -130,6 +130,29 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href*='filter=contacts']"
   end
 
+  test "GET index tabs drive a full-page navigation, not a frame swap" do
+    # The tab bar lives outside the turbo frame, so it must navigate the whole
+    # page; otherwise the active highlight never moves off "Tous".
+    get admin_contacts_url
+    assert_response :success
+    assert_select "nav a[data-turbo-frame='_top'][href*='filter=peers']"
+  end
+
+  test "GET index highlights the active filter tab" do
+    get admin_contacts_url(filter: "peers")
+    assert_response :success
+    # The active tab carries the navy highlight; inactive ones do not.
+    assert_select "nav a[href*='filter=peers'].bg-navy"
+    assert_select "nav a[href*='filter=contacts'].bg-navy", false
+  end
+
+  test "GET index highlights Tous when no filter is set" do
+    get admin_contacts_url
+    assert_response :success
+    # The "Tous" tab links back to the bare index (no filter param).
+    assert_select "nav a.bg-navy", text: /Tous/
+  end
+
   test "GET index renders a search field" do
     get admin_contacts_url
     assert_response :success

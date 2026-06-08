@@ -15,7 +15,7 @@
       <% tabs.each do |value, label, count| %>
         <% active = @filter == value %>
         <%= link_to admin_contacts_path({ filter: value, q: @query }.compact_blank),
-              data: { turbo_frame: "contacts_table" },
+              data: { turbo_frame: "_top" },
               class: "px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 #{active ? "bg-navy text-white" : "text-gray-600 hover:text-navy"}" do %>
           <%= label %>
           <span class="text-xs <%= active ? "text-white/80" : "text-gray-400" %>"><%= count %></span>
@@ -23,11 +23,11 @@
       <% end %>
     </nav>
 
-    <%= form_with url: admin_contacts_path, method: :get, data: { turbo_frame: "contacts_table" }, class: "relative" do |f| %>
+    <%= form_with url: admin_contacts_path, method: :get, data: { turbo_frame: "_top" }, class: "relative w-full sm:w-80" do |f| %>
       <%= f.hidden_field :filter, value: @filter %>
       <%= f.search_field :q, value: @query, placeholder: t("admin.contacts.search_placeholder"),
-            class: "w-64 rounded-lg border border-gray-200 pl-9 pr-3 py-2 text-sm focus:border-navy focus:ring-navy" %>
-      <svg class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class: "w-full rounded-lg border border-gray-300 bg-gray-50 pl-10 pr-3 py-2.5 text-sm shadow-sm placeholder:text-gray-400 focus:bg-white focus:border-navy focus:ring-2 focus:ring-navy/30" %>
+      <svg class="absolute left-3 top-3 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
       </svg>
     <% end %>

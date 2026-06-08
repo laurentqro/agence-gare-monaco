@@ -1,44 +1,46 @@
 <div class="p-8">
   <h1 class="heading-page mb-6"><%= t("admin.property_shares.title") %></h1>
 
-  <% tabs = [
-       [nil, t("admin.contacts.filters.all"), @counts[:all]],
-       ["contacts", t("admin.contacts.filters.contacts"), @counts[:contacts]],
-       ["peers", t("admin.contacts.filters.peers"), @counts[:peers]]
-     ] %>
+  <%= form_with(url: admin_property_share_path(@property), method: :post, id: "share_form") do |f| %><% end %>
 
-  <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-    <nav class="inline-flex rounded-lg border border-gray-200 bg-white p-1 text-sm">
-      <% tabs.each do |value, label, count| %>
-        <% active = @filter == value %>
-        <%= link_to new_admin_property_share_path(@property, { filter: value, q: @query }.compact_blank),
-              data: { turbo_frame: "share_contacts_table" },
-              class: "px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 #{active ? "bg-navy text-white" : "text-gray-600 hover:text-navy"}" do %>
-          <%= label %>
-          <span class="text-xs <%= active ? "text-white/80" : "text-gray-400" %>"><%= count %></span>
-        <% end %>
-      <% end %>
-    </nav>
+  <div class="bg-white rounded shadow p-6">
+    <h2 class="heading-section mb-3"><%= t("admin.property_shares.select_contacts") %></h2>
 
-    <%= form_with url: new_admin_property_share_path(@property), method: :get, data: { turbo_frame: "share_contacts_table" }, class: "relative" do |sf| %>
-      <%= sf.hidden_field :filter, value: @filter %>
-      <%= sf.search_field :q, value: @query, placeholder: t("admin.contacts.search_placeholder"),
-            class: "w-64 rounded-lg border border-gray-200 pl-9 pr-3 py-2 text-sm focus:border-navy focus:ring-navy" %>
-      <svg class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
-      </svg>
-    <% end %>
-  </div>
+    <% if @counts[:all].positive? %>
+      <div data-controller="share-selection">
+      <%= turbo_frame_tag "share_contacts_table" do %>
+        <% url = new_admin_property_share_path(@property) %>
+        <% frame = "share_contacts_table" %>
+        <% tabs = [
+             [nil, t("admin.contacts.filters.all"), @counts[:all]],
+             ["contacts", t("admin.contacts.filters.contacts"), @counts[:contacts]],
+             ["peers", t("admin.contacts.filters.peers"), @counts[:peers]]
+           ] %>
 
-  <%= form_with(url: admin_property_share_path(@property), method: :post, id: "share_form", class: "space-y-6") do |f| %>
-    <div class="bg-white rounded shadow p-6">
-      <h2 class="heading-section mb-3"><%= t("admin.property_shares.select_contacts") %></h2>
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <nav class="inline-flex rounded-lg border border-gray-200 bg-white p-1 text-sm">
+            <% tabs.each do |value, label, count| %>
+              <% active = @filter == value %>
+              <%= link_to new_admin_property_share_path(@property, { filter: value, q: @query }.compact_blank),
+                    data: { turbo_frame: frame },
+                    class: "px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 #{active ? "bg-navy text-white" : "text-gray-600 hover:text-navy"}" do %>
+                <%= label %>
+                <span class="text-xs <%= active ? "text-white/80" : "text-gray-400" %>"><%= count %></span>
+              <% end %>
+            <% end %>
+          </nav>
 
-      <% if @contacts.any? %>
-        <div data-controller="share-selection">
-        <%= turbo_frame_tag "share_contacts_table" do %>
-          <% url = new_admin_property_share_path(@property) %>
-          <% frame = "share_contacts_table" %>
+          <%= form_with url: new_admin_property_share_path(@property), method: :get, data: { turbo_frame: frame }, class: "relative w-full sm:w-80" do |sf| %>
+            <%= sf.hidden_field :filter, value: @filter %>
+            <%= sf.search_field :q, value: @query, placeholder: t("admin.contacts.search_placeholder"),
+                  class: "w-full rounded-lg border border-gray-300 bg-gray-50 pl-10 pr-3 py-2.5 text-sm shadow-sm placeholder:text-gray-400 focus:bg-white focus:border-navy focus:ring-2 focus:ring-navy/30" %>
+            <svg class="absolute left-3 top-3 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+            </svg>
+          <% end %>
+        </div>
+
+        <% if @contacts.any? %>
           <div class="overflow-x-auto border border-gray-200 rounded">
             <table class="w-full text-sm">
               <thead class="bg-gray-50 text-left">
@@ -80,18 +82,20 @@
               </tbody>
             </table>
           </div>
+        <% else %>
+          <p class="text-gray-500 text-sm"><%= t("admin.property_shares.no_results") %></p>
         <% end %>
-        </div>
-      <% else %>
-        <p class="text-gray-500 text-sm"><%= t("admin.property_shares.no_contacts") %> <%= link_to t("admin.property_shares.add_contact"), new_admin_contact_path, class: "text-accent hover:underline" %></p>
       <% end %>
-    </div>
+      </div>
+    <% else %>
+      <p class="text-gray-500 text-sm"><%= t("admin.property_shares.no_contacts") %> <%= link_to t("admin.property_shares.add_contact"), new_admin_contact_path, class: "text-accent hover:underline" %></p>
+    <% end %>
+  </div>
 
-    <div class="flex gap-3">
-      <%= f.submit t("admin.property_shares.send_email"), class: "bg-navy text-white px-4 py-2 rounded hover:bg-navy/90 cursor-pointer" %>
-      <%= link_to t("admin.shared.cancel"), admin_contacts_path, class: "px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50" %>
-    </div>
-  <% end %>
+  <div class="flex gap-3 mt-6">
+    <%= submit_tag t("admin.property_shares.send_email"), form: "share_form", class: "bg-navy text-white px-4 py-2 rounded hover:bg-navy/90 cursor-pointer" %>
+    <%= link_to t("admin.shared.cancel"), admin_contacts_path, class: "px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50" %>
+  </div>
 
   <div class="bg-white rounded shadow p-6 mt-6">
     <h2 class="heading-section mb-3"><%= t("admin.property_shares.email_preview") %></h2>
