@@ -99,9 +99,12 @@ fr:
       table:
         last_name: "Nom"
         first_name: "Prénom"
+        name: "Nom"
         company: "Société"
         email: "Email"
         phone: "Téléphone"
+        city: "Ville"
+        country: "Pays"
       form:
         first_name: "Prénom"
         last_name: "Nom"
@@ -226,6 +229,7 @@ fr:
       no_contacts: "Aucun contact pour le moment."
       add_contact: "Ajouter un contact"
       send_email: "Envoyer par email"
+      select_column: "Sélection"
       flash:
         shared: "Bien partagé avec %{count} contacts."
         no_contacts_selected: "Veuillez sélectionner au moins un contact."

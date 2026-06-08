@@ -3,7 +3,8 @@ module Admin
     before_action :set_property
 
     def new
-      @contacts = Contact.order(:last_name, :first_name)
+      # Sharing is email-only, so only contacts with an email can be selected.
+      @contacts = Contact.where.not(email: nil).order(:last_name, :first_name)
       # decoded returns a SafeBuffer; coerce to a plain String so the view can
       # HTML-escape it into the iframe srcdoc attribute (otherwise the inline
       # style double-quotes truncate the attribute and the preview is blank).

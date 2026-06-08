@@ -6,16 +6,36 @@
       <h2 class="heading-section mb-3"><%= t("admin.property_shares.select_contacts") %></h2>
 
       <% if @contacts.any? %>
-        <div class="space-y-2">
-          <% @contacts.each do |contact| %>
-            <label class="flex items-center gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer">
-              <input type="checkbox" name="contact_ids[]" value="<%= contact.id %>" class="rounded border-gray-300 text-navy focus:ring-navy">
-              <span class="text-sm">
-                <span class="font-medium"><%= contact.first_name %> <%= contact.last_name %></span>
-                <span class="text-gray-500">— <%= contact.email %></span>
-              </span>
-            </label>
-          <% end %>
+        <div class="overflow-x-auto border border-gray-200 rounded">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50 text-left">
+              <tr>
+                <th class="px-3 py-2 font-medium text-gray-600 w-10"><span class="sr-only"><%= t("admin.property_shares.select_column") %></span></th>
+                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.name") %></th>
+                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.company") %></th>
+                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.email") %></th>
+                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.phone") %></th>
+                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.city") %></th>
+                <th class="px-3 py-2 font-medium text-gray-600"><%= t("admin.contacts.table.country") %></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <% @contacts.each do |contact| %>
+                <tr class="hover:bg-gray-50">
+                  <td class="px-3 py-2">
+                    <input type="checkbox" name="contact_ids[]" value="<%= contact.id %>"
+                           class="rounded border-gray-300 text-navy focus:ring-navy">
+                  </td>
+                  <td class="px-3 py-2 font-medium"><%= [contact.first_name, contact.last_name].compact_blank.join(" ") %></td>
+                  <td class="px-3 py-2"><%= contact.company %></td>
+                  <td class="px-3 py-2"><%= contact.email %></td>
+                  <td class="px-3 py-2"><%= contact.phone %></td>
+                  <td class="px-3 py-2"><%= contact.city %></td>
+                  <td class="px-3 py-2"><%= contact.country %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
         </div>
       <% else %>
         <p class="text-gray-500 text-sm"><%= t("admin.property_shares.no_contacts") %> <%= link_to t("admin.property_shares.add_contact"), new_admin_contact_path, class: "text-accent hover:underline" %></p>

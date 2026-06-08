@@ -36,6 +36,40 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type='checkbox'][name='contact_ids[]']", 2
   end
 
+  test "GET new lists contacts in a table with all columns" do
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    # Header row exposes the full contact columns
+    %w[Nom Société Email Téléphone Ville Pays].each do |col|
+      assert_select "table thead th", text: /#{col}/
+    end
+    # One data row per contact
+    assert_select "table tbody tr", 2
+  end
+
+  test "GET new shows the full details of a rich contact row" do
+    Contact.create!(
+      first_name: "Anna", last_name: "Berg", company: "Acme SCI",
+      email: "anna@example.com", phone: "+377 99 00", city: "Monaco", country: "Monaco"
+    )
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    assert_select "table tbody td", text: /Acme SCI/
+    assert_select "table tbody td", text: /\+377 99 00/
+    assert_select "table tbody td", text: /Monaco/
+  end
+
+  test "GET new only lists contacts that have an email" do
+    no_email = Contact.create!(first_name: "Sans", last_name: "Email", phone: "0600000000")
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    # Email-less contacts are excluded entirely (sharing is email-only)
+    assert_select "input[type='checkbox'][value='#{no_email.id}']", 0
+    assert_select "input[type='checkbox'][value='#{@contact1.id}']", 1
+    # Only the two seeded contacts (both have emails) appear
+    assert_select "table tbody tr", 2
+  end
+
   test "GET new shows email preview with property details" do
     get new_admin_property_share_url(@property)
     assert_response :success
@@ -70,8 +104,8 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
   test "GET new lists all contacts with checkboxes" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_select "label", /Jean Dupont/
-    assert_select "label", /Pierre Martin/
+    assert_select "table tbody td", /Jean Dupont/
+    assert_select "table tbody td", /Pierre Martin/
   end
 
   # CREATE (send sharing emails)
