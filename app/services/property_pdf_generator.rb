@@ -1,3 +1,5 @@
+require "open-uri"
+
 class PropertyPdfGenerator
   NAVY = "#090956"
   ACCENT = "#6E8297"

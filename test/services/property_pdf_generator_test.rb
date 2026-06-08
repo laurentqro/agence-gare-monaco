@@ -248,6 +248,32 @@ class PropertyPdfGeneratorTest < ActiveSupport::TestCase
     assert pdf_bytes.start_with?("%PDF")
   end
 
+  test "loads open-uri so image fetching works in a clean process" do
+    # In a bare process (e.g. the background brochure job) open-uri is not
+    # loaded, so URI::HTTPS#open is private and every image fetch silently
+    # fails — producing brochures with no property images. The generator must
+    # require open-uri itself rather than rely on it being loaded ambiently.
+    source = File.read(Rails.root.join("app/services/property_pdf_generator.rb"))
+    assert_match(/require ["']open-uri["']/, source,
+      "PropertyPdfGenerator must require 'open-uri' or image fetching fails in a clean process")
+  end
+
+  test "embeds the cover photo as the hero image" do
+    # 1×1 white PNG (valid CRC) so Typst can actually decode it.
+    png_bytes = [ "89504e470d0a1a0a0000000d49484452000000010000000108000000003a7e9b550000000a49444154789c63fa0f0001050102cfa02ecd0000000049454e44ae426082" ].pack("H*")
+    stub_request(:get, "https://example.com/cover.png")
+      .to_return(status: 200, body: png_bytes, headers: { "Content-Type" => "image/png" })
+
+    @property.property_images.create!(remote_url: "https://example.com/cover.png", position: 0)
+
+    generator = PropertyPdfGenerator.new(@property, locale: :fr)
+    generator.generate
+    dependencies = generator.instance_variable_get(:@dependencies)
+
+    assert dependencies.keys.any? { |k| k.start_with?("hero.") },
+      "expected the cover photo to be embedded as the hero image, got: #{dependencies.keys.inspect}"
+  end
+
   test "includes district name in details" do
     pdf_bytes = PropertyPdfGenerator.new(@property, locale: :fr).generate
     text = extract_text(pdf_bytes)
