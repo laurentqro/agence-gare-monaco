@@ -4,11 +4,11 @@ image: laurentqro/agence-gare-monaco
 
 servers:
   web:
-    - 46.225.227.128
+    - 100.111.226.59
 
 proxy:
   ssl: true
-  host: curau.dev
+  host: dev.agencegaremonaco.com
 
 registry:
   server: ghcr.io
@@ -21,7 +21,7 @@ env:
     - RAILS_MASTER_KEY
   clear:
     SOLID_QUEUE_IN_PUMA: true
-    SITE_HOST: https://curau.dev
+    SITE_HOST: https://dev.agencegaremonaco.com
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"
@@ -36,5 +36,8 @@ volumes:
 asset_path: /rails/public/assets
 
 builder:
-  remote: ssh://root@46.225.227.128
+  remote: ssh://ubuntu@100.111.226.59
   arch: amd64
+
+ssh:
+  user: ubuntu
