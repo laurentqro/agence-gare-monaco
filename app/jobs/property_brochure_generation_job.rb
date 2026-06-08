@@ -4,7 +4,9 @@ class PropertyBrochureGenerationJob < ApplicationJob
   # Many jobs for one property are enqueued during a sync (one per saved image).
   # Serialize them per property so the purge+attach sequence can't interleave and
   # collide on the active_storage_attachments UNIQUE index (RecordNotUnique).
-  limits_concurrency to: 1, key: ->(property_id) { property_id }
+  # duration must exceed the worst-case run (18 PDFs) so the lock can't expire
+  # mid-run and let a second job in; the Solid Queue default is only 3 minutes.
+  limits_concurrency to: 1, key: ->(property_id) { property_id }, duration: 15.minutes
 
   LOCALES = %i[fr en it de sv no da fi ru].freeze
   LOGO_VARIANTS = [ true, false ].freeze

@@ -70,6 +70,14 @@ class PropertyBrochureGenerationJobTest < ActiveJob::TestCase
     assert_includes key.to_s, @property.id.to_s,
                     "concurrency key must include the property id so distinct properties run in parallel"
   end
+
+  test "concurrency lock outlasts a full brochure generation run" do
+    # The lock duration must exceed the worst-case run time (18 PDFs) so the
+    # semaphore can't expire mid-run and let a second job in, reopening the
+    # race. The Solid Queue default is only 3 minutes; pin it explicitly.
+    assert_operator PropertyBrochureGenerationJob.concurrency_duration, :>=, 10.minutes,
+                    "expected an explicit concurrency duration well above worst-case run time"
+  end
 end
 
 unless PropertyPdfGenerator.respond_to?(:stub_any_instance)
