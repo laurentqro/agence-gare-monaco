@@ -33,14 +33,16 @@
             </td>
             <td class="px-4 py-3 align-middle whitespace-nowrap">
               <% transaction_classes = property.transaction_type.to_s == "rental" ? "bg-amber-50 text-amber-700" : "bg-sky-50 text-sky-700" %>
-              <span class="inline-block rounded px-1.5 py-0.5 text-xs font-medium <%= transaction_classes %>"><%= admin_transaction_label(property) %></span>
-              <div class="text-gray-500 text-xs mt-1"><%= admin_property_type_only_label(property) %></div>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="inline-block rounded px-1.5 py-0.5 text-xs font-medium <%= transaction_classes %>"><%= admin_transaction_label(property) %></span>
+                <span class="text-gray-500 text-xs"><%= admin_property_type_only_label(property) %></span>
+              </span>
             </td>
             <td class="px-4 py-3 align-middle text-right font-semibold text-gray-800 tabular-nums whitespace-nowrap">
               <%= property.formatted_price ? "#{property.formatted_price} €" : "—" %>
             </td>
             <td class="px-4 py-3 align-middle">
-              <div class="flex flex-wrap items-center gap-1">
+              <div class="flex items-center gap-1 whitespace-nowrap">
                 <% if property.published? %>
                   <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full"><span class="h-1.5 w-1.5 rounded-full bg-green-500"></span><%= t("admin.properties.published") %></span>
                 <% else %>
