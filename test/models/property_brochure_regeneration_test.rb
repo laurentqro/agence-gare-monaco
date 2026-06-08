@@ -43,4 +43,30 @@ class PropertyBrochureRegenerationTest < ActiveJob::TestCase
       image.destroy!
     end
   end
+
+  test "image saves inside suppress_brochure_generation do not enqueue the job" do
+    property = build_property
+    property.save!
+
+    assert_no_enqueued_jobs(only: PropertyBrochureGenerationJob) do
+      PropertyImage.suppress_brochure_generation do
+        property.property_images.create!(remote_url: "https://example.com/a.jpg", position: 1)
+        property.property_images.create!(remote_url: "https://example.com/b.jpg", position: 2)
+      end
+    end
+  end
+
+  test "suppression is reset after the block even when it raises" do
+    property = build_property
+    property.save!
+
+    assert_raises(RuntimeError) do
+      PropertyImage.suppress_brochure_generation { raise "boom" }
+    end
+
+    # Callback works normally again afterwards.
+    assert_enqueued_with(job: PropertyBrochureGenerationJob, args: [ property.id ]) do
+      property.property_images.create!(remote_url: "https://example.com/c.jpg", position: 1)
+    end
+  end
 end

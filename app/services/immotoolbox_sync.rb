@@ -135,11 +135,20 @@ class ImmotoolboxSync
         synced_at: Time.current
       )
       property.save!
-      property.enqueue_post_save_jobs!
+      enqueued = property.enqueue_post_save_jobs!
 
-      # Sync images from inline images array
+      # Sync images from inline images array. Suppress the per-image brochure
+      # enqueue so a property with many images produces one job, not one per
+      # image, then enqueue a single brochure job below.
       images = data["images"] || []
-      sync_property_images(property, images)
+      PropertyImage.suppress_brochure_generation do
+        sync_property_images(property, images)
+      end
+
+      # Enqueue exactly one brochure job per property. Skip if enqueue_post_save_jobs!
+      # already queued one (:brochure) or queued a translation (:translation) that
+      # will regenerate brochures on success.
+      PropertyBrochureGenerationJob.perform_later(property.id) if enqueued.nil?
 
       synced_ids << data["id"]
       is_new ? stats[:created] += 1 : stats[:updated] += 1

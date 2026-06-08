@@ -256,6 +256,36 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     assert_equal true, plan.is_plan
   end
 
+  test "sync enqueues exactly one brochure job per property despite multiple images" do
+    setup_districts_and_buildings
+    # Seed an existing property whose FR text matches the API (so no translation
+    # job) but whose metadata changes, forcing the direct-brochure path. This
+    # isolates the per-image dedup: the property has multiple images in the API
+    # response, but only one brochure job should result.
+    prop = Property.create!(
+      reference: "AG-001", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", price: 999_999, immotoolbox_id: 100,
+      num_rooms: 1,
+      title: { "fr" => "Studio Monte-Carlo" },
+      intro: { "fr" => "Vue mer panoramique" },
+      description: { "fr" => "Magnifique studio" }
+    )
+    prop.update_columns(translation_source_hash: "seeded-hash")
+    clear_enqueued_jobs
+
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+
+    prop.reload
+    assert_operator prop.property_images.count, :>, 1,
+                    "fixture should have multiple images to make the dedup meaningful"
+
+    brochure_jobs = enqueued_jobs.select do |j|
+      j[:job] == PropertyBrochureGenerationJob && j[:args] == [ prop.id ]
+    end
+    assert_equal 1, brochure_jobs.size,
+                 "expected a single brochure job for the property, not one per image"
+  end
+
   test "sync updates existing properties" do
     setup_districts_and_buildings
     Property.create!(

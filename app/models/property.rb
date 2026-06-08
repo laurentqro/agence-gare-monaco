@@ -102,12 +102,16 @@ class Property < ApplicationRecord
 
   # The translation job enqueues brochure regen itself on success, so the
   # brochure branch only fires when translations aren't being re-run.
+  # Returns a symbol naming what was enqueued (:translation, :brochure, or nil)
+  # so bulk callers can avoid enqueuing a duplicate brochure job.
   def enqueue_post_save_jobs!
     text_changed = saved_changes.keys.intersect?(%w[title intro description])
     if text_changed || translation_source_hash.nil?
       PropertyTranslationJob.perform_later(id)
+      :translation
     elsif saved_changes.keys.intersect?(BROCHURE_TRIGGER_COLUMNS)
       PropertyBrochureGenerationJob.perform_later(id)
+      :brochure
     end
   end
 end
