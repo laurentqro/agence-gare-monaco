@@ -80,18 +80,18 @@
                       <%= @property.title_for(:fr) %>
                     </h1>
 
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0; padding-top:20px;">&nbsp;</td></tr>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
+                      <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0;">&nbsp;</td></tr>
                     </table>
 
                     <!-- stats strip -->
                     <% if stats.any? %>
-                    <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:22px auto 0;">
+                    <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
                       <tr>
                         <% stats.each do |value, label| %>
                           <td align="center" style="padding:0 14px; font-family:Arial, Helvetica, sans-serif; color:#ffffff;" valign="top">
-                            <div style="font-size:18px; font-weight:bold; line-height:1.2;"><%= value %></div>
-                            <div style="font-size:11px; color:rgba(255,255,255,0.65); text-transform:uppercase; letter-spacing:0.04em; margin-top:4px;"><%= label %></div>
+                            <div style="font-size:11px; color:rgba(255,255,255,0.65); text-transform:uppercase; letter-spacing:0.04em;"><%= label %></div>
+                            <div style="font-size:18px; font-weight:bold; line-height:1.2; margin-top:4px;"><%= value %></div>
                           </td>
                         <% end %>
                       </tr>
@@ -101,21 +101,21 @@
                     <!-- intro -->
                     <% if @property.intro_for(:fr).present? %>
                       <% if stats.any? %>
-                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                        <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0; padding-top:22px;">&nbsp;</td></tr>
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
+                        <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0;">&nbsp;</td></tr>
                       </table>
                       <% end %>
-                      <p style="margin:20px 0 0; font-family:Arial, Helvetica, sans-serif; color:rgba(255,255,255,0.88); font-size:14px; line-height:1.7; text-align:center;">
+                      <p style="margin:0; font-family:Arial, Helvetica, sans-serif; color:rgba(255,255,255,0.88); font-size:14px; line-height:1.7; text-align:center;">
                         <%= @property.intro_for(:fr) %>
                       </p>
                     <% end %>
 
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0; padding-top:26px;">&nbsp;</td></tr>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
+                      <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0;">&nbsp;</td></tr>
                     </table>
 
                     <!-- CTA button -->
-                    <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:26px auto 0;">
+                    <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
                       <tr>
                         <td align="center" style="background-color:#ffffff;">
                           <a href="<%= property_url %>"
