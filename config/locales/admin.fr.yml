@@ -99,14 +99,23 @@ fr:
       table:
         last_name: "Nom"
         first_name: "Prénom"
+        company: "Société"
         email: "Email"
         phone: "Téléphone"
       form:
         first_name: "Prénom"
         last_name: "Nom"
+        company: "Société"
         email: "Email"
         phone: "Téléphone"
         phone_placeholder: "Facultatif"
+        address: "Adresse"
+        city: "Ville"
+        postcode: "Code postal"
+        country: "Pays"
+        notes: "Commentaires"
+        contact_details: "Coordonnées"
+        location: "Localisation"
         create: "Créer le contact"
         update: "Mettre à jour le contact"
       flash:

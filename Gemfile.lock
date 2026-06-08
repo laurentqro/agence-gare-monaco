@@ -137,6 +137,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
+    csv (3.3.5)
     date (3.5.1)
     debug (1.11.1)
       irb (~> 1.10)
@@ -502,6 +503,7 @@ DEPENDENCIES
   bundler-audit
   capybara
   commonmarker
+  csv
   debug
   image_processing (~> 2.0)
   importmap-rails

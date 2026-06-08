@@ -1,0 +1,7 @@
+"id","firstname","lastname","company","address","city","zipcode","country","email","telephone","comments","reference","building","date","ip","type","visit_id","request_id","admin_id"
+"10","Tanguy","Anders","","12 rue de la Gare","Monaco","98000","Monaco","tanguy@example.com","+377 99 00 11 22","Recherche 3 pièces","REF-10","","2020-01-01","","","0","0","1"
+"11","Raphael","Espagnol","","","Monaco","","","","0631874206","","","","2020-02-02","","","0","0","1"
+"12","","","Consulat de Belgique","","","","Monaco","consulat@example.mc","+377 97 97 11 02","","","","2020-03-03","","","0","0","1"
+"13","  Meloni  ","Meloni","","","","","","","0607939300","  Recherche 2 ou 3p loc ou achat  ","","","2020-04-04","","","0","0","1"
+"14","","","","12 rue Vide","Nice","","","","","","","","2020-05-05","","","0","0","1"
+"15","Anna","Berg","Acme SCI","","","","Sweden","ANNA@EXAMPLE.COM","","","","","2020-06-06","","","0","0","1"

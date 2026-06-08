@@ -10,6 +10,7 @@
         <tr>
           <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.contacts.table.last_name") %></th>
           <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.contacts.table.first_name") %></th>
+          <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.contacts.table.company") %></th>
           <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.contacts.table.email") %></th>
           <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.contacts.table.phone") %></th>
           <th class="px-4 py-3 font-medium text-gray-600"><%= t("admin.shared.actions") %></th>
@@ -20,6 +21,7 @@
           <tr class="hover:bg-gray-50">
             <td class="px-4 py-3 font-medium"><%= contact.last_name %></td>
             <td class="px-4 py-3"><%= contact.first_name %></td>
+            <td class="px-4 py-3 text-gray-500"><%= contact.company %></td>
             <td class="px-4 py-3 text-gray-500"><%= contact.email %></td>
             <td class="px-4 py-3 text-gray-500"><%= contact.phone %></td>
             <td class="px-4 py-3 space-x-2">

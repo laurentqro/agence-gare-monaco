@@ -21,6 +21,13 @@
   </div>
 
   <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.contacts.form.company") %></label>
+    <%= f.text_field :company, class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy" %>
+  </div>
+
+  <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-400 pt-2"><%= t("admin.contacts.form.contact_details") %></h3>
+
+  <div>
     <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.contacts.form.email") %></label>
     <%= f.email_field :email, class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy" %>
   </div>
@@ -28,6 +35,34 @@
   <div>
     <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.contacts.form.phone") %></label>
     <%= f.text_field :phone, placeholder: t("admin.contacts.form.phone_placeholder"), class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy" %>
+  </div>
+
+  <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-400 pt-2"><%= t("admin.contacts.form.location") %></h3>
+
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.contacts.form.address") %></label>
+    <%= f.text_field :address, class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy" %>
+  </div>
+
+  <div class="grid grid-cols-3 gap-3">
+    <div class="col-span-2">
+      <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.contacts.form.city") %></label>
+      <%= f.text_field :city, class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy" %>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.contacts.form.postcode") %></label>
+      <%= f.text_field :postcode, class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy" %>
+    </div>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.contacts.form.country") %></label>
+    <%= f.text_field :country, class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy" %>
+  </div>
+
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.contacts.form.notes") %></label>
+    <%= f.text_area :notes, rows: 4, class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy" %>
   </div>
 
   <div class="flex gap-3">

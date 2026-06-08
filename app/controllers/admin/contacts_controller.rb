@@ -43,7 +43,10 @@ module Admin
     end
 
     def contact_params
-      params.require(:contact).permit(:first_name, :last_name, :email, :phone)
+      params.require(:contact).permit(
+        :first_name, :last_name, :email, :phone,
+        :company, :address, :city, :postcode, :country, :notes
+      )
     end
   end
 end

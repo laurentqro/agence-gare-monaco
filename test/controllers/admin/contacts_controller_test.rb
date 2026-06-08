@@ -51,6 +51,49 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='contact[phone]']"
   end
 
+  test "GET new renders the extended legacy fields" do
+    get new_admin_contact_url
+    assert_response :success
+    assert_select "input[name='contact[company]']"
+    assert_select "input[name='contact[address]']"
+    assert_select "input[name='contact[city]']"
+    assert_select "input[name='contact[postcode]']"
+    assert_select "input[name='contact[country]']"
+    assert_select "textarea[name='contact[notes]']"
+  end
+
+  test "POST create persists the extended fields" do
+    post admin_contacts_url, params: {
+      contact: {
+        first_name: "Anna", last_name: "Berg", company: "Acme SCI",
+        address: "12 rue de la Gare", city: "Monaco", postcode: "98000",
+        country: "Monaco", notes: "Recherche 2 pièces"
+      }
+    }
+    c = Contact.last
+    assert_equal "Acme SCI", c.company
+    assert_equal "12 rue de la Gare", c.address
+    assert_equal "Monaco", c.city
+    assert_equal "98000", c.postcode
+    assert_equal "Monaco", c.country
+    assert_equal "Recherche 2 pièces", c.notes
+  end
+
+  test "GET edit shows the extended fields prefilled" do
+    contact = Contact.create!(first_name: "Anna", last_name: "Berg", company: "Acme SCI", city: "Monaco")
+    get edit_admin_contact_url(contact)
+    assert_response :success
+    assert_select "input[name='contact[company]'][value='Acme SCI']"
+    assert_select "input[name='contact[city]'][value='Monaco']"
+  end
+
+  test "GET index shows the company column" do
+    Contact.create!(company: "Consulat de Belgique", email: "c@example.mc")
+    get admin_contacts_url
+    assert_response :success
+    assert_select "td", /Consulat de Belgique/
+  end
+
   # CREATE
   test "POST create creates contact and redirects" do
     assert_difference "Contact.count", 1 do
@@ -71,23 +114,23 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_contacts_url
   end
 
-  test "POST create with invalid data re-renders form" do
+  test "POST create with no identifying field re-renders form" do
     assert_no_difference "Contact.count" do
       post admin_contacts_url, params: {
-        contact: { first_name: "", last_name: "", email: "" }
+        contact: { first_name: "", last_name: "", email: "", phone: "", company: "", city: "Monaco" }
       }
     end
     assert_response :unprocessable_entity
   end
 
-  test "POST create with duplicate email re-renders form" do
+  test "POST create with duplicate email is allowed" do
     Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@example.com")
-    assert_no_difference "Contact.count" do
+    assert_difference "Contact.count", 1 do
       post admin_contacts_url, params: {
         contact: { first_name: "Pierre", last_name: "Martin", email: "jean@example.com" }
       }
     end
-    assert_response :unprocessable_entity
+    assert_redirected_to admin_contacts_url
   end
 
   # EDIT
@@ -113,10 +156,10 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "pierre@example.com", contact.email
   end
 
-  test "PATCH update with invalid data re-renders form" do
+  test "PATCH update with no identifying field re-renders form" do
     contact = Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@example.com")
     patch admin_contact_url(contact), params: {
-      contact: { email: "" }
+      contact: { first_name: "", last_name: "", email: "", phone: "", company: "" }
     }
     assert_response :unprocessable_entity
   end
