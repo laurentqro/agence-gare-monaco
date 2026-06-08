@@ -31,6 +31,29 @@ module AdminHelper
     end
   end
 
+  # Whether a sidebar nav link should be marked active for the current path.
+  #
+  # By default a link is active when the current path equals the link path or
+  # is nested beneath it (so /admin/articles/5/edit highlights "Articles").
+  # Pass exact: true for the dashboard root, whose path is a prefix of every
+  # other admin page.
+  def admin_nav_active?(current_path, link_path, exact: false)
+    return current_path == link_path if exact
+
+    current_path == link_path || current_path.start_with?("#{link_path}/")
+  end
+
+  # CSS classes for a sidebar nav link, adding an active highlight when the
+  # link matches the current request path.
+  def admin_nav_link_class(link_path, exact: false)
+    base = "flex items-center gap-3 px-3 py-2 rounded"
+    if admin_nav_active?(request.path, link_path, exact: exact)
+      "#{base} bg-white/15 font-semibold"
+    else
+      "#{base} hover:bg-white/10"
+    end
+  end
+
   private
 
   def icon_svg(inner)

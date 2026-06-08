@@ -29,6 +29,14 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "p", text: "Bienvenue, user@example.com"
   end
 
+  test "sidebar highlights the active nav link" do
+    User.create!(email_address: "user@example.com", password: "securepassword123")
+    post session_url, params: { email_address: "user@example.com", password: "securepassword123" }
+    get admin_root_url
+
+    assert_select "a[href=?].bg-white\\/15", admin_root_path
+  end
+
   test "dashboard shows quick links section" do
     user = User.create!(email_address: "adrien@agencegaremonaco.com", password: "securepassword123")
     post session_url, params: { email_address: "adrien@agencegaremonaco.com", password: "securepassword123" }
