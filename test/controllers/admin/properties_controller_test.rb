@@ -290,6 +290,15 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", text: /MC-ON/, count: 0
   end
 
+  test "GET index with filter=immotool shows only synced properties" do
+    synced = create_property(reference: "MC-SYNC", immotoolbox_id: 9999)
+    manual = create_property(reference: "MC-MANUAL", off_market: true)
+    get admin_properties_url(filter: "immotool")
+    assert_response :success
+    assert_select "td", /MC-SYNC/
+    assert_select "td", text: /MC-MANUAL/, count: 0
+  end
+
   test "GET index without filter shows all properties" do
     on_market = create_property(reference: "MC-ON", off_market: false)
     off_market = create_property(reference: "MC-OFF", off_market: true)

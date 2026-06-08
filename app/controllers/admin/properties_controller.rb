@@ -6,7 +6,12 @@ module Admin
 
     def index
       @properties = Property.includes(:district, :building).order(created_at: :desc)
-      @properties = @properties.where(off_market: true) if params[:filter] == "off_market"
+      case params[:filter]
+      when "immotool"
+        @properties = @properties.where.not(immotoolbox_id: nil)
+      when "off_market"
+        @properties = @properties.where(off_market: true)
+      end
     end
 
     def show
