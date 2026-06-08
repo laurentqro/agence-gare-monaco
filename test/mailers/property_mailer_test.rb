@@ -100,6 +100,26 @@ class PropertyMailerTest < ActionMailer::TestCase
     %w[3 2 1].each { |n| assert_includes body, n }
   end
 
+  test "share property shows stats before the intro" do
+    email = PropertyMailer.share_property(@property, @contact)
+    body = email.body.encoded
+    assert_operator body.index("Surface"), :<, body.index("Un écrin rare au coeur de Monaco"),
+                    "stats strip should render before the intro paragraph"
+  end
+
+  test "share property stats use text labels, not inline SVG icons" do
+    # Inline <svg> is stripped by most email clients (Gmail/Outlook/Apple Mail),
+    # so stats must be labelled with text instead.
+    email = PropertyMailer.share_property(@property, @contact)
+    body = email.body.encoded
+    refute_includes body, "<svg"
+    assert_includes body, "Pièces"
+    assert_includes body, "Chambres"
+    assert_includes body, "Salles de bain"
+    assert_includes body, "Parking"
+    assert_includes body, "Surface"
+  end
+
   test "share property body contains link to property page" do
     email = PropertyMailer.share_property(@property, @contact)
     assert_includes email.body.encoded, "/fr/biens/#{@property.id}"

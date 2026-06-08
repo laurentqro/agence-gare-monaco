@@ -6,22 +6,15 @@
   hero   = @hero_image && (@hero_image.large_url.presence || @hero_image.medium_url.presence || @hero_image.remote_url)
   rental = @property.transaction_type == "rental"
 
-  # (svg, value) pairs for the stat strip — only rendered when the value is present.
-  stat = ->(path) {
-    %(<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;">#{path}</svg>)
-  }
-  icon_rooms    = stat.call(%(<path d="M3 11 12 4l9 7M5 10v10h14V10" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>))
-  icon_bedrooms = stat.call(%(<path d="M3 18v-5h18v5M3 13V8a2 2 0 0 1 2-2h6v7M11 13V6h6a2 2 0 0 1 2 2v5M3 18v2M21 18v2" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>))
-  icon_baths    = stat.call(%(<path d="M4 12V6a2 2 0 0 1 2-2 2 2 0 0 1 2 2M3 12h18v3a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-3ZM6 19l-1 2M18 19l1 2" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>))
-  icon_parking  = stat.call(%(<path d="M5 17v-5l2-5h10l2 5v5M5 17v2M19 17v2M5 12h14M8 12.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM19 12.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>))
-  icon_area     = stat.call(%(<path d="M4 4h16v16H4zM4 9h3M4 14h3M9 20v-3M14 20v-3" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>))
-
+  # (value, label) pairs for the stat strip — only rendered when the value is present.
+  # Text labels rather than inline SVG: <svg> is stripped by most email clients
+  # (Gmail / Outlook / Apple Mail), which would leave the values unlabelled.
   stats = []
-  stats << [icon_rooms,    @property.num_rooms]                                  if @property.num_rooms.to_i.positive?
-  stats << [icon_bedrooms, @property.num_bedrooms]                              if @property.num_bedrooms.to_i.positive?
-  stats << [icon_baths,    @property.num_bathrooms]                             if @property.num_bathrooms.to_i.positive?
-  stats << [icon_parking,  @property.num_parkings]                              if @property.num_parkings.to_i.positive?
-  stats << [icon_area,     "#{@property.living_area.to_i} m&sup2;".html_safe]   if @property.living_area.to_f.positive?
+  stats << [@property.num_rooms,                       "Pièces"]        if @property.num_rooms.to_i.positive?
+  stats << [@property.num_bedrooms,                    "Chambres"]      if @property.num_bedrooms.to_i.positive?
+  stats << [@property.num_bathrooms,                   "Salles de bain"] if @property.num_bathrooms.to_i.positive?
+  stats << [@property.num_parkings,                    "Parking"]       if @property.num_parkings.to_i.positive?
+  stats << ["#{@property.living_area.to_i} m&sup2;".html_safe, "Surface"] if @property.living_area.to_f.positive?
 %>
 <!DOCTYPE html>
 <html lang="fr">
@@ -91,28 +84,30 @@
                       <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0; padding-top:20px;">&nbsp;</td></tr>
                     </table>
 
-                    <!-- intro -->
-                    <% if @property.intro_for(:fr).present? %>
-                      <p style="margin:20px 0 0; font-family:Arial, Helvetica, sans-serif; color:rgba(255,255,255,0.88); font-size:14px; line-height:1.7; text-align:center;">
-                        <%= @property.intro_for(:fr) %>
-                      </p>
-                    <% end %>
-
-                    <% if stats.any? %>
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                      <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0; padding-top:22px;">&nbsp;</td></tr>
-                    </table>
-
                     <!-- stats strip -->
+                    <% if stats.any? %>
                     <table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:22px auto 0;">
                       <tr>
-                        <% stats.each do |svg, value| %>
-                          <td style="padding:0 10px; font-family:Arial, Helvetica, sans-serif; color:#ffffff; font-size:14px; white-space:nowrap;" valign="middle">
-                            <%= svg.html_safe %>&nbsp;<span style="vertical-align:middle;"><%= value %></span>
+                        <% stats.each do |value, label| %>
+                          <td align="center" style="padding:0 14px; font-family:Arial, Helvetica, sans-serif; color:#ffffff;" valign="top">
+                            <div style="font-size:18px; font-weight:bold; line-height:1.2;"><%= value %></div>
+                            <div style="font-size:11px; color:rgba(255,255,255,0.65); text-transform:uppercase; letter-spacing:0.04em; margin-top:4px;"><%= label %></div>
                           </td>
                         <% end %>
                       </tr>
                     </table>
+                    <% end %>
+
+                    <!-- intro -->
+                    <% if @property.intro_for(:fr).present? %>
+                      <% if stats.any? %>
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr><td style="border-top:1px solid rgba(255,255,255,0.18); font-size:0; line-height:0; padding-top:22px;">&nbsp;</td></tr>
+                      </table>
+                      <% end %>
+                      <p style="margin:20px 0 0; font-family:Arial, Helvetica, sans-serif; color:rgba(255,255,255,0.88); font-size:14px; line-height:1.7; text-align:center;">
+                        <%= @property.intro_for(:fr) %>
+                      </p>
                     <% end %>
 
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
