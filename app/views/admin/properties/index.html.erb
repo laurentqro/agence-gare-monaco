@@ -43,17 +43,19 @@
                 <span class="inline-block px-2 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded ml-1"><%= t("admin.properties.off_market") %></span>
               <% end %>
             </td>
-            <td class="px-4 py-3 space-x-2">
-              <% if property.immotoolbox_id.present? %>
-                <%= link_to t("admin.shared.view"), admin_property_path(property), class: "text-accent hover:underline" %>
-              <% else %>
-                <%= link_to t("admin.shared.edit"), edit_admin_property_path(property), class: "text-accent hover:underline" %>
-              <% end %>
-              <%= link_to t("admin.property_brochures.pdf"), new_admin_property_brochure_path(property), class: "text-accent hover:underline" %>
-              <%= link_to t("admin.properties.share"), new_admin_property_share_path(property), class: "text-accent hover:underline" %>
-              <% if property.immotoolbox_id.blank? %>
-                <%= link_to t("admin.shared.delete"), admin_property_path(property), data: { turbo_method: :delete, turbo_confirm: t("admin.shared.confirm_delete") }, class: "text-red-600 hover:underline" %>
-              <% end %>
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-1">
+                <% if property.immotoolbox_id.present? %>
+                  <%= admin_action_link t("admin.shared.view"), admin_property_path(property), icon: :eye %>
+                <% else %>
+                  <%= admin_action_link t("admin.shared.edit"), edit_admin_property_path(property), icon: :pencil %>
+                <% end %>
+                <%= admin_action_link t("admin.property_brochures.pdf"), new_admin_property_brochure_path(property), icon: :document %>
+                <%= admin_action_link t("admin.properties.share"), new_admin_property_share_path(property), icon: :share %>
+                <% if property.immotoolbox_id.blank? %>
+                  <%= admin_action_link t("admin.shared.delete"), admin_property_path(property), icon: :trash, variant: :danger, data: { turbo_method: :delete, turbo_confirm: t("admin.shared.confirm_delete") } %>
+                <% end %>
+              </div>
             </td>
           </tr>
         <% end %>

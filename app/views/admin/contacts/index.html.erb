@@ -64,9 +64,11 @@
                   <span class="inline-block rounded-full bg-gray-100 text-gray-500 text-xs px-2 py-0.5"><%= t("admin.contacts.filters.contact_badge") %></span>
                 <% end %>
               </td>
-              <td class="px-4 py-3 space-x-2">
-                <%= link_to t("admin.shared.edit"), edit_admin_contact_path(contact), data: { turbo_frame: "_top" }, class: "text-accent hover:underline" %>
-                <%= link_to t("admin.shared.delete"), admin_contact_path(contact), data: { turbo_method: :delete, turbo_confirm: t("admin.shared.confirm_delete"), turbo_frame: "_top" }, class: "text-red-600 hover:underline" %>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-1">
+                  <%= admin_action_link t("admin.shared.edit"), edit_admin_contact_path(contact), icon: :pencil, data: { turbo_frame: "_top" } %>
+                  <%= admin_action_link t("admin.shared.delete"), admin_contact_path(contact), icon: :trash, variant: :danger, data: { turbo_method: :delete, turbo_confirm: t("admin.shared.confirm_delete"), turbo_frame: "_top" } %>
+                </div>
               </td>
             </tr>
           <% end %>
