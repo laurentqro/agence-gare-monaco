@@ -100,6 +100,15 @@ class PropertyMailerTest < ActionMailer::TestCase
     %w[3 2 1].each { |n| assert_includes body, n }
   end
 
+  test "share property dividers use cell-based spacing, not table margins" do
+    # Outlook (Word engine) ignores top/bottom margin on tables, so divider
+    # spacing must live in padded/height spacer cells instead.
+    email = PropertyMailer.share_property(@property, @contact)
+    body = email.body.encoded
+    refute_match(/margin:\s*24px/, body)
+    assert_includes body, "height:24px"
+  end
+
   test "share property shows stats before the intro" do
     email = PropertyMailer.share_property(@property, @contact)
     body = email.body.encoded
