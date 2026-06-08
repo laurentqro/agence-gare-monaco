@@ -1,4 +1,20 @@
 module ApplicationHelper
+  # French-language "Transaction · Type" label for the admin properties table.
+  # DB values are inconsistent in casing and language (Immotoolbox sync), so
+  # both parts are normalized via parameterize before lookup, falling back to
+  # the capitalized raw value when no translation exists.
+  def admin_property_type_label(property)
+    transaction = I18n.t(
+      "admin.properties.transaction_labels.#{property.transaction_type}",
+      default: property.transaction_type.to_s.capitalize
+    )
+    type = I18n.t(
+      "admin.properties.property_type_labels.#{property.property_type.to_s.parameterize}",
+      default: property.property_type.to_s.capitalize
+    )
+    "#{transaction} · #{type}"
+  end
+
   def locale_root_path(locale = I18n.locale)
     locale.to_sym == :fr ? "/" : "/#{locale}"
   end

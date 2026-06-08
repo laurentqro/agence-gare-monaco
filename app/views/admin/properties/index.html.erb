@@ -28,7 +28,7 @@
           <tr class="hover:bg-gray-50">
             <td class="px-4 py-3 font-mono text-xs"><%= property.reference %></td>
             <td class="px-4 py-3"><%= property.title_for(:fr) %></td>
-            <td class="px-4 py-3 capitalize"><%= property.transaction_type %> · <%= property.property_type %></td>
+            <td class="px-4 py-3"><%= admin_property_type_label(property) %></td>
             <td class="px-4 py-3"><%= property.formatted_price ? "#{property.formatted_price} €" : "—" %></td>
             <td class="px-4 py-3">
               <% if property.published? %>
