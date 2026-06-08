@@ -68,8 +68,9 @@ class Admin::FrenchLocaleTest < ActionDispatch::IntegrationTest
     )
     get admin_properties_url
     assert_response :success
-    assert_select "th", /Référence/
+    assert_select "th", /Titre/
     assert_select "th", /Prix/
+    assert_select "td", /MC-001/
     assert_select "span", /Publié/
   end
 

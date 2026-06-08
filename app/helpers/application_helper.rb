@@ -15,6 +15,22 @@ module ApplicationHelper
     "#{transaction} · #{type}"
   end
 
+  # Just the localized transaction label (Vente / Location).
+  def admin_transaction_label(property)
+    I18n.t(
+      "admin.properties.transaction_labels.#{property.transaction_type}",
+      default: property.transaction_type.to_s.capitalize
+    )
+  end
+
+  # Just the localized property-type label (Appartement, Cave, …).
+  def admin_property_type_only_label(property)
+    I18n.t(
+      "admin.properties.property_type_labels.#{property.property_type.to_s.parameterize}",
+      default: property.property_type.to_s.capitalize
+    )
+  end
+
   def locale_root_path(locale = I18n.locale)
     locale.to_sym == :fr ? "/" : "/#{locale}"
   end
