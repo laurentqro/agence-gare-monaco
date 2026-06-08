@@ -99,7 +99,6 @@ fr:
       table:
         last_name: "Nom"
         first_name: "Prénom"
-        name: "Nom"
         company: "Société"
         email: "Email"
         phone: "Téléphone"

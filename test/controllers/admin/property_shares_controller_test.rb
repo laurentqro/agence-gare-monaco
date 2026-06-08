@@ -39,12 +39,19 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
   test "GET new lists contacts in a table with all columns" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    # Header row exposes the full contact columns
-    %w[Nom Société Email Téléphone Ville Pays].each do |col|
-      assert_select "table thead th", text: /#{col}/
+    # Header row exposes the full contact columns, with name split in two
+    ["Nom", "Prénom", "Société", "Email", "Téléphone", "Ville", "Pays"].each do |col|
+      assert_select "table thead th", text: col
     end
     # One data row per contact
     assert_select "table tbody tr", 2
+  end
+
+  test "GET new shows first and last name in separate cells" do
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    assert_select "table tbody tr:first-child td", text: "Dupont"
+    assert_select "table tbody tr:first-child td", text: "Jean"
   end
 
   test "GET new shows the full details of a rich contact row" do
@@ -104,8 +111,8 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
   test "GET new lists all contacts with checkboxes" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_select "table tbody td", /Jean Dupont/
-    assert_select "table tbody td", /Pierre Martin/
+    assert_select "table tbody td", text: "Dupont"
+    assert_select "table tbody td", text: "Martin"
   end
 
   # CREATE (send sharing emails)
