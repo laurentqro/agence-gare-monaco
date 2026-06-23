@@ -121,6 +121,10 @@ article_category_map = {
 Dir.glob(Rails.root.join("articles/*.md")).each do |file|
   content = File.read(file)
 
+  # The filename is prefixed with the old CMS id (e.g. "09-...md"), the numeric
+  # id the legacy /{locale}/(article|post)/{id}/{slug} URLs reference.
+  legacy_id = File.basename(file)[/\A(\d+)-/, 1]&.to_i
+
   # Parse header: title is the first # line, metadata between **Key:** value lines
   title = content.match(/^# (.+)$/)[1]
   date = content.match(/\*\*Date:\*\* (.+)$/)[1].strip
@@ -140,13 +144,15 @@ Dir.glob(Rails.root.join("articles/*.md")).each do |file|
     a.title = { "fr" => title }
     a.body = { "fr" => body }
     a.category = category
+    a.legacy_id = legacy_id
     a.published = true
     a.featured = false
     a.published_at = Date.parse(date)
     a.cover_image_url = image_url
   end
 
-  # Update cover_image_url if not yet set (for idempotency on re-seed)
+  # Backfill legacy_id / cover_image_url on re-seed if not yet set (idempotent)
+  article.update!(legacy_id: legacy_id) if legacy_id && article.legacy_id.blank?
   if image_url.present? && article.cover_image_url.blank?
     article.update!(cover_image_url: image_url)
   end

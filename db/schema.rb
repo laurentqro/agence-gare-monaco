@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_08_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_23_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -45,6 +45,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_210000) do
     t.string "cover_image_url"
     t.datetime "created_at", null: false
     t.boolean "featured", default: false
+    t.integer "legacy_id"
     t.boolean "published", default: false
     t.datetime "published_at"
     t.string "slug", null: false
@@ -54,6 +55,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_210000) do
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_articles_on_category_id"
     t.index ["featured"], name: "index_articles_on_featured"
+    t.index ["legacy_id"], name: "index_articles_on_legacy_id", unique: true
     t.index ["published"], name: "index_articles_on_published"
     t.index ["slug"], name: "index_articles_on_slug", unique: true
   end

@@ -1,6 +1,23 @@
 class LegacyRedirectsController < ApplicationController
   allow_unauthenticated_access
 
+  # Old CMS category slugs → the new category slug that absorbed them.
+  # The new site reorganised the blog into fewer categories; these legacy
+  # /fr/posts/:category URLs must land on whichever new category took over.
+  # An unmapped slug falls back to the articles index.
+  LEGACY_CATEGORY_SLUGS = {
+    "achat" => "guides-pratiques",
+    "estimation" => "marche-immobilier",
+    "fiscalite" => "guides-pratiques",
+    "formalites" => "guides-pratiques",
+    "gestion" => "guides-pratiques",
+    "ventes" => "guides-pratiques",
+    "quartiers" => "quartiers-de-monaco",
+    "securite-sante" => "art-de-vivre-a-monaco",
+    "my-monaco" => "art-de-vivre-a-monaco",
+    "actualites" => "actualites"
+  }.freeze
+
   # FR: /fr/bien/{immotoolbox_id} → /fr/biens/{id}-{slug}
   # EN: /en/property/{immotoolbox_id} → /en/properties/{id}-{slug}
   # IT: /it/immobile/{immotoolbox_id} → /it/immobili/{id}-{slug}
@@ -43,19 +60,31 @@ class LegacyRedirectsController < ApplicationController
     end
   end
 
-  # FR: /fr/article/{id}/{slug}/ or /fr/post/{id}/{slug} → /fr/articles/{slug}
-  # EN: /en/article/{id}/{slug} → /en/articles/{slug}
+  # FR: /fr/article/{id}/{slug}/ or /fr/post/{id}/{slug} → /fr/articles/{current-slug}
+  # EN: /en/article/{id}/{slug} → /en/articles/{current-slug}
+  #
+  # The old numeric id is stable; the slug in the URL is the OLD slug and no
+  # longer matches the article's current slug. Look the article up by its
+  # legacy id and redirect to its current slug. 410 if no such article exists.
   def article
     locale = params[:locale]
-    articles_segment = I18n.t("routes.articles", locale: locale)
-    redirect_to "/#{locale}/#{articles_segment}/#{params[:slug]}", status: :moved_permanently
+    article = Article.published.find_by(legacy_id: params[:id])
+    if article
+      articles_segment = I18n.t("routes.articles", locale: locale)
+      redirect_to "/#{locale}/#{articles_segment}/#{article.slug}", status: :moved_permanently
+    else
+      head :gone
+    end
   end
 
-  # FR: /fr/posts/{category}/ → /fr/articles/{category-slug}
+  # FR: /fr/posts/{old-category}/ → /fr/articles/{new-category-slug}
+  # Unknown legacy categories fall back to the articles index.
   def posts_category
     locale = params[:locale]
     articles_segment = I18n.t("routes.articles", locale: locale)
-    redirect_to "/#{locale}/#{articles_segment}/#{params[:category_slug]}", status: :moved_permanently
+    new_slug = LEGACY_CATEGORY_SLUGS[params[:category_slug]]
+    target = new_slug ? "/#{locale}/#{articles_segment}/#{new_slug}" : "/#{locale}/#{articles_segment}"
+    redirect_to target, status: :moved_permanently
   end
 
   # FR: /fr/recherche/{location} → /fr/ventes
