@@ -351,13 +351,15 @@ class HomepageTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "homepage renders video iframes when videos exist" do
+  test "homepage renders click-to-load video facades when videos exist" do
     YoutubeVideo.create!(video_id: "abc123", title: "Monaco Tour", published_at: 1.day.ago)
     YoutubeVideo.create!(video_id: "def456", title: "Property Visit", published_at: 2.days.ago)
 
     get "/"
-    assert_select "[data-testid='videos'] iframe[src='https://www.youtube-nocookie.com/embed/abc123']"
-    assert_select "[data-testid='videos'] iframe[src='https://www.youtube-nocookie.com/embed/def456']"
+    # Facades carry the autoplay embed URL; no live iframe loads up front (no third-party cookies).
+    assert_select "[data-testid='videos'] [data-testid='video-facade'][data-video-facade-src-value='https://www.youtube-nocookie.com/embed/abc123?autoplay=1']"
+    assert_select "[data-testid='videos'] [data-testid='video-facade'][data-video-facade-src-value='https://www.youtube-nocookie.com/embed/def456?autoplay=1']"
+    assert_select "[data-testid='videos'] iframe", 0, "videos should be facades on load, not live iframes"
   end
 
   test "homepage shows video titles" do
@@ -397,7 +399,7 @@ class HomepageTest < ActionDispatch::IntegrationTest
     10.times { |i| YoutubeVideo.create!(video_id: "vid#{i}", title: "Video #{i}", published_at: i.days.ago) }
 
     get "/"
-    assert_select "[data-testid='videos'] iframe", 9
+    assert_select "[data-testid='videos'] [data-testid='video-facade']", 9
   end
 
   test "homepage videos are in reverse chronological order" do
@@ -405,16 +407,17 @@ class HomepageTest < ActionDispatch::IntegrationTest
     YoutubeVideo.create!(video_id: "new", title: "New Video", published_at: 1.day.ago)
 
     get "/"
-    iframes = css_select("[data-testid='videos'] iframe")
-    srcs = iframes.map { |iframe| iframe["src"] }
-    assert_equal "https://www.youtube-nocookie.com/embed/new", srcs.first
-    assert_equal "https://www.youtube-nocookie.com/embed/old", srcs.last
+    facades = css_select("[data-testid='videos'] [data-testid='video-facade']")
+    srcs = facades.map { |f| f["data-video-facade-src-value"] }
+    assert_equal "https://www.youtube-nocookie.com/embed/new?autoplay=1", srcs.first
+    assert_equal "https://www.youtube-nocookie.com/embed/old?autoplay=1", srcs.last
   end
 
   test "homepage videos section degrades gracefully when empty" do
     get "/"
     assert_select "[data-testid='videos']" do
       assert_select "h2", text: I18n.t("homepage.videos_title", locale: :fr)
+      assert_select "[data-testid='video-facade']", 0
       assert_select "iframe", 0
     end
   end

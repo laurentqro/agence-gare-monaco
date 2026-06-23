@@ -47,6 +47,8 @@ fi:
     card_management: "Hallinto"
     videos_title: "Videot"
     videos_view_channel: "Katso kaikki videomme"
+    video_iframe_title: "YouTube-video"
+    video_play: "Toista video: %{title}"
     faq_title: "Usein kysytyt kysymykset"
     faqs:
       - question: "Mikä on Agence Immobilière de la Gare?"

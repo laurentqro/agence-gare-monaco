@@ -47,6 +47,8 @@ ru:
     card_management: "Управление"
     videos_title: "Видео"
     videos_view_channel: "Смотреть все наши видео"
+    video_iframe_title: "Видео YouTube"
+    video_play: "Воспроизвести видео: %{title}"
     faq_title: "Часто задаваемые вопросы"
     faqs:
       - question: "Что такое Agence Immobilière de la Gare?"

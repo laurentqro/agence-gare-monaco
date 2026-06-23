@@ -11,4 +11,17 @@ class YoutubeVideo < ApplicationRecord
   def embed_url
     "https://www.youtube-nocookie.com/embed/#{video_id}"
   end
+
+  # Embed URL that starts playing immediately — used when a facade thumbnail
+  # is clicked, so the user does not have to press play twice.
+  def autoplay_embed_url
+    "#{embed_url}?autoplay=1"
+  end
+
+  # Cookie-free thumbnail for the click-to-load facade. Prefers the stored
+  # feed thumbnail, falling back to YouTube's deterministic image CDN
+  # (i.ytimg.com sets no cookies, unlike the embed iframe).
+  def thumbnail_image_url
+    thumbnail_url.presence || "https://i.ytimg.com/vi/#{video_id}/hqdefault.jpg"
+  end
 end

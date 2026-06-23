@@ -47,6 +47,8 @@ fr:
     card_management: "Gestion"
     videos_title: "Vidéos"
     videos_view_channel: "Voir toutes nos vidéos"
+    video_iframe_title: "Vidéo YouTube"
+    video_play: "Lire la vidéo : %{title}"
     faq_title: "Questions fréquentes"
     faqs:
       - question: "Qu'est-ce que l'Agence Immobilière de la Gare ?"

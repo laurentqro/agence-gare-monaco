@@ -47,6 +47,8 @@ da:
     card_management: "Administration"
     videos_title: "Videoer"
     videos_view_channel: "Se alle vores videoer"
+    video_iframe_title: "YouTube-video"
+    video_play: "Afspil video: %{title}"
     faq_title: "Ofte stillede spørgsmål"
     faqs:
       - question: "Hvad er Agence Immobilière de la Gare?"

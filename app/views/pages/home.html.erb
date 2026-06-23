@@ -42,15 +42,27 @@
         <div data-videos-carousel-target="track" class="flex transition-transform duration-500 -mx-3">
           <% @youtube_videos.each do |video| %>
             <div data-videos-carousel-target="slide" data-testid="video-slide" class="shrink-0 w-full md:w-1/3 px-3">
+              <% video_title = video.title.presence || t("homepage.video_iframe_title", default: "Vidéo YouTube") %>
               <div class="aspect-video rounded overflow-hidden">
-                <iframe src="<%= video.embed_url %>"
-                        title="<%= video.title.presence || t("homepage.video_iframe_title", default: "Vidéo YouTube") %>"
-                        class="w-full h-full"
-                        frameborder="0"
-                        loading="lazy"
-                        allowfullscreen
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-                </iframe>
+                <button type="button"
+                        data-testid="video-facade"
+                        data-controller="video-facade"
+                        data-video-facade-src-value="<%= video.autoplay_embed_url %>"
+                        data-video-facade-title-value="<%= video_title %>"
+                        data-action="video-facade#load"
+                        aria-label="<%= t("homepage.video_play", default: "Lire la vidéo : %{title}", title: video_title) %>"
+                        class="group relative block w-full h-full cursor-pointer">
+                  <img src="<%= video.thumbnail_image_url %>"
+                       alt="<%= video_title %>"
+                       loading="lazy"
+                       class="absolute inset-0 w-full h-full object-cover">
+                  <span class="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></span>
+                  <span class="absolute inset-0 flex items-center justify-center">
+                    <span class="flex items-center justify-center w-16 h-16 rounded-full bg-black/60 group-hover:bg-red-600 transition-colors">
+                      <svg class="w-7 h-7 text-white ml-1" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                    </span>
+                  </span>
+                </button>
               </div>
               <p class="text-xs text-dark mt-2"><%= video.title %></p>
             </div>
