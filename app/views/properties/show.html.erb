@@ -162,6 +162,7 @@
           <% if @property.virtual_tour_url.end_with?(".html") %>
             <div class="aspect-video rounded overflow-hidden">
               <iframe src="<%= @property.virtual_tour_url %>"
+                      title="<%= t("property_detail.virtual_tour") %>"
                       class="w-full h-full"
                       frameborder="0"
                       allow="accelerometer; magnetometer; gyroscope; fullscreen"
@@ -185,6 +186,7 @@
           <% if youtube_id %>
             <div class="aspect-video rounded overflow-hidden">
               <iframe src="https://www.youtube-nocookie.com/embed/<%= youtube_id %>"
+                      title="<%= @property.title_for(I18n.locale).presence || t("property_detail.video") %>"
                       class="w-full h-full"
                       frameborder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

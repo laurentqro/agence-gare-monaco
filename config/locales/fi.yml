@@ -28,6 +28,7 @@ fi:
     about_expertise: "Asiantuntemuksemme mahdollistaa yhteistyön monacalaisten notaarien ja asianajajien kanssa kiinteistöjen arvioinnissa ja arvonmäärityksessä. Yhteistyössä Tania Sisustusarkkitehtuuri -toimiston kanssa tarjoamme asuntojen uudelleensuunnitteluprojekteja. Toiminta-alueemme ulottuu Monacon ruhtinaskuntaan ja viereiselle Ranskan alueelle. Ota yhteyttä numeroon (+377) 93 30 22 36 tai osoitteeseen info@agencegaremonaco.com."
     team_title: "Tiimimme"
     team:
+      email_member: "Lähetä sähköpostia: %{name}"
       pierre_role: "Osaomistaja"
       adrien_role: "Johtaja / Neuvottelija"
       josiane_role: "Sihteeristö / Hallinto"

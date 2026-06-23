@@ -28,6 +28,7 @@ en:
     about_expertise: "Our expertise allows us to collaborate with Monegasque notaries and lawyers for property estimation and valuation. In partnership with the firm Tania Interior Architecture, we offer apartment redesign and renovation projects. Our area of operation extends to the Principality of Monaco and the neighbouring French region. Contact us at (+377) 93 30 22 36 or info@agencegaremonaco.com."
     team_title: "Our Team"
     team:
+      email_member: "Email %{name}"
       pierre_role: "Co-Manager"
       adrien_role: "Director / Negotiator"
       josiane_role: "Secretariat / Management"

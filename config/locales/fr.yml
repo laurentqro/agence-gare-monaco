@@ -28,6 +28,7 @@ fr:
     about_expertise: "Notre expertise nous permet de collaborer avec des notaires et avocats monégasques pour l'estimation et l'évaluation de biens immobiliers. En partenariat avec le cabinet Tania Architecture d'intérieur, nous proposons des projets de réaménagement d'appartements. Notre domaine d'intervention s'étend à la Principauté de Monaco et à la région française limitrophe. Contactez-nous au (+377) 93 30 22 36 ou à info@agencegaremonaco.com."
     team_title: "Notre Équipe"
     team:
+      email_member: "Envoyer un email à %{name}"
       pierre_role: "Co-Gérant"
       adrien_role: "Directeur / Négociateur"
       josiane_role: "Secrétariat / Gestion"

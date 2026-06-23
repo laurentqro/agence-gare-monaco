@@ -28,6 +28,7 @@ it:
     about_expertise: "La nostra competenza ci permette di collaborare con notai e avvocati monegaschi per la stima e la valutazione di beni immobiliari. In collaborazione con lo studio Tania Architettura d'interni, proponiamo progetti di ristrutturazione di appartamenti. Il nostro ambito di intervento si estende al Principato di Monaco e alla regione francese limitrofa. Contattateci al (+377) 93 30 22 36 o a info@agencegaremonaco.com."
     team_title: "Il Nostro Team"
     team:
+      email_member: "Invia un'email a %{name}"
       pierre_role: "Co-Direttore"
       adrien_role: "Direttore / Negoziatore"
       josiane_role: "Segretariato / Gestione"

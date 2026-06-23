@@ -28,6 +28,7 @@ de:
     about_expertise: "Unsere Expertise ermöglicht die Zusammenarbeit mit monegassischen Notaren und Anwälten bei der Schätzung und Bewertung von Immobilien. In Zusammenarbeit mit dem Büro Tania Innenarchitektur bieten wir Projekte zur Umgestaltung von Wohnungen an. Unser Tätigkeitsbereich erstreckt sich auf das Fürstentum Monaco und die angrenzende französische Region. Kontaktieren Sie uns unter (+377) 93 30 22 36 oder info@agencegaremonaco.com."
     team_title: "Unser Team"
     team:
+      email_member: "%{name} eine E-Mail senden"
       pierre_role: "Co-Geschäftsführer"
       adrien_role: "Direktor / Verhandlungsführer"
       josiane_role: "Sekretariat / Verwaltung"

@@ -28,6 +28,7 @@
     about_expertise: "Vår ekspertise gjør det mulig å samarbeide med monegaskiske notarer og advokater for estimering og verdivurdering av eiendommer. I samarbeid med firmaet Tania Interiørarkitektur tilbyr vi prosjekter for ominnredning av leiligheter. Vårt virkeområde strekker seg til Fyrstedømmet Monaco og den tilgrensende franske regionen. Kontakt oss på (+377) 93 30 22 36 eller info@agencegaremonaco.com."
     team_title: "Vårt Team"
     team:
+      email_member: "Send e-post til %{name}"
       pierre_role: "Medleder"
       adrien_role: "Direktør / Forhandler"
       josiane_role: "Sekretariat / Forvaltning"
