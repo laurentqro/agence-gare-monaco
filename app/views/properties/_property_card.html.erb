@@ -88,13 +88,13 @@
           <%= property.formatted_price %> &euro;
         </span>
         <% if property.transaction_type == "rental" %>
-          <span class="text-navy/50 text-xs ml-0.5"><%= t("property_detail.per_month") %></span>
+          <span class="text-navy/70 text-xs ml-0.5"><%= t("property_detail.per_month") %></span>
         <% end %>
         <% if (converted = converted_price_tag(property.price)) %>
-          <span data-testid="converted-price" class="text-xs text-navy/40 ml-1.5"><%= converted %></span>
+          <span data-testid="converted-price" class="text-xs text-navy/70 ml-1.5"><%= converted %></span>
         <% end %>
       <% else %>
-        <span class="text-navy/50 text-sm italic">
+        <span class="text-navy/70 text-sm italic">
           <%= t("listings.price_on_request") %>
         </span>
       <% end %>
