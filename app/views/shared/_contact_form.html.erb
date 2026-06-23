@@ -32,22 +32,22 @@
     <% end %>
 
     <div>
-      <label class="<%= label_class %>"><%= t("contact_form.name") %></label>
+      <%= f.label :name, t("contact_form.name"), class: label_class %>
       <%= f.text_field :name, class: input_class, required: true %>
     </div>
 
     <div>
-      <label class="<%= label_class %>"><%= t("contact_form.email") %></label>
+      <%= f.label :email, t("contact_form.email"), class: label_class %>
       <%= f.email_field :email, class: input_class, required: true %>
     </div>
 
     <div>
-      <label class="<%= label_class %>"><%= t("contact_form.subject") %></label>
+      <%= f.label :subject, t("contact_form.subject"), class: label_class %>
       <%= f.text_field :subject, class: input_class %>
     </div>
 
     <div>
-      <label class="<%= label_class %>"><%= t("contact_form.message") %></label>
+      <%= f.label :message, t("contact_form.message"), class: label_class %>
       <%= f.text_area :message, rows: 5, class: input_class, required: true %>
     </div>
 

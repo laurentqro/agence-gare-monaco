@@ -447,7 +447,7 @@
       <h2 class="heading-section mb-6"><%= t("property_detail.similar_properties") %></h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <% @similar_properties.each do |property| %>
-          <%= render "properties/property_card", property: property %>
+          <%= render "properties/property_card", property: property, heading_level: :h3 %>
         <% end %>
       </div>
     </div>

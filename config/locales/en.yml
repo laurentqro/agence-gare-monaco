@@ -64,6 +64,9 @@ en:
 
   listings:
     sales: "Sales"
+    view_property: "View property: %{property}"
+    previous_photo: "Previous photo"
+    next_photo: "Next photo"
     rentals: "Rentals"
     sales_monaco: "Sales in Monaco"
     rentals_monaco: "Rentals in Monaco"

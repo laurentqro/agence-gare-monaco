@@ -64,6 +64,9 @@ sv:
 
   listings:
     sales: "Försäljning"
+    view_property: "Visa fastighet: %{property}"
+    previous_photo: "Föregående foto"
+    next_photo: "Nästa foto"
     rentals: "Uthyrning"
     sales_monaco: "Försäljning i Monaco"
     rentals_monaco: "Uthyrning i Monaco"

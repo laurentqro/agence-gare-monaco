@@ -64,6 +64,9 @@ fi:
 
   listings:
     sales: "Myynti"
+    view_property: "Näytä kohde: %{property}"
+    previous_photo: "Edellinen kuva"
+    next_photo: "Seuraava kuva"
     rentals: "Vuokraus"
     sales_monaco: "Myynti Monacossa"
     rentals_monaco: "Vuokraus Monacossa"

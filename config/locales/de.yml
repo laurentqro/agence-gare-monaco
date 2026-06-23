@@ -64,6 +64,9 @@ de:
 
   listings:
     sales: "Verkauf"
+    view_property: "Immobilie ansehen: %{property}"
+    previous_photo: "Vorheriges Foto"
+    next_photo: "Nächstes Foto"
     rentals: "Vermietung"
     sales_monaco: "Verkauf in Monaco"
     rentals_monaco: "Vermietung in Monaco"

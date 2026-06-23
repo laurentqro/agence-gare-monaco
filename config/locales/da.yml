@@ -64,6 +64,9 @@ da:
 
   listings:
     sales: "Salg"
+    view_property: "Se ejendom: %{property}"
+    previous_photo: "Forrige foto"
+    next_photo: "Næste foto"
     rentals: "Udlejning"
     sales_monaco: "Salg i Monaco"
     rentals_monaco: "Udlejning i Monaco"
