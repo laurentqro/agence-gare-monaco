@@ -35,7 +35,7 @@ background; the attachment is stored briefly, used for the sends, then purged.
 | Recipient handling | Separate email per contact | Discretion among peers; matches existing property-share loop |
 | Entry point | Standalone "Envoyer un email" page + sidebar link | Discoverable, self-contained, not tied to a property |
 | Body format | Plain text, no branding | Reads like a personal email, not a marketing template |
-| From / Reply-To | From agency (`info@agencegaremonaco.com`), Reply-To `adrien@agencegaremonaco.com` | Keeps verified Brevo sender + DKIM; replies reach Adrien. Matches `PropertyMailer` |
+| From / Reply-To | From agency (`info@agencegaremonaco.com`, display name "Agence Immobilière de la Gare"), Reply-To `adrien@agencegaremonaco.com` | Keeps verified Brevo sender + DKIM; replies reach Adrien. Matches `PropertyMailer` and `ApplicationMailer` default. Display name kept (not personalized to Adrien) for deliverability; the personal tone comes from the plain-text body and the Reply-To |
 | Attachment | One optional file, any type, ≤ 10 MB | Covers the stated need; size cap keeps within email limits |
 | Delivery | Async via Solid Queue (`deliver_later`-style jobs), no stored history | Instant UX; one failed recipient doesn't block the rest |
 | Attachment lifecycle | Active Storage (local disk), auto-purged after last send | Survives the request for background jobs; no disk accumulation |
@@ -77,10 +77,17 @@ Each unit has one clear purpose, a defined interface, and is testable in isolati
 
 - Inherits `Admin::BaseController` (admin layout, French locale).
 - `new` — renders the compose page (recipient picker + form).
-- `create` — validates (≥ 1 recipient, subject + body present, attachment within
-  size cap); builds the `OutgoingEmail` (`pending_count` = number of recipients);
-  enqueues one `SendOutgoingEmailJob` per recipient; flashes and redirects. On
-  validation failure, re-renders the form with errors and enqueues nothing.
+- `create` — receives `contact_ids[]` from the picker. Resolves them at enqueue
+  time: loads the contacts, keeps only those that still exist and have a non-nil
+  email, and maps each to a `(recipient_email, recipient_name)` pair. This is why
+  the model has no Contact association — recipients are snapshotted into the jobs.
+  Validates (≥ 1 resolvable recipient, subject + body present, attachment within
+  size cap); builds the `OutgoingEmail` (`pending_count` = number of resolved
+  recipients); enqueues one `SendOutgoingEmailJob` per recipient; flashes and
+  redirects. On validation failure, re-renders the form with errors and enqueues
+  nothing. A submitted `contact_id` that no longer exists or whose email became
+  nil between page-load and submit is silently dropped (not an error); if that
+  leaves zero recipients, it fails the "≥ 1 recipient" validation.
 - Reuses the existing contact scope/search/sort helpers from the property-share
   flow; only contacts with an email are selectable (`.where.not(email: nil)`).
 
@@ -89,6 +96,10 @@ Each unit has one clear purpose, a defined interface, and is testable in isolati
 - `compose(outgoing_email, recipient_email, recipient_name)` — builds one
   plain-text email: `from` agency, `reply_to` Adrien, subject/body from the
   record, line breaks preserved; attaches the file when present.
+- Uses a **text-only** mailer template (`compose.text.erb`, no HTML part). The
+  body is rendered verbatim as plain text, so there is no HTML escaping or
+  injection surface from Adrien's free-text input; the subject is passed straight
+  to the mail header.
 
 ### 4. `SendOutgoingEmailJob` (new)
 
@@ -107,9 +118,16 @@ Each unit has one clear purpose, a defined interface, and is testable in isolati
 
 - `app/views/admin/outgoing_emails/new.html.erb` — recipient picker + subject /
   body / attachment fields.
-- **Refactor:** extract the property-share recipient table into a shared partial
-  `app/views/admin/contacts/_picker.html.erb` rendered by both the property-share
-  flow and this new compose page. Small, focused improvement serving this feature.
+- **Refactor:** extract the property-share recipient table (currently inline in
+  `property_shares/new.html.erb`: tabs-with-counts, search form, sortable headers,
+  checkboxes) into a shared partial `app/views/admin/contacts/_picker.html.erb`
+  rendered by both the property-share flow and this new compose page. This is a
+  real refactor, not a trivial move: the partial must be parameterized (form
+  action, hidden-field/checkbox names — property-share posts `contact_ids[]`), and
+  the tab/filter logic (`filtered_scope`) is currently duplicated across
+  `PropertySharesController` and `ContactsController`, so it should be extracted
+  into a shared concern. The plan should budget for this. Both flows must keep
+  working; the existing property-share tests gate the extraction.
 - New sidebar entry in `app/views/layouts/admin.html.erb` ("Envoyer un email").
 
 ## Data flow
