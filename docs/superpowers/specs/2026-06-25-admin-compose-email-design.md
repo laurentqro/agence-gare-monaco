@@ -92,9 +92,11 @@ Each unit has one clear purpose, a defined interface, and is testable in isolati
 - `new` — renders the compose page (audience toggle + searchable recipient list +
   form). The audience param (`peers` / `contacts`, default `peers`) and search
   term scope the list via the `Contact` `.peers` / `.contacts_only` and `.search`
-  scopes; only contacts with an email are listed (`.where.not(email: nil)`). The
-  list re-renders on audience/search change (Turbo Frame, like the existing
-  contacts index).
+  scopes; only contacts with an email are listed (`.where.not(email: nil)`),
+  ordered by name (`.order(:last_name, :first_name)`). The list re-renders on
+  audience/search change (Turbo Frame, like the existing contacts index). Note:
+  this view deliberately drops sortable columns, so it must NOT include the
+  `Sortable` concern (no `sort_scope` / `sort_link`) — just the name ordering.
 - `create` — receives `contact_ids[]` plus the `audience`. Resolves recipients at
   enqueue time: loads the submitted contacts, keeps only those that still exist,
   belong to the submitted audience, and have a non-nil email, then maps each to a
@@ -209,8 +211,10 @@ last job (pending_count → 0)
 - `new` (default) renders the compose form with the Peers audience selected.
 - `new?audience=contacts` lists contacts (not peers); search narrows the list.
 - The list shows only contacts with an email; peers and contacts don't intermix.
-- `new` renders a "select all" checkbox (assert markup / data-attributes — the
-  project has no JS or system test runner; Minitest integration tests only).
+- `new` renders a "select all" checkbox (assert markup / data-attributes in a
+  Minitest integration test — no system tests exist: no `test/system/`, no
+  `application_system_test_case.rb`, no `driven_by` usage, so select-all's
+  client-side toggling is verified via markup, not a browser/JS test).
 - `create` (valid, audience=peers) enqueues N jobs (`assert_enqueued_jobs N`),
   flashes, redirects; emails only the resolved peers.
 - `create` drops submitted ids that are out of audience / no longer exist / have a
