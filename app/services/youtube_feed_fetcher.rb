@@ -18,6 +18,7 @@ class YoutubeFeedFetcher
       record = YoutubeVideo.find_or_initialize_by(video_id: video_id)
       record.update!(
         title: entry.at("title")&.text,
+        description: entry.at("description")&.text,
         thumbnail_url: entry.at("thumbnail")&.[]("url"),
         published_at: entry.at("published")&.text
       )
