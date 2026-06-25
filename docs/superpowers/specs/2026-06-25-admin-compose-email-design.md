@@ -6,10 +6,12 @@
 ## Summary
 
 Give the admin user (Adrien) a standalone page to compose and send an email to
-one or more contacts/peers from the address book. The email has free-text
-subject and body and one optional attachment. Each selected recipient receives
-their own separate email; recipients never see each other. Sends run in the
-background; the attachment is stored briefly, used for the sends, then purged.
+one or more recipients from the address book. A single email targets **one
+audience** — peers **or** contacts, never a mix (Adrien emails groups of peers,
+or groups of contacts, but not both at once). The email has free-text subject
+and body and one optional attachment. Each selected recipient receives their own
+separate email; recipients never see each other. Sends run in the background; the
+attachment is stored briefly, used for the sends, then purged.
 
 ## Goals
 
@@ -27,12 +29,19 @@ background; the attachment is stored briefly, used for the sends, then purged.
 - No multiple attachments.
 - No per-email configurable sender (always agency from / Adrien reply-to).
 - No deep-link "email selected" action from the Contacts list (standalone page only).
+- **No mixed-audience sends.** A single email goes to peers or to contacts, not
+  both — so no "Tous" tab and no cross-tab/cross-audience selection.
+- **No reuse of the property-share picker.** The compose page has its own simpler
+  recipient list; the existing `share_selection_controller.js` persisted-selection
+  picker is left untouched (no shared-partial extraction, no controller rename).
 
 ## Design decisions
 
 | Decision | Choice | Rationale |
 |---|---|---|
 | Recipient handling | Separate email per contact | Discretion among peers; matches existing property-share loop |
+| Audience | Single audience per email — toggle Peers / Contacts (default Peers) | Adrien never mixes peers and contacts in one send; removes cross-audience ambiguity |
+| Recipient list | Own list on the compose page: audience toggle + search + checkboxes + select-all, ordered by name. No sortable columns. Does NOT reuse the property-share picker | Simpler, fit-for-purpose, and avoids coupling to / changing the existing persisted-selection picker |
 | Entry point | Standalone "Envoyer un email" page + sidebar link | Discoverable, self-contained, not tied to a property |
 | Body format | Plain text, no branding | Reads like a personal email, not a marketing template |
 | From / Reply-To | From agency (`info@agencegaremonaco.com`, display name "Agence Immobilière de la Gare"), Reply-To `adrien@agencegaremonaco.com` | Keeps verified Brevo sender + DKIM; replies reach Adrien. Matches `PropertyMailer` and `ApplicationMailer` default. Display name kept (not personalized to Adrien) for deliverability; the personal tone comes from the plain-text body and the Reply-To |
@@ -43,9 +52,13 @@ background; the attachment is stored briefly, used for the sends, then purged.
 ## User flow
 
 1. Adrien clicks **"Envoyer un email"** in the admin sidebar.
-2. The compose page shows a recipient picker (tabs Tous/Contacts/Peers, search,
-   sortable table, checkboxes) plus **Subject**, **Body**, and **Attachment** fields.
-3. Adrien selects recipients, writes subject + body, optionally attaches a file.
+2. The compose page shows an **audience toggle** (Peers / Contacts, default
+   Peers), a **search** field, a checkbox list of that audience ordered by name,
+   and a **"select all"** checkbox that ticks every row currently listed (i.e.
+   the current audience filtered by the current search). Plus **Subject**,
+   **Body**, and **Attachment** fields.
+3. Adrien picks the audience, optionally searches, selects recipients (or "select
+   all"), writes subject + body, and optionally attaches a file.
 4. Adrien clicks **Envoyer**.
 5. The controller validates, persists an `OutgoingEmail` record (with the
    attachment), enqueues one send job per recipient, flashes
@@ -76,20 +89,24 @@ Each unit has one clear purpose, a defined interface, and is testable in isolati
 ### 2. `Admin::OutgoingEmailsController` (new)
 
 - Inherits `Admin::BaseController` (admin layout, French locale).
-- `new` — renders the compose page (recipient picker + form).
-- `create` — receives `contact_ids[]` from the picker. Resolves them at enqueue
-  time: loads the contacts, keeps only those that still exist and have a non-nil
-  email, and maps each to a `(recipient_email, recipient_name)` pair. This is why
-  the model has no Contact association — recipients are snapshotted into the jobs.
-  Validates (≥ 1 resolvable recipient, subject + body present, attachment within
-  size cap); builds the `OutgoingEmail` (`pending_count` = number of resolved
-  recipients); enqueues one `SendOutgoingEmailJob` per recipient; flashes and
-  redirects. On validation failure, re-renders the form with errors and enqueues
-  nothing. A submitted `contact_id` that no longer exists or whose email became
+- `new` — renders the compose page (audience toggle + searchable recipient list +
+  form). The audience param (`peers` / `contacts`, default `peers`) and search
+  term scope the list via the `Contact` `.peers` / `.contacts_only` and `.search`
+  scopes; only contacts with an email are listed (`.where.not(email: nil)`). The
+  list re-renders on audience/search change (Turbo Frame, like the existing
+  contacts index).
+- `create` — receives `contact_ids[]` plus the `audience`. Resolves recipients at
+  enqueue time: loads the submitted contacts, keeps only those that still exist,
+  belong to the submitted audience, and have a non-nil email, then maps each to a
+  `(recipient_email, recipient_name)` pair. This is why the model has no Contact
+  association — recipients are snapshotted into the jobs. Validates (≥ 1 resolvable
+  recipient, subject + body present, attachment within size cap); builds the
+  `OutgoingEmail` (`pending_count` = number of resolved recipients); enqueues one
+  `SendOutgoingEmailJob` per recipient; flashes and redirects. On validation
+  failure, re-renders the form with errors and enqueues nothing. A submitted
+  `contact_id` that no longer exists, is out of audience, or whose email became
   nil between page-load and submit is silently dropped (not an error); if that
   leaves zero recipients, it fails the "≥ 1 recipient" validation.
-- Reuses the existing contact scope/search/sort helpers from the property-share
-  flow; only contacts with an email are selectable (`.where.not(email: nil)`).
 
 ### 3. `OutgoingEmailMailer` (new)
 
@@ -114,20 +131,27 @@ Each unit has one clear purpose, a defined interface, and is testable in isolati
   against orphaned records/blobs left by a job that exhausts retries before
   decrementing.
 
-### 6. Compose view + shared picker partial + sidebar link
+### 6. Compose view + select-all controller + sidebar link
 
-- `app/views/admin/outgoing_emails/new.html.erb` — recipient picker + subject /
-  body / attachment fields.
-- **Refactor:** extract the property-share recipient table (currently inline in
-  `property_shares/new.html.erb`: tabs-with-counts, search form, sortable headers,
-  checkboxes) into a shared partial `app/views/admin/contacts/_picker.html.erb`
-  rendered by both the property-share flow and this new compose page. This is a
-  real refactor, not a trivial move: the partial must be parameterized (form
-  action, hidden-field/checkbox names — property-share posts `contact_ids[]`), and
-  the tab/filter logic (`filtered_scope`) is currently duplicated across
-  `PropertySharesController` and `ContactsController`, so it should be extracted
-  into a shared concern. The plan should budget for this. Both flows must keep
-  working; the existing property-share tests gate the extraction.
+- `app/views/admin/outgoing_emails/new.html.erb` — the compose form: audience
+  toggle (Peers / Contacts), search field, recipient checkbox list, select-all
+  checkbox, and Subject / Body / Attachment fields.
+- **Own recipient list, not the property-share picker.** Because a send never
+  mixes audiences, the compose page does NOT reuse or extract the property-share
+  picker. It renders its own simpler list of one audience at a time (ordered by
+  name, `contact_ids[]` checkboxes, only contacts with email). No "Tous" tab, no
+  sortable columns, no cross-audience persistence. The existing
+  `share_selection_controller.js` and `property_shares/new.html.erb` are left
+  **untouched** — this design avoids the rename/coordination risk of sharing that
+  controller.
+- **Select-all checkbox:** a small Stimulus controller (`select_all_controller.js`)
+  whose header checkbox toggles every currently-listed `contact_ids[]` checkbox on
+  or off, and reflects an indeterminate/checked state as individual rows are
+  toggled. Because the list shows a single audience filtered by search, "select
+  all" unambiguously means "everyone currently shown" — there is no hidden
+  cross-audience selection to reason about. When the list re-renders (audience or
+  search change via Turbo Frame), the controller resyncs the header state to the
+  rows then present.
 - New sidebar entry in `app/views/layouts/admin.html.erb` ("Envoyer un email").
 
 ## Data flow
@@ -182,17 +206,24 @@ last job (pending_count → 0)
 
 **Controller** (`test/controllers/admin/outgoing_emails_controller_test.rb`)
 - Unauthenticated → redirect to login.
-- `new` renders compose form + recipient picker.
-- `create` (valid) enqueues N jobs (`assert_enqueued_jobs N`), flashes, redirects.
+- `new` (default) renders the compose form with the Peers audience selected.
+- `new?audience=contacts` lists contacts (not peers); search narrows the list.
+- The list shows only contacts with an email; peers and contacts don't intermix.
+- `new` renders a "select all" checkbox (assert markup / data-attributes — the
+  project has no JS or system test runner; Minitest integration tests only).
+- `create` (valid, audience=peers) enqueues N jobs (`assert_enqueued_jobs N`),
+  flashes, redirects; emails only the resolved peers.
+- `create` drops submitted ids that are out of audience / no longer exist / have a
+  nil email; if that leaves zero, it fails the "≥ 1 recipient" validation.
 - `create` (no recipients / missing subject / missing body / oversized attachment)
   → re-renders with errors, enqueues nothing.
-- Contacts without email are not selectable.
 
 **Sweeper** (`test/jobs/purge_stale_outgoing_emails_job_test.rb`)
 - Purges records older than 24h; leaves recent ones.
 
-**Regression:** run the existing property-share tests to confirm the shared
-`_picker` partial extraction doesn't break them.
+**No regression to property-share:** this design does not touch the property-share
+picker, controller, or `share_selection_controller.js`. Still run the existing
+property-share tests as a sanity check, but no changes to them are expected.
 
 ## Affected / new files
 
@@ -201,8 +232,9 @@ last job (pending_count → 0)
 - New: `app/mailers/outgoing_email_mailer.rb` + views (`text` template)
 - New: `app/jobs/send_outgoing_email_job.rb`
 - New: `app/jobs/purge_stale_outgoing_emails_job.rb`
-- New: `app/views/admin/outgoing_emails/new.html.erb`
-- New: `app/views/admin/contacts/_picker.html.erb` (extracted; property-share view updated to render it)
+- New: `app/views/admin/outgoing_emails/new.html.erb` (audience toggle + searchable list + form)
+- New: `app/views/admin/outgoing_emails/_recipient_list.html.erb` (Turbo Frame partial re-rendered on audience/search change)
+- New: `app/javascript/controllers/select_all_controller.js` (compose-page select-all; property-share controller untouched)
 - New migration: `outgoing_emails` table
 - Edit: `config/routes.rb` (admin `resources :outgoing_emails, only: [:new, :create]`)
 - Edit: `config/recurring.yml` (sweeper schedule)
