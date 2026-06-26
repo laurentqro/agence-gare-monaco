@@ -31,9 +31,48 @@ attachment is stored briefly, used for the sends, then purged.
 - No deep-link "email selected" action from the Contacts list (standalone page only).
 - **No mixed-audience sends.** A single email goes to peers or to contacts, not
   both — so no "Tous" tab and no cross-tab/cross-audience selection.
-- **No reuse of the property-share picker.** The compose page has its own simpler
-  recipient list; the existing `share_selection_controller.js` persisted-selection
+- **No reuse of the property-share *persisted-selection UI*.** The compose page
+  has its own simpler recipient list; the existing `share_selection_controller.js`
   picker is left untouched (no shared-partial extraction, no controller rename).
+  Backend logic IS reused — see "Code reuse" below.
+
+## Code reuse
+
+Maximize reuse of the **audience-agnostic** pieces the property-share flow already
+established; build new only the parts that differ because compose is single-audience
+and free-text. Explicitly:
+
+**Reuse (do not rebuild):**
+- `Contact` scopes `.peers`, `.contacts_only`, `.search(q)` — already shared model
+  API; the compose list is built from `Contact.where.not(email: nil).search(q)`
+  narrowed by the chosen audience scope, exactly mirroring
+  `PropertySharesController#new` (lines 14-16).
+- The **email-only filter** `.where.not(email: nil)` (recipients must have an email).
+- The **per-recipient send loop** shape from `PropertySharesController#create`
+  (`contacts.each { |c| Mailer....deliver }`), swapping `PropertyMailer` →
+  `OutgoingEmailMailer`, `deliver_now` → `SendOutgoingEmailJob.perform_later`.
+- The **Turbo-Frame list-refresh-on-filter** pattern used by the admin contacts
+  index / property-share `new` (the frame re-renders when audience/search change).
+- `Admin::BaseController` (admin layout + French locale), the admin form styling,
+  and the flash conventions.
+
+**Reuse opportunistically (implementer's call, don't over-extract):**
+- `filtered_scope` (the tiny peers/contacts/all `case` in both
+  `PropertySharesController` and `ContactsController`). Compose needs only the
+  peers-or-contacts subset, so either extract it into a small shared concern and
+  use it, or reimplement as a two-line audience scope — whichever is cleaner. Do
+  NOT force a heavyweight refactor of the property-share flow for this.
+
+**Build new (intentionally not reused):**
+- The compose view (audience toggle + searchable list + subject/body/attachment).
+- `select_all_controller.js` — a *stateless* select-all (toggle currently-listed
+  rows), NOT the persisted `share_selection_controller.js`. Single-audience means
+  no cross-tab selection to persist, so its persistence behavior is unwanted here.
+
+**Leave untouched (no regression risk):**
+- `share_selection_controller.js`, `app/views/admin/property_shares/*`, and
+  `PropertySharesController` — the property-share flow is in production and this
+  feature changes none of it.
 
 ## Design decisions
 
