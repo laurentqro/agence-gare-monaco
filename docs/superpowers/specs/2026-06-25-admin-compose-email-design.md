@@ -44,15 +44,26 @@ and free-text. Explicitly:
 
 **Reuse (do not rebuild):**
 - `Contact` scopes `.peers`, `.contacts_only`, `.search(q)` — already shared model
-  API; the compose list is built from `Contact.where.not(email: nil).search(q)`
-  narrowed by the chosen audience scope, exactly mirroring
-  `PropertySharesController#new` (lines 14-16).
+  API; the compose list is built as `audience_scope(Contact.where.not(email: nil)).search(q)`
+  (audience filter then search, composing scopes), mirroring
+  `PropertySharesController#new` (lines 14-15: `filtered_scope(shareable).search(@query)`).
 - The **email-only filter** `.where.not(email: nil)` (recipients must have an email).
 - The **per-recipient send loop** shape from `PropertySharesController#create`
-  (`contacts.each { |c| Mailer....deliver }`), swapping `PropertyMailer` →
-  `OutgoingEmailMailer`, `deliver_now` → `SendOutgoingEmailJob.perform_later`.
-- The **Turbo-Frame list-refresh-on-filter** pattern used by the admin contacts
-  index / property-share `new` (the frame re-renders when audience/search change).
+  (lines 37-40: `contacts.each { |c| Mailer....deliver }`), swapping `PropertyMailer` →
+  `OutgoingEmailMailer`, and the synchronous `deliver_now` → `SendOutgoingEmailJob.perform_later`.
+- The **Turbo-Frame list-refresh-on-filter** pattern — copy it from
+  **`property_shares/new.html.erb`**, whose filter tabs and search form both target
+  the `share_contacts_table` frame for an *in-frame* swap. Do NOT model it on the
+  contacts *index*: that uses `data: { turbo_frame: "_top" }` for filter/search
+  (full-page navigation), which is the wrong behavior here. The recipient-checkbox +
+  email-only + in-frame markup variant lives in `property_shares/new`, so copy from
+  there rather than the contacts index.
+- The **Active Storage `has_one_attached` convention** — established across the app
+  (`PropertyDocument#has_one_attached :file` is the closest precedent, same `:file`
+  name; also Article, PropertyImage, Property). Mirror its service config; only the
+  ≤ 10 MB byte-size validation is genuinely new (no existing model validates size).
+- The **mailer From/Reply-To precedent** from `PropertyMailer` (Reply-To
+  `adrien@agencegaremonaco.com`, From inherited from `ApplicationMailer`).
 - `Admin::BaseController` (admin layout + French locale), the admin form styling,
   and the flash conventions.
 
@@ -133,9 +144,11 @@ Each unit has one clear purpose, a defined interface, and is testable in isolati
   term scope the list via the `Contact` `.peers` / `.contacts_only` and `.search`
   scopes; only contacts with an email are listed (`.where.not(email: nil)`),
   ordered by name (`.order(:last_name, :first_name)`). The list re-renders on
-  audience/search change (Turbo Frame, like the existing contacts index). Note:
-  this view deliberately drops sortable columns, so it must NOT include the
-  `Sortable` concern (no `sort_scope` / `sort_link`) — just the name ordering.
+  audience/search change (Turbo Frame, like the in-frame refresh in
+  `property_shares/new` — NOT the contacts index, which navigates `_top` on
+  filter/search). Note: this view deliberately drops sortable columns, so it must
+  NOT include the `Sortable` concern (no `sort_scope` / `sort_link`) — just name
+  ordering.
 - `create` — receives `contact_ids[]` plus the `audience`. Resolves recipients at
   enqueue time: loads the submitted contacts, keeps only those that still exist,
   belong to the submitted audience, and have a non-nil email, then maps each to a
