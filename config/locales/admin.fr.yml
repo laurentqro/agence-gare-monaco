@@ -8,6 +8,7 @@ fr:
       categories: "Catégories"
       contacts: "Contacts"
       information_requests: "Demandes"
+      compose_email: "Envoyer un email"
       logout: "Déconnexion"
     sessions:
       title: "Administration"
@@ -293,5 +294,21 @@ fr:
         shared: "Bien partagé avec %{count} contacts."
         no_contacts_selected: "Veuillez sélectionner au moins un contact."
     outgoing_emails:
+      title: "Envoyer un email"
+      audience:
+        peers: "Confrères"
+        contacts: "Contacts"
+      search_placeholder: "Rechercher…"
+      select_all: "Tout sélectionner"
+      no_results: "Aucun résultat."
+      no_recipients: "Aucun destinataire pour le moment."
+      fields:
+        subject: "Sujet"
+        body: "Message"
+        attachment: "Pièce jointe (optionnelle, 10 Mo max)"
+      send: "Envoyer"
+      flash:
+        queued: "Email mis en file pour %{count} contacts."
+        no_recipients: "Veuillez sélectionner au moins un destinataire."
       errors:
         attachment_too_big: "Le fichier dépasse 10 Mo."

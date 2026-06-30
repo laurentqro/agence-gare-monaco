@@ -1,0 +1,11 @@
+<div class="p-8">
+  <h1 class="heading-page mb-6"><%= t("admin.outgoing_emails.title") %></h1>
+
+  <%= form_with url: admin_outgoing_emails_path, method: :post, id: "compose_form", multipart: true do |f| %>
+    <%= f.hidden_field :audience, value: @audience, id: "compose_audience" %>
+
+    <div class="bg-white rounded shadow p-6 mb-6">
+      <%= render "recipient_list" %>
+    </div>
+  <% end %>
+</div>
