@@ -306,6 +306,8 @@ fr:
         subject: "Sujet"
         body: "Message"
         attachment: "Pièce jointe (optionnelle, 10 Mo max)"
+        choose_file: "Choisir un fichier"
+        no_file: "Aucun fichier sélectionné"
       send: "Envoyer"
       flash:
         queued: "Email mis en file pour %{count} contacts."

@@ -102,6 +102,18 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type='submit']"
   end
 
+  test "GET new renders a styled French file picker, not the bare browser control" do
+    get new_admin_outgoing_email_url
+    assert_response :success
+    # The native input is hidden and driven by a styled label-button so the
+    # control matches the admin theme and shows French text (the browser's own
+    # "Choose file / No file chosen" ignores the locale).
+    assert_select "[data-controller='file-input']"
+    assert_select "input[type='file'][name='outgoing_email[file]'].hidden"
+    assert_select "[data-controller='file-input'] label", text: /Choisir un fichier/
+    assert_select "[data-file-input-target='filename']", text: /Aucun fichier sélectionné/
+  end
+
   test "GET new renders a select-all checkbox wired to the select-all controller" do
     get new_admin_outgoing_email_url
     assert_response :success
