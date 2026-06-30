@@ -24,6 +24,11 @@ class Contact < ApplicationRecord
     where(clause, pattern: pattern)
   }
 
+  # "Last First" for list rows and email greetings, skipping blank parts.
+  def listing_name
+    [ last_name, first_name ].compact_blank.join(" ")
+  end
+
   private
 
   def must_have_identifying_field

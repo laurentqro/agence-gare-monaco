@@ -2,9 +2,12 @@ module Admin
   class OutgoingEmailsController < BaseController
     AUDIENCES = %w[peers contacts].freeze
 
-    # Pre-filled into the body on a fresh compose page. The leading blank lines
-    # put the cursor above the signature so Adrien types his message first.
-    SIGNATURE = "\n\nAdrien Maré\nadrien@agencegaremonaco.com\nT: +33 6 62 39 20 65".freeze
+    # Pre-filled into the body on a fresh compose page, built from the shared
+    # agent record so the name/email/phone stay in one place. The leading blank
+    # lines put the cursor above the signature so Adrien types his message first.
+    SIGNATURE = "\n\n#{PropertyMailer::AGENT[:name]}\n" \
+                "#{PropertyMailer::AGENT[:email]}\n" \
+                "T: #{PropertyMailer::AGENT[:phone]}".freeze
 
     def new
       load_recipients
@@ -25,8 +28,8 @@ module Admin
         return render_new_with_errors
       end
 
-      recipients.each do |email, name|
-        SendOutgoingEmailJob.perform_later(@outgoing_email.id, email, name)
+      recipients.each do |email|
+        SendOutgoingEmailJob.perform_later(@outgoing_email.id, email)
       end
 
       redirect_to new_admin_outgoing_email_url,
@@ -48,8 +51,7 @@ module Admin
       ids = Array(params[:contact_ids]).reject(&:blank?)
       return [] if ids.empty?
 
-      audience_scope(Contact.with_email.where(id: ids))
-        .map { |c| [ c.email, [ c.last_name, c.first_name ].compact_blank.join(" ") ] }
+      audience_scope(Contact.with_email.where(id: ids)).pluck(:email)
     end
 
     def render_new_with_errors

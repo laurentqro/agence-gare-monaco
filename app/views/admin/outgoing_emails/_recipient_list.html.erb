@@ -45,7 +45,7 @@
                        class="rounded border-gray-300 text-navy focus:ring-navy">
               </td>
               <td class="px-3 py-2 font-medium" data-recipient-name>
-                <%= [contact.last_name, contact.first_name].compact_blank.join(" ") %>
+                <%= contact.listing_name %>
               </td>
               <td class="px-3 py-2 text-gray-500"><%= contact.email %></td>
             </tr>
