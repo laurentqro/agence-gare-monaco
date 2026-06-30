@@ -67,4 +67,23 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href*='audience=peers']"
     assert_select "input[type='search'][name='q']"
   end
+
+  test "GET new renders subject, body and attachment fields" do
+    get new_admin_outgoing_email_url
+    assert_response :success
+    assert_select "input[name='outgoing_email[subject]']"
+    assert_select "textarea[name='outgoing_email[body]']"
+    assert_select "input[type='file'][name='outgoing_email[file]']"
+    assert_select "input[type='submit']"
+  end
+
+  test "GET new renders a select-all checkbox wired to the select-all controller" do
+    get new_admin_outgoing_email_url
+    assert_response :success
+    # The controller must wrap the frame so it survives Turbo re-render.
+    assert_select "[data-controller='select-all'] turbo-frame#compose_recipients"
+    assert_select "input[type='checkbox'][data-select-all-target='all']"
+    # Row checkboxes are the controller's targets.
+    assert_select "input[type='checkbox'][data-select-all-target='item']"
+  end
 end
