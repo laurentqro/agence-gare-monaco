@@ -1,6 +1,7 @@
 module Admin
   class OutgoingEmailsController < BaseController
     AUDIENCES = %w[peers contacts].freeze
+    DEFAULT_AUDIENCE = "peers".freeze
 
     # Pre-filled into the body on a fresh compose page, built from the shared
     # agent record so the name/email/phone stay in one place. The leading blank
@@ -8,6 +9,8 @@ module Admin
     SIGNATURE = "\n\n#{PropertyMailer::AGENT[:name]}\n" \
                 "#{PropertyMailer::AGENT[:email]}\n" \
                 "T: #{PropertyMailer::AGENT[:phone]}".freeze
+
+    before_action :set_audience
 
     def new
       load_recipients
@@ -42,11 +45,11 @@ module Admin
       params.require(:outgoing_email).permit(:subject, :body, :file)
     end
 
-    # Resolves submitted contact_ids to [email, name] pairs, keeping only
-    # contacts that still exist, belong to the submitted audience, and have a
-    # non-nil email. Out-of-audience / missing / now-email-less ids are silently
-    # dropped (page-load vs submit drift); if that leaves zero, the create path
-    # treats it as "no recipients selected".
+    # Resolves submitted contact_ids to recipient emails, keeping only contacts
+    # that still exist, belong to the submitted audience, and have a present
+    # email. Out-of-audience, missing, or now-email-less ids are silently dropped
+    # (page-load vs submit drift); if that leaves zero, the create path treats it
+    # as "no recipients selected".
     def resolve_recipients
       ids = Array(params[:contact_ids]).reject(&:blank?)
       return [] if ids.empty?
@@ -61,19 +64,20 @@ module Admin
 
     # Recipients are email-bearing contacts of the chosen audience, name-ordered.
     # Mirrors PropertySharesController#new (audience filter then search), minus
-    # sorting — this page deliberately has no sortable columns.
+    # sorting: this page deliberately has no sortable columns.
     def load_recipients
-      @audience = AUDIENCES.include?(params[:audience]) ? params[:audience] : "peers"
       @query = params[:q]
-
-      emailable = Contact.with_email
-      @recipients = audience_scope(emailable)
+      @recipients = audience_scope(Contact.with_email)
                       .search(@query)
                       .order(:last_name, :first_name)
     end
 
+    def set_audience
+      @audience = AUDIENCES.include?(params[:audience]) ? params[:audience] : DEFAULT_AUDIENCE
+    end
+
+    # Pure: filters the given relation by the already-resolved @audience.
     def audience_scope(relation)
-      @audience ||= AUDIENCES.include?(params[:audience]) ? params[:audience] : "peers"
       @audience == "contacts" ? relation.contacts_only : relation.peers
     end
   end

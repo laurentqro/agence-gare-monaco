@@ -301,11 +301,10 @@ fr:
       search_placeholder: "Rechercher…"
       select_all: "Tout sélectionner"
       no_results: "Aucun résultat."
-      no_recipients: "Aucun destinataire pour le moment."
       fields:
         subject: "Sujet"
         body: "Message"
-        attachment: "Pièce jointe (optionnelle, 10 Mo max)"
+        attachment: "Pièce jointe (optionnelle, %{limit} Mo max)"
         choose_file: "Choisir un fichier"
         no_file: "Aucun fichier sélectionné"
       send: "Envoyer"
@@ -313,4 +312,4 @@ fr:
         queued: "Email mis en file pour %{count} contacts."
         no_recipients: "Veuillez sélectionner au moins un destinataire."
       errors:
-        attachment_too_big: "Le fichier dépasse 10 Mo."
+        attachment_too_big: "Le fichier dépasse %{limit} Mo."

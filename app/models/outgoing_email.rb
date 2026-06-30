@@ -56,7 +56,12 @@ class OutgoingEmail < ApplicationRecord
 
     # Explicit message (not a bare :too_big symbol) because rails-i18n ships no
     # `too_big` default in FR, so the rendered error box would otherwise show a
-    # missing-translation string.
-    errors.add(:file, I18n.t("admin.outgoing_emails.errors.attachment_too_big"))
+    # missing-translation string. The limit is interpolated from the one constant
+    # so the number lives in a single place.
+    errors.add(:file, I18n.t("admin.outgoing_emails.errors.attachment_too_big", limit: max_attachment_mb))
+  end
+
+  def max_attachment_mb
+    MAX_ATTACHMENT_BYTES / 1.megabyte
   end
 end
