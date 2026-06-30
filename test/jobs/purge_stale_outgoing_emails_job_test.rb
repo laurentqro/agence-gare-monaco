@@ -13,12 +13,23 @@ class PurgeStaleOutgoingEmailsJobTest < ActiveJob::TestCase
     assert_not ActiveStorage::Blob.exists?(blob_id)
   end
 
-  test "leaves recent records untouched" do
+  test "leaves recent records untouched even when still draining" do
+    # A young record with recipients still pending is a healthy in-flight send,
+    # not an orphan; the sweeper must not touch it.
     recent = OutgoingEmail.create!(subject: "New", body: "Body", pending_count: 1)
     recent.update_column(:created_at, 1.hour.ago)
 
     PurgeStaleOutgoingEmailsJob.perform_now
 
     assert OutgoingEmail.exists?(recent.id)
+  end
+
+  test "reaps an old orphan whose recipients never completed" do
+    orphan = OutgoingEmail.create!(subject: "Stuck", body: "Body", pending_count: 2)
+    orphan.update_column(:created_at, 30.hours.ago)
+
+    PurgeStaleOutgoingEmailsJob.perform_now
+
+    assert_not OutgoingEmail.exists?(orphan.id)
   end
 end

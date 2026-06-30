@@ -7,25 +7,48 @@ class OutgoingEmail < ApplicationRecord
   validates :body, presence: true
   validate :attachment_within_size_limit
 
-  # Atomically records that one more recipient's send finished. When the last
-  # send completes (post-decrement count reaches 0) it purges the attachment
-  # and destroys the record. The conditional UPDATE means exactly one caller
-  # can drive the count to 0, so exactly one caller purges — two jobs finishing
-  # at the same instant can't both purge or both skip.
-  def decrement_and_maybe_purge!
-    rows = self.class.where(id: id).where("pending_count > 0")
-                 .update_all("pending_count = pending_count - 1")
-    return if rows.zero?
+  # Claims a recipient as delivered, exactly once. Returns true the first time a
+  # given recipient is recorded and false on any replay (worker crash recovery,
+  # operator retry), so the caller can send on true and skip on false. The first
+  # successful claim also counts that recipient down and purges the record when
+  # the last one completes. A row lock serializes the read-modify-write on the
+  # JSON column, so two jobs finishing at the same instant cannot both claim the
+  # same recipient, double-decrement, or double-purge.
+  def mark_sent!(recipient_email)
+    claimed = false
+    with_lock do
+      already = sent_emails.include?(recipient_email)
+      next if already
 
-    if reload.pending_count <= 0
+      update!(
+        sent_emails: sent_emails + [ recipient_email ],
+        pending_count: [ pending_count - 1, 0 ].max
+      )
+      claimed = true
+    end
+
+    purge_if_complete!
+    claimed
+  rescue ActiveRecord::RecordNotFound
+    # Another concurrent caller already completed and destroyed it; nothing to do.
+    false
+  end
+
+  private
+
+  # Purges the attachment and destroys the record once every recipient has been
+  # claimed. Guarded so only the final claimer (pending_count reached 0) tears it
+  # down, and tolerant of a concurrent teardown that already removed the row.
+  def purge_if_complete!
+    return if pending_count.positive?
+
+    with_lock do
       file.purge if file.attached?
       destroy
     end
   rescue ActiveRecord::RecordNotFound
-    # Another concurrent caller already destroyed it; nothing to do.
+    # Already destroyed by a concurrent final claimer.
   end
-
-  private
 
   def attachment_within_size_limit
     return unless file.attached?

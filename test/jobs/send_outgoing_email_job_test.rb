@@ -36,4 +36,23 @@ class SendOutgoingEmailJobTest < ActiveJob::TestCase
       SendOutgoingEmailJob.perform_now(-1, "jean@example.com", "Jean Dupont")
     end
   end
+
+  test "a replayed job for the same recipient does not re-send or re-decrement" do
+    # Simulates Solid Queue re-dispatching a job after a worker crash: the first
+    # run sends and counts the recipient down; the replay must be a silent no-op.
+    SendOutgoingEmailJob.perform_now(@outgoing.id, "jean@example.com", "Jean Dupont")
+    assert_equal 1, @outgoing.reload.pending_count
+
+    assert_no_emails do
+      SendOutgoingEmailJob.perform_now(@outgoing.id, "jean@example.com", "Jean Dupont")
+    end
+    assert_equal 1, @outgoing.reload.pending_count, "a replay must not decrement again"
+  end
+
+  test "distinct recipients each send and count down" do
+    SendOutgoingEmailJob.perform_now(@outgoing.id, "jean@example.com", "Jean Dupont")
+    SendOutgoingEmailJob.perform_now(@outgoing.id, "marie@example.com", "Marie Aubert")
+    # Both recipients claimed -> record torn down.
+    assert_not OutgoingEmail.exists?(@outgoing.id)
+  end
 end
