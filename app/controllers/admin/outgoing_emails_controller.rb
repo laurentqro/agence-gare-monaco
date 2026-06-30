@@ -48,7 +48,7 @@ module Admin
       ids = Array(params[:contact_ids]).reject(&:blank?)
       return [] if ids.empty?
 
-      audience_scope(Contact.where.not(email: nil).where(id: ids))
+      audience_scope(Contact.with_email.where(id: ids))
         .map { |c| [ c.email, [ c.last_name, c.first_name ].compact_blank.join(" ") ] }
     end
 
@@ -64,7 +64,7 @@ module Admin
       @audience = AUDIENCES.include?(params[:audience]) ? params[:audience] : "peers"
       @query = params[:q]
 
-      emailable = Contact.where.not(email: nil)
+      emailable = Contact.with_email
       @recipients = audience_scope(emailable)
                       .search(@query)
                       .order(:last_name, :first_name)

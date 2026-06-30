@@ -10,6 +10,9 @@ class Contact < ApplicationRecord
   scope :peers, -> { where(peer: true) }
   scope :contacts_only, -> { where(peer: false) }
 
+  # Contacts that can actually be emailed: a present (non-nil, non-blank) email.
+  scope :with_email, -> { where.not(email: [ nil, "" ]) }
+
   # Case-insensitive match across name, company, and email. Blank query returns
   # the full relation.
   scope :search, ->(query) {

@@ -136,6 +136,25 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#compose_recipients[data-audience='contacts']"
   end
 
+  test "GET new excludes contacts whose email is an empty string" do
+    blank_email = Contact.create!(last_name: "Vide", first_name: "Email", email: "", peer: true)
+    get new_admin_outgoing_email_url
+    assert_response :success
+    assert_select "input[type='checkbox'][value='#{blank_email.id}']", 0
+  end
+
+  test "POST create drops contacts whose email is an empty string" do
+    blank_email = Contact.create!(last_name: "Vide", first_name: "Email", email: "", peer: true)
+    assert_enqueued_jobs 1, only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        audience: "peers",
+        contact_ids: [ @peer1.id, blank_email.id ],
+        outgoing_email: { subject: "S", body: "B" }
+      }
+    end
+    assert_equal 1, OutgoingEmail.last.pending_count
+  end
+
   test "POST create resolves recipients matching the submitted audience" do
     # Server-side guard: even if the audience and ids drift, the audience cross-
     # filter keeps a send single-audience. Submitting contacts under the contacts
