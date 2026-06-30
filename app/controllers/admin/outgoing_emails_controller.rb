@@ -2,9 +2,13 @@ module Admin
   class OutgoingEmailsController < BaseController
     AUDIENCES = %w[peers contacts].freeze
 
+    # Pre-filled into the body on a fresh compose page. The leading blank lines
+    # put the cursor above the signature so Adrien types his message first.
+    SIGNATURE = "\n\nAdrien Maré\nadrien@agencegaremonaco.com\nT: +33 6 62 39 20 65".freeze
+
     def new
       load_recipients
-      @outgoing_email ||= OutgoingEmail.new
+      @outgoing_email ||= OutgoingEmail.new(body: SIGNATURE)
     end
 
     def create

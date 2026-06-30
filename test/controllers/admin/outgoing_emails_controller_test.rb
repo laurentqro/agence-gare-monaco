@@ -27,6 +27,31 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type='checkbox'][value='#{@contact1.id}']", 0
   end
 
+  test "GET new pre-fills the body with Adrien's signature" do
+    get new_admin_outgoing_email_url
+    assert_response :success
+    body = css_select("textarea[name='outgoing_email[body]']").first.text
+    assert_includes body, "Adrien Maré"
+    assert_includes body, "adrien@agencegaremonaco.com"
+    assert_includes body, "T: +33 6 62 39 20 65"
+    # The signature sits below empty leading lines so the cursor lands above it.
+    assert body.start_with?("\n\n"), "expected blank lines before the signature, got #{body.inspect}"
+  end
+
+  test "POST create re-render keeps the submitted body, not the default signature" do
+    # A validation failure (missing subject) re-renders the form; it must show
+    # what Adrien actually typed, never re-stamp the pre-filled signature over it.
+    post admin_outgoing_emails_url, params: {
+      audience: "peers",
+      contact_ids: [ @peer1.id ],
+      outgoing_email: { subject: "", body: "Bonjour, voici mon message." }
+    }
+    assert_response :unprocessable_entity
+    body = css_select("textarea[name='outgoing_email[body]']").first.text
+    assert_includes body, "Bonjour, voici mon message."
+    refute_includes body, "Adrien Maré"
+  end
+
   test "GET new lists only contacts that have an email" do
     get new_admin_outgoing_email_url
     assert_response :success
