@@ -86,4 +86,127 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     # Row checkboxes are the controller's targets.
     assert_select "input[type='checkbox'][data-select-all-target='item']"
   end
+
+  # --- create ---
+
+  test "POST create enqueues one send job per resolved peer and redirects" do
+    assert_enqueued_jobs 2, only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        audience: "peers",
+        contact_ids: [ @peer1.id, @peer2.id ],
+        outgoing_email: { subject: "Bonjour", body: "Un message." }
+      }
+    end
+    assert_redirected_to new_admin_outgoing_email_url
+    assert_equal "Email mis en file pour 2 contacts.", flash[:notice]
+  end
+
+  test "POST create persists an OutgoingEmail with pending_count = recipient count" do
+    assert_difference "OutgoingEmail.count", 1 do
+      post admin_outgoing_emails_url, params: {
+        audience: "peers",
+        contact_ids: [ @peer1.id, @peer2.id ],
+        outgoing_email: { subject: "Bonjour", body: "Un message." }
+      }
+    end
+    assert_equal 2, OutgoingEmail.last.pending_count
+  end
+
+  test "POST create attaches an uploaded file to the OutgoingEmail" do
+    file = Rack::Test::UploadedFile.new(StringIO.new("PDF"), "application/pdf", original_filename: "doc.pdf")
+    post admin_outgoing_emails_url, params: {
+      audience: "peers",
+      contact_ids: [ @peer1.id ],
+      outgoing_email: { subject: "S", body: "B", file: file }
+    }
+    assert OutgoingEmail.last.file.attached?
+  end
+
+  test "POST create drops ids that are out of the submitted audience" do
+    # contact1 is NOT a peer; submitting it under audience=peers must drop it.
+    assert_enqueued_jobs 1, only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        audience: "peers",
+        contact_ids: [ @peer1.id, @contact1.id ],
+        outgoing_email: { subject: "S", body: "B" }
+      }
+    end
+    assert_equal 1, OutgoingEmail.last.pending_count
+  end
+
+  test "POST create drops ids with no email and ids that no longer exist" do
+    assert_enqueued_jobs 1, only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        audience: "peers",
+        contact_ids: [ @peer1.id, @no_email.id, 999_999 ],
+        outgoing_email: { subject: "S", body: "B" }
+      }
+    end
+  end
+
+  test "POST create with no resolvable recipients re-renders with an error" do
+    assert_no_enqueued_jobs only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        audience: "peers",
+        contact_ids: [ @contact1.id ], # out of audience → resolves to zero
+        outgoing_email: { subject: "S", body: "B" }
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_select ".bg-red-50"
+  end
+
+  test "POST create with empty contact_ids re-renders with an error and enqueues nothing" do
+    assert_no_enqueued_jobs only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        audience: "peers",
+        contact_ids: [],
+        outgoing_email: { subject: "S", body: "B" }
+      }
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test "POST create with a missing subject re-renders with errors, enqueues nothing" do
+    assert_no_enqueued_jobs only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        audience: "peers",
+        contact_ids: [ @peer1.id ],
+        outgoing_email: { subject: "", body: "B" }
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_select ".bg-red-50"
+  end
+
+  test "POST create with a missing body re-renders with errors, enqueues nothing" do
+    assert_no_enqueued_jobs only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        audience: "peers",
+        contact_ids: [ @peer1.id ],
+        outgoing_email: { subject: "S", body: "" }
+      }
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test "POST create with an oversized attachment re-renders with errors, enqueues nothing" do
+    big = Rack::Test::UploadedFile.new(StringIO.new("a" * (10.megabytes + 1)), "application/pdf", original_filename: "big.pdf")
+    assert_no_enqueued_jobs only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        audience: "peers",
+        contact_ids: [ @peer1.id ],
+        outgoing_email: { subject: "S", body: "B", file: big }
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_no_difference "OutgoingEmail.count" do
+      # second submit confirms nothing persisted on the failing path
+      post admin_outgoing_emails_url, params: {
+        audience: "peers",
+        contact_ids: [ @peer1.id ],
+        outgoing_email: { subject: "S", body: "B", file: big }
+      }
+    end
+  end
 end
