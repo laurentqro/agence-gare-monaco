@@ -209,4 +209,10 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
       }
     end
   end
+
+  test "admin sidebar links to the compose-email page" do
+    get new_admin_outgoing_email_url
+    assert_response :success
+    assert_select "aside nav a[href='#{new_admin_outgoing_email_path}']", text: /Envoyer un email/
+  end
 end
