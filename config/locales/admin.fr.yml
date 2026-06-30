@@ -292,3 +292,6 @@ fr:
       flash:
         shared: "Bien partagé avec %{count} contacts."
         no_contacts_selected: "Veuillez sélectionner au moins un contact."
+    outgoing_emails:
+      errors:
+        attachment_too_big: "Le fichier dépasse 10 Mo."
