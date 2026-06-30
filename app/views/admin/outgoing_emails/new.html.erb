@@ -2,8 +2,6 @@
   <h1 class="heading-page mb-6"><%= t("admin.outgoing_emails.title") %></h1>
 
   <%= form_with url: admin_outgoing_emails_path, method: :post, id: "compose_form", multipart: true do |f| %>
-    <%= f.hidden_field :audience, value: @audience, id: "compose_audience" %>
-
     <% if @outgoing_email&.errors&.any? %>
       <div class="bg-red-50 border border-red-200 text-red-700 rounded p-4 mb-6">
         <ul class="list-disc list-inside text-sm">
@@ -14,7 +12,12 @@
       </div>
     <% end %>
 
-    <div class="bg-white rounded shadow p-6 mb-6">
+    <%# The recipient-selection controller wraps BOTH the hidden audience field
+        and the frame, so it can keep the audience and the checked rows in sync
+        across the Turbo re-render that an audience toggle or a search triggers. %>
+    <div class="bg-white rounded shadow p-6 mb-6" data-controller="recipient-selection">
+      <%= f.hidden_field :audience, value: @audience, id: "compose_audience",
+            data: { "recipient-selection-target": "audience" } %>
       <%= render "recipient_list" %>
     </div>
 

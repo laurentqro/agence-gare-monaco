@@ -1,5 +1,4 @@
-<div data-controller="select-all">
-<%= turbo_frame_tag "compose_recipients" do %>
+<%= turbo_frame_tag "compose_recipients", data: { audience: @audience } do %>
   <% frame = "compose_recipients" %>
 
   <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
@@ -28,8 +27,8 @@
         <thead class="sticky top-0 z-10 bg-gray-100 text-left text-xs uppercase tracking-wider border-b-2 border-gray-200">
           <tr>
             <th class="px-3 py-2 w-10">
-              <input type="checkbox" data-select-all-target="all"
-                     data-action="change->select-all#toggleAll"
+              <input type="checkbox" data-recipient-selection-target="all"
+                     data-action="change->recipient-selection#toggleAll"
                      aria-label="<%= t("admin.outgoing_emails.select_all") %>"
                      class="rounded border-gray-300 text-navy focus:ring-navy">
             </th>
@@ -42,8 +41,7 @@
             <tr class="hover:bg-gray-50">
               <td class="px-3 py-2 w-10">
                 <input type="checkbox" name="contact_ids[]" value="<%= contact.id %>" form="compose_form"
-                       data-select-all-target="item"
-                       data-action="change->select-all#itemChanged"
+                       data-recipient-selection-target="item"
                        class="rounded border-gray-300 text-navy focus:ring-navy">
               </td>
               <td class="px-3 py-2 font-medium" data-recipient-name>
@@ -59,4 +57,3 @@
     <p class="text-gray-500 text-sm"><%= t("admin.outgoing_emails.no_results") %></p>
   <% end %>
 <% end %>
-</div>

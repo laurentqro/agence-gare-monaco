@@ -114,14 +114,40 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-file-input-target='filename']", text: /Aucun fichier sélectionné/
   end
 
-  test "GET new renders a select-all checkbox wired to the select-all controller" do
+  test "GET new wires the recipient-selection controller around the frame for select-all and persistence" do
     get new_admin_outgoing_email_url
     assert_response :success
-    # The controller must wrap the frame so it survives Turbo re-render.
-    assert_select "[data-controller='select-all'] turbo-frame#compose_recipients"
-    assert_select "input[type='checkbox'][data-select-all-target='all']"
-    # Row checkboxes are the controller's targets.
-    assert_select "input[type='checkbox'][data-select-all-target='item']"
+    # The controller wraps the frame (and the hidden audience field) so both the
+    # checked rows AND the audience survive a Turbo re-render on search/toggle.
+    assert_select "[data-controller='recipient-selection'] turbo-frame#compose_recipients"
+    assert_select "input[type='checkbox'][data-recipient-selection-target='all']"
+    # Row checkboxes are the controller's persisted targets.
+    assert_select "input[type='checkbox'][data-recipient-selection-target='item']"
+  end
+
+  test "GET new exposes the current audience on the frame so JS can keep the hidden field in sync" do
+    get new_admin_outgoing_email_url(audience: "contacts")
+    assert_response :success
+    # The hidden audience field the controller writes to is inside the wrapper,
+    # and the frame advertises its current audience for the controller to read
+    # after each re-render. Without this, switching audience leaves the submitted
+    # value stale and the chosen recipients get filtered out on the server.
+    assert_select "[data-controller='recipient-selection'] input#compose_audience[type='hidden']"
+    assert_select "turbo-frame#compose_recipients[data-audience='contacts']"
+  end
+
+  test "POST create resolves recipients matching the submitted audience" do
+    # Server-side guard: even if the audience and ids drift, the audience cross-
+    # filter keeps a send single-audience. Submitting contacts under the contacts
+    # audience emails the contacts (not peers).
+    assert_enqueued_jobs 1, only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        audience: "contacts",
+        contact_ids: [ @contact1.id, @peer1.id ],
+        outgoing_email: { subject: "S", body: "B" }
+      }
+    end
+    assert_equal 1, OutgoingEmail.last.pending_count
   end
 
   # --- create ---
