@@ -64,10 +64,10 @@ class ContactTest < ActiveSupport::TestCase
     berg = Contact.create!(first_name: "Anna", last_name: "Berg", email: "anna@acme.com", company: "Acme SCI")
     dupont = Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@other.com")
 
-    assert_equal [berg], Contact.search("anna").to_a
-    assert_equal [berg], Contact.search("BERG").to_a
-    assert_equal [berg], Contact.search("acme").to_a
-    assert_equal [dupont], Contact.search("other.com").to_a
+    assert_equal [ berg ], Contact.search("anna").to_a
+    assert_equal [ berg ], Contact.search("BERG").to_a
+    assert_equal [ berg ], Contact.search("acme").to_a
+    assert_equal [ dupont ], Contact.search("other.com").to_a
     assert_equal [], Contact.search("nomatch").to_a
   end
 
@@ -82,8 +82,8 @@ class ContactTest < ActiveSupport::TestCase
     contact = Contact.create!(last_name: "Ordinary", peer: false)
     peer = Contact.create!(last_name: "Confrère", peer: true)
 
-    assert_equal [peer], Contact.peers.to_a
-    assert_equal [contact], Contact.contacts_only.to_a
+    assert_equal [ peer ], Contact.peers.to_a
+    assert_equal [ contact ], Contact.contacts_only.to_a
   end
 
   test "stores extended legacy fields" do
