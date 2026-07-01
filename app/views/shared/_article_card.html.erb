@@ -21,7 +21,7 @@
     <h3 class="article-title text-lg font-bold text-navy group-hover:text-accent transition-colors">
       <%= article.title_for(I18n.locale) %>
     </h3>
-    <p class="article-meta mt-2 text-xs text-accent">
+    <p class="article-meta mt-2 text-xs text-accent-dark">
       <% if article.published_at %>
         <time datetime="<%= article.published_at.iso8601 %>"><%= I18n.l(article.published_at.to_date, format: :long) %></time>
       <% end %>

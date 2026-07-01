@@ -19,9 +19,9 @@ module AdminHelper
   def admin_action_link(label, url, icon:, variant: :default, data: {}, **options)
     svg = ACTION_ICONS.fetch(icon)
     colors = case variant
-             when :danger then "text-red-600 hover:bg-red-50 hover:text-red-700"
-             else "text-gray-600 hover:bg-navy/5 hover:text-navy"
-             end
+    when :danger then "text-red-600 hover:bg-red-50 hover:text-red-700"
+    else "text-gray-600 hover:bg-navy/5 hover:text-navy"
+    end
 
     link_to url,
             data: data,

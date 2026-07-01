@@ -8,7 +8,7 @@
         <h2 class="heading-section mb-6"><%= t("listings.offmarket_sales") %></h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <% @sales.each do |property| %>
-            <%= render "property_card", property: property %>
+            <%= render "property_card", property: property, heading_level: :h3 %>
           <% end %>
         </div>
       </section>
@@ -19,7 +19,7 @@
         <h2 class="heading-section mb-6"><%= t("listings.offmarket_rentals") %></h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <% @rentals.each do |property| %>
-            <%= render "property_card", property: property %>
+            <%= render "property_card", property: property, heading_level: :h3 %>
           <% end %>
         </div>
       </section>

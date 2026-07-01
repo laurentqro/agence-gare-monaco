@@ -3,6 +3,8 @@ class Article < ApplicationRecord
 
   belongs_to :category
 
+  has_one_attached :cover_image
+
   validates :slug, presence: true, uniqueness: true
 
   before_validation :generate_slug, if: -> { slug.blank? && title.is_a?(Hash) }

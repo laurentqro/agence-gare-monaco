@@ -8,7 +8,9 @@ servers:
 
 proxy:
   ssl: true
-  host: dev.agencegaremonaco.com
+  hosts:
+    - agencegaremonaco.com
+    - www.agencegaremonaco.com
 
 registry:
   server: ghcr.io
@@ -21,7 +23,7 @@ env:
     - RAILS_MASTER_KEY
   clear:
     SOLID_QUEUE_IN_PUMA: true
-    SITE_HOST: https://dev.agencegaremonaco.com
+    SITE_HOST: https://agencegaremonaco.com
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"

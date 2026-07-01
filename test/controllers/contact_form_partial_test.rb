@@ -12,16 +12,16 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
   test "gestion page contact form has all fields" do
     get "/gestion"
     assert_response :success
-    assert_select "input[name='contact_submission[name]']"
-    assert_select "input[name='contact_submission[email]']"
-    assert_select "input[name='contact_submission[subject]']"
-    assert_select "textarea[name='contact_submission[message]']"
+    assert_select "input[name='information_request[name]']"
+    assert_select "input[name='information_request[email]']"
+    assert_select "input[name='information_request[subject]']"
+    assert_select "textarea[name='information_request[message]']"
     assert_select "input[type='submit']"
   end
 
-  test "gestion page contact form posts to contact_submissions" do
+  test "gestion page contact form posts to information_requests" do
     get "/gestion"
-    assert_select "form[action^='/contact_submissions']"
+    assert_select "form[action^='/information_requests']"
   end
 
   test "gestion page contact form has honeypot field" do
@@ -45,10 +45,10 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
   test "vendre page contact form has all fields" do
     get "/vendre"
     assert_response :success
-    assert_select "input[name='contact_submission[name]']"
-    assert_select "input[name='contact_submission[email]']"
-    assert_select "input[name='contact_submission[subject]']"
-    assert_select "textarea[name='contact_submission[message]']"
+    assert_select "input[name='information_request[name]']"
+    assert_select "input[name='information_request[email]']"
+    assert_select "input[name='information_request[subject]']"
+    assert_select "textarea[name='information_request[message]']"
   end
 
   test "vendre page contact form has return_to hidden field" do
@@ -61,17 +61,17 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
   test "contact page still renders contact form" do
     get "/contact"
     assert_response :success
-    assert_select "input[name='contact_submission[name]']"
-    assert_select "input[name='contact_submission[email]']"
-    assert_select "textarea[name='contact_submission[message]']"
+    assert_select "input[name='information_request[name]']"
+    assert_select "input[name='information_request[email]']"
+    assert_select "textarea[name='information_request[message]']"
   end
 
   # === Form submission from gestion/vendre redirects back correctly ===
 
   test "successful submission from gestion redirects back to gestion" do
     assert_emails 1 do
-      post contact_submissions_path, params: {
-        contact_submission: { name: "Test", email: "test@example.com", message: "Hello" },
+      post information_requests_path, params: {
+        information_request: { name: "Test", email: "test@example.com", message: "Hello" },
         return_to: "gestion",
         locale: "fr"
       }
@@ -83,8 +83,8 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
 
   test "successful submission from vendre redirects back to vendre" do
     assert_emails 1 do
-      post contact_submissions_path, params: {
-        contact_submission: { name: "Test", email: "test@example.com", message: "Hello" },
+      post information_requests_path, params: {
+        information_request: { name: "Test", email: "test@example.com", message: "Hello" },
         return_to: "vendre",
         locale: "fr"
       }
@@ -96,8 +96,8 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
 
   test "successful submission without return_to redirects to contact page" do
     assert_emails 1 do
-      post contact_submissions_path, params: {
-        contact_submission: { name: "Test", email: "test@example.com", message: "Hello" },
+      post information_requests_path, params: {
+        information_request: { name: "Test", email: "test@example.com", message: "Hello" },
         locale: "fr"
       }
     end
@@ -105,8 +105,8 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
   end
 
   test "failed submission from gestion re-renders gestion page with errors" do
-    post contact_submissions_path, params: {
-      contact_submission: { name: "", email: "", message: "" },
+    post information_requests_path, params: {
+      information_request: { name: "", email: "", message: "" },
       return_to: "gestion",
       locale: "fr"
     }
@@ -116,8 +116,8 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
   end
 
   test "failed submission from vendre re-renders vendre page with errors" do
-    post contact_submissions_path, params: {
-      contact_submission: { name: "", email: "", message: "" },
+    post information_requests_path, params: {
+      information_request: { name: "", email: "", message: "" },
       return_to: "vendre",
       locale: "fr"
     }

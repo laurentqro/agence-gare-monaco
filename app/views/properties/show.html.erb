@@ -162,6 +162,7 @@
           <% if @property.virtual_tour_url.end_with?(".html") %>
             <div class="aspect-video rounded overflow-hidden">
               <iframe src="<%= @property.virtual_tour_url %>"
+                      title="<%= t("property_detail.virtual_tour") %>"
                       class="w-full h-full"
                       frameborder="0"
                       allow="accelerometer; magnetometer; gyroscope; fullscreen"
@@ -185,6 +186,7 @@
           <% if youtube_id %>
             <div class="aspect-video rounded overflow-hidden">
               <iframe src="https://www.youtube-nocookie.com/embed/<%= youtube_id %>"
+                      title="<%= @property.title_for(I18n.locale).presence || t("property_detail.video") %>"
                       class="w-full h-full"
                       frameborder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -370,7 +372,7 @@
 
       <%# Right column: form panel %>
       <div class="lg:col-span-8">
-        <% enquiry = @submission || ContactSubmission.new %>
+        <% enquiry = @submission || InformationRequest.new %>
 
         <div class="relative bg-[#faf8f4] border-l-2 border-gold px-6 py-8 md:px-10 md:py-10">
           <% if enquiry.errors.any? %>
@@ -383,7 +385,7 @@
             </div>
           <% end %>
 
-          <%= form_with(model: enquiry, url: contact_submissions_path, method: :post, local: true, class: "space-y-7") do |f| %>
+          <%= form_with(model: enquiry, url: information_requests_path, method: :post, local: true, class: "space-y-7") do |f| %>
             <%# Honeypot field %>
             <div style="position: absolute; left: -9999px;" aria-hidden="true">
               <label for="website">Website</label>
@@ -394,28 +396,28 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-7">
               <div class="group">
-                <label for="contact_submission_name" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
+                <label for="information_request_name" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
                   <%= t("contact_form.name") %> <span class="text-gold">*</span>
                 </label>
                 <%= f.text_field :name, class: "w-full bg-transparent border-0 border-b border-accent/30 text-sm text-dark px-0 py-2 focus:border-navy focus:ring-0 focus:outline-none transition-colors placeholder-accent/40", required: true %>
               </div>
 
               <div class="group">
-                <label for="contact_submission_email" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
+                <label for="information_request_email" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
                   <%= t("contact_form.email") %> <span class="text-gold">*</span>
                 </label>
                 <%= f.email_field :email, class: "w-full bg-transparent border-0 border-b border-accent/30 text-sm text-dark px-0 py-2 focus:border-navy focus:ring-0 focus:outline-none transition-colors placeholder-accent/40", required: true %>
               </div>
 
               <div class="group">
-                <label for="contact_submission_phone" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
+                <label for="information_request_phone" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
                   <%= t("contact_form.phone") %>
                 </label>
                 <%= f.telephone_field :phone, class: "w-full bg-transparent border-0 border-b border-accent/30 text-sm text-dark px-0 py-2 focus:border-navy focus:ring-0 focus:outline-none transition-colors placeholder-accent/40" %>
               </div>
 
               <div class="group">
-                <label for="contact_submission_country" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
+                <label for="information_request_country" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
                   <%= t("contact_form.country") %>
                 </label>
                 <%= f.text_field :country, class: "w-full bg-transparent border-0 border-b border-accent/30 text-sm text-dark px-0 py-2 focus:border-navy focus:ring-0 focus:outline-none transition-colors placeholder-accent/40" %>
@@ -423,7 +425,7 @@
             </div>
 
             <div class="group">
-              <label for="contact_submission_message" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
+              <label for="information_request_message" class="block text-[10px] uppercase tracking-[0.2em] text-accent group-focus-within:text-navy transition-colors mb-2">
                 <%= t("contact_form.message") %> <span class="text-gold">*</span>
               </label>
               <%= f.text_area :message, rows: 4, class: "w-full bg-transparent border-0 border-b border-accent/30 text-sm text-dark px-0 py-2 focus:border-navy focus:ring-0 focus:outline-none transition-colors placeholder-accent/40 resize-none", required: true %>
@@ -445,7 +447,7 @@
       <h2 class="heading-section mb-6"><%= t("property_detail.similar_properties") %></h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <% @similar_properties.each do |property| %>
-          <%= render "properties/property_card", property: property %>
+          <%= render "properties/property_card", property: property, heading_level: :h3 %>
         <% end %>
       </div>
     </div>

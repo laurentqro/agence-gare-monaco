@@ -10,6 +10,9 @@ class Contact < ApplicationRecord
   scope :peers, -> { where(peer: true) }
   scope :contacts_only, -> { where(peer: false) }
 
+  # Contacts that can actually be emailed: a present (non-nil, non-blank) email.
+  scope :with_email, -> { where.not(email: [ nil, "" ]) }
+
   # Case-insensitive match across name, company, and email. Blank query returns
   # the full relation.
   scope :search, ->(query) {
@@ -20,6 +23,11 @@ class Contact < ApplicationRecord
     clause = SEARCHABLE_FIELDS.map { |f| "#{f} LIKE :pattern" }.join(" OR ")
     where(clause, pattern: pattern)
   }
+
+  # "Last First" for list rows and email greetings, skipping blank parts.
+  def listing_name
+    [ last_name, first_name ].compact_blank.join(" ")
+  end
 
   private
 

@@ -3,16 +3,16 @@
   <div class="mb-6 text-sm text-gray-500">
     <% locale = params[:locale] || I18n.locale.to_s %>
     <% articles_segment = I18n.t("routes.articles", locale: locale) %>
-    <a href="/<%= locale %>/<%= articles_segment %>" class="text-accent hover:underline"><%= t("nav.articles") %></a>
+    <a href="/<%= locale %>/<%= articles_segment %>" class="text-accent-dark hover:underline"><%= t("nav.articles") %></a>
     <span class="mx-1">/</span>
-    <a href="/<%= locale %>/<%= articles_segment %>/<%= @article.category.slug_for %>" class="text-accent hover:underline"><%= @article.category.name_for %></a>
+    <a href="/<%= locale %>/<%= articles_segment %>/<%= @article.category.slug_for %>" class="text-accent-dark hover:underline"><%= @article.category.name_for %></a>
   </div>
 
   <%# Article header %>
   <h1 class="heading-page mb-3"><%= @article.title_for(I18n.locale) %></h1>
 
   <div class="flex items-center gap-3 text-sm text-gray-500 mb-8">
-    <span class="text-accent font-medium"><%= @article.category.name_for %></span>
+    <span class="text-accent-dark font-medium"><%= @article.category.name_for %></span>
     <% if @article.published_at %>
       <span>&middot;</span>
       <time datetime="<%= @article.published_at.iso8601 %>">
