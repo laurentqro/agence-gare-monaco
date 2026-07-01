@@ -255,19 +255,19 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='estimate-result']"
   end
 
-  test "result page renders expert contact form posting to contact_submissions" do
+  test "result page renders expert contact form posting to information_requests" do
     get "/estimer", params: {
       district: "monte-carlo",
       surface: 100,
       construction_year: 2024
     }
     assert_response :success
-    assert_select "[data-testid='estimate-expert-form'] form[action^='/contact_submissions']"
-    assert_select "input[name='contact_submission[name]']"
-    assert_select "input[name='contact_submission[email]']"
-    assert_select "input[name='contact_submission[phone]']"
+    assert_select "[data-testid='estimate-expert-form'] form[action^='/information_requests']"
+    assert_select "input[name='information_request[name]']"
+    assert_select "input[name='information_request[email]']"
+    assert_select "input[name='information_request[phone]']"
     # Form intentionally has no message field — the server fills it from the estimate inputs.
-    assert_select "textarea[name='contact_submission[message]']", false
+    assert_select "textarea[name='information_request[message]']", false
     # Carries the inputs that produced the estimate so the agent has full context
     assert_select "input[type='hidden'][name='estimate[district]'][value='monte-carlo']"
     assert_select "input[type='hidden'][name='estimate[surface]'][value='100']"
@@ -279,9 +279,9 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     # An attacker manipulates the hidden estimate[district] field to inject newlines
     # and a fake field. The persisted submission must not contain the injected lines
     # verbatim; the agent should see a clean record.
-    assert_difference -> { ContactSubmission.count }, 1 do
-      post "/contact_submissions", params: {
-        contact_submission: {
+    assert_difference -> { InformationRequest.count }, 1 do
+      post "/information_requests", params: {
+        information_request: {
           name: "Sophie Martin",
           email: "sophie@example.com",
           phone: "+33 6 12 34 56 78"
@@ -295,7 +295,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
         locale: "fr"
       }
     end
-    submission = ContactSubmission.last
+    submission = InformationRequest.last
     refute_match(/Fake-Field/, submission.message,
       "Tampered hidden field must not appear verbatim in the persisted message")
     refute_match(/\nFake-Field/, submission.message,
@@ -303,8 +303,8 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
   end
 
   test "tampered hidden estimate[district] with unknown slug falls back to a safe message" do
-    post "/contact_submissions", params: {
-      contact_submission: {
+    post "/information_requests", params: {
+      information_request: {
         name: "Sophie Martin",
         email: "sophie@example.com",
         phone: "+33 6 12 34 56 78"
@@ -317,15 +317,15 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
       },
       locale: "fr"
     }
-    submission = ContactSubmission.last
+    submission = InformationRequest.last
     refute_match(/<script>/, submission.message,
       "Unknown/unsafe district slug must not be echoed into the message")
   end
 
   test "submitting the expert contact form from estimate creates a submission and redirects back to the estimate page" do
-    assert_difference -> { ContactSubmission.count }, 1 do
-      post "/contact_submissions", params: {
-        contact_submission: {
+    assert_difference -> { InformationRequest.count }, 1 do
+      post "/information_requests", params: {
+        information_request: {
           name: "Sophie Martin",
           email: "sophie@example.com",
           phone: "+33 6 12 34 56 78"
@@ -339,7 +339,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
         locale: "fr"
       }
     end
-    submission = ContactSubmission.last
+    submission = InformationRequest.last
     # The server auto-fills the message body from the estimate inputs so the agent
     # has full context even though the form only collects name + phone + email.
     assert_match(/Monte-Carlo/, submission.message)
@@ -351,8 +351,8 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
   end
 
   test "expert contact form submitted without name or email re-renders the result with errors and preserves the estimate" do
-    post "/contact_submissions", params: {
-      contact_submission: {
+    post "/information_requests", params: {
+      information_request: {
         name: "",
         email: "",
         phone: ""

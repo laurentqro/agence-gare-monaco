@@ -12,6 +12,6 @@ class ApplicationController < ActionController::Base
   private
 
   def set_submission_for_footer
-    @submission ||= ContactSubmission.new
+    @submission ||= InformationRequest.new
   end
 end

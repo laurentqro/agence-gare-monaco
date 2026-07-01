@@ -7,6 +7,8 @@ Rails.application.routes.draw do
     resource :article_preview, only: [ :create ]
     resources :categories
     resources :contacts
+    resources :outgoing_emails, only: %i[new create]
+    resources :information_requests, only: %i[index show update destroy]
     resources :properties, path: "biens" do
       resource :share, only: [ :new, :create ], controller: "property_shares"
       resource :brochure, only: [ :new, :create ], controller: "property_brochures"
@@ -122,7 +124,7 @@ Rails.application.routes.draw do
   end
 
   # Contact form submissions
-  resources :contact_submissions, only: [ :create ]
+  resources :information_requests, only: [ :create ]
 
   # SEO: XML Sitemaps
   get "sitemap.xml", to: "sitemaps#index", as: :sitemap, defaults: { format: :xml }

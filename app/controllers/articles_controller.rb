@@ -3,7 +3,7 @@ class ArticlesController < ApplicationController
   include SeoConfigurable
   allow_unauthenticated_access
 
-  before_action :initialize_contact_submission
+  before_action :initialize_information_request
 
   def index
     @articles = Article.published.includes(:category).order(published_at: :desc)
@@ -25,7 +25,7 @@ class ArticlesController < ApplicationController
 
   private
 
-  def initialize_contact_submission
-    @submission = ContactSubmission.new
+  def initialize_information_request
+    @submission = InformationRequest.new
   end
 end
