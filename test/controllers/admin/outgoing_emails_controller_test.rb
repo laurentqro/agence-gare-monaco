@@ -136,6 +136,23 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#compose_recipients[data-audience='contacts']"
   end
 
+  test "GET new carries the audience on a marker INSIDE the frame so it survives a Turbo swap" do
+    # Turbo's frame render replaces only the frame's CONTENTS, never the
+    # <turbo-frame> element's own attributes. So the audience the JS reads to
+    # sync the submitted hidden field must live on an element inside the frame
+    # (swapped in on every toggle/search), not on the frame element itself.
+    # Otherwise, after switching peers -> contacts, the form submits audience
+    # "peers" with contact ids, the server filters them all out, and the user
+    # gets "select at least one recipient" despite having selected recipients.
+    get new_admin_outgoing_email_url(audience: "contacts")
+    assert_response :success
+    assert_select "turbo-frame#compose_recipients [data-recipient-selection-target='marker'][data-audience='contacts']"
+
+    get new_admin_outgoing_email_url(audience: "peers")
+    assert_response :success
+    assert_select "turbo-frame#compose_recipients [data-recipient-selection-target='marker'][data-audience='peers']"
+  end
+
   test "GET new excludes contacts whose email is an empty string" do
     blank_email = Contact.create!(last_name: "Vide", first_name: "Email", email: "", peer: true)
     get new_admin_outgoing_email_url

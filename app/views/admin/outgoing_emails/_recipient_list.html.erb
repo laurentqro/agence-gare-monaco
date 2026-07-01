@@ -1,6 +1,14 @@
 <%= turbo_frame_tag "compose_recipients", data: { audience: @audience } do %>
   <% frame = "compose_recipients" %>
 
+  <%# The audience marker lives INSIDE the frame so it is swapped in on every
+      re-render. Turbo's frame render replaces only the frame's contents, not
+      the <turbo-frame> element's own attributes, so a data-audience on the
+      frame element would stay stale after a toggle and the form would submit
+      the wrong audience (filtering all selected recipients out server-side).
+      The recipient-selection controller reads this element after each render. %>
+  <div hidden data-recipient-selection-target="marker" data-audience="<%= @audience %>"></div>
+
   <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
     <nav class="inline-flex rounded-lg border border-gray-200 bg-white p-1 text-sm">
       <% [["peers", t("admin.outgoing_emails.audience.peers")],

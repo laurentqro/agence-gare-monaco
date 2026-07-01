@@ -7,20 +7,25 @@ import { Controller } from "@hotwired/stimulus"
 //   1. Selection persistence. Checked recipients are recorded in a Set keyed by
 //      contact id and re-applied after every frame render, so checking peers,
 //      then searching for one more, does not silently drop the first picks.
-//   2. The audience hidden field. Each re-rendered frame advertises its current
-//      audience via data-audience; the controller copies that into the hidden
-//      field the main form submits, so the audience the server filters by always
-//      matches the audience the user is looking at.
+//   2. The audience hidden field. A marker element INSIDE the frame carries the
+//      current audience; the controller copies it into the hidden field the main
+//      form submits, so the audience the server filters by always matches the
+//      audience the user is looking at. The marker must be inside the frame (not
+//      a data-audience on the <turbo-frame> itself) because Turbo swaps only the
+//      frame's contents, leaving the frame element's own attributes stale.
 //   3. Select-all. The header checkbox toggles every currently-listed row, and
 //      reflects an all/none/indeterminate state as rows change.
 //
 // Markup:
 //   <div data-controller="recipient-selection">
-//     <input type="hidden" id="compose_audience" ...>
-//     <turbo-frame id="compose_recipients" data-audience="peers"> ...rows... </turbo-frame>
+//     <input type="hidden" id="compose_audience" data-recipient-selection-target="audience" ...>
+//     <turbo-frame id="compose_recipients">
+//       <div hidden data-recipient-selection-target="marker" data-audience="peers"></div>
+//       ...rows...
+//     </turbo-frame>
 //   </div>
 export default class extends Controller {
-  static targets = ["all", "audience"]
+  static targets = ["all", "audience", "marker"]
 
   connect() {
     this.selected = new Set()
@@ -83,11 +88,14 @@ export default class extends Controller {
     }
   }
 
-  // Mirror the frame's current audience into the hidden field the form submits.
+  // Mirror the current audience into the hidden field the form submits. The
+  // source is the marker element INSIDE the frame (not the <turbo-frame>'s own
+  // data-audience): Turbo swaps the frame's contents but leaves the frame
+  // element's attributes untouched, so the frame attribute goes stale after a
+  // toggle while the marker is re-rendered with the new audience each time.
   syncAudience() {
-    if (!this.hasAudienceTarget) return
-    const frame = this.element.querySelector("turbo-frame#compose_recipients")
-    const audience = frame && frame.getAttribute("data-audience")
+    if (!this.hasAudienceTarget || !this.hasMarkerTarget) return
+    const audience = this.markerTarget.getAttribute("data-audience")
     if (audience) this.audienceTarget.value = audience
   }
 
