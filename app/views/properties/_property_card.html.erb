@@ -5,7 +5,7 @@
   <%# Image carousel area %>
   <div class="relative aspect-[4/3] bg-stone-100 overflow-hidden"
        <% if has_carousel %>data-controller="card-carousel"<% end %>>
-    <a href="<%= locale_property_path(property) %>" class="block w-full h-full" data-turbo-frame="_top">
+    <a href="<%= locale_property_path(property) %>" class="block w-full h-full" data-turbo-frame="_top" aria-label="<%= t("listings.view_property", property: property.location_label) %>">
       <% if images.any? %>
         <% images.each_with_index do |image, i| %>
           <% src_url = image.medium_url || image.remote_url %>
@@ -33,12 +33,14 @@
 
     <% if has_carousel %>
       <button data-testid="carousel-prev" data-action="card-carousel#prev"
+              aria-label="<%= t("listings.previous_photo") %>"
               class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center text-white/80 hover:text-white z-10">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
       </button>
       <button data-testid="carousel-next" data-action="card-carousel#next"
+              aria-label="<%= t("listings.next_photo") %>"
               class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center text-white/80 hover:text-white z-10">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
       </button>
     <% end %>
 
@@ -70,13 +72,12 @@
       <% end %>
     </div>
 
-    <%# Location as main heading %>
-    <h3 data-testid="card-location" class="text-navy font-semibold text-xl leading-snug mb-1">
-      <%= property.location_label %>
-    </h3>
+    <%# Location as main heading — level adapts to page context (h2 under an h1 listing, h3 under an h2 section) %>
+    <% heading_tag = local_assigns.fetch(:heading_level, :h2) %>
+    <%= content_tag heading_tag, property.location_label, "data-testid": "card-location", class: "text-navy font-semibold text-xl leading-snug mb-1" %>
 
     <%# Title as tagline %>
-    <p data-testid="card-tagline" class="text-navy/50 text-sm leading-snug line-clamp-1 mb-3">
+    <p data-testid="card-tagline" class="text-navy/70 text-sm leading-snug line-clamp-1 mb-3">
       <%= property.title_for(I18n.locale) %>
     </p>
 
@@ -87,13 +88,13 @@
           <%= property.formatted_price %> &euro;
         </span>
         <% if property.transaction_type == "rental" %>
-          <span class="text-navy/50 text-xs ml-0.5"><%= t("property_detail.per_month") %></span>
+          <span class="text-navy/70 text-xs ml-0.5"><%= t("property_detail.per_month") %></span>
         <% end %>
         <% if (converted = converted_price_tag(property.price)) %>
-          <span data-testid="converted-price" class="text-xs text-navy/40 ml-1.5"><%= converted %></span>
+          <span data-testid="converted-price" class="text-xs text-navy/70 ml-1.5"><%= converted %></span>
         <% end %>
       <% else %>
-        <span class="text-navy/50 text-sm italic">
+        <span class="text-navy/70 text-sm italic">
           <%= t("listings.price_on_request") %>
         </span>
       <% end %>

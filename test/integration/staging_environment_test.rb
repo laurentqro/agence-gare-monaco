@@ -23,7 +23,8 @@ class StagingEnvironmentTest < ActionDispatch::IntegrationTest
   test "production: homepage includes Plausible analytics script" do
     get "/"
     assert_response :success
-    assert_includes response.body, "plausible.io/js/script.js"
+    assert_includes response.body, "plausible.io/js/pa-JTo1asj68MUtTtbaCOJVm.js"
+    assert_includes response.body, "plausible.init()"
   end
 
   # --- Staging behavior ---
@@ -52,7 +53,8 @@ class StagingEnvironmentTest < ActionDispatch::IntegrationTest
     with_staging_host do
       get "/"
       assert_response :success
-      assert_not_includes response.body, "plausible.io/js/script.js"
+      assert_not_includes response.body, "plausible.io/js/pa-JTo1asj68MUtTtbaCOJVm.js"
+      assert_not_includes response.body, "plausible.init()"
     end
   end
 

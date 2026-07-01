@@ -23,7 +23,7 @@
     <% if article.body_for(I18n.locale).present? %>
       <p class="mt-3 text-sm text-gray-600 line-clamp-3"><%= strip_tags(article.body_for(I18n.locale)).truncate(180) %></p>
     <% end %>
-    <p class="article-meta mt-4 text-xs text-accent">
+    <p class="article-meta mt-4 text-xs text-accent-dark">
       <% if article.published_at %>
         <time datetime="<%= article.published_at.iso8601 %>"><%= I18n.l(article.published_at.to_date, format: :long) %></time>
       <% end %>

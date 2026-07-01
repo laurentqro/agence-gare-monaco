@@ -28,6 +28,7 @@ fi:
     about_expertise: "Asiantuntemuksemme mahdollistaa yhteistyön monacalaisten notaarien ja asianajajien kanssa kiinteistöjen arvioinnissa ja arvonmäärityksessä. Yhteistyössä Tania Sisustusarkkitehtuuri -toimiston kanssa tarjoamme asuntojen uudelleensuunnitteluprojekteja. Toiminta-alueemme ulottuu Monacon ruhtinaskuntaan ja viereiselle Ranskan alueelle. Ota yhteyttä numeroon (+377) 93 30 22 36 tai osoitteeseen info@agencegaremonaco.com."
     team_title: "Tiimimme"
     team:
+      email_member: "Lähetä sähköpostia: %{name}"
       pierre_role: "Osaomistaja"
       adrien_role: "Johtaja / Neuvottelija"
       josiane_role: "Sihteeristö / Hallinto"
@@ -46,6 +47,8 @@ fi:
     card_management: "Hallinto"
     videos_title: "Videot"
     videos_view_channel: "Katso kaikki videomme"
+    video_iframe_title: "YouTube-video"
+    video_play: "Toista video: %{title}"
     faq_title: "Usein kysytyt kysymykset"
     faqs:
       - question: "Mikä on Agence Immobilière de la Gare?"
@@ -63,6 +66,9 @@ fi:
 
   listings:
     sales: "Myynti"
+    view_property: "Näytä kohde: %{property}"
+    previous_photo: "Edellinen kuva"
+    next_photo: "Seuraava kuva"
     rentals: "Vuokraus"
     sales_monaco: "Myynti Monacossa"
     rentals_monaco: "Vuokraus Monacossa"

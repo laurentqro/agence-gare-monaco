@@ -28,6 +28,7 @@ da:
     about_expertise: "Vores ekspertise gør det muligt at samarbejde med monegaskiske notarer og advokater om estimering og vurdering af fast ejendom. I samarbejde med firmaet Tania Indretningsarkitektur tilbyder vi projekter til ombygning af lejligheder. Vores virkeområde strækker sig til Fyrstendømmet Monaco og den tilgrænsende franske region. Kontakt os på (+377) 93 30 22 36 eller info@agencegaremonaco.com."
     team_title: "Vores Team"
     team:
+      email_member: "Send e-mail til %{name}"
       pierre_role: "Medleder"
       adrien_role: "Direktør / Forhandler"
       josiane_role: "Sekretariat / Forvaltning"
@@ -46,6 +47,8 @@ da:
     card_management: "Administration"
     videos_title: "Videoer"
     videos_view_channel: "Se alle vores videoer"
+    video_iframe_title: "YouTube-video"
+    video_play: "Afspil video: %{title}"
     faq_title: "Ofte stillede spørgsmål"
     faqs:
       - question: "Hvad er Agence Immobilière de la Gare?"
@@ -63,6 +66,9 @@ da:
 
   listings:
     sales: "Salg"
+    view_property: "Se ejendom: %{property}"
+    previous_photo: "Forrige foto"
+    next_photo: "Næste foto"
     rentals: "Udlejning"
     sales_monaco: "Salg i Monaco"
     rentals_monaco: "Udlejning i Monaco"
