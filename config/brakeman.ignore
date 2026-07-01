@@ -1,0 +1,25 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "002ddad50cee26af24a1e3502f4dd03fa0e03cb568f7156771adc185fd2a9a6d",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/concerns/sortable.rb",
+      "line": 23,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "relation.order(Arel.sql(\"#{relation.table_name}.#{(params[:sort].to_s or (default or columns.map(&:to_s).first).to_s)}\") => current_direction)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Sortable",
+        "method": "sort_scope"
+      },
+      "user_input": "params[:sort].to_s",
+      "confidence": "High",
+      "note": "False positive. `column` is forced to a value from the controller-declared allow-list on the line above (allowed.include?(params[:sort]) ? params[:sort] : fallback), so params[:sort] can never reach the SQL string unless it is already an allow-listed column name. relation.table_name is not user input. Covered by tests asserting an unknown/malicious sort param falls back to an allowed column."
+    }
+  ],
+  "brakeman_version": "8.0.5"
+}
