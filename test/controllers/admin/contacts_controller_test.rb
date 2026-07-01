@@ -188,6 +188,34 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_select "textarea[name='contact[notes]']"
   end
 
+  test "GET new renders the peer checkbox" do
+    get new_admin_contact_url
+    assert_response :success
+    assert_select "input[type=checkbox][name='contact[peer]']"
+  end
+
+  test "POST create can mark a contact as a peer" do
+    post admin_contacts_url, params: {
+      contact: { first_name: "Paul", last_name: "Confrère", company: "Other Agency", peer: "1" }
+    }
+    assert Contact.last.peer, "expected the created contact to be a peer"
+  end
+
+  test "GET edit shows the peer checkbox checked for a peer" do
+    peer = Contact.create!(last_name: "Confrère", company: "Other Agency", peer: true)
+    get edit_admin_contact_url(peer)
+    assert_response :success
+    assert_select "input[type=checkbox][name='contact[peer]'][checked]"
+  end
+
+  test "GET edit shows the peer checkbox unchecked for an ordinary contact" do
+    contact = Contact.create!(last_name: "Ordinary", peer: false)
+    get edit_admin_contact_url(contact)
+    assert_response :success
+    assert_select "input[type=checkbox][name='contact[peer]']"
+    assert_select "input[type=checkbox][name='contact[peer]'][checked]", 0
+  end
+
   test "POST create persists the extended fields" do
     post admin_contacts_url, params: {
       contact: {

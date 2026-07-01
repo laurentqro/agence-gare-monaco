@@ -25,6 +25,11 @@
     <%= f.text_field :company, class: "w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-navy focus:border-navy" %>
   </div>
 
+  <div class="flex items-center gap-2">
+    <%= f.check_box :peer, class: "h-4 w-4 rounded border-gray-300 text-navy focus:ring-navy" %>
+    <%= f.label :peer, t("admin.contacts.form.peer"), class: "text-sm font-medium text-gray-700" %>
+  </div>
+
   <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-400 pt-2"><%= t("admin.contacts.form.contact_details") %></h3>
 
   <div>
