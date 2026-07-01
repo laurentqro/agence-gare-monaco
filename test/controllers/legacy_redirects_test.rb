@@ -20,6 +20,7 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
       title: { "fr" => "Mon article test" },
       body: { "fr" => "Le contenu de l'article" },
       slug: "mon-article-test",
+      legacy_id: 42,
       category: @category,
       published: true,
       published_at: Time.current
@@ -86,6 +87,30 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
     assert_redirected_to "/fr/articles/actualites"
   end
 
+  test "FR legacy /fr/posts/{old-category} maps to the new category that absorbed it" do
+    {
+      "achat" => "guides-pratiques",
+      "estimation" => "marche-immobilier",
+      "fiscalite" => "guides-pratiques",
+      "formalites" => "guides-pratiques",
+      "gestion" => "guides-pratiques",
+      "ventes" => "guides-pratiques",
+      "quartiers" => "quartiers-de-monaco",
+      "securite-sante" => "art-de-vivre-a-monaco",
+      "my-monaco" => "art-de-vivre-a-monaco"
+    }.each do |old_slug, new_slug|
+      get "/fr/posts/#{old_slug}"
+      assert_response :moved_permanently, "expected 301 for /fr/posts/#{old_slug}"
+      assert_redirected_to "/fr/articles/#{new_slug}"
+    end
+  end
+
+  test "FR legacy /fr/posts/{unknown-category} falls back to the articles index" do
+    get "/fr/posts/this-category-never-existed"
+    assert_response :moved_permanently
+    assert_redirected_to "/fr/articles"
+  end
+
   test "FR legacy /fr/posts/{category}/ with trailing slash strips slash first" do
     get "/fr/posts/actualites/"
     assert_response :moved_permanently
@@ -96,6 +121,17 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
     get "/fr/article/42/mon-article-test"
     assert_response :moved_permanently
     assert_redirected_to "/fr/articles/mon-article-test"
+  end
+
+  test "FR legacy /fr/article/{id}/{slug} looks up by legacy id, ignoring a stale slug" do
+    get "/fr/article/42/an-old-outdated-slug"
+    assert_response :moved_permanently
+    assert_redirected_to "/fr/articles/mon-article-test"
+  end
+
+  test "FR legacy /fr/article/{id}/{slug} returns 410 when legacy id is unknown" do
+    get "/fr/article/99999/whatever-slug"
+    assert_response :gone
   end
 
   test "FR legacy /fr/article/{id}/{slug}/ with trailing slash strips slash first" do
@@ -160,15 +196,20 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
   end
 
   test "EN legacy /en/article/{id}/{slug} redirects to article" do
-    get "/en/article/42/mon-article-test"
+    get "/en/article/42/5-reasons-to-live-in-monaco"
     assert_response :moved_permanently
     assert_redirected_to "/en/articles/mon-article-test"
   end
 
   test "EN legacy /en/post/{id}/{slug} redirects to article" do
-    get "/en/post/42/mon-article-test"
+    get "/en/post/42/5-reasons-to-live-in-monaco"
     assert_response :moved_permanently
     assert_redirected_to "/en/articles/mon-article-test"
+  end
+
+  test "EN legacy /en/article/{id}/{slug} returns 410 when legacy id is unknown" do
+    get "/en/article/99999/whatever"
+    assert_response :gone
   end
 
   test "EN legacy /en/property-off-market/{id} redirects to property detail when published" do

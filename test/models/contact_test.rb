@@ -64,10 +64,10 @@ class ContactTest < ActiveSupport::TestCase
     berg = Contact.create!(first_name: "Anna", last_name: "Berg", email: "anna@acme.com", company: "Acme SCI")
     dupont = Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@other.com")
 
-    assert_equal [berg], Contact.search("anna").to_a
-    assert_equal [berg], Contact.search("BERG").to_a
-    assert_equal [berg], Contact.search("acme").to_a
-    assert_equal [dupont], Contact.search("other.com").to_a
+    assert_equal [ berg ], Contact.search("anna").to_a
+    assert_equal [ berg ], Contact.search("BERG").to_a
+    assert_equal [ berg ], Contact.search("acme").to_a
+    assert_equal [ dupont ], Contact.search("other.com").to_a
     assert_equal [], Contact.search("nomatch").to_a
   end
 
@@ -82,8 +82,8 @@ class ContactTest < ActiveSupport::TestCase
     contact = Contact.create!(last_name: "Ordinary", peer: false)
     peer = Contact.create!(last_name: "Confrère", peer: true)
 
-    assert_equal [peer], Contact.peers.to_a
-    assert_equal [contact], Contact.contacts_only.to_a
+    assert_equal [ peer ], Contact.peers.to_a
+    assert_equal [ contact ], Contact.contacts_only.to_a
   end
 
   test "stores extended legacy fields" do
@@ -103,5 +103,15 @@ class ContactTest < ActiveSupport::TestCase
     assert_equal "98000", contact.postcode
     assert_equal "Recherche 2 pièces location", contact.notes
     assert_equal 10, contact.legacy_id
+  end
+
+  test "listing_name joins last and first name" do
+    contact = Contact.new(last_name: "Dupont", first_name: "Jean")
+    assert_equal "Dupont Jean", contact.listing_name
+  end
+
+  test "listing_name skips blank name parts" do
+    assert_equal "Berg", Contact.new(last_name: "Berg", first_name: "").listing_name
+    assert_equal "Anna", Contact.new(last_name: nil, first_name: "Anna").listing_name
   end
 end

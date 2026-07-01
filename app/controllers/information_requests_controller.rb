@@ -1,4 +1,4 @@
-class ContactSubmissionsController < ApplicationController
+class InformationRequestsController < ApplicationController
   include Localizable
   include SeoConfigurable
   allow_unauthenticated_access
@@ -10,7 +10,7 @@ class ContactSubmissionsController < ApplicationController
       return
     end
 
-    @submission = ContactSubmission.new(submission_params)
+    @submission = InformationRequest.new(submission_params)
     @submission.form_type = @submission.property_id.present? ? "enquiry" : "contact"
 
     # The valuation form has no message field — derive one from the estimate inputs
@@ -44,12 +44,12 @@ class ContactSubmissionsController < ApplicationController
   private
 
   def submission_params
-    params.require(:contact_submission).permit(:name, :email, :phone, :country, :subject, :message, :property_id)
+    params.require(:information_request).permit(:name, :email, :phone, :country, :subject, :message, :property_id)
   end
 
   def redirect_path_after_submission
-    if @submission&.property_id.present? || params.dig(:contact_submission, :property_id).present?
-      property = @submission&.property || Property.find_by(id: params.dig(:contact_submission, :property_id))
+    if @submission&.property_id.present? || params.dig(:information_request, :property_id).present?
+      property = @submission&.property || Property.find_by(id: params.dig(:information_request, :property_id))
       helpers.locale_property_path(property) if property
     elsif params[:return_to] == "gestion"
       helpers.locale_gestion_path

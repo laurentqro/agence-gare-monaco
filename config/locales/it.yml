@@ -28,6 +28,7 @@ it:
     about_expertise: "La nostra competenza ci permette di collaborare con notai e avvocati monegaschi per la stima e la valutazione di beni immobiliari. In collaborazione con lo studio Tania Architettura d'interni, proponiamo progetti di ristrutturazione di appartamenti. Il nostro ambito di intervento si estende al Principato di Monaco e alla regione francese limitrofa. Contattateci al (+377) 93 30 22 36 o a info@agencegaremonaco.com."
     team_title: "Il Nostro Team"
     team:
+      email_member: "Invia un'email a %{name}"
       pierre_role: "Co-Direttore"
       adrien_role: "Direttore / Negoziatore"
       josiane_role: "Segretariato / Gestione"
@@ -46,6 +47,8 @@ it:
     card_management: "Gestione"
     videos_title: "Video"
     videos_view_channel: "Guarda tutti i nostri video"
+    video_iframe_title: "Video YouTube"
+    video_play: "Riproduci il video: %{title}"
     faq_title: "Domande frequenti"
     faqs:
       - question: "Cos'è l'Agence Immobilière de la Gare?"
@@ -63,6 +66,9 @@ it:
 
   listings:
     sales: "Vendite"
+    view_property: "Vedi l'immobile: %{property}"
+    previous_photo: "Foto precedente"
+    next_photo: "Foto successiva"
     rentals: "Affitti"
     sales_monaco: "Vendite a Monaco"
     rentals_monaco: "Affitti a Monaco"

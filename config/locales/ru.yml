@@ -28,6 +28,7 @@ ru:
     about_expertise: "Наш опыт позволяет нам сотрудничать с монакскими нотариусами и адвокатами для оценки недвижимости. В партнёрстве с бюро Tania Architecture d'intérieur мы предлагаем проекты по перепланировке и ремонту квартир. Наша зона деятельности охватывает Княжество Монако и прилегающий регион Франции. Свяжитесь с нами по телефону (+377) 93 30 22 36 или по адресу info@agencegaremonaco.com."
     team_title: "Наша команда"
     team:
+      email_member: "Написать %{name}"
       pierre_role: "Со-управляющий"
       adrien_role: "Директор / Переговорщик"
       josiane_role: "Секретариат / Управление"
@@ -46,6 +47,8 @@ ru:
     card_management: "Управление"
     videos_title: "Видео"
     videos_view_channel: "Смотреть все наши видео"
+    video_iframe_title: "Видео YouTube"
+    video_play: "Воспроизвести видео: %{title}"
     faq_title: "Часто задаваемые вопросы"
     faqs:
       - question: "Что такое Agence Immobilière de la Gare?"
@@ -63,6 +66,9 @@ ru:
 
   listings:
     sales: "Продажа"
+    view_property: "Смотреть объект: %{property}"
+    previous_photo: "Предыдущее фото"
+    next_photo: "Следующее фото"
     rentals: "Аренда"
     sales_monaco: "Продажа в Монако"
     rentals_monaco: "Аренда в Монако"

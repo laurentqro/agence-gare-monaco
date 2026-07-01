@@ -59,10 +59,10 @@ class LegacyPeerImporter
   # "SURNAME Firstname" => [last, first]. A single token becomes last_name only.
   def split_person(person)
     value = person.to_s.strip
-    return [nil, nil] if value.empty?
+    return [ nil, nil ] if value.empty?
 
     last, first = value.split(/\s+/, 2)
-    [presence(last), presence(first)]
+    [ presence(last), presence(first) ]
   end
 
   # Strips newlines/whitespace, collapses numbers duplicated with or without a
