@@ -25,6 +25,7 @@ class YoutubeFeedFetcherTest < ActiveSupport::TestCase
     video = YoutubeVideo.find_by(video_id: "video_0")
     assert_equal "Test Video 0", video.title
     assert_equal "https://i.ytimg.com/vi/video_0/hqdefault.jpg", video.thumbnail_url
+    assert_equal "Description for video 0", video.description
     assert_not_nil video.published_at
   end
 
@@ -99,6 +100,7 @@ class YoutubeFeedFetcherTest < ActiveSupport::TestCase
           <published>2026-02-#{28 - i}T12:00:00+00:00</published>
           <media:group>
             <media:thumbnail url="https://i.ytimg.com/vi/video_#{i}/hqdefault.jpg" />
+            <media:description>Description for video #{i}</media:description>
           </media:group>
         </entry>
       ENTRY

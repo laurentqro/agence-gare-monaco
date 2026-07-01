@@ -8,6 +8,13 @@ class YoutubeVideo < ApplicationRecord
 
   scope :latest, ->(n = 4) { order(published_at: :desc).limit(n) }
 
+  # Description for structured data. Falls back to the title so the
+  # VideoObject JSON-LD always carries a non-empty `description` field
+  # (Search Console flags a missing one as a non-critical issue).
+  def seo_description
+    description.presence || title
+  end
+
   def embed_url
     "https://www.youtube-nocookie.com/embed/#{video_id}"
   end

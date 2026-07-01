@@ -357,6 +357,7 @@ module SeoHelper
           "item" => {
             "@type" => "VideoObject",
             "name" => video.title,
+            "description" => video.seo_description,
             "contentUrl" => "https://www.youtube.com/watch?v=#{video.video_id}",
             "embedUrl" => video.embed_url,
             "thumbnailUrl" => "https://img.youtube.com/vi/#{video.video_id}/maxresdefault.jpg",
