@@ -160,7 +160,7 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
       }
     end
     assert_redirected_to new_admin_outgoing_email_url
-    assert_equal "Email mis en file pour 3 contacts.", flash[:notice]
+    assert_equal "Email envoyé à 3 contacts.", flash[:notice]
     assert_equal 3, OutgoingEmail.last.pending_count
   end
 
@@ -172,7 +172,18 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
       }
     end
     assert_redirected_to new_admin_outgoing_email_url
-    assert_equal "Email mis en file pour 2 contacts.", flash[:notice]
+    assert_equal "Email envoyé à 2 contacts.", flash[:notice]
+  end
+
+  test "POST create flash uses the singular when sending to exactly one recipient" do
+    assert_enqueued_jobs 1, only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        contact_ids: [ @peer1.id ],
+        outgoing_email: { subject: "Bonjour", body: "Un message." }
+      }
+    end
+    assert_redirected_to new_admin_outgoing_email_url
+    assert_equal "Email envoyé à 1 contact.", flash[:notice]
   end
 
   test "POST create persists an OutgoingEmail with pending_count = recipient count" do

@@ -314,7 +314,9 @@ fr:
         no_file: "Aucun fichier sélectionné"
       send: "Envoyer"
       flash:
-        queued: "Email mis en file pour %{count} contacts."
+        queued:
+          one: "Email envoyé à %{count} contact."
+          other: "Email envoyé à %{count} contacts."
         no_recipients: "Veuillez sélectionner au moins un destinataire."
       errors:
         attachment_too_big: "Le fichier dépasse %{limit} Mo."
