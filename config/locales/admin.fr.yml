@@ -136,6 +136,9 @@ fr:
         created: "Contact créé."
         updated: "Contact mis à jour."
         deleted: "Contact supprimé."
+        peer_created: "Confrère créé."
+        peer_updated: "Confrère mis à jour."
+        peer_deleted: "Confrère supprimé."
     information_requests:
       title: "Demandes de renseignements"
       empty: "Aucune demande pour le moment."

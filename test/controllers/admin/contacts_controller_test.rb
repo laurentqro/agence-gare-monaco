@@ -277,6 +277,16 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "POST create flash says contact for an ordinary contact" do
+    post admin_contacts_url, params: { contact: { last_name: "Dupont" } }
+    assert_equal "Contact créé.", flash[:notice]
+  end
+
+  test "POST create flash says confrère for a peer" do
+    post admin_contacts_url, params: { contact: { last_name: "Confrère", peer: "1" } }
+    assert_equal "Confrère créé.", flash[:notice]
+  end
+
   test "POST create with duplicate email is allowed" do
     Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@example.com")
     assert_difference "Contact.count", 1 do
@@ -316,6 +326,24 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
       contact: { first_name: "", last_name: "", email: "", phone: "", company: "" }
     }
     assert_response :unprocessable_entity
+  end
+
+  test "PATCH update flash says confrère when the contact is a peer" do
+    peer = Contact.create!(last_name: "Confrère", peer: true)
+    patch admin_contact_url(peer), params: { contact: { last_name: "Confrère II" } }
+    assert_equal "Confrère mis à jour.", flash[:notice]
+  end
+
+  test "PATCH update flash reflects a promotion to peer" do
+    contact = Contact.create!(last_name: "Dupont", peer: false)
+    patch admin_contact_url(contact), params: { contact: { peer: "1" } }
+    assert_equal "Confrère mis à jour.", flash[:notice]
+  end
+
+  test "DELETE flash says confrère for a peer" do
+    peer = Contact.create!(last_name: "Confrère", peer: true)
+    delete admin_contact_url(peer)
+    assert_equal "Confrère supprimé.", flash[:notice]
   end
 
   # DESTROY

@@ -27,7 +27,7 @@ module Admin
     def create
       @contact = Contact.new(contact_params)
       if @contact.save
-        redirect_to admin_contacts_url, notice: t("admin.contacts.flash.created")
+        redirect_to admin_contacts_url, notice: flash_notice(:created)
       else
         render :new, status: :unprocessable_entity
       end
@@ -39,7 +39,7 @@ module Admin
     def update
       @contact.assign_attributes(contact_params)
       if @contact.save
-        redirect_to admin_contacts_url, notice: t("admin.contacts.flash.updated")
+        redirect_to admin_contacts_url, notice: flash_notice(:updated)
       else
         render :edit, status: :unprocessable_entity
       end
@@ -47,10 +47,17 @@ module Admin
 
     def destroy
       @contact.destroy
-      redirect_to admin_contacts_url, notice: t("admin.contacts.flash.deleted")
+      redirect_to admin_contacts_url, notice: flash_notice(:deleted)
     end
 
     private
+
+    # Picks the confrère-specific flash message when the record is a peer,
+    # falling back to the generic contact wording otherwise.
+    def flash_notice(action)
+      key = @contact.peer? ? "peer_#{action}" : action
+      t("admin.contacts.flash.#{key}")
+    end
 
     def filtered_scope
       case params[:filter]
