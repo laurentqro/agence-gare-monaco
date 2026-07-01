@@ -7,8 +7,8 @@ Rails.application.routes.draw do
     resource :article_preview, only: [ :create ]
     resources :categories
     resources :contacts
-    resources :outgoing_emails, only: %i[new create]
-    resources :information_requests, only: %i[index show update destroy]
+    resources :outgoing_emails, only: %i[new create], path: "envoyer-email", path_names: { new: "" }
+    resources :information_requests, only: %i[index show update destroy], path: "demandes-information"
     resources :properties, path: "biens" do
       resource :share, only: [ :new, :create ], controller: "property_shares"
       resource :brochure, only: [ :new, :create ], controller: "property_brochures"
