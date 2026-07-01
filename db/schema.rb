@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_23_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_30_202040) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -139,6 +139,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_23_120000) do
     t.index ["read"], name: "index_information_requests_on_read"
   end
 
+  create_table "outgoing_emails", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.integer "pending_count", default: 0, null: false
+    t.json "sent_emails", default: [], null: false
+    t.string "subject", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "properties", force: :cascade do |t|
     t.string "address"
     t.integer "building_id"
@@ -241,6 +250,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_23_120000) do
 
   create_table "youtube_videos", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.text "description"
     t.datetime "published_at", null: false
     t.string "thumbnail_url"
     t.string "title", null: false

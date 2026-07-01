@@ -47,6 +47,11 @@ class PropertyMailerTest < ActionMailer::TestCase
     assert_equal [ "info@agencegaremonaco.com" ], email.from
   end
 
+  test "share property from header carries the agency display name" do
+    email = PropertyMailer.share_property(@property, @contact)
+    assert_equal "\"Agence Immobilière de la Gare\" <info@agencegaremonaco.com>", email[:from].decoded
+  end
+
   test "share property reply-to is the sending agent" do
     email = PropertyMailer.share_property(@property, @contact)
     assert_equal [ "adrien@agencegaremonaco.com" ], email.reply_to
