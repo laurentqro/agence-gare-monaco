@@ -297,4 +297,48 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "aside nav a[href='#{new_admin_outgoing_email_path}']", text: /Envoyer un email/
   end
+
+  # Regression: the compose form must not nest the recipient search <form>
+  # (inside the turbo-frame) inside the outer #compose_form. Nested <form>
+  # elements are invalid HTML; a real browser auto-closes #compose_form at the
+  # inner form, orphaning the submit button and the subject/body fields so
+  # clicking "Send" does nothing and never reaches the server. assert_select
+  # uses Nokogiri's lenient HTML4 parser and hides this, so parse with the
+  # browser-accurate HTML5 parser and assert the real form association.
+  test "GET new keeps the submit button and message fields inside #compose_form under HTML5 parsing" do
+    get new_admin_outgoing_email_url
+    assert_response :success
+
+    doc = Nokogiri::HTML5(response.body)
+    compose_form = doc.at_css("form#compose_form")
+    assert compose_form, "expected a #compose_form element"
+    # File attachments only upload if the form is multipart; the empty-form
+    # pattern must keep the enctype even with no file field inside the block.
+    assert_equal "multipart/form-data", compose_form["enctype"],
+                 "#compose_form must stay multipart so attachments upload"
+
+    # A control belongs to #compose_form if the browser associates it there:
+    # either a DOM descendant of the form, or linked to it by the form="" id.
+    belongs = lambda do |el|
+      el && (el.ancestors("form#compose_form").any? || el["form"] == "compose_form")
+    end
+
+    submit = doc.at_css("input[type='submit']")
+    assert belongs.call(submit),
+           "the Send button must belong to #compose_form (a nested search <form> orphaned it)"
+    assert belongs.call(doc.at_css("input[name='outgoing_email[subject]']")),
+           "the subject field must belong to #compose_form"
+    assert belongs.call(doc.at_css("textarea[name='outgoing_email[body]']")),
+           "the body field must belong to #compose_form"
+    assert belongs.call(doc.at_css("input[type='file'][name='outgoing_email[file]']")),
+           "the file field must belong to #compose_form"
+    assert belongs.call(doc.at_css("input[name='audience']")),
+           "the audience field must belong to #compose_form"
+    # Every recipient checkbox must belong to the form too, or the send is empty.
+    checkboxes = doc.css("input[type='checkbox'][name='contact_ids[]']")
+    assert checkboxes.any?, "expected recipient checkboxes"
+    checkboxes.each do |box|
+      assert belongs.call(box), "recipient checkbox #{box["value"]} must belong to #compose_form"
+    end
+  end
 end

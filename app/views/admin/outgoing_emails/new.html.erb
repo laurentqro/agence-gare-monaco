@@ -1,57 +1,63 @@
 <div class="p-8">
   <h1 class="heading-page mb-6"><%= t("admin.outgoing_emails.title") %></h1>
 
-  <%= form_with url: admin_outgoing_emails_path, method: :post, id: "compose_form", multipart: true do |f| %>
-    <% if @outgoing_email&.errors&.any? %>
-      <div class="bg-red-50 border border-red-200 text-red-700 rounded p-4 mb-6">
-        <ul class="list-disc list-inside text-sm">
-          <% @outgoing_email.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+  <%# The compose form is rendered EMPTY and OUTSIDE the recipient wrapper. The
+      recipient list lives in a Turbo Frame that contains its own search <form>,
+      and a <form> may not nest inside another <form> (the browser auto-closes
+      the outer one, orphaning the submit button so "Send" does nothing). So the
+      fields below associate to this form by id via the form: "compose_form"
+      attribute instead of being wrapped by it. %>
+  <%= form_with url: admin_outgoing_emails_path, method: :post, id: "compose_form", multipart: true do |f| %><% end %>
 
-    <%# The recipient-selection controller wraps BOTH the hidden audience field
-        and the frame, so it can keep the audience and the checked rows in sync
-        across the Turbo re-render that an audience toggle or a search triggers. %>
-    <div class="bg-white rounded shadow p-6 mb-6" data-controller="recipient-selection">
-      <%= f.hidden_field :audience, value: @audience, id: "compose_audience",
-            data: { "recipient-selection-target": "audience" } %>
-      <%= render "recipient_list" %>
-    </div>
-
-    <div class="bg-white rounded shadow p-6 mb-6 space-y-4">
-      <div>
-        <%= label_tag "outgoing_email[subject]", t("admin.outgoing_emails.fields.subject"), class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= text_field_tag "outgoing_email[subject]", @outgoing_email&.subject,
-              class: "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-navy focus:ring-2 focus:ring-navy/30" %>
-      </div>
-      <div>
-        <%= label_tag "outgoing_email[body]", t("admin.outgoing_emails.fields.body"), class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= text_area_tag "outgoing_email[body]", @outgoing_email&.body, rows: 10,
-              class: "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-navy focus:ring-2 focus:ring-navy/30" %>
-      </div>
-      <div>
-        <span class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.outgoing_emails.fields.attachment", limit: OutgoingEmail::MAX_ATTACHMENT_BYTES / 1.megabyte) %></span>
-        <div class="flex items-center gap-3" data-controller="file-input"
-             data-file-input-empty-value="<%= t("admin.outgoing_emails.fields.no_file") %>">
-          <label class="inline-flex items-center gap-2 cursor-pointer rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
-            <%# paper-clip %>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-gray-500">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
-            </svg>
-            <%= t("admin.outgoing_emails.fields.choose_file") %>
-            <%= file_field_tag "outgoing_email[file]", class: "hidden", data: { action: "change->file-input#changed" } %>
-          </label>
-          <span class="text-sm text-gray-500" data-file-input-target="filename"><%= t("admin.outgoing_emails.fields.no_file") %></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex gap-3">
-      <%= submit_tag t("admin.outgoing_emails.send"), class: "bg-navy text-white px-4 py-2 rounded hover:bg-navy/90 cursor-pointer" %>
-      <%= link_to t("admin.shared.cancel"), admin_root_path, class: "px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50" %>
+  <% if @outgoing_email&.errors&.any? %>
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded p-4 mb-6">
+      <ul class="list-disc list-inside text-sm">
+        <% @outgoing_email.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
     </div>
   <% end %>
+
+  <%# The recipient-selection controller wraps BOTH the hidden audience field
+      and the frame, so it can keep the audience and the checked rows in sync
+      across the Turbo re-render that an audience toggle or a search triggers. %>
+  <div class="bg-white rounded shadow p-6 mb-6" data-controller="recipient-selection">
+    <%= hidden_field_tag "audience", @audience, id: "compose_audience", form: "compose_form",
+          data: { "recipient-selection-target": "audience" } %>
+    <%= render "recipient_list" %>
+  </div>
+
+  <div class="bg-white rounded shadow p-6 mb-6 space-y-4">
+    <div>
+      <%= label_tag "outgoing_email[subject]", t("admin.outgoing_emails.fields.subject"), class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= text_field_tag "outgoing_email[subject]", @outgoing_email&.subject, form: "compose_form",
+            class: "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-navy focus:ring-2 focus:ring-navy/30" %>
+    </div>
+    <div>
+      <%= label_tag "outgoing_email[body]", t("admin.outgoing_emails.fields.body"), class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= text_area_tag "outgoing_email[body]", @outgoing_email&.body, rows: 10, form: "compose_form",
+            class: "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-navy focus:ring-2 focus:ring-navy/30" %>
+    </div>
+    <div>
+      <span class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.outgoing_emails.fields.attachment", limit: OutgoingEmail::MAX_ATTACHMENT_BYTES / 1.megabyte) %></span>
+      <div class="flex items-center gap-3" data-controller="file-input"
+           data-file-input-empty-value="<%= t("admin.outgoing_emails.fields.no_file") %>">
+        <label class="inline-flex items-center gap-2 cursor-pointer rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+          <%# paper-clip %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4 text-gray-500">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
+          </svg>
+          <%= t("admin.outgoing_emails.fields.choose_file") %>
+          <%= file_field_tag "outgoing_email[file]", form: "compose_form", class: "hidden", data: { action: "change->file-input#changed" } %>
+        </label>
+        <span class="text-sm text-gray-500" data-file-input-target="filename"><%= t("admin.outgoing_emails.fields.no_file") %></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+    <%= submit_tag t("admin.outgoing_emails.send"), form: "compose_form", class: "bg-navy text-white px-4 py-2 rounded hover:bg-navy/90 cursor-pointer" %>
+    <%= link_to t("admin.shared.cancel"), admin_root_path, class: "px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50" %>
+  </div>
 </div>
