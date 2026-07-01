@@ -1,0 +1,72 @@
+<div class="p-8 max-w-3xl">
+  <div class="mb-6">
+    <%= link_to t("admin.shared.back"), admin_information_requests_path, class: "text-sm text-accent hover:underline" %>
+  </div>
+
+  <div class="bg-white rounded shadow overflow-hidden">
+    <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+      <div>
+        <h1 class="heading-page mb-1"><%= @submission.name %></h1>
+        <p class="text-sm text-gray-500"><%= l(@submission.created_at, format: "%d/%m/%Y %H:%M") %></p>
+      </div>
+      <% if @submission.form_type == "enquiry" %>
+        <span class="inline-block rounded-full bg-accent/10 text-accent text-xs px-3 py-1"><%= t("admin.information_requests.filters.enquiry") %></span>
+      <% else %>
+        <span class="inline-block rounded-full bg-gray-100 text-gray-500 text-xs px-3 py-1"><%= t("admin.information_requests.filters.contact") %></span>
+      <% end %>
+    </div>
+
+    <dl class="px-6 py-5 space-y-4 text-sm">
+      <div class="flex">
+        <dt class="w-32 text-gray-400 uppercase text-xs tracking-wider pt-0.5"><%= t("admin.information_requests.table.email") %></dt>
+        <dd><%= mail_to @submission.email, @submission.email, class: "text-navy hover:underline" %></dd>
+      </div>
+      <% if @submission.phone.present? %>
+        <div class="flex">
+          <dt class="w-32 text-gray-400 uppercase text-xs tracking-wider pt-0.5"><%= t("admin.information_requests.detail.phone") %></dt>
+          <dd><%= @submission.phone %></dd>
+        </div>
+      <% end %>
+      <% if @submission.country.present? %>
+        <div class="flex">
+          <dt class="w-32 text-gray-400 uppercase text-xs tracking-wider pt-0.5"><%= t("admin.information_requests.detail.country") %></dt>
+          <dd><%= @submission.country %></dd>
+        </div>
+      <% end %>
+      <% if @submission.subject.present? %>
+        <div class="flex">
+          <dt class="w-32 text-gray-400 uppercase text-xs tracking-wider pt-0.5"><%= t("admin.information_requests.table.subject") %></dt>
+          <dd><%= @submission.subject %></dd>
+        </div>
+      <% end %>
+      <% if @submission.property.present? %>
+        <div class="flex">
+          <dt class="w-32 text-gray-400 uppercase text-xs tracking-wider pt-0.5"><%= t("admin.information_requests.detail.property") %></dt>
+          <dd>
+            <%= link_to admin_property_path(@submission.property), class: "text-navy hover:underline" do %>
+              <%= @submission.property.reference %> — <%= @submission.property.title_for(:fr) %>
+            <% end %>
+          </dd>
+        </div>
+      <% end %>
+    </dl>
+
+    <div class="px-6 py-5 border-t border-gray-100">
+      <h2 class="text-xs uppercase tracking-wider text-gray-400 mb-2"><%= t("admin.information_requests.detail.message") %></h2>
+      <p class="text-sm text-text whitespace-pre-line"><%= @submission.message %></p>
+    </div>
+
+    <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center gap-3">
+      <%= button_to t("admin.information_requests.actions.mark_unread"),
+            admin_information_request_path(@submission),
+            method: :patch,
+            params: { information_request: { read: false } },
+            class: "text-sm border border-gray-300 px-4 py-2 rounded hover:bg-white" %>
+      <%= button_to t("admin.shared.delete"),
+            admin_information_request_path(@submission),
+            method: :delete,
+            data: { turbo_confirm: t("admin.shared.confirm_delete") },
+            class: "text-sm text-red-600 border border-red-200 px-4 py-2 rounded hover:bg-red-50" %>
+    </div>
+  </div>
+</div>

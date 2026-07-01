@@ -17,7 +17,7 @@ class ContactMailerTest < ActionMailer::TestCase
   # === Homepage contact form email ===
 
   test "contact email is sent to agency" do
-    submission = ContactSubmission.create!(
+    submission = InformationRequest.create!(
       form_type: "contact",
       name: "Jean Dupont",
       email: "jean@example.com",
@@ -32,7 +32,7 @@ class ContactMailerTest < ActionMailer::TestCase
   end
 
   test "contact email has correct recipient" do
-    submission = ContactSubmission.create!(
+    submission = InformationRequest.create!(
       form_type: "contact",
       name: "Jean Dupont",
       email: "jean@example.com",
@@ -45,7 +45,7 @@ class ContactMailerTest < ActionMailer::TestCase
   end
 
   test "contact email has correct reply-to" do
-    submission = ContactSubmission.create!(
+    submission = InformationRequest.create!(
       form_type: "contact",
       name: "Jean Dupont",
       email: "jean@example.com",
@@ -58,7 +58,7 @@ class ContactMailerTest < ActionMailer::TestCase
   end
 
   test "contact email subject includes submission subject" do
-    submission = ContactSubmission.create!(
+    submission = InformationRequest.create!(
       form_type: "contact",
       name: "Jean Dupont",
       email: "jean@example.com",
@@ -71,7 +71,7 @@ class ContactMailerTest < ActionMailer::TestCase
   end
 
   test "contact email body contains sender name and message" do
-    submission = ContactSubmission.create!(
+    submission = InformationRequest.create!(
       form_type: "contact",
       name: "Jean Dupont",
       email: "jean@example.com",
@@ -88,7 +88,7 @@ class ContactMailerTest < ActionMailer::TestCase
   # === Property enquiry email ===
 
   test "enquiry email is sent to agency" do
-    submission = ContactSubmission.create!(
+    submission = InformationRequest.create!(
       form_type: "enquiry",
       name: "Pierre Martin",
       email: "pierre@example.com",
@@ -105,7 +105,7 @@ class ContactMailerTest < ActionMailer::TestCase
   end
 
   test "enquiry email has correct recipient" do
-    submission = ContactSubmission.create!(
+    submission = InformationRequest.create!(
       form_type: "enquiry",
       name: "Pierre Martin",
       email: "pierre@example.com",
@@ -118,7 +118,7 @@ class ContactMailerTest < ActionMailer::TestCase
   end
 
   test "enquiry email has correct reply-to" do
-    submission = ContactSubmission.create!(
+    submission = InformationRequest.create!(
       form_type: "enquiry",
       name: "Pierre Martin",
       email: "pierre@example.com",
@@ -131,7 +131,7 @@ class ContactMailerTest < ActionMailer::TestCase
   end
 
   test "enquiry email subject includes property reference" do
-    submission = ContactSubmission.create!(
+    submission = InformationRequest.create!(
       form_type: "enquiry",
       name: "Pierre Martin",
       email: "pierre@example.com",
@@ -144,7 +144,7 @@ class ContactMailerTest < ActionMailer::TestCase
   end
 
   test "enquiry email body contains sender details and property info" do
-    submission = ContactSubmission.create!(
+    submission = InformationRequest.create!(
       form_type: "enquiry",
       name: "Pierre Martin",
       email: "pierre@example.com",
@@ -165,7 +165,7 @@ class ContactMailerTest < ActionMailer::TestCase
   end
 
   test "enquiry email body contains link to property" do
-    submission = ContactSubmission.create!(
+    submission = InformationRequest.create!(
       form_type: "enquiry",
       name: "Pierre Martin",
       email: "pierre@example.com",

@@ -162,7 +162,7 @@
       <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-14">
         <% [ :step1, :step2, :step3 ].each_with_index do |step, idx| %>
           <div>
-            <p class="<%= font_sans %> text-[10px] font-semibold tracking-[0.3em] uppercase text-navy/40 mb-5">
+            <p class="<%= font_sans %> text-[10px] font-semibold tracking-[0.3em] uppercase text-navy/70 mb-5">
               <%= "%02d" % (idx + 1) %>
             </p>
             <h3 class="font-['Domine',serif] text-xl md:text-2xl leading-snug tracking-tight text-navy font-medium">
@@ -498,7 +498,7 @@
   </section>
 
   <%# === EXPERT FORM — dedicated section under the result billboard === %>
-  <% expert_submission = @submission || ContactSubmission.new %>
+  <% expert_submission = @submission || InformationRequest.new %>
   <section data-testid="estimate-expert-form" class="bg-[#FAF8F4]">
     <div class="max-w-6xl mx-auto px-6 lg:px-10 py-20 md:py-24">
       <div class="grid grid-cols-1 lg:grid-cols-[5fr_7fr] gap-x-16 gap-y-10">
@@ -515,7 +515,7 @@
           <p class="<%= font_sans %> mt-6 text-sm leading-relaxed text-navy/70 max-w-md">
             <%= t("estimate.expert_form.lede") %>
           </p>
-          <p class="<%= font_sans %> mt-8 text-[10px] tracking-[0.2em] uppercase text-navy/40">
+          <p class="<%= font_sans %> mt-8 text-[10px] tracking-[0.2em] uppercase text-navy/70">
             <%= t("estimate.expert_form.privacy_note") %>
           </p>
         </div>
@@ -532,7 +532,7 @@
             </div>
           <% end %>
 
-          <%= form_with(model: expert_submission, url: contact_submissions_path, method: :post, local: true,
+          <%= form_with(model: expert_submission, url: information_requests_path, method: :post, local: true,
                        html: { class: "space-y-6", "data-turbo": "false" }) do |f| %>
 
             <%# Honeypot %>
@@ -549,7 +549,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
               <div>
-                <label for="contact_submission_name"
+                <label for="information_request_name"
                        class="<%= font_sans %> block text-[10px] font-semibold tracking-[0.25em] uppercase text-navy/60 mb-2">
                   <%= t("estimate.expert_form.name_label") %>
                 </label>
@@ -561,7 +561,7 @@
                               focus:outline-none focus:border-gold transition-colors" %>
               </div>
               <div>
-                <label for="contact_submission_phone"
+                <label for="information_request_phone"
                        class="<%= font_sans %> block text-[10px] font-semibold tracking-[0.25em] uppercase text-navy/60 mb-2">
                   <%= t("estimate.expert_form.phone_label") %>
                 </label>
@@ -575,7 +575,7 @@
             </div>
 
             <div>
-              <label for="contact_submission_email"
+              <label for="information_request_email"
                      class="<%= font_sans %> block text-[10px] font-semibold tracking-[0.25em] uppercase text-navy/60 mb-2">
                 <%= t("estimate.expert_form.email_label") %>
               </label>

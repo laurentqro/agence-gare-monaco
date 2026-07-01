@@ -2,7 +2,7 @@ class PropertiesController < ApplicationController
   include Localizable
   include SeoConfigurable
   allow_unauthenticated_access
-  before_action :initialize_contact_submission
+  before_action :initialize_information_request
 
   def index
     @transaction_type = params[:transaction_type]
@@ -67,8 +67,8 @@ class PropertiesController < ApplicationController
 
   private
 
-  def initialize_contact_submission
-    @submission = ContactSubmission.new
+  def initialize_information_request
+    @submission = InformationRequest.new
   end
 
   def apply_type_filters(scope, localized_values)

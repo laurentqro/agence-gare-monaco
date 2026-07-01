@@ -10,7 +10,7 @@ class PagesController < ApplicationController
   end
 
   def contact
-    @submission = ContactSubmission.new
+    @submission = InformationRequest.new
     set_seo(page_type: :contact)
   end
 
@@ -19,12 +19,12 @@ class PagesController < ApplicationController
   end
 
   def gestion
-    @submission = ContactSubmission.new
+    @submission = InformationRequest.new
     set_seo(page_type: :gestion)
   end
 
   def vendre
-    @submission = ContactSubmission.new
+    @submission = InformationRequest.new
     set_seo(page_type: :vendre)
   end
 

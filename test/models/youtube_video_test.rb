@@ -55,6 +55,21 @@ class YoutubeVideoTest < ActiveSupport::TestCase
     assert_equal "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ", video.embed_url
   end
 
+  test "autoplay_embed_url adds autoplay param to the embed URL" do
+    video = YoutubeVideo.new(video_id: "dQw4w9WgXcQ")
+    assert_equal "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1", video.autoplay_embed_url
+  end
+
+  test "thumbnail_image_url returns the stored thumbnail when present" do
+    video = YoutubeVideo.new(video_id: "dQw4w9WgXcQ", thumbnail_url: "https://i.ytimg.com/vi/dQw4w9WgXcQ/custom.jpg")
+    assert_equal "https://i.ytimg.com/vi/dQw4w9WgXcQ/custom.jpg", video.thumbnail_image_url
+  end
+
+  test "thumbnail_image_url falls back to ytimg hqdefault when blank" do
+    video = YoutubeVideo.new(video_id: "dQw4w9WgXcQ", thumbnail_url: nil)
+    assert_equal "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg", video.thumbnail_image_url
+  end
+
   test "CHANNEL_ID is set" do
     assert_equal "UC2w6AJOPj37wDZxXjWLRxtg", YoutubeVideo::CHANNEL_ID
   end

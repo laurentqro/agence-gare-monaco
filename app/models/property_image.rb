@@ -1,6 +1,8 @@
 class PropertyImage < ApplicationRecord
   belongs_to :property
 
+  has_one_attached :image
+
   validates :remote_url, presence: true
 
   scope :ordered, -> { order(:position) }

@@ -40,7 +40,7 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     get new_admin_property_share_url(@property)
     assert_response :success
     # Header row exposes the full contact columns, with name split in two
-    ["Nom", "Prénom", "Société", "Email", "Téléphone", "Ville", "Pays"].each do |col|
+    [ "Nom", "Prénom", "Société", "Email", "Téléphone", "Ville", "Pays" ].each do |col|
       assert_select "table thead th a", text: /#{Regexp.escape(col)}/
     end
     # One data row per contact
