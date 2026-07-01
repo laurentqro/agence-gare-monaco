@@ -84,4 +84,14 @@ class Admin::DashboardControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "a[href=?]", admin_contacts_path, text: "Voir tous les contacts"
   end
+
+  test "dashboard quick actions include a link to compose an email" do
+    user = User.create!(email_address: "adrien@agencegaremonaco.com", password: "securepassword123")
+    post session_url, params: { email_address: "adrien@agencegaremonaco.com", password: "securepassword123" }
+    get admin_root_url
+
+    # Scope to the quick-actions grid so the sidebar's compose-email nav link
+    # (which points at the same path) does not satisfy this assertion.
+    assert_select ".grid a[href=?]", new_admin_outgoing_email_path, count: 1, text: "Envoyer un email"
+  end
 end

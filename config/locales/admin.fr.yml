@@ -25,6 +25,7 @@ fr:
         new_article: "Rédiger un article"
         new_off_market_property: "Ajouter un bien off market"
         new_contact: "Ajouter un contact"
+        send_email: "Envoyer un email"
         all_properties: "Voir tous les biens"
         all_contacts: "Voir tous les contacts"
         information_requests: "Demandes de renseignements"
