@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_25_135650) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_30_202040) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -137,6 +137,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_25_135650) do
     t.index ["form_type"], name: "index_information_requests_on_form_type"
     t.index ["property_id"], name: "index_information_requests_on_property_id"
     t.index ["read"], name: "index_information_requests_on_read"
+  end
+
+  create_table "outgoing_emails", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.integer "pending_count", default: 0, null: false
+    t.json "sent_emails", default: [], null: false
+    t.string "subject", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "properties", force: :cascade do |t|

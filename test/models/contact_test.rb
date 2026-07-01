@@ -104,4 +104,14 @@ class ContactTest < ActiveSupport::TestCase
     assert_equal "Recherche 2 pièces location", contact.notes
     assert_equal 10, contact.legacy_id
   end
+
+  test "listing_name joins last and first name" do
+    contact = Contact.new(last_name: "Dupont", first_name: "Jean")
+    assert_equal "Dupont Jean", contact.listing_name
+  end
+
+  test "listing_name skips blank name parts" do
+    assert_equal "Berg", Contact.new(last_name: "Berg", first_name: "").listing_name
+    assert_equal "Anna", Contact.new(last_name: nil, first_name: "Anna").listing_name
+  end
 end
