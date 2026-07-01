@@ -280,7 +280,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
     # and a fake field. The persisted submission must not contain the injected lines
     # verbatim; the agent should see a clean record.
     assert_difference -> { InformationRequest.count }, 1 do
-      post "/information_requests", params: {
+      submit_information_request({
         information_request: {
           name: "Sophie Martin",
           email: "sophie@example.com",
@@ -293,7 +293,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
           construction_year: "2024"
         },
         locale: "fr"
-      }
+      }, from: "/estimer?district=monte-carlo&surface=100&construction_year=2024")
     end
     submission = InformationRequest.last
     refute_match(/Fake-Field/, submission.message,
@@ -303,7 +303,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
   end
 
   test "tampered hidden estimate[district] with unknown slug falls back to a safe message" do
-    post "/information_requests", params: {
+    submit_information_request({
       information_request: {
         name: "Sophie Martin",
         email: "sophie@example.com",
@@ -316,7 +316,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
         construction_year: "2024"
       },
       locale: "fr"
-    }
+    }, from: "/estimer?district=monte-carlo&surface=100&construction_year=2024")
     submission = InformationRequest.last
     refute_match(/<script>/, submission.message,
       "Unknown/unsafe district slug must not be echoed into the message")
@@ -324,7 +324,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
 
   test "submitting the expert contact form from estimate creates a submission and redirects back to the estimate page" do
     assert_difference -> { InformationRequest.count }, 1 do
-      post "/information_requests", params: {
+      submit_information_request({
         information_request: {
           name: "Sophie Martin",
           email: "sophie@example.com",
@@ -337,7 +337,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
           construction_year: "2024"
         },
         locale: "fr"
-      }
+      }, from: "/estimer?district=monte-carlo&surface=100&construction_year=2024")
     end
     submission = InformationRequest.last
     # The server auto-fills the message body from the estimate inputs so the agent
@@ -351,7 +351,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
   end
 
   test "expert contact form submitted without name or email re-renders the result with errors and preserves the estimate" do
-    post "/information_requests", params: {
+    submit_information_request({
       information_request: {
         name: "",
         email: "",
@@ -364,7 +364,7 @@ class EstimatePageTest < ActionDispatch::IntegrationTest
         construction_year: "2024"
       },
       locale: "fr"
-    }
+    }, from: "/estimer?district=monte-carlo&surface=100&construction_year=2024")
     assert_response :unprocessable_content
     # The estimate result is restored alongside the form errors
     assert_select "[data-testid='estimate-result']"

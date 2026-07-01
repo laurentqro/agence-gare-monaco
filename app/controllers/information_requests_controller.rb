@@ -3,8 +3,17 @@ class InformationRequestsController < ApplicationController
   include SeoConfigurable
   allow_unauthenticated_access
 
+  # invisible_captcha: honeypot (randomized field), timestamp trap, and spinner
+  # token all guard #create. Any trip is dropped silently via #discard_spam so
+  # bots receive a success-looking response and don't learn to adapt.
+  invisible_captcha only: :create,
+                    honeypot: :subtitle,
+                    scope: :information_request,
+                    on_spam: :discard_spam,
+                    on_timestamp_spam: :discard_spam
+
   def create
-    # Honeypot check: if the hidden "website" field is filled, silently reject
+    # Legacy static honeypot: kept as a cheap first layer alongside invisible_captcha.
     if params[:website].present?
       redirect_to redirect_path_after_submission
       return
@@ -42,6 +51,12 @@ class InformationRequestsController < ApplicationController
   end
 
   private
+
+  # Silent spam handler for invisible_captcha. Redirects as if the submission
+  # succeeded (so the bot can't tell it was blocked) without saving or emailing.
+  def discard_spam
+    redirect_to redirect_path_after_submission
+  end
 
   def submission_params
     params.require(:information_request).permit(:name, :email, :phone, :country, :subject, :message, :property_id)

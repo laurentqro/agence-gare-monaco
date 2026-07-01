@@ -535,7 +535,10 @@
           <%= form_with(model: expert_submission, url: information_requests_path, method: :post, local: true,
                        html: { class: "space-y-6", "data-turbo": "false" }) do |f| %>
 
-            <%# Honeypot %>
+            <%# Spam protection: randomized honeypot + timestamp + spinner (invisible_captcha) %>
+            <%= f.invisible_captcha :subtitle %>
+
+            <%# Legacy static honeypot, kept as a cheap first layer %>
             <div class="absolute -left-[9999px]">
               <label for="estimate_website">Website</label>
               <input type="text" name="website" id="estimate_website" tabindex="-1" autocomplete="off">

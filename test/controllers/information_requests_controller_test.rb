@@ -19,7 +19,7 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
   test "successful contact form submission creates record and sends email" do
     assert_difference "InformationRequest.count", 1 do
       assert_emails 1 do
-        post information_requests_url, params: {
+        submit_information_request({
           information_request: {
             name: "Jean Dupont",
             email: "jean@example.com",
@@ -27,7 +27,7 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
             message: "I would like more information."
           },
           locale: "en"
-        }
+        }, from: "/en/contact")
       end
     end
 
@@ -47,21 +47,84 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
 
   test "contact form submission with validation errors re-renders contact page" do
     assert_no_difference "InformationRequest.count" do
-      post information_requests_url, params: {
+      submit_information_request({
         information_request: {
           name: "",
           email: "",
           message: ""
         },
         locale: "en"
-      }
+      }, from: "/en/contact")
     end
 
     assert_response :unprocessable_entity
     assert_select "form[action^='/information_requests']"
   end
 
-  test "contact form submission with honeypot filled is rejected silently" do
+  test "contact form submission with legacy honeypot filled is rejected silently" do
+    assert_no_difference "InformationRequest.count" do
+      assert_no_emails do
+        submit_information_request({
+          information_request: {
+            name: "Bot User",
+            email: "bot@spam.com",
+            subject: "Buy now",
+            message: "Click here to win"
+          },
+          website: "http://spam.example.com",
+          locale: "en"
+        }, from: "/en/contact")
+      end
+    end
+
+    # Redirects as if successful (don't reveal to bot)
+    assert_redirected_to "/en/contact"
+  end
+
+  test "contact form submission with invisible_captcha honeypot filled is rejected silently" do
+    assert_no_difference "InformationRequest.count" do
+      assert_no_emails do
+        submit_information_request({
+          information_request: {
+            name: "Bot User",
+            email: "bot@spam.com",
+            subject: "Buy now",
+            message: "Click here to win",
+            subtitle: "http://spam.example.com"
+          },
+          locale: "en"
+        }, from: "/en/contact")
+      end
+    end
+
+    assert_redirected_to "/en/contact"
+  end
+
+  test "contact form submission faster than the timestamp threshold is rejected silently" do
+    get "/en/contact"
+    spinner = captcha_spinner_from(response.body)
+
+    assert_no_difference "InformationRequest.count" do
+      assert_no_emails do
+        # No time travel: POST arrives immediately, faster than a human could type.
+        post information_requests_url, params: {
+          information_request: {
+            name: "Bot User",
+            email: "bot@spam.com",
+            subject: "Buy now",
+            message: "Click here to win"
+          },
+          spinner: spinner,
+          locale: "en"
+        }
+      end
+    end
+
+    assert_redirected_to "/en/contact"
+  end
+
+  test "contact form submission with no prior form render is rejected silently" do
+    # A bot re-POSTing without fetching the form has no session timestamp/spinner.
     assert_no_difference "InformationRequest.count" do
       assert_no_emails do
         post information_requests_url, params: {
@@ -71,13 +134,11 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
             subject: "Buy now",
             message: "Click here to win"
           },
-          website: "http://spam.example.com",
           locale: "en"
         }
       end
     end
 
-    # Redirects as if successful (don't reveal to bot)
     assert_redirected_to "/en/contact"
   end
 
@@ -86,7 +147,7 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
   test "successful enquiry form submission creates record and sends email" do
     assert_difference "InformationRequest.count", 1 do
       assert_emails 1 do
-        post information_requests_url, params: {
+        submit_information_request({
           information_request: {
             name: "Pierre Martin",
             email: "pierre@example.com",
@@ -96,7 +157,7 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
             property_id: @property.id
           },
           locale: "en"
-        }
+        }, from: "/en/properties/#{@property.id}-test-studio")
       end
     end
 
@@ -110,7 +171,7 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "enquiry form redirects back to property page on success" do
-    post information_requests_url, params: {
+    submit_information_request({
       information_request: {
         name: "Pierre Martin",
         email: "pierre@example.com",
@@ -118,7 +179,7 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
         property_id: @property.id
       },
       locale: "en"
-    }
+    }, from: "/en/properties/#{@property.id}-test-studio")
 
     assert_redirected_to "/en/properties/#{@property.id}-test-studio"
     follow_redirect!
@@ -127,7 +188,7 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
 
   test "enquiry form with validation errors re-renders property page" do
     assert_no_difference "InformationRequest.count" do
-      post information_requests_url, params: {
+      submit_information_request({
         information_request: {
           name: "",
           email: "",
@@ -135,13 +196,35 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
           property_id: @property.id
         },
         locale: "en"
-      }
+      }, from: "/en/properties/#{@property.id}-test-studio")
     end
 
     assert_response :unprocessable_entity
   end
 
-  test "enquiry form with honeypot filled is rejected silently" do
+  test "enquiry form with legacy honeypot filled is rejected silently" do
+    assert_no_difference "InformationRequest.count" do
+      assert_no_emails do
+        submit_information_request({
+          information_request: {
+            name: "Bot User",
+            email: "bot@spam.com",
+            message: "Click here",
+            property_id: @property.id
+          },
+          website: "http://spam.example.com",
+          locale: "en"
+        }, from: "/en/properties/#{@property.id}-test-studio")
+      end
+    end
+
+    assert_redirected_to "/en/properties/#{@property.id}-test-studio"
+  end
+
+  test "enquiry form submitted faster than the timestamp threshold is rejected silently" do
+    get "/en/properties/#{@property.id}-test-studio"
+    spinner = captcha_spinner_from(response.body)
+
     assert_no_difference "InformationRequest.count" do
       assert_no_emails do
         post information_requests_url, params: {
@@ -151,7 +234,7 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
             message: "Click here",
             property_id: @property.id
           },
-          website: "http://spam.example.com",
+          spinner: spinner,
           locale: "en"
         }
       end
@@ -172,10 +255,17 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
     assert_select "textarea[name='information_request[message]']"
   end
 
-  test "contact page renders honeypot field" do
+  test "contact page renders legacy honeypot field" do
     get "/en/contact"
     assert_response :success
     assert_select "input[name='website']"
+  end
+
+  test "contact page renders invisible_captcha honeypot and spinner" do
+    get "/en/contact"
+    assert_response :success
+    assert_select "input[name='information_request[subtitle]']"
+    assert_select "input[name='spinner']"
   end
 
   # === Contact page team section ===
@@ -263,9 +353,16 @@ class InformationRequestsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "property page renders honeypot field in enquiry form" do
+  test "property page renders legacy honeypot field in enquiry form" do
     get "/en/properties/#{@property.id}-test-studio"
     assert_response :success
     assert_select "[data-testid='enquiry-form'] input[name='website']"
+  end
+
+  test "property page renders invisible_captcha honeypot and spinner in enquiry form" do
+    get "/en/properties/#{@property.id}-test-studio"
+    assert_response :success
+    assert_select "[data-testid='enquiry-form'] input[name='information_request[subtitle]']"
+    assert_select "[data-testid='enquiry-form'] input[name='spinner']"
   end
 end

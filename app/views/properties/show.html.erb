@@ -386,7 +386,10 @@
           <% end %>
 
           <%= form_with(model: enquiry, url: information_requests_path, method: :post, local: true, class: "space-y-7") do |f| %>
-            <%# Honeypot field %>
+            <%# Spam protection: randomized honeypot + timestamp + spinner (invisible_captcha) %>
+            <%= f.invisible_captcha :subtitle %>
+
+            <%# Legacy static honeypot, kept as a cheap first layer %>
             <div style="position: absolute; left: -9999px;" aria-hidden="true">
               <label for="website">Website</label>
               <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">

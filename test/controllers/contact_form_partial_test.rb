@@ -24,9 +24,15 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
     assert_select "form[action^='/information_requests']"
   end
 
-  test "gestion page contact form has honeypot field" do
+  test "gestion page contact form has legacy honeypot field" do
     get "/gestion"
     assert_select "input[name='website'][tabindex='-1']"
+  end
+
+  test "gestion page contact form has invisible_captcha honeypot and spinner" do
+    get "/gestion"
+    assert_select "input[name='information_request[subtitle]']"
+    assert_select "input[name='spinner']"
   end
 
   test "gestion page contact form has return_to hidden field" do
@@ -70,11 +76,11 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
 
   test "successful submission from gestion redirects back to gestion" do
     assert_emails 1 do
-      post information_requests_path, params: {
+      submit_information_request({
         information_request: { name: "Test", email: "test@example.com", message: "Hello" },
         return_to: "gestion",
         locale: "fr"
-      }
+      }, from: "/gestion")
     end
     assert_redirected_to "/gestion"
     follow_redirect!
@@ -83,11 +89,11 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
 
   test "successful submission from vendre redirects back to vendre" do
     assert_emails 1 do
-      post information_requests_path, params: {
+      submit_information_request({
         information_request: { name: "Test", email: "test@example.com", message: "Hello" },
         return_to: "vendre",
         locale: "fr"
-      }
+      }, from: "/vendre")
     end
     assert_redirected_to "/vendre"
     follow_redirect!
@@ -96,31 +102,31 @@ class ContactFormPartialTest < ActionDispatch::IntegrationTest
 
   test "successful submission without return_to redirects to contact page" do
     assert_emails 1 do
-      post information_requests_path, params: {
+      submit_information_request({
         information_request: { name: "Test", email: "test@example.com", message: "Hello" },
         locale: "fr"
-      }
+      }, from: "/contact")
     end
     assert_redirected_to "/contact"
   end
 
   test "failed submission from gestion re-renders gestion page with errors" do
-    post information_requests_path, params: {
+    submit_information_request({
       information_request: { name: "", email: "", message: "" },
       return_to: "gestion",
       locale: "fr"
-    }
+    }, from: "/gestion")
     assert_response :unprocessable_entity
     assert_select "[data-testid='gestion-content']"
     assert_select "[data-testid='inline-contact-form']"
   end
 
   test "failed submission from vendre re-renders vendre page with errors" do
-    post information_requests_path, params: {
+    submit_information_request({
       information_request: { name: "", email: "", message: "" },
       return_to: "vendre",
       locale: "fr"
-    }
+    }, from: "/vendre")
     assert_response :unprocessable_entity
     assert_select "[data-testid='vendre-content']"
     assert_select "[data-testid='inline-contact-form']"
