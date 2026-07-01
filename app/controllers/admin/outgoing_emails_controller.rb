@@ -1,16 +1,11 @@
 module Admin
   class OutgoingEmailsController < BaseController
-    AUDIENCES = %w[peers contacts].freeze
-    DEFAULT_AUDIENCE = "peers".freeze
-
     # Pre-filled into the body on a fresh compose page, built from the shared
     # agent record so the name/email/phone stay in one place. The leading blank
     # lines put the cursor above the signature so Adrien types his message first.
     SIGNATURE = "\n\n#{PropertyMailer::AGENT[:name]}\n" \
                 "#{PropertyMailer::AGENT[:email]}\n" \
                 "T: #{PropertyMailer::AGENT[:phone]}".freeze
-
-    before_action :set_audience
 
     def new
       load_recipients
@@ -45,16 +40,18 @@ module Admin
       params.require(:outgoing_email).permit(:subject, :body, :file)
     end
 
-    # Resolves submitted contact_ids to recipient emails, keeping only contacts
-    # that still exist, belong to the submitted audience, and have a present
-    # email. Out-of-audience, missing, or now-email-less ids are silently dropped
-    # (page-load vs submit drift); if that leaves zero, the create path treats it
-    # as "no recipients selected".
+    # Resolves submitted contact_ids to recipient emails. A send may now target a
+    # mixed audience (peers and contacts together), so there is no audience cross-
+    # filter: any email-bearing contact whose id was submitted is a recipient.
+    # Ids that no longer exist or lost their email between page-load and submit
+    # are silently dropped (page-load vs submit drift); if that leaves zero, the
+    # create path treats it as "no recipients selected". `.distinct` guards against
+    # a contact submitted twice from double-counting or double-sending.
     def resolve_recipients
       ids = Array(params[:contact_ids]).reject(&:blank?)
       return [] if ids.empty?
 
-      audience_scope(Contact.with_email.where(id: ids)).pluck(:email)
+      Contact.with_email.where(id: ids).distinct.pluck(:email)
     end
 
     def render_new_with_errors
@@ -62,23 +59,14 @@ module Admin
       render :new, status: :unprocessable_entity
     end
 
-    # Recipients are email-bearing contacts of the chosen audience, name-ordered.
-    # Mirrors PropertySharesController#new (audience filter then search), minus
-    # sorting: this page deliberately has no sortable columns.
+    # Loads both recipient lists, each name-ordered and each narrowed by its own
+    # search term. Both are shown at once (stacked), so the compose page can build
+    # one email to a mix of peers and contacts. Only email-bearing contacts appear.
     def load_recipients
-      @query = params[:q]
-      @recipients = audience_scope(Contact.with_email)
-                      .search(@query)
-                      .order(:last_name, :first_name)
-    end
-
-    def set_audience
-      @audience = AUDIENCES.include?(params[:audience]) ? params[:audience] : DEFAULT_AUDIENCE
-    end
-
-    # Pure: filters the given relation by the already-resolved @audience.
-    def audience_scope(relation)
-      @audience == "contacts" ? relation.contacts_only : relation.peers
+      @peers_query = params[:peers_q]
+      @contacts_query = params[:contacts_q]
+      @peers = Contact.peers.with_email.search(@peers_query).order(:last_name, :first_name)
+      @contacts = Contact.contacts_only.with_email.search(@contacts_query).order(:last_name, :first_name)
     end
   end
 end

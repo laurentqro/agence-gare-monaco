@@ -8,6 +8,7 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     @peer1 = Contact.create!(last_name: "Confrère", first_name: "Paul", company: "Agence A", email: "paul@agency.mc", peer: true)
     @peer2 = Contact.create!(last_name: "Aubert", first_name: "Marie", company: "Agence B", email: "marie@agency.mc", peer: true)
     @contact1 = Contact.create!(last_name: "Dupont", first_name: "Jean", email: "jean@example.com", peer: false)
+    @contact2 = Contact.create!(last_name: "Martin", first_name: "Luc", email: "luc@example.com", peer: false)
     @no_email = Contact.create!(last_name: "Sans", first_name: "Email", phone: "0600000000", peer: true)
   end
 
@@ -17,14 +18,43 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_url
   end
 
-  test "GET new renders the compose form defaulting to the peers audience" do
+  test "GET new renders the compose form with both peers and contacts lists stacked" do
     get new_admin_outgoing_email_url
     assert_response :success
     assert_select "h1", /Envoyer un email/
     assert_select "form#compose_form"
-    # Default audience is peers: peers are listed, contacts are not.
+    # Both audiences are shown at once (stacked), no tabs: peers AND contacts.
     assert_select "input[type='checkbox'][value='#{@peer1.id}']", 1
-    assert_select "input[type='checkbox'][value='#{@contact1.id}']", 0
+    assert_select "input[type='checkbox'][value='#{@contact1.id}']", 1
+  end
+
+  test "GET new renders both audience section headings" do
+    get new_admin_outgoing_email_url
+    assert_response :success
+    assert_select "h2", text: /confrères/i
+    assert_select "h2", text: /contacts/i
+  end
+
+  test "GET new renders a separate turbo frame per audience list" do
+    get new_admin_outgoing_email_url
+    assert_response :success
+    assert_select "turbo-frame#compose_peers"
+    assert_select "turbo-frame#compose_contacts"
+  end
+
+  test "GET new renders a selected-recipients panel for each audience" do
+    get new_admin_outgoing_email_url
+    assert_response :success
+    # Each list has its own live "selected" panel (the JS fills it in).
+    assert_select "[data-recipient-selection-target='peersSelected']"
+    assert_select "[data-recipient-selection-target='contactsSelected']"
+  end
+
+  test "GET new renders a search field for each audience list" do
+    get new_admin_outgoing_email_url
+    assert_response :success
+    assert_select "input[type='search'][name='peers_q']"
+    assert_select "input[type='search'][name='contacts_q']"
   end
 
   test "GET new pre-fills the body with Adrien's signature" do
@@ -42,7 +72,6 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     # A validation failure (missing subject) re-renders the form; it must show
     # what Adrien actually typed, never re-stamp the pre-filled signature over it.
     post admin_outgoing_emails_url, params: {
-      audience: "peers",
       contact_ids: [ @peer1.id ],
       outgoing_email: { subject: "", body: "Bonjour, voici mon message." }
     }
@@ -58,99 +87,48 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type='checkbox'][value='#{@no_email.id}']", 0
   end
 
-  test "GET new with audience=contacts lists contacts not peers" do
-    get new_admin_outgoing_email_url(audience: "contacts")
-    assert_response :success
-    assert_select "input[type='checkbox'][value='#{@contact1.id}']", 1
-    assert_select "input[type='checkbox'][value='#{@peer1.id}']", 0
-  end
-
-  test "GET new search narrows the list within the audience" do
-    get new_admin_outgoing_email_url(audience: "peers", q: "Aubert")
+  test "GET new peers search narrows only the peers list" do
+    get new_admin_outgoing_email_url(peers_q: "Aubert")
     assert_response :success
     assert_select "input[type='checkbox'][value='#{@peer2.id}']", 1
     assert_select "input[type='checkbox'][value='#{@peer1.id}']", 0
+    # The contacts list is unaffected by the peers search term.
+    assert_select "input[type='checkbox'][value='#{@contact1.id}']", 1
   end
 
-  test "GET new lists recipients ordered by name" do
-    get new_admin_outgoing_email_url(audience: "peers")
+  test "GET new contacts search narrows only the contacts list" do
+    get new_admin_outgoing_email_url(contacts_q: "Martin")
     assert_response :success
-    names = css_select("tbody [data-recipient-name]").map { |el| el.text.strip }
+    assert_select "input[type='checkbox'][value='#{@contact2.id}']", 1
+    assert_select "input[type='checkbox'][value='#{@contact1.id}']", 0
+    # The peers list is unaffected by the contacts search term.
+    assert_select "input[type='checkbox'][value='#{@peer1.id}']", 1
+  end
+
+  test "GET new lists peers ordered by name" do
+    get new_admin_outgoing_email_url
+    assert_response :success
+    names = css_select("turbo-frame#compose_peers td[data-recipient-name]").map { |el| el.text.strip }
     assert_equal names.sort, names
   end
 
-  test "GET new renders inside the recipient turbo frame" do
+  test "GET new exposes each recipient's display name on the checkbox for the chips UI" do
     get new_admin_outgoing_email_url
     assert_response :success
-    assert_select "turbo-frame#compose_recipients"
+    # The JS renders removable chips from the checkbox, so the name must travel
+    # with it (rows scrolled out of view / filtered away still need their label).
+    assert_select "input[type='checkbox'][value='#{@peer1.id}'][data-recipient-name=?]", @peer1.listing_name
   end
 
-  test "GET new renders the audience toggle and search field" do
+  test "GET new wires the recipient-selection controller around both frames" do
     get new_admin_outgoing_email_url
     assert_response :success
-    assert_select "a[href*='audience=contacts']"
-    assert_select "a[href*='audience=peers']"
-    assert_select "input[type='search'][name='q']"
-  end
-
-  test "GET new renders subject, body and attachment fields" do
-    get new_admin_outgoing_email_url
-    assert_response :success
-    assert_select "input[name='outgoing_email[subject]']"
-    assert_select "textarea[name='outgoing_email[body]']"
-    assert_select "input[type='file'][name='outgoing_email[file]']"
-    assert_select "input[type='submit']"
-  end
-
-  test "GET new renders a styled French file picker, not the bare browser control" do
-    get new_admin_outgoing_email_url
-    assert_response :success
-    # The native input is hidden and driven by a styled label-button so the
-    # control matches the admin theme and shows French text (the browser's own
-    # "Choose file / No file chosen" ignores the locale).
-    assert_select "[data-controller='file-input']"
-    assert_select "input[type='file'][name='outgoing_email[file]'].hidden"
-    assert_select "[data-controller='file-input'] label", text: /Choisir un fichier/
-    assert_select "[data-file-input-target='filename']", text: /Aucun fichier sélectionné/
-  end
-
-  test "GET new wires the recipient-selection controller around the frame for select-all and persistence" do
-    get new_admin_outgoing_email_url
-    assert_response :success
-    # The controller wraps the frame (and the hidden audience field) so both the
-    # checked rows AND the audience survive a Turbo re-render on search/toggle.
-    assert_select "[data-controller='recipient-selection'] turbo-frame#compose_recipients"
-    assert_select "input[type='checkbox'][data-recipient-selection-target='all']"
+    assert_select "[data-controller='recipient-selection'] turbo-frame#compose_peers"
+    assert_select "[data-controller='recipient-selection'] turbo-frame#compose_contacts"
+    # A select-all header checkbox per list.
+    assert_select "input[type='checkbox'][data-recipient-selection-target='all']", 2
     # Row checkboxes are the controller's persisted targets.
     assert_select "input[type='checkbox'][data-recipient-selection-target='item']"
-  end
-
-  test "GET new exposes the current audience on the frame so JS can keep the hidden field in sync" do
-    get new_admin_outgoing_email_url(audience: "contacts")
-    assert_response :success
-    # The hidden audience field the controller writes to is inside the wrapper,
-    # and the frame advertises its current audience for the controller to read
-    # after each re-render. Without this, switching audience leaves the submitted
-    # value stale and the chosen recipients get filtered out on the server.
-    assert_select "[data-controller='recipient-selection'] input#compose_audience[type='hidden']"
-    assert_select "turbo-frame#compose_recipients[data-audience='contacts']"
-  end
-
-  test "GET new carries the audience on a marker INSIDE the frame so it survives a Turbo swap" do
-    # Turbo's frame render replaces only the frame's CONTENTS, never the
-    # <turbo-frame> element's own attributes. So the audience the JS reads to
-    # sync the submitted hidden field must live on an element inside the frame
-    # (swapped in on every toggle/search), not on the frame element itself.
-    # Otherwise, after switching peers -> contacts, the form submits audience
-    # "peers" with contact ids, the server filters them all out, and the user
-    # gets "select at least one recipient" despite having selected recipients.
-    get new_admin_outgoing_email_url(audience: "contacts")
-    assert_response :success
-    assert_select "turbo-frame#compose_recipients [data-recipient-selection-target='marker'][data-audience='contacts']"
-
-    get new_admin_outgoing_email_url(audience: "peers")
-    assert_response :success
-    assert_select "turbo-frame#compose_recipients [data-recipient-selection-target='marker'][data-audience='peers']"
   end
 
   test "GET new excludes contacts whose email is an empty string" do
@@ -164,22 +142,7 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     blank_email = Contact.create!(last_name: "Vide", first_name: "Email", email: "", peer: true)
     assert_enqueued_jobs 1, only: SendOutgoingEmailJob do
       post admin_outgoing_emails_url, params: {
-        audience: "peers",
         contact_ids: [ @peer1.id, blank_email.id ],
-        outgoing_email: { subject: "S", body: "B" }
-      }
-    end
-    assert_equal 1, OutgoingEmail.last.pending_count
-  end
-
-  test "POST create resolves recipients matching the submitted audience" do
-    # Server-side guard: even if the audience and ids drift, the audience cross-
-    # filter keeps a send single-audience. Submitting contacts under the contacts
-    # audience emails the contacts (not peers).
-    assert_enqueued_jobs 1, only: SendOutgoingEmailJob do
-      post admin_outgoing_emails_url, params: {
-        audience: "contacts",
-        contact_ids: [ @contact1.id, @peer1.id ],
         outgoing_email: { subject: "S", body: "B" }
       }
     end
@@ -188,10 +151,22 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
 
   # --- create ---
 
-  test "POST create enqueues one send job per resolved peer and redirects" do
+  test "POST create sends to a mixed audience of peers and contacts at once" do
+    # The whole point of the redesign: one email can target peers AND contacts.
+    assert_enqueued_jobs 3, only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        contact_ids: [ @peer1.id, @contact1.id, @contact2.id ],
+        outgoing_email: { subject: "Bonjour", body: "Un message." }
+      }
+    end
+    assert_redirected_to new_admin_outgoing_email_url
+    assert_equal "Email mis en file pour 3 contacts.", flash[:notice]
+    assert_equal 3, OutgoingEmail.last.pending_count
+  end
+
+  test "POST create enqueues one send job per resolved recipient and redirects" do
     assert_enqueued_jobs 2, only: SendOutgoingEmailJob do
       post admin_outgoing_emails_url, params: {
-        audience: "peers",
         contact_ids: [ @peer1.id, @peer2.id ],
         outgoing_email: { subject: "Bonjour", body: "Un message." }
       }
@@ -203,8 +178,7 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
   test "POST create persists an OutgoingEmail with pending_count = recipient count" do
     assert_difference "OutgoingEmail.count", 1 do
       post admin_outgoing_emails_url, params: {
-        audience: "peers",
-        contact_ids: [ @peer1.id, @peer2.id ],
+        contact_ids: [ @peer1.id, @contact1.id ],
         outgoing_email: { subject: "Bonjour", body: "Un message." }
       }
     end
@@ -214,40 +188,36 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
   test "POST create attaches an uploaded file to the OutgoingEmail" do
     file = Rack::Test::UploadedFile.new(StringIO.new("PDF"), "application/pdf", original_filename: "doc.pdf")
     post admin_outgoing_emails_url, params: {
-      audience: "peers",
       contact_ids: [ @peer1.id ],
       outgoing_email: { subject: "S", body: "B", file: file }
     }
     assert OutgoingEmail.last.file.attached?
   end
 
-  test "POST create drops ids that are out of the submitted audience" do
-    # contact1 is NOT a peer; submitting it under audience=peers must drop it.
-    assert_enqueued_jobs 1, only: SendOutgoingEmailJob do
-      post admin_outgoing_emails_url, params: {
-        audience: "peers",
-        contact_ids: [ @peer1.id, @contact1.id ],
-        outgoing_email: { subject: "S", body: "B" }
-      }
-    end
-    assert_equal 1, OutgoingEmail.last.pending_count
-  end
-
   test "POST create drops ids with no email and ids that no longer exist" do
     assert_enqueued_jobs 1, only: SendOutgoingEmailJob do
       post admin_outgoing_emails_url, params: {
-        audience: "peers",
         contact_ids: [ @peer1.id, @no_email.id, 999_999 ],
         outgoing_email: { subject: "S", body: "B" }
       }
     end
   end
 
+  test "POST create de-duplicates a recipient submitted more than once" do
+    # Distinct ids only; a doubled id must not double-send or inflate the count.
+    assert_enqueued_jobs 1, only: SendOutgoingEmailJob do
+      post admin_outgoing_emails_url, params: {
+        contact_ids: [ @peer1.id, @peer1.id ],
+        outgoing_email: { subject: "S", body: "B" }
+      }
+    end
+    assert_equal 1, OutgoingEmail.last.pending_count
+  end
+
   test "POST create with no resolvable recipients re-renders with an error" do
     assert_no_enqueued_jobs only: SendOutgoingEmailJob do
       post admin_outgoing_emails_url, params: {
-        audience: "peers",
-        contact_ids: [ @contact1.id ], # out of audience → resolves to zero
+        contact_ids: [ @no_email.id ], # no email → resolves to zero
         outgoing_email: { subject: "S", body: "B" }
       }
     end
@@ -258,7 +228,6 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
   test "POST create with empty contact_ids re-renders with an error and enqueues nothing" do
     assert_no_enqueued_jobs only: SendOutgoingEmailJob do
       post admin_outgoing_emails_url, params: {
-        audience: "peers",
         contact_ids: [],
         outgoing_email: { subject: "S", body: "B" }
       }
@@ -269,7 +238,6 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
   test "POST create with a missing subject re-renders with errors, enqueues nothing" do
     assert_no_enqueued_jobs only: SendOutgoingEmailJob do
       post admin_outgoing_emails_url, params: {
-        audience: "peers",
         contact_ids: [ @peer1.id ],
         outgoing_email: { subject: "", body: "B" }
       }
@@ -281,7 +249,6 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
   test "POST create with a missing body re-renders with errors, enqueues nothing" do
     assert_no_enqueued_jobs only: SendOutgoingEmailJob do
       post admin_outgoing_emails_url, params: {
-        audience: "peers",
         contact_ids: [ @peer1.id ],
         outgoing_email: { subject: "S", body: "" }
       }
@@ -293,7 +260,6 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     big = Rack::Test::UploadedFile.new(StringIO.new("a" * (10.megabytes + 1)), "application/pdf", original_filename: "big.pdf")
     assert_no_enqueued_jobs only: SendOutgoingEmailJob do
       post admin_outgoing_emails_url, params: {
-        audience: "peers",
         contact_ids: [ @peer1.id ],
         outgoing_email: { subject: "S", body: "B", file: big }
       }
@@ -302,7 +268,6 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_no_difference "OutgoingEmail.count" do
       # second submit confirms nothing persisted on the failing path
       post admin_outgoing_emails_url, params: {
-        audience: "peers",
         contact_ids: [ @peer1.id ],
         outgoing_email: { subject: "S", body: "B", file: big }
       }
@@ -315,8 +280,8 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_select "aside nav a[href='#{new_admin_outgoing_email_path}']", text: /Envoyer un email/
   end
 
-  # Regression: the compose form must not nest the recipient search <form>
-  # (inside the turbo-frame) inside the outer #compose_form. Nested <form>
+  # Regression: the compose form must not nest the recipient search <form>s
+  # (inside the turbo-frames) inside the outer #compose_form. Nested <form>
   # elements are invalid HTML; a real browser auto-closes #compose_form at the
   # inner form, orphaning the submit button and the subject/body fields so
   # clicking "Send" does nothing and never reaches the server. assert_select
@@ -349,9 +314,8 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
            "the body field must belong to #compose_form"
     assert belongs.call(doc.at_css("input[type='file'][name='outgoing_email[file]']")),
            "the file field must belong to #compose_form"
-    assert belongs.call(doc.at_css("input[name='audience']")),
-           "the audience field must belong to #compose_form"
-    # Every recipient checkbox must belong to the form too, or the send is empty.
+    # Every recipient checkbox (in either list) must belong to the form too, or
+    # the send drops them.
     checkboxes = doc.css("input[type='checkbox'][name='contact_ids[]']")
     assert checkboxes.any?, "expected recipient checkboxes"
     checkboxes.each do |box|

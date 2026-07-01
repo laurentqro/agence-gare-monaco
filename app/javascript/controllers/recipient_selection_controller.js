@@ -1,117 +1,172 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Drives the compose recipient picker. It lives OUTSIDE the Turbo Frame so it
-// survives the frame swap that happens on an audience toggle or a search, and
-// it keeps three things consistent across those swaps:
+// Drives the compose recipient picker, which stacks two lists — peers and
+// contacts — so a single email can target a mixed audience. The controller lives
+// OUTSIDE both Turbo Frames so it survives the frame swap a per-list search
+// triggers, and it keeps three things consistent across those swaps:
 //
-//   1. Selection persistence. Checked recipients are recorded in a Set keyed by
-//      contact id and re-applied after every frame render, so checking peers,
-//      then searching for one more, does not silently drop the first picks.
-//   2. The audience hidden field. A marker element INSIDE the frame carries the
-//      current audience; the controller copies it into the hidden field the main
-//      form submits, so the audience the server filters by always matches the
-//      audience the user is looking at. The marker must be inside the frame (not
-//      a data-audience on the <turbo-frame> itself) because Turbo swaps only the
-//      frame's contents, leaving the frame element's own attributes stale.
-//   3. Select-all. The header checkbox toggles every currently-listed row, and
-//      reflects an all/none/indeterminate state as rows change.
+//   1. Selection persistence. Checked recipients are recorded in a Map keyed by
+//      contact id (value = {name, audience}) and re-applied after every frame
+//      render, so checking a peer, then searching the contacts list, does not
+//      drop the peer. The Map also lets a chip render for a recipient whose row
+//      was filtered out of the DOM by a search (the row's checkbox is gone, but
+//      we still know its name and audience).
+//   2. The live "selected" chip panels. Each audience has its own panel; the
+//      controller renders one removable chip per selected recipient of that
+//      audience. Clicking a chip's ✕ deselects that recipient everywhere.
+//   3. Select-all, per list. Each list's header checkbox toggles that list's
+//      currently-listed rows and reflects an all/none/indeterminate state.
 //
-// Markup:
+// Markup (abbreviated):
 //   <div data-controller="recipient-selection">
-//     <input type="hidden" id="compose_audience" data-recipient-selection-target="audience" ...>
-//     <turbo-frame id="compose_recipients">
-//       <div hidden data-recipient-selection-target="marker" data-audience="peers"></div>
-//       ...rows...
-//     </turbo-frame>
+//     <turbo-frame id="compose_peers"> ...rows (checkbox[data-audience=peers])... </turbo-frame>
+//     <div data-recipient-selection-target="peersSelected" data-audience="peers"></div>
+//     <turbo-frame id="compose_contacts"> ...rows (checkbox[data-audience=contacts])... </turbo-frame>
+//     <div data-recipient-selection-target="contactsSelected" data-audience="contacts"></div>
 //   </div>
 export default class extends Controller {
-  static targets = ["all", "audience", "marker"]
+  static targets = ["all", "item", "peersSelected", "contactsSelected"]
 
   connect() {
-    this.selected = new Set()
+    // id -> { name, audience }. Preserved across frame renders.
+    this.selected = new Map()
     this.captureChecked()
 
     this.onChange = this.onChange.bind(this)
+    this.onClick = this.onClick.bind(this)
     this.onFrameRender = this.onFrameRender.bind(this)
     this.element.addEventListener("change", this.onChange)
+    this.element.addEventListener("click", this.onClick)
     this.element.addEventListener("turbo:frame-render", this.onFrameRender)
 
-    this.syncAudience()
-    this.syncHeader()
+    this.syncHeaders()
+    this.renderChips()
   }
 
   disconnect() {
     this.element.removeEventListener("change", this.onChange)
+    this.element.removeEventListener("click", this.onClick)
     this.element.removeEventListener("turbo:frame-render", this.onFrameRender)
   }
 
-  // Header "select all" clicked: apply its state to every visible row, recording
-  // each into the persistent Set so the choice survives the next frame render.
-  toggleAll() {
-    const checked = this.allTarget.checked
-    this.itemCheckboxes().forEach((box) => {
+  // Header "select all" clicked: apply its state to every visible row of THAT
+  // list, recording each into the Map so the choice survives the next render.
+  toggleAll(event) {
+    const header = event.target
+    const audience = header.dataset.audience
+    const checked = header.checked
+    this.itemsForAudience(audience).forEach((box) => {
       box.checked = checked
       this.record(box)
     })
-    this.syncHeader()
+    this.syncHeaders()
+    this.renderChips()
   }
 
   onChange(event) {
     const box = event.target
     if (!this.isItem(box)) return
     this.record(box)
-    this.syncHeader()
+    this.syncHeaders()
+    this.renderChips()
   }
 
-  // After Turbo swaps in new rows (audience/search change), re-check anything
-  // still selected and resync the audience field + header to the new rows.
+  // Chip ✕ clicked: deselect that recipient. Unchecks its row if still listed,
+  // drops it from the Map, and refreshes headers + chips.
+  onClick(event) {
+    const remove = event.target.closest("[data-recipient-remove]")
+    if (!remove || !this.element.contains(remove)) return
+    event.preventDefault()
+
+    const id = remove.dataset.recipientRemove
+    this.selected.delete(id)
+    const box = this.itemTargets.find((el) => el.value === id)
+    if (box) box.checked = false
+    this.syncHeaders()
+    this.renderChips()
+  }
+
+  // After Turbo swaps in new rows (a per-list search), re-check anything still
+  // selected and resync headers + chips to the new rows.
   onFrameRender() {
-    this.itemCheckboxes().forEach((box) => {
+    this.itemTargets.forEach((box) => {
       box.checked = this.selected.has(box.value)
     })
-    this.syncAudience()
-    this.syncHeader()
+    this.syncHeaders()
+    this.renderChips()
   }
 
-  // Seed the Set from whatever is checked on the initial render.
+  // Seed the Map from whatever is checked on the initial render.
   captureChecked() {
-    this.itemCheckboxes().forEach((box) => {
-      if (box.checked) this.selected.add(box.value)
+    this.itemTargets.forEach((box) => {
+      if (box.checked) this.record(box)
     })
   }
 
   record(box) {
     if (box.checked) {
-      this.selected.add(box.value)
+      this.selected.set(box.value, {
+        name: box.dataset.recipientName || "",
+        audience: box.dataset.audience
+      })
     } else {
       this.selected.delete(box.value)
     }
   }
 
-  // Mirror the current audience into the hidden field the form submits. The
-  // source is the marker element INSIDE the frame (not the <turbo-frame>'s own
-  // data-audience): Turbo swaps the frame's contents but leaves the frame
-  // element's attributes untouched, so the frame attribute goes stale after a
-  // toggle while the marker is re-rendered with the new audience each time.
-  syncAudience() {
-    if (!this.hasAudienceTarget || !this.hasMarkerTarget) return
-    const audience = this.markerTarget.getAttribute("data-audience")
-    if (audience) this.audienceTarget.value = audience
+  // Rebuild both chip panels from the Map, one chip per selected recipient in
+  // the matching audience. A chip carries the id so its ✕ can deselect it.
+  renderChips() {
+    this.renderPanel("peers", this.hasPeersSelectedTarget ? this.peersSelectedTarget : null)
+    this.renderPanel("contacts", this.hasContactsSelectedTarget ? this.contactsSelectedTarget : null)
   }
 
-  syncHeader() {
-    if (!this.hasAllTarget) return
-    const boxes = this.itemCheckboxes()
-    const total = boxes.length
-    const checked = boxes.filter((box) => box.checked).length
-    this.allTarget.checked = total > 0 && checked === total
-    this.allTarget.indeterminate = checked > 0 && checked < total
+  renderPanel(audience, panel) {
+    if (!panel) return
+    panel.replaceChildren()
+    this.selected.forEach((meta, id) => {
+      if (meta.audience !== audience) return
+      panel.appendChild(this.buildChip(id, meta.name))
+    })
   }
 
-  itemCheckboxes() {
-    return Array.from(
-      this.element.querySelectorAll('input[type="checkbox"][name="contact_ids[]"]')
-    )
+  buildChip(id, name) {
+    const chip = document.createElement("span")
+    chip.className =
+      "inline-flex items-center gap-1.5 rounded-full bg-navy/10 text-navy text-sm px-3 py-1"
+
+    const label = document.createElement("span")
+    label.textContent = name
+    chip.appendChild(label)
+
+    const remove = document.createElement("button")
+    remove.type = "button"
+    remove.dataset.recipientRemove = id
+    remove.setAttribute("aria-label", `${this.removeLabel} ${name}`.trim())
+    remove.className = "text-navy/60 hover:text-navy font-bold leading-none"
+    remove.textContent = "×"
+    chip.appendChild(remove)
+
+    return chip
+  }
+
+  get removeLabel() {
+    return this.element.dataset.recipientSelectionRemoveLabel || "Retirer"
+  }
+
+  // Reflect each list's all/none/indeterminate state independently.
+  syncHeaders() {
+    this.allTargets.forEach((header) => {
+      const boxes = this.itemsForAudience(header.dataset.audience)
+      const total = boxes.length
+      const checked = boxes.filter((box) => box.checked).length
+      header.checked = total > 0 && checked === total
+      header.indeterminate = checked > 0 && checked < total
+    })
+  }
+
+  itemsForAudience(audience) {
+    return this.itemTargets.filter((box) => box.dataset.audience === audience)
   }
 
   isItem(el) {

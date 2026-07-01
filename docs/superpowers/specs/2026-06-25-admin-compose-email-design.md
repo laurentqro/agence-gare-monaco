@@ -3,6 +3,20 @@
 **Date:** 2026-06-25
 **Status:** Approved (design phase)
 
+> **Amendment (2026-07-01) — mixed-audience redesign.** The original single-audience
+> constraint below was **reversed** at Adrien's request. The compose page now sends
+> to a **mixed audience**: peers **and** contacts together, in one email. The tabbed
+> / audience-toggle recipient picker was replaced by **two always-visible stacked
+> lists** (peers on top, contacts below), each with its own search box, its own
+> select-all, and its own live "selected recipients" chip panel (removable ✕ chips).
+> The server no longer cross-filters by a single `audience`; `create` resolves every
+> submitted `contact_id` that still exists and has an email (`.distinct`), spanning
+> both peers and contacts. There is no `audience` param, no audience marker, and no
+> `set_audience`. Everything else in this doc (per-recipient send loop, `OutgoingEmail`
+> lifecycle, mailer, jobs, attachment handling, async delivery, purge sweeper) is
+> unchanged and audience-agnostic. Sections below that describe the audience toggle /
+> single-audience behavior are **superseded** by this amendment.
+
 ## Summary
 
 Give the admin user (Adrien) a standalone page to compose and send an email to
