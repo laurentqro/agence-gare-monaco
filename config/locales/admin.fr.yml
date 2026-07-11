@@ -1,4 +1,9 @@
 fr:
+  activemodel:
+    attributes:
+      property_share:
+        subject: "Sujet"
+        body: "Message"
   admin:
     layout:
       title: "Admin | Agence Gare Monaco"

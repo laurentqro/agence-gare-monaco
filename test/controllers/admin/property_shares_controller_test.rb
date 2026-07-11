@@ -182,39 +182,84 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # CREATE (send sharing emails)
-  test "POST create sends emails to selected contacts" do
-    assert_emails 2 do
+  # CREATE (queue one share email per recipient)
+  test "POST create queues one share job per selected contact and redirects" do
+    assert_enqueued_jobs 2, only: SharePropertyEmailJob do
       post admin_property_share_url(@property), params: {
-        contact_ids: [ @contact1.id, @contact2.id ]
+        contact_ids: [ @contact1.id, @contact2.id ],
+        property_share: { subject: "Sujet perso", body: "Bonjour", attach_pdf: "0", include_logo: "1" }
       }
     end
     assert_redirected_to admin_contacts_url
     assert_equal "Bien partagé avec 2 contacts.", flash[:notice]
   end
 
-  test "POST create sends email to a single contact" do
-    assert_emails 1 do
+  test "POST create passes the send options to each job as plain args" do
+    post admin_property_share_url(@property), params: {
+      contact_ids: [ @contact1.id ],
+      property_share: { subject: "Sujet perso", body: "Bonjour Jean", attach_pdf: "1", include_logo: "0" }
+    }
+    assert_enqueued_with(
+      job: SharePropertyEmailJob,
+      args: [ @property.id, @contact1.id, "Sujet perso", "Bonjour Jean", true, false ]
+    )
+  end
+
+  test "POST create flash uses the singular when sharing with exactly one contact" do
+    post admin_property_share_url(@property), params: {
+      contact_ids: [ @contact1.id ],
+      property_share: { subject: "S" }
+    }
+    assert_equal "Bien partagé avec 1 contact.", flash[:notice]
+  end
+
+  test "POST create de-duplicates a contact submitted more than once" do
+    assert_enqueued_jobs 1, only: SharePropertyEmailJob do
       post admin_property_share_url(@property), params: {
-        contact_ids: [ @contact1.id ]
+        contact_ids: [ @contact1.id, @contact1.id ],
+        property_share: { subject: "S" }
       }
     end
-    assert_redirected_to admin_contacts_url
   end
 
-  test "POST create without selecting contacts redirects with alert" do
-    assert_no_emails do
-      post admin_property_share_url(@property), params: { contact_ids: [] }
+  test "POST create drops ids with no email and ids that no longer exist" do
+    no_email = Contact.create!(first_name: "Sans", last_name: "Email", phone: "0600000000")
+    assert_enqueued_jobs 1, only: SharePropertyEmailJob do
+      post admin_property_share_url(@property), params: {
+        contact_ids: [ @contact1.id, no_email.id, 999_999 ],
+        property_share: { subject: "S" }
+      }
     end
-    assert_redirected_to new_admin_property_share_url(@property)
-    assert_equal "Veuillez sélectionner au moins un contact.", flash[:alert]
   end
 
-  test "POST create without contact_ids param redirects with alert" do
-    assert_no_emails do
-      post admin_property_share_url(@property)
+  test "POST create with a missing subject re-renders with errors and keeps the typed message" do
+    assert_no_enqueued_jobs only: SharePropertyEmailJob do
+      post admin_property_share_url(@property), params: {
+        contact_ids: [ @contact1.id ],
+        property_share: { subject: "", body: "Bonjour, voici un bien." }
+      }
     end
-    assert_redirected_to new_admin_property_share_url(@property)
-    assert_equal "Veuillez sélectionner au moins un contact.", flash[:alert]
+    assert_response :unprocessable_entity
+    assert_select ".bg-red-50"
+    assert_includes css_select("textarea[name='property_share[body]']").first.text, "Bonjour, voici un bien."
+  end
+
+  test "POST create without recipients re-renders with an error and queues nothing" do
+    assert_no_enqueued_jobs only: SharePropertyEmailJob do
+      post admin_property_share_url(@property), params: {
+        contact_ids: [],
+        property_share: { subject: "S" }
+      }
+    end
+    assert_response :unprocessable_entity
+    assert_select ".bg-red-50 li", text: "Veuillez sélectionner au moins un contact."
+  end
+
+  test "POST create surfaces the subject and recipients errors together" do
+    post admin_property_share_url(@property), params: {
+      property_share: { subject: "" }
+    }
+    assert_response :unprocessable_entity
+    assert_select ".bg-red-50 li", 2
   end
 end
