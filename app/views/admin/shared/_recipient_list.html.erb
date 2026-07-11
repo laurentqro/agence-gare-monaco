@@ -42,7 +42,11 @@
                   <%# data-recipient-name travels with the checkbox so the JS can
                       label the removable chip even for rows scrolled out of view
                       or filtered away by a search. %>
+                  <%# checked survives a validation re-render (the controller
+                      passes back the submitted ids); the JS reseeds its chip
+                      state from these boxes on connect. %>
                   <input type="checkbox" name="contact_ids[]" value="<%= contact.id %>" form="<%= form_id %>"
+                         <%= "checked".html_safe if selected_ids.include?(contact.id.to_s) %>
                          data-recipient-selection-target="item"
                          data-audience="<%= audience %>"
                          data-recipient-name="<%= contact.listing_name %>"

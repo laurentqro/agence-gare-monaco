@@ -255,6 +255,19 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".bg-red-50 li", text: "Veuillez sélectionner au moins un contact."
   end
 
+  test "a validation re-render keeps the submitted recipients checked" do
+    post admin_property_share_url(@property), params: {
+      contact_ids: [ @contact1.id, @peer.id ],
+      property_share: { subject: "" }
+    }
+    assert_response :unprocessable_entity
+    # The picker is re-rendered server-side with the submitted boxes checked, so
+    # the recipient-selection controller reseeds its chips from them on connect.
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@contact1.id}'][checked]", 1
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@peer.id}'][checked]", 1
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@contact2.id}'][checked]", 0
+  end
+
   test "POST create surfaces the subject and recipients errors together" do
     post admin_property_share_url(@property), params: {
       property_share: { subject: "" }

@@ -246,6 +246,19 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "POST create re-render keeps the submitted recipients checked" do
+    post admin_outgoing_emails_url, params: {
+      contact_ids: [ @peer1.id, @contact1.id ],
+      outgoing_email: { subject: "", body: "B" }
+    }
+    assert_response :unprocessable_entity
+    # The picker is re-rendered server-side with the submitted boxes checked, so
+    # the recipient-selection controller reseeds its chips from them on connect.
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@peer1.id}'][checked]", 1
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@contact1.id}'][checked]", 1
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@contact2.id}'][checked]", 0
+  end
+
   test "POST create with a missing subject re-renders with errors, enqueues nothing" do
     assert_no_enqueued_jobs only: SendOutgoingEmailJob do
       post admin_outgoing_emails_url, params: {

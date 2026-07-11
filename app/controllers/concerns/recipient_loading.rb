@@ -9,9 +9,13 @@ module RecipientLoading
   # Loads both recipient lists, each name-ordered and each narrowed by its own
   # search term. Both are shown at once (stacked), so a page can build one email
   # to a mix of peers and contacts. Only email-bearing contacts appear.
+  # @selected_contact_ids re-checks the submitted boxes when a validation
+  # failure re-renders the page (empty on a fresh GET), so the admin's
+  # selection survives the round-trip.
   def load_recipients
     @peers_query = params[:peers_q]
     @contacts_query = params[:contacts_q]
+    @selected_contact_ids = Array(params[:contact_ids]).reject(&:blank?).map(&:to_s).to_set
     @peers = Contact.peers.with_email.search(@peers_query).order(:last_name, :first_name)
     @contacts = Contact.contacts_only.with_email.search(@contacts_query).order(:last_name, :first_name)
   end

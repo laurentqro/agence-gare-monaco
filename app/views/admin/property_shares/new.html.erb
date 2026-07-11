@@ -35,6 +35,7 @@
           query: @peers_query,
           query_param: "peers_q",
           recipients: @peers,
+          selected_ids: @selected_contact_ids,
           url: new_admin_property_share_path(@property),
           form_id: "share_form" %>
 
@@ -47,6 +48,7 @@
           query: @contacts_query,
           query_param: "contacts_q",
           recipients: @contacts,
+          selected_ids: @selected_contact_ids,
           url: new_admin_property_share_path(@property),
           form_id: "share_form" %>
   </div>
