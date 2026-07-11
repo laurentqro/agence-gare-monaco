@@ -1,7 +1,11 @@
 <%# One stacked audience section (peers or contacts): heading, its own search,
     a live "selected recipients" chip panel, and the scrollable checkbox table.
-    Locals: audience, frame, heading, selected_target, selected_label, query,
-    query_param, recipients. The recipient-selection Stimulus controller (which
+    Shared by the compose-email and property-share pages. Locals: audience,
+    frame, heading, selected_target, selected_label, query, query_param,
+    recipients, url (where this section's search form submits) and form_id (the
+    page's outer form the checkboxes attach to via the form: attribute — they
+    cannot be wrapped by it because this section carries its own search <form>
+    and forms may not nest). The recipient-selection Stimulus controller (which
     wraps both sections) reads the checkboxes and renders the chip panel. %>
 <section class="mb-8">
   <h2 class="text-lg font-semibold text-navy uppercase tracking-wide mb-4"><%= heading %></h2>
@@ -10,8 +14,8 @@
       never re-renders or clears the other. It lives inside the frame so a search
       re-render brings back the same form pre-filled with the current term. %>
   <%= turbo_frame_tag frame do %>
-    <%= form_with url: new_admin_outgoing_email_path, method: :get, data: { turbo_frame: frame }, class: "relative w-full sm:w-96 mb-4" do |sf| %>
-      <%= sf.search_field query_param, value: query, placeholder: t("admin.outgoing_emails.search_placeholder"),
+    <%= form_with url: url, method: :get, data: { turbo_frame: frame }, class: "relative w-full sm:w-96 mb-4" do |sf| %>
+      <%= sf.search_field query_param, value: query, placeholder: t("admin.recipient_picker.search_placeholder"),
             class: "w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm shadow-sm focus:bg-white focus:border-navy focus:ring-2 focus:ring-navy/30" %>
     <% end %>
 
@@ -24,7 +28,7 @@
                 <input type="checkbox" data-recipient-selection-target="all"
                        data-action="change->recipient-selection#toggleAll"
                        data-audience="<%= audience %>"
-                       aria-label="<%= t("admin.outgoing_emails.select_all") %>"
+                       aria-label="<%= t("admin.recipient_picker.select_all") %>"
                        class="rounded border-gray-300 text-navy focus:ring-navy">
               </th>
               <th class="px-3 py-2 font-semibold text-gray-700"><%= t("admin.contacts.table.last_name") %></th>
@@ -38,7 +42,7 @@
                   <%# data-recipient-name travels with the checkbox so the JS can
                       label the removable chip even for rows scrolled out of view
                       or filtered away by a search. %>
-                  <input type="checkbox" name="contact_ids[]" value="<%= contact.id %>" form="compose_form"
+                  <input type="checkbox" name="contact_ids[]" value="<%= contact.id %>" form="<%= form_id %>"
                          data-recipient-selection-target="item"
                          data-audience="<%= audience %>"
                          data-recipient-name="<%= contact.listing_name %>"
@@ -54,7 +58,7 @@
         </table>
       </div>
     <% else %>
-      <p class="text-gray-500 text-sm"><%= t("admin.outgoing_emails.no_results") %></p>
+      <p class="text-gray-500 text-sm"><%= t("admin.recipient_picker.no_results") %></p>
     <% end %>
   <% end %>
 
@@ -67,6 +71,6 @@
     <div class="flex flex-wrap gap-2 empty:after:content-[attr(data-empty-text)] empty:after:text-sm empty:after:text-gray-400"
          data-recipient-selection-target="<%= selected_target %>"
          data-audience="<%= audience %>"
-         data-empty-text="<%= t("admin.outgoing_emails.selected.none") %>"></div>
+         data-empty-text="<%= t("admin.recipient_picker.selected.none") %>"></div>
   </div>
 </section>

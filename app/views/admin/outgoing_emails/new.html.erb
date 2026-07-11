@@ -24,26 +24,30 @@
       live "selected" chip panels stay in sync as rows are checked/unchecked. A
       single send can mix peers and contacts, so there is no audience toggle. %>
   <div data-controller="recipient-selection"
-       data-recipient-selection-remove-label="<%= t("admin.outgoing_emails.selected.remove") %>">
-    <%= render "recipient_list",
+       data-recipient-selection-remove-label="<%= t("admin.recipient_picker.selected.remove") %>">
+    <%= render "admin/shared/recipient_list",
           audience: "peers",
           frame: "compose_peers",
-          heading: t("admin.outgoing_emails.sections.peers"),
+          heading: t("admin.recipient_picker.sections.peers"),
           selected_target: "peersSelected",
-          selected_label: t("admin.outgoing_emails.selected.peers"),
+          selected_label: t("admin.recipient_picker.selected.peers"),
           query: @peers_query,
           query_param: "peers_q",
-          recipients: @peers %>
+          recipients: @peers,
+          url: new_admin_outgoing_email_path,
+          form_id: "compose_form" %>
 
-    <%= render "recipient_list",
+    <%= render "admin/shared/recipient_list",
           audience: "contacts",
           frame: "compose_contacts",
-          heading: t("admin.outgoing_emails.sections.contacts"),
+          heading: t("admin.recipient_picker.sections.contacts"),
           selected_target: "contactsSelected",
-          selected_label: t("admin.outgoing_emails.selected.contacts"),
+          selected_label: t("admin.recipient_picker.selected.contacts"),
           query: @contacts_query,
           query_param: "contacts_q",
-          recipients: @contacts %>
+          recipients: @contacts,
+          url: new_admin_outgoing_email_path,
+          form_id: "compose_form" %>
   </div>
 
   <div class="bg-white rounded shadow p-6 mb-6 space-y-4">

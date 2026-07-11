@@ -1,5 +1,7 @@
 module Admin
   class OutgoingEmailsController < BaseController
+    include RecipientLoading
+
     # Pre-filled into the body on a fresh compose page, built from the shared
     # agent record so the name/email/phone stay in one place. The leading blank
     # lines put the cursor above the signature so Adrien types his message first.
@@ -40,33 +42,13 @@ module Admin
       params.require(:outgoing_email).permit(:subject, :body, :file)
     end
 
-    # Resolves submitted contact_ids to recipient emails. A send may now target a
-    # mixed audience (peers and contacts together), so there is no audience cross-
-    # filter: any email-bearing contact whose id was submitted is a recipient.
-    # Ids that no longer exist or lost their email between page-load and submit
-    # are silently dropped (page-load vs submit drift); if that leaves zero, the
-    # create path treats it as "no recipients selected". `.distinct` guards against
-    # a contact submitted twice from double-counting or double-sending.
     def resolve_recipients
-      ids = Array(params[:contact_ids]).reject(&:blank?)
-      return [] if ids.empty?
-
-      Contact.with_email.where(id: ids).distinct.pluck(:email)
+      resolve_recipient_contacts.pluck(:email)
     end
 
     def render_new_with_errors
       load_recipients
       render :new, status: :unprocessable_entity
-    end
-
-    # Loads both recipient lists, each name-ordered and each narrowed by its own
-    # search term. Both are shown at once (stacked), so the compose page can build
-    # one email to a mix of peers and contacts. Only email-bearing contacts appear.
-    def load_recipients
-      @peers_query = params[:peers_q]
-      @contacts_query = params[:contacts_q]
-      @peers = Contact.peers.with_email.search(@peers_query).order(:last_name, :first_name)
-      @contacts = Contact.contacts_only.with_email.search(@contacts_query).order(:last_name, :first_name)
     end
   end
 end

@@ -297,8 +297,9 @@ fr:
       flash:
         shared: "Bien partagé avec %{count} contacts."
         no_contacts_selected: "Veuillez sélectionner au moins un contact."
-    outgoing_emails:
-      title: "Envoyer un email"
+    # Shared recipient-picker UI (stacked peers/contacts lists with search,
+    # select-all and chip panels) used by compose-email and property-share.
+    recipient_picker:
       sections:
         peers: "Sélectionner des confrères"
         contacts: "Sélectionner des contacts"
@@ -310,6 +311,8 @@ fr:
       search_placeholder: "Rechercher…"
       select_all: "Tout sélectionner"
       no_results: "Aucun résultat."
+    outgoing_emails:
+      title: "Envoyer un email"
       fields:
         subject: "Sujet"
         body: "Message"
