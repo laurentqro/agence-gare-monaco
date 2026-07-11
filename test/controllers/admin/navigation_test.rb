@@ -22,6 +22,12 @@ class Admin::NavigationTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{admin_categories_path}']", /Catégories/
   end
 
+  test "admin sidebar logo links to the public site" do
+    get admin_root_url
+    assert_response :success
+    assert_select "a[href='#{fr_root_path}'] img[src*='logo-monogram']"
+  end
+
   test "admin layout shows logout link" do
     get admin_root_url
     assert_response :success

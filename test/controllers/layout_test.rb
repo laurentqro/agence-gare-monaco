@@ -41,6 +41,23 @@ class LayoutTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "navbar shows admin area icon link when admin is logged in" do
+    User.create!(email_address: "adrien@agencegaremonaco.com", password: "securepassword123")
+    post session_url, params: { email_address: "adrien@agencegaremonaco.com", password: "securepassword123" }
+
+    get "/"
+    assert_response :success
+    assert_select "nav a[href='#{admin_root_path}'][aria-label='Administration']" do
+      assert_select "svg"
+    end
+  end
+
+  test "navbar does not show admin area link when not logged in" do
+    get "/"
+    assert_response :success
+    assert_select "nav a[href='#{admin_root_path}']", count: 0
+  end
+
   test "navbar includes main navigation links for French" do
     get "/"
     assert_select "nav" do
