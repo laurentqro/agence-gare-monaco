@@ -25,8 +25,11 @@ class Contact < ApplicationRecord
   }
 
   # "Last First" for list rows and email greetings, skipping blank parts.
+  # Name-less contacts (consulates, SCIs) fall back to company, then email, so
+  # picker rows and selection chips are never blank.
   def listing_name
-    [ last_name, first_name ].compact_blank.join(" ")
+    name = [ last_name, first_name ].compact_blank.join(" ")
+    name.presence || company.presence || email.to_s
   end
 
   private

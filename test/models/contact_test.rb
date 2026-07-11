@@ -114,4 +114,14 @@ class ContactTest < ActiveSupport::TestCase
     assert_equal "Berg", Contact.new(last_name: "Berg", first_name: "").listing_name
     assert_equal "Anna", Contact.new(last_name: nil, first_name: "Anna").listing_name
   end
+
+  test "listing_name falls back to company when there is no name" do
+    contact = Contact.new(company: "Consulat de Finlande", email: "info@consulatfinlande.mc")
+    assert_equal "Consulat de Finlande", contact.listing_name
+  end
+
+  test "listing_name falls back to email when there is no name or company" do
+    contact = Contact.new(email: "info@consulatfinlande.mc")
+    assert_equal "info@consulatfinlande.mc", contact.listing_name
+  end
 end
