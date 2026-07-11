@@ -30,6 +30,19 @@ class PropertyMailerTest < ActionMailer::TestCase
     @contact = Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@example.com")
   end
 
+  # Seeds the brochure cache with both French logo variants (distinct bytes so
+  # a test can tell which variant was attached) without running Typst.
+  def attach_fake_brochures
+    { true => "%PDF-logo", false => "%PDF-nologo" }.each do |include_logo, bytes|
+      @property.brochures.attach(
+        io: StringIO.new(bytes),
+        filename: @property.brochure_filename,
+        content_type: "application/pdf",
+        metadata: { locale: "fr", include_logo: include_logo }
+      )
+    end
+  end
+
   test "share property is delivered" do
     email = PropertyMailer.share_property(@property, @contact)
     assert_emails 1 do
@@ -167,5 +180,60 @@ class PropertyMailerTest < ActionMailer::TestCase
     body = email.body.encoded
     assert_includes body, "Studio Carré d&#39;Or"
     assert_includes body, "Adrien Maré"
+  end
+
+  # --- admin-customized share (subject / personal note / PDF brochure) ---
+
+  test "share property uses the admin-provided subject" do
+    email = PropertyMailer.share_property(@property, @contact, subject: "Une opportunité rare")
+    assert_equal "Une opportunité rare", email.subject
+  end
+
+  test "share property renders the personal note between the agent block and the hero" do
+    email = PropertyMailer.share_property(@property, @contact, body: "Bonjour Jean,\nvoici un bien pour vous.")
+    body = email.body.encoded
+    assert_includes body, "Bonjour Jean,<br>voici un bien pour vous."
+    assert_operator body.index("adrien@agencegaremonaco.com"), :<, body.index("Bonjour Jean,"),
+                    "the note should render after the agent block"
+    assert_operator body.index("Bonjour Jean,"), :<, body.index("https://cdn.immotoolbox.com/large/photo1.jpg"),
+                    "the note should render before the hero photo"
+  end
+
+  test "share property HTML-escapes the personal note" do
+    email = PropertyMailer.share_property(@property, @contact, body: "Prix < 2M & <b>vue mer</b>")
+    body = email.body.encoded
+    assert_includes body, "Prix &lt; 2M &amp; &lt;b&gt;vue mer&lt;/b&gt;"
+    refute_includes body, "<b>vue mer</b>"
+  end
+
+  test "share property attaches the cached French brochure when asked" do
+    attach_fake_brochures
+    email = PropertyMailer.share_property(@property, @contact, attach_pdf: true)
+
+    assert_equal 1, email.attachments.size
+    attachment = email.attachments.first
+    assert_equal @property.brochure_filename, attachment.filename
+    assert_equal "application/pdf", attachment.mime_type
+    assert_equal "%PDF-logo", attachment.body.raw_source
+  end
+
+  test "share property attaches the no-logo brochure variant when logo is off" do
+    attach_fake_brochures
+    email = PropertyMailer.share_property(@property, @contact, attach_pdf: true, include_logo: false)
+    assert_equal "%PDF-nologo", email.attachments.first.body.raw_source
+  end
+
+  test "share property attaches nothing by default" do
+    attach_fake_brochures
+    email = PropertyMailer.share_property(@property, @contact)
+    assert_empty email.attachments
+  end
+
+  test "share property with an attachment still renders the property card" do
+    attach_fake_brochures
+    email = PropertyMailer.share_property(@property, @contact, attach_pdf: true, body: "Bonjour")
+    html = email.html_part.body.encoded
+    assert_includes html, "Studio Carré d&#39;Or"
+    assert_includes html, "Bonjour"
   end
 end

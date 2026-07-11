@@ -68,6 +68,16 @@
             </td>
           </tr>
 
+          <!-- personal note from the admin (plain text, so escape it and keep
+               the typed line breaks; absent on the default share) -->
+          <% if @personal_message.present? %>
+          <tr>
+            <td style="padding:0 32px 28px; font-family:Arial, Helvetica, sans-serif; color:<%= ink %>; font-size:14px; line-height:1.7;">
+              <%= safe_join(@personal_message.lines(chomp: true), tag.br) %>
+            </td>
+          </tr>
+          <% end %>
+
           <!-- hero image -->
           <% if hero %>
           <tr>
