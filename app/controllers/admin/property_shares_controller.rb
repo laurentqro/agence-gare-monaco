@@ -1,25 +1,12 @@
 module Admin
   class PropertySharesController < BaseController
-    include Sortable
-
-    SORT_COLUMNS = %w[last_name first_name company email phone city country].freeze
+    include RecipientLoading
 
     before_action :set_property
 
     def new
-      @filter = params[:filter]
-      @query = params[:q]
-
-      # Sharing is email-only, so only contacts with an email can be selected.
-      shareable = Contact.where.not(email: nil)
-      scope = filtered_scope(shareable).search(@query)
-      @contacts = sort_scope(scope, columns: SORT_COLUMNS, default: "last_name")
-
-      @counts = {
-        all: shareable.count,
-        contacts: shareable.contacts_only.count,
-        peers: shareable.peers.count
-      }
+      load_recipients
+      @property_share ||= PropertyShare.new(subject: default_subject)
       # decoded returns a SafeBuffer; coerce to a plain String so the view can
       # HTML-escape it into the iframe srcdoc attribute (otherwise the inline
       # style double-quotes truncate the attribute and the preview is blank).
@@ -44,12 +31,10 @@ module Admin
 
     private
 
-    def filtered_scope(relation)
-      case params[:filter]
-      when "peers" then relation.peers
-      when "contacts" then relation.contacts_only
-      else relation
-      end
+    # Matches the auto subject the mailer falls back to, so the prefilled field
+    # sends the same email as an untouched one.
+    def default_subject
+      "#{@property.reference} — #{@property.title_for(:fr)}"
     end
 
     def set_property

@@ -19,6 +19,7 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
 
     @contact1 = Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@example.com")
     @contact2 = Contact.create!(first_name: "Pierre", last_name: "Martin", email: "pierre@example.com")
+    @peer = Contact.create!(last_name: "Confrère", company: "Agency", email: "peer@agency.mc", peer: true)
   end
 
   # Authentication
@@ -28,73 +29,47 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_url
   end
 
-  # NEW (select contacts form)
-  test "GET new renders contact selection form" do
+  # NEW (compose-style share form: stacked peers/contacts picker)
+  test "GET new renders the share form with both peers and contacts lists stacked" do
     get new_admin_property_share_url(@property)
     assert_response :success
     assert_select "h1", /Partager le bien/
-    assert_select "input[type='checkbox'][name='contact_ids[]']", 2
+    assert_select "form#share_form"
+    # Both audiences are shown at once (stacked), no tabs: peers AND contacts.
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@peer.id}']", 1
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@contact1.id}']", 1
+    assert_select "a[href*='filter=']", 0
   end
 
-  test "GET new lists contacts in a table with all columns" do
+  test "GET new shows which property is being shared" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    # Header row exposes the full contact columns, with name split in two
-    [ "Nom", "Prénom", "Société", "Email", "Téléphone", "Ville", "Pays" ].each do |col|
-      assert_select "table thead th a", text: /#{Regexp.escape(col)}/
-    end
-    # One data row per contact
-    assert_select "table tbody tr", 2
+    assert_select "p", text: /MC-TEST-001/
   end
 
-  test "GET new headers are sort links targeting the turbo frame" do
+  test "GET new renders a separate turbo frame per audience list" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_select "turbo-frame#share_contacts_table"
-    assert_select "thead th a[href*='sort=company']"
+    assert_select "turbo-frame#share_peers"
+    assert_select "turbo-frame#share_contacts"
   end
 
-  test "GET new wraps the frame in the selection-preserving controller" do
+  test "GET new renders a search field for each audience list" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    # The controller element must sit OUTSIDE the frame so it survives the
-    # swap on sort, with the frame nested inside it.
-    assert_select "[data-controller='share-selection'] turbo-frame#share_contacts_table"
+    assert_select "input[type='search'][name='peers_q']"
+    assert_select "input[type='search'][name='contacts_q']"
   end
 
-  test "GET new sorts contacts by a requested column" do
-    Contact.where.not(id: nil).update_all(company: nil)
-    @contact1.update!(company: "Zeta")
-    @contact2.update!(company: "Alpha")
-    get new_admin_property_share_url(@property, sort: "company", direction: "asc")
-    assert_response :success
-    companies = css_select("table tbody td:nth-child(4)").map { |td| td.text.strip }.reject(&:empty?)
-    assert_equal %w[Alpha Zeta], companies
-  end
-
-  test "GET new ignores an unknown sort column" do
-    get new_admin_property_share_url(@property, sort: "evil); DROP TABLE contacts;--")
-    assert_response :success
-    assert_select "table tbody tr", 2
-  end
-
-  test "GET new shows first and last name in separate cells" do
+  test "GET new wires the recipient-selection controller around both frames" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_select "table tbody tr:first-child td", text: "Dupont"
-    assert_select "table tbody tr:first-child td", text: "Jean"
-  end
-
-  test "GET new shows the full details of a rich contact row" do
-    Contact.create!(
-      first_name: "Anna", last_name: "Berg", company: "Acme SCI",
-      email: "anna@example.com", phone: "+377 99 00", city: "Monaco", country: "Monaco"
-    )
-    get new_admin_property_share_url(@property)
-    assert_response :success
-    assert_select "table tbody td", text: /Acme SCI/
-    assert_select "table tbody td", text: /\+377 99 00/
-    assert_select "table tbody td", text: /Monaco/
+    assert_select "[data-controller='recipient-selection'] turbo-frame#share_peers"
+    assert_select "[data-controller='recipient-selection'] turbo-frame#share_contacts"
+    # A select-all header checkbox per list, plus a live "selected" panel each.
+    assert_select "input[type='checkbox'][data-recipient-selection-target='all']", 2
+    assert_select "[data-recipient-selection-target='peersSelected']"
+    assert_select "[data-recipient-selection-target='contactsSelected']"
   end
 
   test "GET new only lists contacts that have an email" do
@@ -102,10 +77,27 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     get new_admin_property_share_url(@property)
     assert_response :success
     # Email-less contacts are excluded entirely (sharing is email-only)
-    assert_select "input[type='checkbox'][value='#{no_email.id}']", 0
-    assert_select "input[type='checkbox'][value='#{@contact1.id}']", 1
-    # Only the two seeded contacts (both have emails) appear
-    assert_select "table tbody tr", 2
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{no_email.id}']", 0
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@contact1.id}']", 1
+  end
+
+  test "GET new peers search narrows only the peers list" do
+    other_peer = Contact.create!(last_name: "Aubert", email: "aubert@agency.mc", peer: true)
+    get new_admin_property_share_url(@property, peers_q: "Aubert")
+    assert_response :success
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{other_peer.id}']", 1
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@peer.id}']", 0
+    # The contacts list is unaffected by the peers search term.
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@contact1.id}']", 1
+  end
+
+  test "GET new contacts search narrows only the contacts list" do
+    get new_admin_property_share_url(@property, contacts_q: "Martin")
+    assert_response :success
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@contact2.id}']", 1
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@contact1.id}']", 0
+    # The peers list is unaffected by the contacts search term.
+    assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@peer.id}']", 1
   end
 
   test "GET new shows email preview with property details" do
@@ -139,58 +131,55 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_includes srcdoc, "</html>"               # the document is not truncated
   end
 
-  test "GET new lists all contacts with checkboxes" do
+  test "GET new pre-fills the subject with the property reference and French title" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_select "table tbody td", text: "Dupont"
-    assert_select "table tbody td", text: "Martin"
+    assert_select "input[name='property_share[subject]'][value=?]", "MC-TEST-001 — Studio Carré d'Or"
   end
 
-  test "GET new renders filter tabs with counts" do
+  test "GET new renders an empty optional message field" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_select "a[href*='filter=peers']"
-    assert_select "a[href*='filter=contacts']"
+    assert_equal "", css_select("textarea[name='property_share[body]']").first.text.strip
   end
 
-  test "GET new renders a search field" do
+  test "GET new offers the PDF brochure attachment with logo checked by default" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_select "input[type='search'][name='q']"
+    assert_select "input[type='checkbox'][name='property_share[attach_pdf]']:not([checked])", 1
+    assert_select "input[type='checkbox'][name='property_share[include_logo]'][checked]", 1
   end
 
-  test "GET new highlights the active filter tab inside the frame" do
-    Contact.create!(last_name: "Confrère", company: "Agency", email: "peer@agency.mc", peer: true)
-    get new_admin_property_share_url(@property, filter: "peers")
-    assert_response :success
-    # Tabs live inside the frame so the active highlight tracks the filter
-    # while preserving checkbox selection across swaps.
-    assert_select "turbo-frame#share_contacts_table nav a[href*='filter=peers'].bg-navy"
-    assert_select "turbo-frame#share_contacts_table nav a[href*='filter=contacts'].bg-navy", false
-  end
-
-  test "GET new filters to peers only" do
-    peer = Contact.create!(last_name: "Confrère", company: "Agency", email: "peer@agency.mc", peer: true)
-    get new_admin_property_share_url(@property, filter: "peers")
-    assert_response :success
-    assert_select "input[type='checkbox'][value='#{peer.id}']", 1
-    assert_select "input[type='checkbox'][value='#{@contact1.id}']", 0
-    assert_select "table tbody tr", 1
-  end
-
-  test "GET new searches within the email-bearing contacts" do
-    Contact.create!(first_name: "Anna", last_name: "Berg", email: "anna@acme.com", company: "Acme")
-    get new_admin_property_share_url(@property, q: "acme")
-    assert_response :success
-    assert_select "table tbody tr", 1
-    assert_select "table tbody td", text: /Berg/
-  end
-
-  test "GET new shows a peer badge on confrère rows" do
-    Contact.create!(last_name: "Confrère", company: "Agency", email: "peer@agency.mc", peer: true)
+  # Regression twin of the compose-page test: the share form must not nest the
+  # recipient search <form>s inside #share_form. assert_select's lenient HTML4
+  # parser hides nesting, so parse with the browser-accurate HTML5 parser and
+  # assert the real form association.
+  test "GET new keeps the submit button and message fields inside #share_form under HTML5 parsing" do
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_select "table tbody tr td span", text: /Confrère/
+
+    doc = Nokogiri::HTML5(response.body)
+    assert doc.at_css("form#share_form"), "expected a #share_form element"
+
+    belongs = lambda do |el|
+      el && (el.ancestors("form#share_form").any? || el["form"] == "share_form")
+    end
+
+    assert belongs.call(doc.at_css("input[type='submit']")),
+           "the Send button must belong to #share_form (a nested search <form> orphaned it)"
+    assert belongs.call(doc.at_css("input[name='property_share[subject]']")),
+           "the subject field must belong to #share_form"
+    assert belongs.call(doc.at_css("textarea[name='property_share[body]']")),
+           "the message field must belong to #share_form"
+    assert belongs.call(doc.at_css("input[type='checkbox'][name='property_share[attach_pdf]']")),
+           "the attach-PDF checkbox must belong to #share_form"
+    assert belongs.call(doc.at_css("input[type='checkbox'][name='property_share[include_logo]']")),
+           "the include-logo checkbox must belong to #share_form"
+    checkboxes = doc.css("input[type='checkbox'][name='contact_ids[]']")
+    assert checkboxes.any?, "expected recipient checkboxes"
+    checkboxes.each do |box|
+      assert belongs.call(box), "recipient checkbox #{box["value"]} must belong to #share_form"
+    end
   end
 
   # CREATE (send sharing emails)

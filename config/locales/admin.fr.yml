@@ -283,19 +283,18 @@ fr:
       pdf: "PDF"
     property_shares:
       title: "Partager le bien"
-      property_details: "Détails du bien"
       email_preview: "Aperçu de l'email"
-      reference: "Référence :"
-      title_label: "Titre :"
-      price: "Prix :"
-      select_contacts: "Sélectionner les destinataires"
-      no_contacts: "Aucun contact pour le moment."
-      no_results: "Aucun résultat."
-      add_contact: "Ajouter un contact"
+      fields:
+        subject: "Sujet"
+        body: "Message personnel (optionnel)"
+        body_placeholder: "Ajouté en haut de l'email, au-dessus de la fiche du bien."
+        attach_pdf: "Joindre la brochure PDF (français)"
+        include_logo: "Inclure le logo de l'agence"
       send_email: "Envoyer par email"
-      select_column: "Sélection"
       flash:
-        shared: "Bien partagé avec %{count} contacts."
+        shared:
+          one: "Bien partagé avec %{count} contact."
+          other: "Bien partagé avec %{count} contacts."
         no_contacts_selected: "Veuillez sélectionner au moins un contact."
     # Shared recipient-picker UI (stacked peers/contacts lists with search,
     # select-all and chip panels) used by compose-email and property-share.
