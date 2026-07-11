@@ -117,7 +117,8 @@ Both controllers include the concern. `Admin::PropertySharesController` drops
 `app/jobs/share_property_email_job.rb`:
 
 ```ruby
-SharePropertyEmailJob.perform(property_id, contact_id, subject, body, attach_pdf, include_logo)
+# perform signature; the controller enqueues with perform_later
+def perform(property_id, contact_id, subject, body, attach_pdf, include_logo)
 ```
 
 - `Property.find_by` / `Contact.find_by`; return silently if either record was
