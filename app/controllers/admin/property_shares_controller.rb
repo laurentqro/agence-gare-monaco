@@ -30,6 +30,13 @@ module Admin
       redirect_to admin_contacts_url, notice: t("admin.property_shares.flash.shared", count: contacts.size)
     end
 
+    # Returns the share email HTML for the live preview iframe, re-rendered
+    # with whatever note the admin has typed so far. POST (not GET) because a
+    # long note does not fit in a query string.
+    def preview
+      render html: preview_html(params[:body]).html_safe, layout: false
+    end
+
     private
 
     def property_share_params
@@ -42,13 +49,18 @@ module Admin
     end
 
     # Everything the form page needs besides the form object itself: the two
-    # recipient lists and the static email preview.
+    # recipient lists and the initial email preview (which reflects the typed
+    # note when a validation failure re-renders the page).
     def prepare_form
       load_recipients
-      # decoded returns a SafeBuffer; coerce to a plain String so the view can
-      # HTML-escape it into the iframe srcdoc attribute (otherwise the inline
-      # style double-quotes truncate the attribute and the preview is blank).
-      @email_preview = PropertyMailer.share_property(@property, nil).body.decoded.to_str
+      @email_preview = preview_html(@property_share&.body)
+    end
+
+    # decoded returns a SafeBuffer; coerce to a plain String so the view can
+    # HTML-escape it into the iframe srcdoc attribute (otherwise the inline
+    # style double-quotes truncate the attribute and the preview is blank).
+    def preview_html(note_body)
+      PropertyMailer.share_property(@property, nil, body: note_body).body.decoded.to_str
     end
 
     # Matches the auto subject the mailer falls back to, so the prefilled field

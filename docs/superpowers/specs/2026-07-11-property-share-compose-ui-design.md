@@ -31,8 +31,13 @@ PDF brochure cannot be attached.
 - No locale picker for the attached PDF (French only; the share email itself is
   French only). Can be added later.
 - No plain-text share mode: the email stays the branded HTML property card.
-- The email preview iframe stays static; it does not live-update with the typed
-  message or subject.
+- The email preview does not live-update with the typed subject (the subject is
+  an email header, not part of the previewed HTML body).
+  (Amended 2026-07-11: Laurent asked for a live preview of the typed note. A
+  `POST preview` action on the share resource re-renders the mailer HTML with
+  the draft note, and a debounced `share-preview` Stimulus controller swaps the
+  iframe's srcdoc with the response. A validation re-render also seeds the
+  initial preview with the persisted note.)
 - No changes to the compose-email feature's behavior.
 
 ## Decisions made during design

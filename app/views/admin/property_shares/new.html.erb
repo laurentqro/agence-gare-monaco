@@ -51,6 +51,10 @@
           form_id: "share_form" %>
   </div>
 
+  <%# share-preview wraps the note field AND the preview iframe: typing the
+      note re-renders the preview with the real mailer output (debounced). %>
+  <div data-controller="share-preview"
+       data-share-preview-url-value="<%= preview_admin_property_share_path(@property) %>">
   <div class="bg-white rounded shadow p-6 mb-6 space-y-4">
     <div>
       <%= label_tag "property_share[subject]", t("admin.property_shares.fields.subject"), class: "block text-sm font-medium text-gray-700 mb-1" %>
@@ -61,6 +65,7 @@
       <%= label_tag "property_share[body]", t("admin.property_shares.fields.body"), class: "block text-sm font-medium text-gray-700 mb-1" %>
       <%= text_area_tag "property_share[body]", @property_share.body, rows: 6, form: "share_form",
             placeholder: t("admin.property_shares.fields.body_placeholder"),
+            data: { share_preview_target: "source", action: "input->share-preview#changed" },
             class: "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-navy focus:ring-2 focus:ring-navy/30" %>
     </div>
     <div class="space-y-2">
@@ -89,8 +94,10 @@
     <h2 class="heading-section mb-3"><%= t("admin.property_shares.email_preview") %></h2>
     <div class="border border-gray-200 rounded bg-white" style="max-width: 640px; margin: 0 auto;">
       <iframe sandbox srcdoc="<%= html_escape(@email_preview) %>"
+              data-share-preview-target="frame"
               style="width: 100%; min-height: 800px; border: 0; display: block;"
               title="<%= t("admin.property_shares.email_preview") %>"></iframe>
     </div>
+  </div>
   </div>
 </div>

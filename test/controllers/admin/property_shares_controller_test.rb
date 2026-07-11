@@ -262,4 +262,35 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_select ".bg-red-50 li", 2
   end
+
+  # PREVIEW (live refresh of the email preview while typing)
+  test "POST preview returns the email HTML with the typed note escaped" do
+    post preview_admin_property_share_url(@property), params: { body: "Bonjour <b>Jean</b>,\nvoici un bien." }
+    assert_response :success
+    assert_includes response.body, "Studio Carré d&#39;Or"
+    assert_includes response.body, "Bonjour &lt;b&gt;Jean&lt;/b&gt;,<br>voici un bien."
+    refute_includes response.body, "<b>Jean</b>"
+  end
+
+  test "POST preview without a body returns the plain property card" do
+    post preview_admin_property_share_url(@property), params: { body: "" }
+    assert_response :success
+    assert_includes response.body, "Studio Carré d&#39;Or"
+  end
+
+  test "POST preview requires authentication" do
+    delete session_url
+    post preview_admin_property_share_url(@property), params: { body: "x" }
+    assert_redirected_to new_session_url
+  end
+
+  test "a validation re-render seeds the preview with the typed note" do
+    post admin_property_share_url(@property), params: {
+      contact_ids: [ @contact1.id ],
+      property_share: { subject: "", body: "Ma note personnelle" }
+    }
+    assert_response :unprocessable_entity
+    srcdoc = CGI.unescapeHTML(css_select("iframe[srcdoc]").first["srcdoc"])
+    assert_includes srcdoc, "Ma note personnelle"
+  end
 end

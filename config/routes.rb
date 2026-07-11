@@ -10,7 +10,10 @@ Rails.application.routes.draw do
     resources :outgoing_emails, only: %i[new create], path: "envoyer-email", path_names: { new: "" }
     resources :information_requests, only: %i[index show update destroy], path: "demandes-information"
     resources :properties, path: "biens" do
-      resource :share, only: [ :new, :create ], controller: "property_shares"
+      resource :share, only: [ :new, :create ], controller: "property_shares" do
+        # Live email preview: re-renders the share email with the typed note.
+        post :preview
+      end
       resource :brochure, only: [ :new, :create ], controller: "property_brochures"
     end
   end
