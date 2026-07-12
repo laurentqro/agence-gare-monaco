@@ -1,0 +1,11 @@
+<%# Red validation-error box shared by the admin compose-style pages.
+    Local: model (may be nil on a fresh form). %>
+<% if model&.errors&.any? %>
+  <div class="bg-red-50 border border-red-200 text-red-700 rounded p-4 mb-6">
+    <ul class="list-disc list-inside text-sm">
+      <% model.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

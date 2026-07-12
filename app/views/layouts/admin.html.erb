@@ -97,31 +97,37 @@
             <%= link_to t("admin.layout.logout"), session_path, data: { turbo_method: :delete }, class: "text-white/70 hover:text-white" %>
           </div>
         </aside>
-
-        <%# Quick toggle back to the public site (mirrors the admin icon in the public navbar) %>
-        <a href="<%= fr_root_path %>" aria-label="Voir le site" title="Voir le site"
-           class="fixed top-3 right-3 z-40 p-2 bg-white rounded-full shadow-md ring-1 ring-gray-200 text-navy hover:text-accent transition-colors">
-          <%# globe-alt %>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21C16.1926 21 19.7156 18.1332 20.7157 14.2529M12 21C7.80742 21 4.28442 18.1332 3.2843 14.2529M12 21C14.4853 21 16.5 16.9706 16.5 12C16.5 7.02944 14.4853 3 12 3M12 21C9.51472 21 7.5 16.9706 7.5 12C7.5 7.02944 9.51472 3 12 3M12 3C15.3652 3 18.299 4.84694 19.8431 7.58245M12 3C8.63481 3 5.70099 4.84694 4.15692 7.58245M19.8431 7.58245C17.7397 9.40039 14.9983 10.5 12 10.5C9.00172 10.5 6.26027 9.40039 4.15692 7.58245M19.8431 7.58245C20.5797 8.88743 21 10.3946 21 12C21 12.778 20.9013 13.5329 20.7157 14.2529M20.7157 14.2529C18.1334 15.6847 15.1619 16.5 12 16.5C8.8381 16.5 5.86662 15.6847 3.2843 14.2529M3.2843 14.2529C3.09871 13.5329 3 12.778 3 12C3 10.3946 3.42032 8.88743 4.15692 7.58245" />
-          </svg>
-        </a>
       <% end %>
 
       <%# Main content %>
-      <main class="flex-1 overflow-auto">
-        <% if flash[:notice] %>
-          <div class="bg-green-50 border-l-4 border-green-400 p-4 m-6 mb-0">
-            <p class="text-green-700"><%= flash[:notice] %></p>
-          </div>
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <% if authenticated? %>
+          <%# Top bar: quick toggle back to the public site (mirrors the admin icon in the public navbar) %>
+          <header class="h-12 flex items-center justify-end px-3 flex-shrink-0">
+            <a href="<%= fr_root_path %>" aria-label="Voir le site" title="Voir le site"
+               class="p-2 bg-white rounded-full shadow-md ring-1 ring-gray-200 text-navy hover:text-accent transition-colors">
+              <%# globe-alt %>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21C16.1926 21 19.7156 18.1332 20.7157 14.2529M12 21C7.80742 21 4.28442 18.1332 3.2843 14.2529M12 21C14.4853 21 16.5 16.9706 16.5 12C16.5 7.02944 14.4853 3 12 3M12 21C9.51472 21 7.5 16.9706 7.5 12C7.5 7.02944 9.51472 3 12 3M12 3C15.3652 3 18.299 4.84694 19.8431 7.58245M12 3C8.63481 3 5.70099 4.84694 4.15692 7.58245M19.8431 7.58245C17.7397 9.40039 14.9983 10.5 12 10.5C9.00172 10.5 6.26027 9.40039 4.15692 7.58245M19.8431 7.58245C20.5797 8.88743 21 10.3946 21 12C21 12.778 20.9013 13.5329 20.7157 14.2529M20.7157 14.2529C18.1334 15.6847 15.1619 16.5 12 16.5C8.8381 16.5 5.86662 15.6847 3.2843 14.2529M3.2843 14.2529C3.09871 13.5329 3 12.778 3 12C3 10.3946 3.42032 8.88743 4.15692 7.58245" />
+              </svg>
+            </a>
+          </header>
         <% end %>
-        <% if flash[:alert] %>
-          <div class="bg-red-50 border-l-4 border-red-400 p-4 m-6 mb-0">
-            <p class="text-red-700"><%= flash[:alert] %></p>
-          </div>
-        <% end %>
-        <%= yield %>
-      </main>
+
+        <main class="flex-1 overflow-auto">
+          <% if flash[:notice] %>
+            <div class="bg-green-50 border-l-4 border-green-400 p-4 m-6 mb-0">
+              <p class="text-green-700"><%= flash[:notice] %></p>
+            </div>
+          <% end %>
+          <% if flash[:alert] %>
+            <div class="bg-red-50 border-l-4 border-red-400 p-4 m-6 mb-0">
+              <p class="text-red-700"><%= flash[:alert] %></p>
+            </div>
+          <% end %>
+          <%= yield %>
+        </main>
+      </div>
     </div>
   </body>
 </html>

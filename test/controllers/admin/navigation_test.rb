@@ -28,6 +28,14 @@ class Admin::NavigationTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{fr_root_path}'] img[src*='logo-monogram']"
   end
 
+  test "admin layout shows a view-site icon link in a top bar above the content" do
+    get admin_root_url
+    assert_response :success
+    assert_select "header a[href='#{fr_root_path}'][aria-label='Voir le site'] svg"
+    # Must not float over the content where it can cover page action buttons
+    assert_select "a[aria-label='Voir le site'][class*='fixed']", count: 0
+  end
+
   test "admin layout shows logout link" do
     get admin_root_url
     assert_response :success

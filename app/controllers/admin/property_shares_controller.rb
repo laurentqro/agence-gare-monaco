@@ -67,10 +67,8 @@ module Admin
       PropertyMailer.share_property(@property, nil, body: note_body).body.decoded.to_str
     end
 
-    # Matches the auto subject the mailer falls back to, so the prefilled field
-    # sends the same email as an untouched one.
     def default_subject
-      "#{@property.reference} — #{@property.title_for(:fr)}"
+      PropertyMailer.default_share_subject(@property)
     end
 
     def set_property

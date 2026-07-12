@@ -10,15 +10,7 @@
       attribute instead of being wrapped by it. %>
   <%= form_with url: admin_property_share_path(@property), method: :post, id: "share_form" do |f| %><% end %>
 
-  <% if @property_share&.errors&.any? %>
-    <div class="bg-red-50 border border-red-200 text-red-700 rounded p-4 mb-6">
-      <ul class="list-disc list-inside text-sm">
-        <% @property_share.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "admin/shared/form_errors", model: @property_share %>
 
   <%# The recipient-selection controller wraps BOTH lists so a recipient checked
       in either survives the Turbo re-render that its search triggers, and so the

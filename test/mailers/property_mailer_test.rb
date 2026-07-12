@@ -189,6 +189,13 @@ class PropertyMailerTest < ActionMailer::TestCase
     assert_equal "Une opportunité rare", email.subject
   end
 
+  test "the blank-subject fallback is the shared default_share_subject" do
+    # Single source of truth: the share form prefill and the mailer fallback
+    # both read this, so an untouched field always sends the same email.
+    email = PropertyMailer.share_property(@property, @contact, subject: "")
+    assert_equal PropertyMailer.default_share_subject(@property), email.subject
+  end
+
   test "share property renders the personal note between the agent block and the hero" do
     email = PropertyMailer.share_property(@property, @contact, body: "Bonjour Jean,\nvoici un bien pour vous.")
     body = email.body.encoded

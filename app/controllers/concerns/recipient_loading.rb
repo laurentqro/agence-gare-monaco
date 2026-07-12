@@ -15,7 +15,7 @@ module RecipientLoading
   def load_recipients
     @peers_query = params[:peers_q]
     @contacts_query = params[:contacts_q]
-    @selected_contact_ids = Array(params[:contact_ids]).reject(&:blank?).map(&:to_s).to_set
+    @selected_contact_ids = submitted_contact_ids.map(&:to_s).to_set
     @peers = Contact.peers.with_email.search(@peers_query).order(:last_name, :first_name)
     @contacts = Contact.contacts_only.with_email.search(@contacts_query).order(:last_name, :first_name)
   end
@@ -28,9 +28,16 @@ module RecipientLoading
   # caller treats it as "no recipients selected". `.distinct` guards against a
   # contact submitted twice from double-counting or double-sending.
   def resolve_recipient_contacts
-    ids = Array(params[:contact_ids]).reject(&:blank?)
+    ids = submitted_contact_ids
     return Contact.none if ids.empty?
 
     Contact.with_email.where(id: ids).distinct
+  end
+
+  # The one place the raw contact_ids[] param is parsed: both the re-checked
+  # boxes (@selected_contact_ids) and the resolved recipients derive from it,
+  # so they cannot drift apart.
+  def submitted_contact_ids
+    Array(params[:contact_ids]).reject(&:blank?)
   end
 end
