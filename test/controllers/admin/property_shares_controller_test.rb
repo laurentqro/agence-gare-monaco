@@ -211,6 +211,23 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_enqueued_with(job: SharePropertyEmailJob, args: [ share.id, @contact1.id ])
   end
 
+  test "POST create with the PDF option warms the brochure cache once before the fan-out" do
+    post admin_property_share_url(@property), params: {
+      contact_ids: [ @contact1.id, @contact2.id ],
+      property_share: { subject: "S", attach_pdf: "1", include_logo: "1" }
+    }
+    assert @property.reload.cached_brochure(locale: :fr, include_logo: true).present?,
+           "expected the shared variant to be pre-cached so each job only downloads it"
+  end
+
+  test "POST create without the PDF option does not touch the brochure cache" do
+    post admin_property_share_url(@property), params: {
+      contact_ids: [ @contact1.id ],
+      property_share: { subject: "S", attach_pdf: "0" }
+    }
+    assert_equal 0, @property.reload.brochures.count
+  end
+
   test "POST create with invalid options persists nothing" do
     assert_no_difference "PropertyShare.count" do
       post admin_property_share_url(@property), params: {

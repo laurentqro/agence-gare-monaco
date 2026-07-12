@@ -18,6 +18,13 @@ module Admin
 
       return render_new_with_errors unless @property_share.save
 
+      # Warm the brochure cache before the fan-out so N recipient jobs never
+      # trigger N identical Typst generations; each job then only downloads
+      # the cached blob.
+      if @property_share.attach_pdf
+        PropertyBrochureCache.ensure_cached(@property, locale: :fr, include_logo: @property_share.include_logo)
+      end
+
       contacts.each do |contact|
         SharePropertyEmailJob.perform_later(@property_share.id, contact.id)
       end
