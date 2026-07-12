@@ -45,7 +45,7 @@ PDF brochure cannot be attached.
 | Question | Decision |
 |---|---|
 | Email format with subject/body | Keep the branded HTML card. Subject prefilled with `"REF — Titre FR"`, editable. Body renders as a personal note block inside the email, above the property card. Empty body means the email looks exactly like today. |
-| Delivery | Background jobs, one per recipient, primitive job args. No `OutgoingEmail` record. |
+| Delivery | Background jobs, one per recipient. (Amended 2026-07-12: a persisted, self-purging `PropertyShare` record carries the options and tracks deliveries for replay safety.) |
 | PDF locale | French only. Options: attach yes/no, logo yes/no. |
 | Validation | Subject required (always prefilled so normally valid), body optional. |
 | Reuse strategy | Extract a shared recipient-list partial and a controller concern used by both pages (Approach A). |
@@ -123,12 +123,21 @@ Both controllers include the concern. `Admin::PropertySharesController` drops
 
 ```ruby
 # perform signature; the controller enqueues with perform_later
-def perform(property_id, contact_id, subject, body, attach_pdf, include_logo)
+def perform(property_share_id, contact_id)
 ```
 
-- `Property.find_by` / `Contact.find_by`; return silently if either record was
-  deleted between enqueue and run.
-- Calls the mailer with `deliver_now`.
+(Amended 2026-07-12 after code review: `PropertyShare` became a persisted,
+self-purging record like `OutgoingEmail`, carrying the send options plus
+`pending_count`/`sent_contact_ids` delivery tracking with a row-locked
+`mark_sent!`. This makes job replays after worker crashes or operator retries
+idempotent, and shrinks the job to two args. The controller also warms the
+brochure cache once via `PropertyBrochureCache.ensure_cached` before the
+fan-out, so N recipients never trigger N Typst generations.)
+
+- `PropertyShare.find_by` / `Contact.find_by`; silent no-op if the share is
+  gone (batch completed, or its property was deleted, which destroys shares);
+  a deleted contact is claimed without sending so the batch still completes.
+- Calls the mailer with `deliver_now`, then `mark_sent!` claims the recipient.
 - One job per recipient so a single failure never blocks other recipients
   (same rationale as `SendOutgoingEmailJob`).
 
