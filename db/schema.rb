@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_30_202040) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_12_213503) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -229,6 +229,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_30_202040) do
     t.index ["property_id"], name: "index_property_images_on_property_id"
   end
 
+  create_table "property_shares", force: :cascade do |t|
+    t.boolean "attach_pdf", default: false, null: false
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.boolean "include_logo", default: true, null: false
+    t.integer "pending_count", default: 0, null: false
+    t.integer "property_id", null: false
+    t.json "sent_contact_ids", default: [], null: false
+    t.string "subject", null: false
+    t.datetime "updated_at", null: false
+    t.index ["property_id"], name: "index_property_shares_on_property_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -268,5 +281,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_30_202040) do
   add_foreign_key "properties", "districts"
   add_foreign_key "property_documents", "properties"
   add_foreign_key "property_images", "properties"
+  add_foreign_key "property_shares", "properties"
   add_foreign_key "sessions", "users"
 end

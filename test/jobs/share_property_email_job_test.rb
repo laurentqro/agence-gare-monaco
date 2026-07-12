@@ -15,30 +15,65 @@ class SharePropertyEmailJobTest < ActiveJob::TestCase
       published: true
     )
     @contact = Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@example.com")
+    @share = PropertyShare.create!(
+      property: @property, subject: "Sujet perso", body: "Bonjour", pending_count: 2
+    )
   end
 
-  test "delivers the share email to the contact with the custom subject" do
+  test "delivers the share email to the contact with the share's options" do
     assert_emails 1 do
-      SharePropertyEmailJob.perform_now(@property.id, @contact.id, "Sujet perso", "Bonjour", false, true)
+      SharePropertyEmailJob.perform_now(@share.id, @contact.id)
     end
     email = ActionMailer::Base.deliveries.last
     assert_equal [ "jean@example.com" ], email.to
     assert_equal "Sujet perso", email.subject
   end
 
-  test "is a silent no-op when the contact was deleted after enqueue" do
+  test "a replayed job never re-sends to an already-claimed contact" do
+    SharePropertyEmailJob.perform_now(@share.id, @contact.id)
+    assert_no_emails do
+      SharePropertyEmailJob.perform_now(@share.id, @contact.id)
+    end
+    assert_equal 1, @share.reload.pending_count
+  end
+
+  test "a non-last delivery decrements but keeps the share record" do
+    SharePropertyEmailJob.perform_now(@share.id, @contact.id)
+    assert PropertyShare.exists?(@share.id)
+    assert_equal 1, @share.reload.pending_count
+  end
+
+  test "the last delivery purges the share record" do
+    @share.update!(pending_count: 1)
+    SharePropertyEmailJob.perform_now(@share.id, @contact.id)
+    assert_not PropertyShare.exists?(@share.id)
+  end
+
+  test "a deleted contact still counts down so the batch completes" do
     contact_id = @contact.id
     @contact.destroy!
+    @share.update!(pending_count: 1)
     assert_no_emails do
-      SharePropertyEmailJob.perform_now(@property.id, contact_id, "S", "B", false, true)
+      SharePropertyEmailJob.perform_now(@share.id, contact_id)
+    end
+    assert_not PropertyShare.exists?(@share.id)
+  end
+
+  test "is a silent no-op when the share record is gone" do
+    share_id = @share.id
+    @share.destroy!
+    assert_no_emails do
+      SharePropertyEmailJob.perform_now(share_id, @contact.id)
     end
   end
 
   test "is a silent no-op when the property was deleted after enqueue" do
-    property_id = @property.id
+    # dependent: :destroy removes the share with its property, so the job
+    # finds nothing to send.
+    share_id = @share.id
     @property.destroy!
     assert_no_emails do
-      SharePropertyEmailJob.perform_now(property_id, @contact.id, "S", "B", false, true)
+      SharePropertyEmailJob.perform_now(share_id, @contact.id)
     end
   end
 end

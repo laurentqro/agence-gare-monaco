@@ -10,21 +10,16 @@ module Admin
     end
 
     def create
-      @property_share = PropertyShare.new(property_share_params)
+      @property_share = @property.property_shares.new(property_share_params)
       contacts = resolve_recipient_contacts
+      # pending_count doubles as the recipients check: the model validates it
+      # on create, so a blank subject and zero recipients surface together.
+      @property_share.pending_count = contacts.size
 
-      # Both problems surface together in one round-trip: validate first, then
-      # stack the recipients error on top (valid? would wipe it otherwise).
-      @property_share.valid?
-      @property_share.errors.add(:base, t("admin.property_shares.flash.no_contacts_selected")) if contacts.empty?
-      return render_new_with_errors if @property_share.errors.any?
+      return render_new_with_errors unless @property_share.save
 
       contacts.each do |contact|
-        SharePropertyEmailJob.perform_later(
-          @property.id, contact.id,
-          @property_share.subject, @property_share.body,
-          @property_share.attach_pdf, @property_share.include_logo
-        )
+        SharePropertyEmailJob.perform_later(@property_share.id, contact.id)
       end
 
       redirect_to admin_contacts_url, notice: t("admin.property_shares.flash.shared", count: contacts.size)
@@ -39,8 +34,10 @@ module Admin
 
     private
 
+    # fetch, not require: a stripped POST with no property_share key must fall
+    # through to the normal validation errors (422), not raise a 400.
     def property_share_params
-      params.require(:property_share).permit(:subject, :body, :attach_pdf, :include_logo)
+      params.fetch(:property_share, {}).permit(:subject, :body, :attach_pdf, :include_logo)
     end
 
     def render_new_with_errors

@@ -10,6 +10,7 @@ class Property < ApplicationRecord
   has_many :property_images, dependent: :destroy
   has_many :property_documents, dependent: :destroy
   has_many :information_requests, dependent: :nullify
+  has_many :property_shares, dependent: :destroy
   has_many_attached :brochures
 
   validates :reference, presence: true, uniqueness: true

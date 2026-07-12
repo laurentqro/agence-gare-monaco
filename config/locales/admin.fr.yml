@@ -1,5 +1,5 @@
 fr:
-  activemodel:
+  activerecord:
     attributes:
       property_share:
         subject: "Sujet"
@@ -296,11 +296,12 @@ fr:
         attach_pdf: "Joindre la brochure PDF (français)"
         include_logo: "Inclure le logo de l'agence"
       send_email: "Envoyer par email"
+      errors:
+        no_recipients: "Veuillez sélectionner au moins un contact."
       flash:
         shared:
           one: "Bien partagé avec %{count} contact."
           other: "Bien partagé avec %{count} contacts."
-        no_contacts_selected: "Veuillez sélectionner au moins un contact."
     # Shared recipient-picker UI (stacked peers/contacts lists with search,
     # select-all and chip panels) used by compose-email and property-share.
     recipient_picker:

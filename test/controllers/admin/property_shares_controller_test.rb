@@ -194,15 +194,30 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Bien partagé avec 2 contacts.", flash[:notice]
   end
 
-  test "POST create passes the send options to each job as plain args" do
-    post admin_property_share_url(@property), params: {
-      contact_ids: [ @contact1.id ],
-      property_share: { subject: "Sujet perso", body: "Bonjour Jean", attach_pdf: "1", include_logo: "0" }
-    }
-    assert_enqueued_with(
-      job: SharePropertyEmailJob,
-      args: [ @property.id, @contact1.id, "Sujet perso", "Bonjour Jean", true, false ]
-    )
+  test "POST create persists the send options on a PropertyShare and enqueues per contact" do
+    assert_difference "PropertyShare.count", 1 do
+      post admin_property_share_url(@property), params: {
+        contact_ids: [ @contact1.id ],
+        property_share: { subject: "Sujet perso", body: "Bonjour Jean", attach_pdf: "1", include_logo: "0" }
+      }
+    end
+    share = PropertyShare.last
+    assert_equal @property, share.property
+    assert_equal "Sujet perso", share.subject
+    assert_equal "Bonjour Jean", share.body
+    assert_equal true, share.attach_pdf
+    assert_equal false, share.include_logo
+    assert_equal 1, share.pending_count
+    assert_enqueued_with(job: SharePropertyEmailJob, args: [ share.id, @contact1.id ])
+  end
+
+  test "POST create with invalid options persists nothing" do
+    assert_no_difference "PropertyShare.count" do
+      post admin_property_share_url(@property), params: {
+        contact_ids: [ @contact1.id ],
+        property_share: { subject: "" }
+      }
+    end
   end
 
   test "POST create flash uses the singular when sharing with exactly one contact" do
@@ -274,6 +289,14 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     }
     assert_response :unprocessable_entity
     assert_select ".bg-red-50 li", 2
+  end
+
+  test "POST create without a property_share key degrades to a validation error, not a 400" do
+    # A stripped or non-form client may post only contact_ids; the old
+    # controller never raised on that shape, so the new one must not either.
+    post admin_property_share_url(@property), params: { contact_ids: [ @contact1.id ] }
+    assert_response :unprocessable_entity
+    assert_select ".bg-red-50"
   end
 
   # PREVIEW (live refresh of the email preview while typing)
