@@ -154,7 +154,7 @@ module ApplicationHelper
 
   def locale_property_path(property, locale = I18n.locale)
     props = I18n.t("routes.properties", locale: locale)
-    slug = property.title_for(locale).parameterize
+    slug = property.slug_for(locale)
     "#{locale_prefix(locale)}/#{props}/#{property.id}-#{slug}"
   end
 

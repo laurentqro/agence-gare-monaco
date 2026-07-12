@@ -204,6 +204,30 @@ class PropertyTest < ActiveSupport::TestCase
     assert_equal "Studio Monaco", property.title_for(:it)
   end
 
+  test "slug_for transliterates with the target locale's rules regardless of current locale" do
+    property = Property.new(
+      reference: "MC-T3", transaction_type: "sale", property_type: "apartment", country: "MC", city: "Monaco",
+      title: { "fr" => "Joli studio en étage élevé", "da" => "Dejlig studio i høj etage" }
+    )
+    I18n.with_locale(:fr) do
+      assert_equal "dejlig-studio-i-hoej-etage", property.slug_for(:da)
+    end
+    I18n.with_locale(:da) do
+      assert_equal "dejlig-studio-i-hoej-etage", property.slug_for(:da)
+      assert_equal "joli-studio-en-etage-eleve", property.slug_for(:fr)
+    end
+  end
+
+  test "slug_for romanizes Cyrillic titles with Russian transliteration rules" do
+    property = Property.new(
+      reference: "MC-T4", transaction_type: "sale", property_type: "apartment", country: "MC", city: "Monaco",
+      title: { "fr" => "Joli studio", "ru" => "Красивая студия" }
+    )
+    I18n.with_locale(:fr) do
+      assert_equal "krasivaya-studiya", property.slug_for(:ru)
+    end
+  end
+
   test "description_for skips empty string and falls back to French" do
     property = Property.new(
       reference: "MC-T2", transaction_type: "sale", property_type: "apartment", country: "MC", city: "Monaco",

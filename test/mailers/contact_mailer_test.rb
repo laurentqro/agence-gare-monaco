@@ -175,6 +175,6 @@ class ContactMailerTest < ActionMailer::TestCase
 
     email = ContactMailer.enquiry_email(submission)
     body = email.body.encoded
-    assert_includes body, "/fr/biens/#{@property.id}"
+    assert_includes body, "https://agencegaremonaco.com/biens/#{@property.id}-#{@property.slug_for(:fr)}"
   end
 end

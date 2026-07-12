@@ -53,7 +53,9 @@ class Property < ApplicationRecord
   end
 
   def slug_for(locale)
-    title_for(locale).parameterize
+    # Pin transliteration to the target locale so the slug is identical no
+    # matter which locale's page renders the link (canonical, hreflang, sitemap).
+    title_for(locale).parameterize(locale: locale.to_sym)
   end
 
   def location_label

@@ -140,6 +140,18 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
+  test "hreflang_tags property URLs use each target locale's transliteration regardless of current locale" do
+    @property.update!(title: @property.title.merge("da" => "Dejlig studio i høj etage"))
+    I18n.with_locale(:fr) do
+      tags = hreflang_tags(page_type: :property, property: @property)
+      assert_includes tags, "href=\"https://agencegaremonaco.com/da/ejendomme/#{@property.id}-dejlig-studio-i-hoej-etage\""
+    end
+    I18n.with_locale(:da) do
+      tags = hreflang_tags(page_type: :property, property: @property)
+      assert_includes tags, "href=\"https://agencegaremonaco.com/da/ejendomme/#{@property.id}-dejlig-studio-i-hoej-etage\""
+    end
+  end
+
   test "hreflang_tags uses nb for Norwegian" do
     I18n.with_locale(:en) do
       tags = hreflang_tags(page_type: :homepage)
