@@ -196,14 +196,14 @@ class PropertyMailerTest < ActionMailer::TestCase
     assert_equal PropertyMailer.default_share_subject(@property), email.subject
   end
 
-  test "share property renders the personal note between the agent block and the hero" do
+  test "share property renders the personal note above the agent signature block" do
     email = PropertyMailer.share_property(@property, @contact, body: "Bonjour Jean,\nvoici un bien pour vous.")
     body = email.body.encoded
     assert_includes body, "Bonjour Jean,<br>voici un bien pour vous."
-    assert_operator body.index("adrien@agencegaremonaco.com"), :<, body.index("Bonjour Jean,"),
-                    "the note should render after the agent block"
-    assert_operator body.index("Bonjour Jean,"), :<, body.index("https://cdn.immotoolbox.com/large/photo1.jpg"),
-                    "the note should render before the hero photo"
+    assert_operator body.index("Bonjour Jean,"), :<, body.index("adrien@agencegaremonaco.com"),
+                    "the agent block reads as the signature, so it must follow the note"
+    assert_operator body.index("adrien@agencegaremonaco.com"), :<, body.index("https://cdn.immotoolbox.com/large/photo1.jpg"),
+                    "the signature should still render before the hero photo"
   end
 
   test "share property HTML-escapes the personal note" do

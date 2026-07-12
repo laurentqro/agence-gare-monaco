@@ -59,7 +59,18 @@
             </td>
           </tr>
 
-          <!-- agent block -->
+          <!-- personal note from the admin (plain text, so escape it and keep
+               the typed line breaks; absent on the default share). Renders
+               ABOVE the agent block, which reads as its signature. -->
+          <% if @personal_message.present? %>
+          <tr>
+            <td style="padding:8px 32px 0; font-family:Arial, Helvetica, sans-serif; color:<%= ink %>; font-size:14px; line-height:1.7;">
+              <%= safe_join(@personal_message.lines(chomp: true), tag.br) %>
+            </td>
+          </tr>
+          <% end %>
+
+          <!-- agent block / signature -->
           <tr>
             <td style="padding:8px 32px 28px; font-family:Arial, Helvetica, sans-serif; color:<%= accent %>; font-size:14px; line-height:1.6;">
               <span style="color:<%= ink %>;"><%= @agent[:name] %></span><br>
@@ -67,16 +78,6 @@
               T: <a href="tel:<%= @agent[:phone].delete(' ') %>" style="color:<%= accent %>; text-decoration:none;"><%= @agent[:phone] %></a>
             </td>
           </tr>
-
-          <!-- personal note from the admin (plain text, so escape it and keep
-               the typed line breaks; absent on the default share) -->
-          <% if @personal_message.present? %>
-          <tr>
-            <td style="padding:0 32px 28px; font-family:Arial, Helvetica, sans-serif; color:<%= ink %>; font-size:14px; line-height:1.7;">
-              <%= safe_join(@personal_message.lines(chomp: true), tag.br) %>
-            </td>
-          </tr>
-          <% end %>
 
           <!-- hero image -->
           <% if hero %>
