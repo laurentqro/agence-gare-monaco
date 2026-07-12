@@ -197,14 +197,14 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
   end
 
   # CREATE (queue one share email per recipient)
-  test "POST create queues one share job per selected contact and redirects" do
+  test "POST create queues one share job per selected contact and returns to the shared property" do
     assert_enqueued_jobs 2, only: SharePropertyEmailJob do
       post admin_property_share_url(@property), params: {
         contact_ids: [ @contact1.id, @contact2.id ],
         property_share: { subject: "Sujet perso", body: "Bonjour", attach_pdf: "0", include_logo: "1" }
       }
     end
-    assert_redirected_to admin_contacts_url
+    assert_redirected_to admin_property_url(@property)
     assert_equal "Bien partagé avec 2 contacts.", flash[:notice]
   end
 

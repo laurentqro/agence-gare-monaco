@@ -29,7 +29,7 @@ module Admin
         SharePropertyEmailJob.perform_later(@property_share.id, contact.id)
       end
 
-      redirect_to admin_contacts_url, notice: t("admin.property_shares.flash.shared", count: contacts.size)
+      redirect_to admin_property_url(@property), notice: t("admin.property_shares.flash.shared", count: contacts.size)
     end
 
     # Returns the share email HTML for the live preview iframe, re-rendered
