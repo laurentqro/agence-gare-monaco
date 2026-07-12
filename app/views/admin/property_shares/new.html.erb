@@ -12,6 +12,15 @@
 
   <%= render "admin/shared/form_errors", model: @property_share %>
 
+  <%# Zero shareable contacts at all (not just an empty search): point the
+      admin straight at contact creation instead of two bare empty lists. %>
+  <% if @peers.empty? && @contacts.empty? && @peers_query.blank? && @contacts_query.blank? %>
+    <p class="text-gray-500 text-sm mb-6">
+      <%= t("admin.property_shares.no_contacts") %>
+      <%= link_to t("admin.property_shares.add_contact"), new_admin_contact_path, class: "text-accent hover:underline" %>
+    </p>
+  <% end %>
+
   <%# The recipient-selection controller wraps BOTH lists so a recipient checked
       in either survives the Turbo re-render that its search triggers, and so the
       live "selected" chip panels stay in sync as rows are checked/unchecked. A
@@ -45,8 +54,12 @@
           form_id: "share_form" %>
   </div>
 
-  <%# share-preview wraps the note field AND the preview iframe: typing the
-      note re-renders the preview with the real mailer output (debounced). %>
+  <%# share-preview spans everything from the fields card down to the preview
+      card (subject, note, PDF options, buttons, iframe); it only needs the
+      note textarea (source) and the iframe (frame), but they sit at opposite
+      ends of that block, so the controller must wrap the whole stretch.
+      Typing the note re-renders the preview with the real mailer output
+      (debounced). %>
   <div data-controller="share-preview"
        data-share-preview-url-value="<%= preview_admin_property_share_path(@property) %>">
   <div class="bg-white rounded shadow p-6 mb-6 space-y-4">

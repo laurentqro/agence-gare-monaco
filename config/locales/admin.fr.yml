@@ -289,6 +289,8 @@ fr:
     property_shares:
       title: "Partager le bien"
       email_preview: "Aperçu de l'email"
+      no_contacts: "Aucun contact pour le moment."
+      add_contact: "Ajouter un contact"
       fields:
         subject: "Sujet"
         body: "Message personnel (optionnel)"

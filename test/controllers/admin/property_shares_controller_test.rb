@@ -81,6 +81,20 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{@contact1.id}']", 1
   end
 
+  test "GET new with no shareable contacts shows a create-contact call to action" do
+    Contact.delete_all
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    assert_select "p", text: /Aucun contact pour le moment/
+    assert_select "a[href='#{new_admin_contact_path}']", text: "Ajouter un contact"
+  end
+
+  test "GET new with contacts present shows no create-contact call to action" do
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    assert_select "a[href='#{new_admin_contact_path}']", 0
+  end
+
   test "GET new peers search narrows only the peers list" do
     other_peer = Contact.create!(last_name: "Aubert", email: "aubert@agency.mc", peer: true)
     get new_admin_property_share_url(@property, peers_q: "Aubert")

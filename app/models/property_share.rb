@@ -8,7 +8,7 @@ class PropertyShare < ApplicationRecord
   belongs_to :property
 
   validates :subject, presence: true
-  # on: :create only — mark_sent! legitimately drives pending_count to zero.
+  # on: :create only; mark_sent! legitimately drives pending_count to zero.
   validate :must_have_recipients, on: :create
 
   # Claims a recipient as delivered, exactly once. Returns true the first time
