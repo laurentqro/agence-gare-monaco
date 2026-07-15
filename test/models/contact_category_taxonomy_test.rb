@@ -14,6 +14,11 @@ class ContactCategoryTaxonomyTest < ActiveSupport::TestCase
     assert_equal Contact::CATEGORIES.sort, RecipientLoading::AUDIENCES.values.flatten.sort
   end
 
+  test "every category has a badge color variant" do
+    assert_equal Contact::CATEGORIES.sort,
+                 AdminHelper::CONTACT_CATEGORY_BADGE_VARIANTS.keys.sort
+  end
+
   test "every category has its badge and form labels" do
     I18n.with_locale(:fr) do
       Contact::CATEGORIES.each do |category|

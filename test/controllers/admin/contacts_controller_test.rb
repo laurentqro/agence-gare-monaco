@@ -221,6 +221,38 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_select "table tbody tr td", text: /Prospect/
   end
 
+  test "GET index badge colors distinguish the categories" do
+    Contact.create!(last_name: "Bailleur", category: "owner")
+    Contact.create!(last_name: "Preneur", category: "tenant")
+    Contact.create!(last_name: "Curieux", category: "prospect")
+    Contact.create!(last_name: "Smith", company: "Agency", category: "peer")
+    get admin_contacts_url
+    assert_response :success
+    assert_select "td span[class*='bg-green-100']", text: "Propriétaire"
+    assert_select "td span[class*='bg-blue-100']", text: "Locataire"
+    assert_select "td span[class*='bg-purple-100']", text: "Prospect"
+    assert_select "td span[class*='bg-accent/10']", text: "Confrère"
+  end
+
+  test "GET index renders an out-of-taxonomy category as its raw value" do
+    # A row written via update_all / raw SQL bypasses the enum validation;
+    # the badge must show the value, not a 'translation missing' string.
+    contact = Contact.create!(last_name: "Étrange")
+    contact.update_columns(category: "vip")
+    get admin_contacts_url
+    assert_response :success
+    assert_select "td span", text: "vip"
+    refute_match(/translation missing/, response.body)
+  end
+
+  test "GET edit surfaces an out-of-taxonomy category as a checked radio" do
+    contact = Contact.create!(last_name: "Étrange")
+    contact.update_columns(category: "vip")
+    get edit_admin_contact_url(contact)
+    assert_response :success
+    assert_select "input[type=radio][name='contact[category]'][value='vip'][checked]"
+  end
+
   # NEW
   test "GET new renders contact form" do
     get new_admin_contact_url

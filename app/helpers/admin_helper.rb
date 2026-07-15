@@ -31,6 +31,44 @@ module AdminHelper
     end
   end
 
+  # Color variants for admin_badge pills.
+  BADGE_VARIANTS = {
+    gray: "bg-gray-100 text-gray-500",
+    accent: "bg-accent/10 text-accent",
+    green: "bg-green-100 text-green-700",
+    blue: "bg-blue-100 text-blue-700",
+    purple: "bg-purple-100 text-purple-700"
+  }.freeze
+
+  # Badge color per contact category. Total over Contact::CATEGORIES
+  # (enforced by ContactCategoryTaxonomyTest).
+  CONTACT_CATEGORY_BADGE_VARIANTS = {
+    "contact" => :gray,
+    "prospect" => :purple,
+    "peer" => :accent,
+    "owner" => :green,
+    "tenant" => :blue
+  }.freeze
+
+  # Small colored pill for admin tables (contact categories, request types).
+  #
+  #   admin_badge t("admin.contacts.badges.peer"), variant: :accent
+  #   admin_badge label, large: true   # detail pages use roomier padding
+  def admin_badge(label, variant: :gray, large: false)
+    padding = large ? "px-3 py-1" : "px-2 py-0.5"
+    tag.span(label, class: "inline-block rounded-full text-xs #{padding} #{BADGE_VARIANTS.fetch(variant)}")
+  end
+
+  # Category pill for a contact row. Degrades gracefully for an
+  # out-of-taxonomy value (bad import, raw SQL — readable only via
+  # raw_category): shows the raw value in gray instead of a "translation
+  # missing" string.
+  def contact_category_badge(contact)
+    category = contact.raw_category.to_s
+    admin_badge t("admin.contacts.badges.#{category}", default: category),
+                variant: CONTACT_CATEGORY_BADGE_VARIANTS.fetch(category, :gray)
+  end
+
   # Whether a sidebar nav link should be marked active for the current path.
   #
   # By default a link is active when the current path equals the link path or

@@ -36,6 +36,13 @@ class Contact < ApplicationRecord
     where(clause, pattern: pattern)
   }
 
+  # The persisted category string even when it is outside the enum mapping
+  # (the enum reads an out-of-taxonomy value as nil). The admin UI uses this
+  # to surface anomalous rows instead of hiding them.
+  def raw_category
+    category || category_before_type_cast.to_s.presence
+  end
+
   # "Last First" for list rows and email greetings, skipping blank parts.
   # Name-less contacts (consulates, SCIs) fall back to company, then email, so
   # picker rows and selection chips are never blank.

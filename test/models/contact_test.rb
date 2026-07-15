@@ -61,6 +61,15 @@ class ContactTest < ActiveSupport::TestCase
     assert contact.errors[:category].any?
   end
 
+  test "raw_category surfaces an out-of-taxonomy value that the enum reads as nil" do
+    contact = Contact.create!(last_name: "Étrange")
+    contact.update_columns(category: "vip")
+    contact.reload
+    assert_nil contact.category
+    assert_equal "vip", contact.raw_category
+    assert_equal "peer", Contact.create!(last_name: "Smith", category: "peer").raw_category
+  end
+
   test "exposes a predicate and a scope per category" do
     peer = Contact.create!(last_name: "Smith", category: "peer")
     assert peer.peer?

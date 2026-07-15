@@ -10,9 +10,9 @@
         <p class="text-sm text-gray-500"><%= l(@submission.created_at, format: "%d/%m/%Y %H:%M") %></p>
       </div>
       <% if @submission.form_type == "enquiry" %>
-        <span class="inline-block rounded-full bg-accent/10 text-accent text-xs px-3 py-1"><%= t("admin.information_requests.filters.enquiry") %></span>
+        <%= admin_badge t("admin.information_requests.filters.enquiry"), variant: :accent, large: true %>
       <% else %>
-        <span class="inline-block rounded-full bg-gray-100 text-gray-500 text-xs px-3 py-1"><%= t("admin.information_requests.filters.contact") %></span>
+        <%= admin_badge t("admin.information_requests.filters.contact"), large: true %>
       <% end %>
     </div>
 

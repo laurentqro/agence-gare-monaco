@@ -28,10 +28,16 @@
   <fieldset>
     <legend class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.contacts.form.category") %></legend>
     <div class="space-y-1">
-      <% Contact::CATEGORIES.each do |category| %>
+      <%# An out-of-taxonomy value (bad import, raw SQL) is appended so it
+          renders as a checked radio: the admin sees the anomaly instead of an
+          all-unchecked group, and re-saving it fails validation loudly. The
+          enum reads such a value as nil, hence raw_category + explicit
+          checked. %>
+      <% current_category = contact.raw_category %>
+      <% (Contact::CATEGORIES | [current_category].compact_blank).each do |category| %>
         <div class="flex items-center gap-2">
-          <%= f.radio_button :category, category, class: "h-4 w-4 border-gray-300 text-navy focus:ring-navy" %>
-          <%= f.label :category, t("admin.contacts.form.categories.#{category}"), value: category, class: "text-sm text-gray-700" %>
+          <%= f.radio_button :category, category, checked: category == current_category, class: "h-4 w-4 border-gray-300 text-navy focus:ring-navy" %>
+          <%= f.label :category, t("admin.contacts.form.categories.#{category}", default: category), value: category, class: "text-sm text-gray-700" %>
         </div>
       <% end %>
     </div>
