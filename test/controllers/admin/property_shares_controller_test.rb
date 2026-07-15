@@ -114,6 +114,16 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{new_admin_contact_path}']", 0
   end
 
+  test "GET new with a single populated section shows no create-contact call to action" do
+    # The CTA means "nothing to share with at all" — one lone owner (three
+    # empty sections) must not trigger it.
+    Contact.delete_all
+    Contact.create!(last_name: "Bailleur", email: "owner@example.com", category: "owner")
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    assert_select "a[href='#{new_admin_contact_path}']", 0
+  end
+
   test "GET new peers search narrows only the peers list" do
     other_peer = Contact.create!(last_name: "Aubert", email: "aubert@agency.mc", category: "peer")
     get new_admin_property_share_url(@property, peers_q: "Aubert")

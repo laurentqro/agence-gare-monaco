@@ -274,12 +274,14 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "GET edit preselects the contact's category" do
-    peer = Contact.create!(last_name: "Smith", company: "Other Agency", category: "peer")
-    get edit_admin_contact_url(peer)
-    assert_response :success
-    assert_select "input[type=radio][name='contact[category]'][value='peer'][checked]"
-    assert_select "input[type=radio][name='contact[category]'][checked]", 1
+  test "GET edit preselects the contact's category, whichever it is" do
+    Contact::CATEGORIES.each do |category|
+      contact = Contact.create!(last_name: "Contact #{category}", category: category)
+      get edit_admin_contact_url(contact)
+      assert_response :success
+      assert_select "input[type=radio][name='contact[category]'][value='#{category}'][checked]"
+      assert_select "input[type=radio][name='contact[category]'][checked]", 1
+    end
   end
 
   test "POST create persists the extended fields" do
