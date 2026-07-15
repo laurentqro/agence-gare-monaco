@@ -7,16 +7,20 @@ class Contact < ApplicationRecord
   # "contact" is the unclassified default; a prospect who signs a mandate gets
   # recategorized to owner or tenant. Everything except "peer" is a client or
   # potential client and belongs on the AML screening roster.
-  CATEGORIES = %w[contact prospect peer owner tenant].freeze
+  # `validate: true` (instead of the raising default) keeps an unknown value a
+  # form error, not an ArgumentError.
+  enum :category, %w[contact prospect peer owner tenant].index_with(&:itself), validate: true
+
+  CATEGORIES = categories.keys.freeze
 
   validate :must_have_identifying_field
-  validates :category, inclusion: { in: CATEGORIES }
   validate :legacy_id_unique_within_partition
 
   # category "peer" = confrères (agents at other agencies we share listings
-  # with); every other category = our own contacts/leads.
-  scope :peers, -> { where(category: "peer") }
-  scope :contacts_only, -> { where.not(category: "peer") }
+  # with); every other category = our own contacts/leads. Named aliases of the
+  # enum scopes (peer / not_peer) that read better at call sites.
+  scope :peers, -> { peer }
+  scope :contacts_only, -> { not_peer }
 
   # Contacts that can actually be emailed: a present (non-nil, non-blank) email.
   scope :with_email, -> { where.not(email: [ nil, "" ]) }

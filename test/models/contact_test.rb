@@ -61,6 +61,14 @@ class ContactTest < ActiveSupport::TestCase
     assert contact.errors[:category].any?
   end
 
+  test "exposes a predicate and a scope per category" do
+    peer = Contact.create!(last_name: "Smith", category: "peer")
+    assert peer.peer?
+    assert_not peer.contact?
+    assert_equal [ peer ], Contact.peer.to_a
+    assert_equal [], Contact.owner.to_a
+  end
+
   test "legacy_id is unique only within the peer / non-peer split" do
     Contact.create!(company: "Client SCI", legacy_id: 2)
     peer = Contact.new(company: "Peer Agency", legacy_id: 2, category: "peer")

@@ -66,7 +66,7 @@ module Admin
     # propriétaire, locataire); the plain contact category uses the generic
     # wording.
     def flash_notice(action)
-      key = @contact.category == "contact" ? action : "#{@contact.category}_#{action}"
+      key = @contact.contact? ? action : "#{@contact.category}_#{action}"
       t("admin.contacts.flash.#{key}")
     end
 
