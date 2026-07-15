@@ -29,7 +29,6 @@ module RecipientLoading
       {
         audience: audience,
         query: query,
-        query_param: "#{audience}_q",
         recipients: Contact.where(category: categories).with_email
                            .search(query).order(:last_name, :first_name).load
       }

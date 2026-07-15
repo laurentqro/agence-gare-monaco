@@ -1,0 +1,25 @@
+<%# The full stacked recipient picker: one _recipient_list section per
+    audience, wrapped in the recipient-selection Stimulus controller so a
+    recipient checked in any section survives the Turbo re-render its search
+    triggers, and the live "selected" chip panels stay in sync. A single send
+    can mix audiences, so there is no audience toggle. Locals: sections
+    (@recipient_sections), frame_prefix ("compose" / "share" — prefixes each
+    section's turbo frame id), selected_ids, url (where the per-section
+    search forms submit) and form_id (the page's outer form the checkboxes
+    attach to). Each section's search param is derived as "<audience>_q". %>
+<div data-controller="recipient-selection"
+     data-recipient-selection-remove-label="<%= t("admin.recipient_picker.selected.remove") %>">
+  <% sections.each do |section| %>
+    <%= render "admin/shared/recipient_list",
+          audience: section[:audience],
+          frame: "#{frame_prefix}_#{section[:audience]}",
+          heading: t("admin.recipient_picker.sections.#{section[:audience]}"),
+          selected_label: t("admin.recipient_picker.selected.#{section[:audience]}"),
+          query: section[:query],
+          query_param: "#{section[:audience]}_q",
+          recipients: section[:recipients],
+          selected_ids: selected_ids,
+          url: url,
+          form_id: form_id %>
+  <% end %>
+</div>

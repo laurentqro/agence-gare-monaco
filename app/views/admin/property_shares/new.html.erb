@@ -21,27 +21,12 @@
     </p>
   <% end %>
 
-  <%# The recipient-selection controller wraps ALL the lists so a recipient
-      checked in any of them survives the Turbo re-render that its search
-      triggers, and so the live "selected" chip panels stay in sync as rows are
-      checked/unchecked. A single share can mix audiences, so there is no
-      audience toggle. %>
-  <div data-controller="recipient-selection"
-       data-recipient-selection-remove-label="<%= t("admin.recipient_picker.selected.remove") %>">
-    <% @recipient_sections.each do |section| %>
-      <%= render "admin/shared/recipient_list",
-            audience: section[:audience],
-            frame: "share_#{section[:audience]}",
-            heading: t("admin.recipient_picker.sections.#{section[:audience]}"),
-            selected_label: t("admin.recipient_picker.selected.#{section[:audience]}"),
-            query: section[:query],
-            query_param: section[:query_param],
-            recipients: section[:recipients],
-            selected_ids: @selected_contact_ids,
-            url: new_admin_property_share_path(@property),
-            form_id: "share_form" %>
-    <% end %>
-  </div>
+  <%= render "admin/shared/recipient_sections",
+        sections: @recipient_sections,
+        frame_prefix: "share",
+        selected_ids: @selected_contact_ids,
+        url: new_admin_property_share_path(@property),
+        form_id: "share_form" %>
 
   <%# share-preview spans everything from the fields card down to the preview
       card (subject, note, PDF options, buttons, iframe); it only needs the
