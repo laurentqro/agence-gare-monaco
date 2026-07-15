@@ -24,15 +24,29 @@ module RecipientLoading
   # fresh GET), so the admin's selection survives the round-trip.
   def load_recipients
     @selected_contact_ids = submitted_contact_ids.map(&:to_s).to_set
+    frame_audience = requested_frame_audience
     @recipient_sections = AUDIENCES.map do |audience, categories|
       query = params["#{audience}_q"]
-      {
-        audience: audience,
-        query: query,
-        recipients: Contact.where(category: categories).with_email
-                           .search(query).order(:last_name, :first_name).load
-      }
+      recipients =
+        if frame_audience.nil? || frame_audience == audience
+          Contact.where(category: categories).with_email
+                 .search(query).order(:last_name, :first_name).load
+        else
+          Contact.none
+        end
+      { audience: audience, query: query, recipients: recipients }
     end
+  end
+
+  # A per-section search re-renders only its own turbo frame and the client
+  # discards the rest of the page, so the other sections' lists are not
+  # loaded for it. Full-page requests (fresh GET, validation re-render) have
+  # no Turbo-Frame header and load everything; so does an unrecognized frame.
+  def requested_frame_audience
+    frame = request.headers["Turbo-Frame"].to_s
+    return nil if frame.blank?
+
+    AUDIENCES.keys.find { |audience| frame.end_with?("_#{audience}") }
   end
 
   # Resolves submitted contact_ids to Contact records. A send may target a

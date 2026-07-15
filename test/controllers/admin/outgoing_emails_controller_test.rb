@@ -75,6 +75,17 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#compose_contacts input[type='checkbox'][value='#{tenant.id}']", 0
   end
 
+  test "GET new for one section's turbo frame only loads that section's list" do
+    owner = Contact.create!(last_name: "Bailleur", email: "owner@example.com", category: "owner")
+    get new_admin_outgoing_email_url(owners_q: ""), headers: { "Turbo-Frame" => "compose_owners" }
+    assert_response :success
+    assert_select "turbo-frame#compose_owners input[type='checkbox'][value='#{owner.id}']", 1
+    # Turbo discards everything but the requested frame, so the other
+    # sections' lists must not be loaded server-side.
+    assert_select "turbo-frame#compose_contacts input[type='checkbox'][name='contact_ids[]']", 0
+    assert_select "turbo-frame#compose_peers input[type='checkbox'][name='contact_ids[]']", 0
+  end
+
   test "GET new owners search narrows only the owners list" do
     owner1 = Contact.create!(last_name: "Bailleur", email: "owner1@example.com", category: "owner")
     owner2 = Contact.create!(last_name: "Rentier", email: "owner2@example.com", category: "owner")
