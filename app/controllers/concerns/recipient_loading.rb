@@ -1,23 +1,39 @@
 # Recipient handling shared by the compose-email and property-share pages,
-# which both render the stacked peers/contacts picker
+# which both render the stacked audience picker
 # (admin/shared/_recipient_list) and resolve its submitted checkboxes.
 module RecipientLoading
   extend ActiveSupport::Concern
 
+  # Picker section => contact categories it lists, in display order. Owners
+  # and tenants get their own sections; "contacts" holds the rest of our own
+  # contacts (unclassified + prospects).
+  AUDIENCES = {
+    "peers" => %w[peer],
+    "owners" => %w[owner],
+    "tenants" => %w[tenant],
+    "contacts" => %w[contact prospect]
+  }.freeze
+
   private
 
-  # Loads both recipient lists, each name-ordered and each narrowed by its own
-  # search term. Both are shown at once (stacked), so a page can build one email
-  # to a mix of peers and contacts. Only email-bearing contacts appear.
-  # @selected_contact_ids re-checks the submitted boxes when a validation
-  # failure re-renders the page (empty on a fresh GET), so the admin's
-  # selection survives the round-trip.
+  # Loads one recipient list per audience section, each name-ordered and each
+  # narrowed by its own search term (peers_q, owners_q, …). All are shown at
+  # once (stacked), so a page can build one email to a mixed audience. Only
+  # email-bearing contacts appear. @selected_contact_ids re-checks the
+  # submitted boxes when a validation failure re-renders the page (empty on a
+  # fresh GET), so the admin's selection survives the round-trip.
   def load_recipients
-    @peers_query = params[:peers_q]
-    @contacts_query = params[:contacts_q]
     @selected_contact_ids = submitted_contact_ids.map(&:to_s).to_set
-    @peers = Contact.peers.with_email.search(@peers_query).order(:last_name, :first_name)
-    @contacts = Contact.contacts_only.with_email.search(@contacts_query).order(:last_name, :first_name)
+    @recipient_sections = AUDIENCES.map do |audience, categories|
+      query = params["#{audience}_q"]
+      {
+        audience: audience,
+        query: query,
+        query_param: "#{audience}_q",
+        recipients: Contact.where(category: categories).with_email
+                           .search(query).order(:last_name, :first_name).load
+      }
+    end
   end
 
   # Resolves submitted contact_ids to Contact records. A send may target a

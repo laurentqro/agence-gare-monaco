@@ -39,6 +39,8 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     get new_admin_outgoing_email_url
     assert_response :success
     assert_select "turbo-frame#compose_peers"
+    assert_select "turbo-frame#compose_owners"
+    assert_select "turbo-frame#compose_tenants"
     assert_select "turbo-frame#compose_contacts"
   end
 
@@ -46,15 +48,43 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     get new_admin_outgoing_email_url
     assert_response :success
     # Each list has its own live "selected" panel (the JS fills it in).
-    assert_select "[data-recipient-selection-target='peersSelected']"
-    assert_select "[data-recipient-selection-target='contactsSelected']"
+    %w[peers owners tenants contacts].each do |audience|
+      assert_select "[data-recipient-selection-target='selected'][data-audience='#{audience}']"
+    end
   end
 
   test "GET new renders a search field for each audience list" do
     get new_admin_outgoing_email_url
     assert_response :success
     assert_select "input[type='search'][name='peers_q']"
+    assert_select "input[type='search'][name='owners_q']"
+    assert_select "input[type='search'][name='tenants_q']"
     assert_select "input[type='search'][name='contacts_q']"
+  end
+
+  test "GET new lists owners and tenants in their own sections, prospects with contacts" do
+    owner = Contact.create!(last_name: "Bailleur", email: "owner@example.com", category: "owner")
+    tenant = Contact.create!(last_name: "Preneur", email: "tenant@example.com", category: "tenant")
+    prospect = Contact.create!(last_name: "Curieux", email: "prospect@example.com", category: "prospect")
+    get new_admin_outgoing_email_url
+    assert_response :success
+    assert_select "turbo-frame#compose_owners input[type='checkbox'][value='#{owner.id}']", 1
+    assert_select "turbo-frame#compose_tenants input[type='checkbox'][value='#{tenant.id}']", 1
+    assert_select "turbo-frame#compose_contacts input[type='checkbox'][value='#{prospect.id}']", 1
+    assert_select "turbo-frame#compose_contacts input[type='checkbox'][value='#{owner.id}']", 0
+    assert_select "turbo-frame#compose_contacts input[type='checkbox'][value='#{tenant.id}']", 0
+  end
+
+  test "GET new owners search narrows only the owners list" do
+    owner1 = Contact.create!(last_name: "Bailleur", email: "owner1@example.com", category: "owner")
+    owner2 = Contact.create!(last_name: "Rentier", email: "owner2@example.com", category: "owner")
+    get new_admin_outgoing_email_url(owners_q: "Rentier")
+    assert_response :success
+    assert_select "input[type='checkbox'][value='#{owner2.id}']", 1
+    assert_select "input[type='checkbox'][value='#{owner1.id}']", 0
+    # The other lists are unaffected by the owners search term.
+    assert_select "input[type='checkbox'][value='#{@peer1.id}']", 1
+    assert_select "input[type='checkbox'][value='#{@contact1.id}']", 1
   end
 
   test "GET new pre-fills the body with Adrien's signature" do
@@ -120,13 +150,16 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type='checkbox'][value='#{@peer1.id}'][data-recipient-name=?]", @peer1.listing_name
   end
 
-  test "GET new wires the recipient-selection controller around both frames" do
+  test "GET new wires the recipient-selection controller around all frames" do
+    Contact.create!(last_name: "Bailleur", email: "owner@example.com", category: "owner")
+    Contact.create!(last_name: "Preneur", email: "tenant@example.com", category: "tenant")
     get new_admin_outgoing_email_url
     assert_response :success
-    assert_select "[data-controller='recipient-selection'] turbo-frame#compose_peers"
-    assert_select "[data-controller='recipient-selection'] turbo-frame#compose_contacts"
-    # A select-all header checkbox per list.
-    assert_select "input[type='checkbox'][data-recipient-selection-target='all']", 2
+    %w[peers owners tenants contacts].each do |audience|
+      assert_select "[data-controller='recipient-selection'] turbo-frame#compose_#{audience}"
+    end
+    # A select-all header checkbox per non-empty list.
+    assert_select "input[type='checkbox'][data-recipient-selection-target='all']", 4
     # Row checkboxes are the controller's persisted targets.
     assert_select "input[type='checkbox'][data-recipient-selection-target='item']"
   end

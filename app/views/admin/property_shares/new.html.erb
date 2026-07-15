@@ -13,45 +13,34 @@
   <%= render "admin/shared/form_errors", model: @property_share %>
 
   <%# Zero shareable contacts at all (not just an empty search): point the
-      admin straight at contact creation instead of two bare empty lists. %>
-  <% if @peers.empty? && @contacts.empty? && @peers_query.blank? && @contacts_query.blank? %>
+      admin straight at contact creation instead of bare empty lists. %>
+  <% if @recipient_sections.all? { |s| s[:recipients].empty? && s[:query].blank? } %>
     <p class="text-gray-500 text-sm mb-6">
       <%= t("admin.property_shares.no_contacts") %>
       <%= link_to t("admin.property_shares.add_contact"), new_admin_contact_path, class: "text-accent hover:underline" %>
     </p>
   <% end %>
 
-  <%# The recipient-selection controller wraps BOTH lists so a recipient checked
-      in either survives the Turbo re-render that its search triggers, and so the
-      live "selected" chip panels stay in sync as rows are checked/unchecked. A
-      single share can mix peers and contacts, so there is no audience toggle. %>
+  <%# The recipient-selection controller wraps ALL the lists so a recipient
+      checked in any of them survives the Turbo re-render that its search
+      triggers, and so the live "selected" chip panels stay in sync as rows are
+      checked/unchecked. A single share can mix audiences, so there is no
+      audience toggle. %>
   <div data-controller="recipient-selection"
        data-recipient-selection-remove-label="<%= t("admin.recipient_picker.selected.remove") %>">
-    <%= render "admin/shared/recipient_list",
-          audience: "peers",
-          frame: "share_peers",
-          heading: t("admin.recipient_picker.sections.peers"),
-          selected_target: "peersSelected",
-          selected_label: t("admin.recipient_picker.selected.peers"),
-          query: @peers_query,
-          query_param: "peers_q",
-          recipients: @peers,
-          selected_ids: @selected_contact_ids,
-          url: new_admin_property_share_path(@property),
-          form_id: "share_form" %>
-
-    <%= render "admin/shared/recipient_list",
-          audience: "contacts",
-          frame: "share_contacts",
-          heading: t("admin.recipient_picker.sections.contacts"),
-          selected_target: "contactsSelected",
-          selected_label: t("admin.recipient_picker.selected.contacts"),
-          query: @contacts_query,
-          query_param: "contacts_q",
-          recipients: @contacts,
-          selected_ids: @selected_contact_ids,
-          url: new_admin_property_share_path(@property),
-          form_id: "share_form" %>
+    <% @recipient_sections.each do |section| %>
+      <%= render "admin/shared/recipient_list",
+            audience: section[:audience],
+            frame: "share_#{section[:audience]}",
+            heading: t("admin.recipient_picker.sections.#{section[:audience]}"),
+            selected_label: t("admin.recipient_picker.selected.#{section[:audience]}"),
+            query: section[:query],
+            query_param: section[:query_param],
+            recipients: section[:recipients],
+            selected_ids: @selected_contact_ids,
+            url: new_admin_property_share_path(@property),
+            form_id: "share_form" %>
+    <% end %>
   </div>
 
   <%# share-preview spans everything from the fields card down to the preview

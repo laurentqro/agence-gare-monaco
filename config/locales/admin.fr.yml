@@ -331,9 +331,13 @@ fr:
     recipient_picker:
       sections:
         peers: "Sélectionner des confrères"
+        owners: "Sélectionner des propriétaires"
+        tenants: "Sélectionner des locataires"
         contacts: "Sélectionner des contacts"
       selected:
         peers: "Confrères sélectionnés :"
+        owners: "Propriétaires sélectionnés :"
+        tenants: "Locataires sélectionnés :"
         contacts: "Contacts sélectionnés :"
         none: "Aucun destinataire sélectionné."
         remove: "Retirer"

@@ -51,6 +51,8 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     get new_admin_property_share_url(@property)
     assert_response :success
     assert_select "turbo-frame#share_peers"
+    assert_select "turbo-frame#share_owners"
+    assert_select "turbo-frame#share_tenants"
     assert_select "turbo-frame#share_contacts"
   end
 
@@ -58,18 +60,35 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
     get new_admin_property_share_url(@property)
     assert_response :success
     assert_select "input[type='search'][name='peers_q']"
+    assert_select "input[type='search'][name='owners_q']"
+    assert_select "input[type='search'][name='tenants_q']"
     assert_select "input[type='search'][name='contacts_q']"
   end
 
-  test "GET new wires the recipient-selection controller around both frames" do
+  test "GET new wires the recipient-selection controller around all frames" do
+    Contact.create!(last_name: "Bailleur", email: "owner@example.com", category: "owner")
+    Contact.create!(last_name: "Preneur", email: "tenant@example.com", category: "tenant")
     get new_admin_property_share_url(@property)
     assert_response :success
-    assert_select "[data-controller='recipient-selection'] turbo-frame#share_peers"
-    assert_select "[data-controller='recipient-selection'] turbo-frame#share_contacts"
-    # A select-all header checkbox per list, plus a live "selected" panel each.
-    assert_select "input[type='checkbox'][data-recipient-selection-target='all']", 2
-    assert_select "[data-recipient-selection-target='peersSelected']"
-    assert_select "[data-recipient-selection-target='contactsSelected']"
+    %w[peers owners tenants contacts].each do |audience|
+      assert_select "[data-controller='recipient-selection'] turbo-frame#share_#{audience}"
+      assert_select "[data-recipient-selection-target='selected'][data-audience='#{audience}']"
+    end
+    # A select-all header checkbox per non-empty list.
+    assert_select "input[type='checkbox'][data-recipient-selection-target='all']", 4
+  end
+
+  test "GET new lists owners and tenants in their own sections, prospects with contacts" do
+    owner = Contact.create!(last_name: "Bailleur", email: "owner@example.com", category: "owner")
+    tenant = Contact.create!(last_name: "Preneur", email: "tenant@example.com", category: "tenant")
+    prospect = Contact.create!(last_name: "Curieux", email: "prospect@example.com", category: "prospect")
+    get new_admin_property_share_url(@property)
+    assert_response :success
+    assert_select "turbo-frame#share_owners input[type='checkbox'][value='#{owner.id}']", 1
+    assert_select "turbo-frame#share_tenants input[type='checkbox'][value='#{tenant.id}']", 1
+    assert_select "turbo-frame#share_contacts input[type='checkbox'][value='#{prospect.id}']", 1
+    assert_select "turbo-frame#share_contacts input[type='checkbox'][value='#{owner.id}']", 0
+    assert_select "turbo-frame#share_contacts input[type='checkbox'][value='#{tenant.id}']", 0
   end
 
   test "GET new only lists contacts that have an email" do

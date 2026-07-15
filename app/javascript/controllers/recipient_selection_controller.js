@@ -1,9 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Drives the compose recipient picker, which stacks two lists — peers and
-// contacts — so a single email can target a mixed audience. The controller lives
-// OUTSIDE both Turbo Frames so it survives the frame swap a per-list search
-// triggers, and it keeps three things consistent across those swaps:
+// Drives the compose recipient picker, which stacks one list per audience
+// (peers, owners, tenants, contacts) so a single email can target a mixed
+// audience. The controller lives OUTSIDE the Turbo Frames so it survives the
+// frame swap a per-list search triggers, and it keeps three things consistent
+// across those swaps:
 //
 //   1. Selection persistence. Checked recipients are recorded in a Map keyed by
 //      contact id (value = {name, audience}) and re-applied after every frame
@@ -17,15 +18,17 @@ import { Controller } from "@hotwired/stimulus"
 //   3. Select-all, per list. Each list's header checkbox toggles that list's
 //      currently-listed rows and reflects an all/none/indeterminate state.
 //
-// Markup (abbreviated):
+// Everything is keyed by data-audience, so audiences are defined by the markup
+// alone (RecipientLoading::AUDIENCES server-side), not by this controller.
+//
+// Markup (abbreviated, one pair per audience):
 //   <div data-controller="recipient-selection">
 //     <turbo-frame id="compose_peers"> ...rows (checkbox[data-audience=peers])... </turbo-frame>
-//     <div data-recipient-selection-target="peersSelected" data-audience="peers"></div>
-//     <turbo-frame id="compose_contacts"> ...rows (checkbox[data-audience=contacts])... </turbo-frame>
-//     <div data-recipient-selection-target="contactsSelected" data-audience="contacts"></div>
+//     <div data-recipient-selection-target="selected" data-audience="peers"></div>
+//     ...
 //   </div>
 export default class extends Controller {
-  static targets = ["all", "item", "peersSelected", "contactsSelected"]
+  static targets = ["all", "item", "selected"]
 
   connect() {
     // id -> { name, audience }. Preserved across frame renders.
@@ -114,15 +117,13 @@ export default class extends Controller {
     }
   }
 
-  // Rebuild both chip panels from the Map, one chip per selected recipient in
-  // the matching audience. A chip carries the id so its ✕ can deselect it.
+  // Rebuild every chip panel from the Map, one chip per selected recipient in
+  // the panel's audience. A chip carries the id so its ✕ can deselect it.
   renderChips() {
-    this.renderPanel("peers", this.hasPeersSelectedTarget ? this.peersSelectedTarget : null)
-    this.renderPanel("contacts", this.hasContactsSelectedTarget ? this.contactsSelectedTarget : null)
+    this.selectedTargets.forEach((panel) => this.renderPanel(panel.dataset.audience, panel))
   }
 
   renderPanel(audience, panel) {
-    if (!panel) return
     panel.replaceChildren()
     this.selected.forEach((meta, id) => {
       if (meta.audience !== audience) return
