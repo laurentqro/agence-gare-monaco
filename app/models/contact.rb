@@ -11,6 +11,7 @@ class Contact < ApplicationRecord
 
   validate :must_have_identifying_field
   validates :category, inclusion: { in: CATEGORIES }
+  validate :legacy_id_unique_within_partition
 
   # category "peer" = confrères (agents at other agencies we share listings
   # with); every other category = our own contacts/leads.
@@ -45,5 +46,19 @@ class Contact < ApplicationRecord
     return if IDENTIFYING_FIELDS.any? { |f| self[f].present? }
 
     errors.add(:base, "must have a name, company, email, or phone")
+  end
+
+  # Mirrors the partial unique indexes on legacy_id: confrères and everyone
+  # else draw from two separate legacy ID spaces, and those spaces overlap.
+  # Validating here turns a colliding save (typically a recategorization
+  # across the peer boundary) into a form error instead of a database-level
+  # RecordNotUnique.
+  def legacy_id_unique_within_partition
+    return if legacy_id.blank?
+
+    partition = category == "peer" ? Contact.peers : Contact.contacts_only
+    return unless partition.where(legacy_id: legacy_id).where.not(id: id).exists?
+
+    errors.add(:legacy_id, "is already used by another contact in the same peer / non-peer group")
   end
 end

@@ -72,9 +72,32 @@ class ContactTest < ActiveSupport::TestCase
     # Owners, tenants, and prospects share the ordinary-contacts legacy ID
     # space; only confrères have their own.
     Contact.create!(company: "Client SCI", legacy_id: 2)
-    assert_raises ActiveRecord::RecordNotUnique do
-      Contact.create!(company: "Owner SCI", legacy_id: 2, category: "owner")
-    end
+    owner = Contact.new(company: "Owner SCI", legacy_id: 2, category: "owner")
+    assert_not owner.valid?
+    assert owner.errors[:legacy_id].any?
+  end
+
+  test "recategorizing across the peer boundary is invalid when legacy_ids collide" do
+    # Legacy contact and peer imports use overlapping ID sequences, so this
+    # must surface as a validation error, not a database-level 500.
+    Contact.create!(company: "Client SCI", legacy_id: 5)
+    peer = Contact.create!(company: "Peer Agency", legacy_id: 5, category: "peer")
+
+    peer.category = "owner"
+    assert_not peer.valid?
+    assert peer.errors[:legacy_id].any?
+  end
+
+  test "recategorizing within the non-peer partition keeps its legacy_id valid" do
+    contact = Contact.create!(company: "Client SCI", legacy_id: 6)
+    contact.category = "owner"
+    assert contact.valid?, contact.errors.full_messages.to_sentence
+  end
+
+  test "contacts without a legacy_id never collide" do
+    Contact.create!(last_name: "Dupont")
+    manual = Contact.new(last_name: "Martin")
+    assert manual.valid?
   end
 
   test "search matches first name, last name, company, or email (case-insensitive)" do
