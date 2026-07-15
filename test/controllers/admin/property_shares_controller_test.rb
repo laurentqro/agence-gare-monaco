@@ -19,7 +19,7 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
 
     @contact1 = Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@example.com")
     @contact2 = Contact.create!(first_name: "Pierre", last_name: "Martin", email: "pierre@example.com")
-    @peer = Contact.create!(last_name: "Confrère", company: "Agency", email: "peer@agency.mc", peer: true)
+    @peer = Contact.create!(last_name: "Confrère", company: "Agency", email: "peer@agency.mc", category: "peer")
   end
 
   # Authentication
@@ -96,7 +96,7 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET new peers search narrows only the peers list" do
-    other_peer = Contact.create!(last_name: "Aubert", email: "aubert@agency.mc", peer: true)
+    other_peer = Contact.create!(last_name: "Aubert", email: "aubert@agency.mc", category: "peer")
     get new_admin_property_share_url(@property, peers_q: "Aubert")
     assert_response :success
     assert_select "input[type='checkbox'][name='contact_ids[]'][value='#{other_peer.id}']", 1

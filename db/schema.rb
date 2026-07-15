@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_12_213503) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_15_090000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -83,6 +83,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_12_213503) do
 
   create_table "contacts", force: :cascade do |t|
     t.string "address"
+    t.string "category", default: "contact", null: false
     t.string "city"
     t.string "company"
     t.string "country"
@@ -92,12 +93,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_12_213503) do
     t.string "last_name"
     t.integer "legacy_id"
     t.text "notes"
-    t.boolean "peer", default: false, null: false
     t.string "phone"
     t.string "postcode"
     t.datetime "updated_at", null: false
-    t.index ["peer", "legacy_id"], name: "index_contacts_on_peer_and_legacy_id", unique: true
-    t.index ["peer"], name: "index_contacts_on_peer"
+    t.index ["category"], name: "index_contacts_on_category"
+    t.index ["legacy_id"], name: "index_contacts_on_legacy_id_for_non_peers", unique: true, where: "category != 'peer'"
+    t.index ["legacy_id"], name: "index_contacts_on_legacy_id_for_peers", unique: true, where: "category = 'peer'"
   end
 
   create_table "districts", force: :cascade do |t|

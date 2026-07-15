@@ -5,11 +5,11 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
     @user = User.create!(email_address: "adrien@agencegaremonaco.com", password: "securepassword123")
     post session_url, params: { email_address: "adrien@agencegaremonaco.com", password: "securepassword123" }
 
-    @peer1 = Contact.create!(last_name: "Confrère", first_name: "Paul", company: "Agence A", email: "paul@agency.mc", peer: true)
-    @peer2 = Contact.create!(last_name: "Aubert", first_name: "Marie", company: "Agence B", email: "marie@agency.mc", peer: true)
-    @contact1 = Contact.create!(last_name: "Dupont", first_name: "Jean", email: "jean@example.com", peer: false)
-    @contact2 = Contact.create!(last_name: "Martin", first_name: "Luc", email: "luc@example.com", peer: false)
-    @no_email = Contact.create!(last_name: "Sans", first_name: "Email", phone: "0600000000", peer: true)
+    @peer1 = Contact.create!(last_name: "Confrère", first_name: "Paul", company: "Agence A", email: "paul@agency.mc", category: "peer")
+    @peer2 = Contact.create!(last_name: "Aubert", first_name: "Marie", company: "Agence B", email: "marie@agency.mc", category: "peer")
+    @contact1 = Contact.create!(last_name: "Dupont", first_name: "Jean", email: "jean@example.com")
+    @contact2 = Contact.create!(last_name: "Martin", first_name: "Luc", email: "luc@example.com")
+    @no_email = Contact.create!(last_name: "Sans", first_name: "Email", phone: "0600000000", category: "peer")
   end
 
   test "redirects unauthenticated users to login" do
@@ -132,14 +132,14 @@ class Admin::OutgoingEmailsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET new excludes contacts whose email is an empty string" do
-    blank_email = Contact.create!(last_name: "Vide", first_name: "Email", email: "", peer: true)
+    blank_email = Contact.create!(last_name: "Vide", first_name: "Email", email: "", category: "peer")
     get new_admin_outgoing_email_url
     assert_response :success
     assert_select "input[type='checkbox'][value='#{blank_email.id}']", 0
   end
 
   test "POST create drops contacts whose email is an empty string" do
-    blank_email = Contact.create!(last_name: "Vide", first_name: "Email", email: "", peer: true)
+    blank_email = Contact.create!(last_name: "Vide", first_name: "Email", email: "", category: "peer")
     assert_enqueued_jobs 1, only: SendOutgoingEmailJob do
       post admin_outgoing_emails_url, params: {
         contact_ids: [ @peer1.id, blank_email.id ],

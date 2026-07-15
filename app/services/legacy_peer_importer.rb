@@ -1,9 +1,9 @@
 require "csv"
 
 # Imports peer agents ("confrères") from the legacy site's partner CSV export
-# into the `contacts` table, flagged with `peer: true`. A peer is a fellow
+# into the `contacts` table, categorized as "peer". A peer is a fellow
 # agent at another agency we cooperate with on listings. Idempotent: rows are
-# matched on `(peer: true, legacy_id)`, so peers keep a legacy ID space
+# matched on `(category: "peer", legacy_id)`, so peers keep a legacy ID space
 # separate from ordinary contacts and re-running updates in place.
 #
 # Legacy columns: id, person, name, email, telephone, link_agency, link_agent.
@@ -31,7 +31,7 @@ class LegacyPeerImporter
         next
       end
 
-      contact = Contact.find_or_initialize_by(peer: true, legacy_id: row["id"].to_i)
+      contact = Contact.find_or_initialize_by(category: "peer", legacy_id: row["id"].to_i)
       was_new = contact.new_record?
       contact.assign_attributes(attrs)
       contact.save!

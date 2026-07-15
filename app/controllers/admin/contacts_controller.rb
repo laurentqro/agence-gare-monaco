@@ -52,10 +52,11 @@ module Admin
 
     private
 
-    # Picks the confrère-specific flash message when the record is a peer,
-    # falling back to the generic contact wording otherwise.
+    # Names the contact's category in the flash message (confrère, prospect,
+    # propriétaire, locataire); the plain contact category uses the generic
+    # wording.
     def flash_notice(action)
-      key = @contact.peer? ? "peer_#{action}" : action
+      key = @contact.category == "contact" ? action : "#{@contact.category}_#{action}"
       t("admin.contacts.flash.#{key}")
     end
 
@@ -74,7 +75,7 @@ module Admin
     def contact_params
       params.require(:contact).permit(
         :first_name, :last_name, :email, :phone,
-        :company, :address, :city, :postcode, :country, :notes, :peer
+        :company, :address, :city, :postcode, :country, :notes, :category
       )
     end
   end

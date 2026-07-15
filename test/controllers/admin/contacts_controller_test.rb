@@ -79,16 +79,16 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
 
   # FILTER + SEARCH
   test "GET index defaults to showing all contacts and peers" do
-    Contact.create!(last_name: "Ordinary", peer: false)
-    Contact.create!(last_name: "Confrère", company: "Agency", peer: true)
+    Contact.create!(last_name: "Ordinary")
+    Contact.create!(last_name: "Confrère", company: "Agency", category: "peer")
     get admin_contacts_url
     assert_response :success
     assert_select "table tbody tr", 2
   end
 
   test "GET index filters to peers only" do
-    Contact.create!(last_name: "Ordinary", peer: false)
-    Contact.create!(last_name: "Confrère", company: "Agency", peer: true)
+    Contact.create!(last_name: "Ordinary")
+    Contact.create!(last_name: "Confrère", company: "Agency", category: "peer")
     get admin_contacts_url(filter: "peers")
     assert_response :success
     assert_select "table tbody tr", 1
@@ -96,8 +96,8 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET index filters to ordinary contacts only" do
-    Contact.create!(last_name: "Ordinary", peer: false)
-    Contact.create!(last_name: "Confrère", company: "Agency", peer: true)
+    Contact.create!(last_name: "Ordinary")
+    Contact.create!(last_name: "Confrère", company: "Agency", category: "peer")
     get admin_contacts_url(filter: "contacts")
     assert_response :success
     assert_select "table tbody tr", 1
@@ -114,16 +114,16 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET index combines filter and search" do
-    Contact.create!(last_name: "Berg", company: "Acme", peer: true)
-    Contact.create!(last_name: "Berg", company: "Acme", peer: false)
+    Contact.create!(last_name: "Berg", company: "Acme", category: "peer")
+    Contact.create!(last_name: "Berg", company: "Acme")
     get admin_contacts_url(filter: "peers", q: "berg")
     assert_response :success
     assert_select "table tbody tr", 1
   end
 
   test "GET index renders filter tabs with counts" do
-    Contact.create!(last_name: "Ordinary", peer: false)
-    Contact.create!(last_name: "Confrère", company: "Agency", peer: true)
+    Contact.create!(last_name: "Ordinary")
+    Contact.create!(last_name: "Confrère", company: "Agency", category: "peer")
     get admin_contacts_url
     assert_response :success
     assert_select "a[href*='filter=peers']"
@@ -160,10 +160,21 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET index shows a peer badge on confrère rows" do
-    Contact.create!(last_name: "Confrère", company: "Agency", peer: true)
+    Contact.create!(last_name: "Smith", company: "Agency", category: "peer")
     get admin_contacts_url
     assert_response :success
     assert_select "table tbody tr td", text: /Confrère/
+  end
+
+  test "GET index shows a category badge per row" do
+    Contact.create!(last_name: "Bailleur", category: "owner")
+    Contact.create!(last_name: "Preneur", category: "tenant")
+    Contact.create!(last_name: "Curieux", category: "prospect")
+    get admin_contacts_url
+    assert_response :success
+    assert_select "table tbody tr td", text: /Propriétaire/
+    assert_select "table tbody tr td", text: /Locataire/
+    assert_select "table tbody tr td", text: /Prospect/
   end
 
   # NEW
@@ -188,32 +199,43 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_select "textarea[name='contact[notes]']"
   end
 
-  test "GET new renders the peer checkbox" do
+  test "GET new renders a radio button per category" do
     get new_admin_contact_url
     assert_response :success
-    assert_select "input[type=checkbox][name='contact[peer]']"
+    Contact::CATEGORIES.each do |category|
+      assert_select "input[type=radio][name='contact[category]'][value='#{category}']"
+    end
+  end
+
+  test "GET new preselects the plain contact category" do
+    get new_admin_contact_url
+    assert_response :success
+    assert_select "input[type=radio][name='contact[category]'][value='contact'][checked]"
+    assert_select "input[type=radio][name='contact[category]'][checked]", 1
   end
 
   test "POST create can mark a contact as a peer" do
     post admin_contacts_url, params: {
-      contact: { first_name: "Paul", last_name: "Confrère", company: "Other Agency", peer: "1" }
+      contact: { first_name: "Paul", last_name: "Smith", company: "Other Agency", category: "peer" }
     }
-    assert Contact.last.peer, "expected the created contact to be a peer"
+    assert_equal "peer", Contact.last.category
   end
 
-  test "GET edit shows the peer checkbox checked for a peer" do
-    peer = Contact.create!(last_name: "Confrère", company: "Other Agency", peer: true)
+  test "POST create rejects an unknown category" do
+    assert_no_difference "Contact.count" do
+      post admin_contacts_url, params: {
+        contact: { last_name: "Dupont", category: "banana" }
+      }
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test "GET edit preselects the contact's category" do
+    peer = Contact.create!(last_name: "Smith", company: "Other Agency", category: "peer")
     get edit_admin_contact_url(peer)
     assert_response :success
-    assert_select "input[type=checkbox][name='contact[peer]'][checked]"
-  end
-
-  test "GET edit shows the peer checkbox unchecked for an ordinary contact" do
-    contact = Contact.create!(last_name: "Ordinary", peer: false)
-    get edit_admin_contact_url(contact)
-    assert_response :success
-    assert_select "input[type=checkbox][name='contact[peer]']"
-    assert_select "input[type=checkbox][name='contact[peer]'][checked]", 0
+    assert_select "input[type=radio][name='contact[category]'][value='peer'][checked]"
+    assert_select "input[type=radio][name='contact[category]'][checked]", 1
   end
 
   test "POST create persists the extended fields" do
@@ -283,8 +305,19 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "POST create flash says confrère for a peer" do
-    post admin_contacts_url, params: { contact: { last_name: "Confrère", peer: "1" } }
+    post admin_contacts_url, params: { contact: { last_name: "Smith", category: "peer" } }
     assert_equal "Confrère créé.", flash[:notice]
+  end
+
+  test "POST create flash names the category" do
+    post admin_contacts_url, params: { contact: { last_name: "Bailleur", category: "owner" } }
+    assert_equal "Propriétaire créé.", flash[:notice]
+
+    post admin_contacts_url, params: { contact: { last_name: "Preneur", category: "tenant" } }
+    assert_equal "Locataire créé.", flash[:notice]
+
+    post admin_contacts_url, params: { contact: { last_name: "Curieux", category: "prospect" } }
+    assert_equal "Prospect créé.", flash[:notice]
   end
 
   test "POST create with duplicate email is allowed" do
@@ -329,19 +362,19 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "PATCH update flash says confrère when the contact is a peer" do
-    peer = Contact.create!(last_name: "Confrère", peer: true)
-    patch admin_contact_url(peer), params: { contact: { last_name: "Confrère II" } }
+    peer = Contact.create!(last_name: "Smith", category: "peer")
+    patch admin_contact_url(peer), params: { contact: { last_name: "Smith II" } }
     assert_equal "Confrère mis à jour.", flash[:notice]
   end
 
-  test "PATCH update flash reflects a promotion to peer" do
-    contact = Contact.create!(last_name: "Dupont", peer: false)
-    patch admin_contact_url(contact), params: { contact: { peer: "1" } }
-    assert_equal "Confrère mis à jour.", flash[:notice]
+  test "PATCH update flash reflects a recategorization" do
+    contact = Contact.create!(last_name: "Dupont")
+    patch admin_contact_url(contact), params: { contact: { category: "tenant" } }
+    assert_equal "Locataire mis à jour.", flash[:notice]
   end
 
   test "DELETE flash says confrère for a peer" do
-    peer = Contact.create!(last_name: "Confrère", peer: true)
+    peer = Contact.create!(last_name: "Smith", category: "peer")
     delete admin_contact_url(peer)
     assert_equal "Confrère supprimé.", flash[:notice]
   end

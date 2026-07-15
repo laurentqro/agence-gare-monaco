@@ -43,21 +43,38 @@ class ContactTest < ActiveSupport::TestCase
     assert duplicate.valid?
   end
 
-  test "defaults to a non-peer (ordinary) contact" do
+  test "defaults to the plain contact category" do
     contact = Contact.create!(first_name: "Jean", last_name: "Dupont")
-    assert_not contact.peer
+    assert_equal "contact", contact.category
   end
 
-  test "can be flagged as a peer (confrère)" do
-    contact = Contact.create!(company: "La Costa Properties", email: "a@b.mc", peer: true)
-    assert contact.peer
+  test "accepts each known category" do
+    Contact::CATEGORIES.each do |category|
+      contact = Contact.new(last_name: "Dupont", category: category)
+      assert contact.valid?, "expected category #{category.inspect} to be valid"
+    end
+  end
+
+  test "rejects an unknown category" do
+    contact = Contact.new(last_name: "Dupont", category: "banana")
+    assert_not contact.valid?
+    assert contact.errors[:category].any?
   end
 
   test "legacy_id is unique only within the peer / non-peer split" do
-    Contact.create!(company: "Client SCI", legacy_id: 2, peer: false)
-    peer = Contact.new(company: "Peer Agency", legacy_id: 2, peer: true)
+    Contact.create!(company: "Client SCI", legacy_id: 2)
+    peer = Contact.new(company: "Peer Agency", legacy_id: 2, category: "peer")
     assert peer.valid?, peer.errors.full_messages.to_sentence
     assert peer.save
+  end
+
+  test "legacy_id collides across non-peer categories" do
+    # Owners, tenants, and prospects share the ordinary-contacts legacy ID
+    # space; only confrères have their own.
+    Contact.create!(company: "Client SCI", legacy_id: 2)
+    assert_raises ActiveRecord::RecordNotUnique do
+      Contact.create!(company: "Owner SCI", legacy_id: 2, category: "owner")
+    end
   end
 
   test "search matches first name, last name, company, or email (case-insensitive)" do
@@ -78,12 +95,16 @@ class ContactTest < ActiveSupport::TestCase
     assert_equal 2, Contact.search("  ").count
   end
 
-  test "peers and contacts_only scopes split on the peer flag" do
-    contact = Contact.create!(last_name: "Ordinary", peer: false)
-    peer = Contact.create!(last_name: "Confrère", peer: true)
+  test "peers and contacts_only scopes split on the peer category" do
+    contact = Contact.create!(last_name: "Ordinary")
+    prospect = Contact.create!(last_name: "Curieux", category: "prospect")
+    owner = Contact.create!(last_name: "Bailleur", category: "owner")
+    tenant = Contact.create!(last_name: "Preneur", category: "tenant")
+    peer = Contact.create!(last_name: "Confrère", category: "peer")
 
     assert_equal [ peer ], Contact.peers.to_a
-    assert_equal [ contact ], Contact.contacts_only.to_a
+    assert_equal [ contact, prospect, owner, tenant ].sort_by(&:id),
+                 Contact.contacts_only.order(:id).to_a
   end
 
   test "stores extended legacy fields" do
