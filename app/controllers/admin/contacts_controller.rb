@@ -4,6 +4,16 @@ module Admin
 
     SORT_COLUMNS = %w[last_name first_name company email phone].freeze
 
+    # Index filter param => contact category. "contacts" is the unclassified
+    # default bucket, not all non-peers.
+    FILTERS = {
+      "contacts" => "contact",
+      "prospects" => "prospect",
+      "peers" => "peer",
+      "owners" => "owner",
+      "tenants" => "tenant"
+    }.freeze
+
     before_action :set_contact, only: %i[edit update destroy]
 
     def index
@@ -13,11 +23,11 @@ module Admin
       scope = filtered_scope.search(@query)
       @contacts = sort_scope(scope, columns: SORT_COLUMNS, default: "last_name")
 
-      @counts = {
-        all: Contact.count,
-        contacts: Contact.contacts_only.count,
-        peers: Contact.peers.count
-      }
+      category_counts = Contact.group(:category).count
+      @counts = { all: category_counts.values.sum }
+      FILTERS.each do |filter, category|
+        @counts[filter.to_sym] = category_counts.fetch(category, 0)
+      end
     end
 
     def new
@@ -61,11 +71,8 @@ module Admin
     end
 
     def filtered_scope
-      case params[:filter]
-      when "peers" then Contact.peers
-      when "contacts" then Contact.contacts_only
-      else Contact.all
-      end
+      category = FILTERS[params[:filter]]
+      category ? Contact.where(category: category) : Contact.all
     end
 
     def set_contact

@@ -4,11 +4,10 @@
     <%= link_to t("admin.contacts.new_action"), new_admin_contact_path, class: "bg-navy text-white px-4 py-2 rounded hover:bg-navy/90" %>
   </div>
 
-  <% tabs = [
-       [nil, t("admin.contacts.filters.all"), @counts[:all]],
-       ["contacts", t("admin.contacts.filters.contacts"), @counts[:contacts]],
-       ["peers", t("admin.contacts.filters.peers"), @counts[:peers]]
-     ] %>
+  <% tabs = [ [nil, t("admin.contacts.filters.all"), @counts[:all]] ] +
+       Admin::ContactsController::FILTERS.keys.map { |filter|
+         [filter, t("admin.contacts.filters.#{filter}"), @counts[filter.to_sym]]
+       } %>
 
   <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
     <nav class="inline-flex rounded-lg border border-gray-200 bg-white p-1 text-sm">

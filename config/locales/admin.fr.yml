@@ -109,7 +109,10 @@ fr:
       filters:
         all: "Tous"
         contacts: "Contacts"
+        prospects: "Prospects"
         peers: "Confrères"
+        owners: "Propriétaires"
+        tenants: "Locataires"
       badges:
         contact: "Contact"
         prospect: "Prospect"

@@ -121,13 +121,57 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_select "table tbody tr", 1
   end
 
-  test "GET index renders filter tabs with counts" do
+  test "GET index renders a filter tab per category with counts" do
     Contact.create!(last_name: "Ordinary")
     Contact.create!(last_name: "Confrère", company: "Agency", category: "peer")
+    Contact.create!(last_name: "Bailleur", category: "owner")
     get admin_contacts_url
     assert_response :success
-    assert_select "a[href*='filter=peers']"
     assert_select "a[href*='filter=contacts']"
+    assert_select "a[href*='filter=prospects']"
+    assert_select "a[href*='filter=peers']"
+    assert_select "a[href*='filter=owners']"
+    assert_select "a[href*='filter=tenants']"
+    assert_select "nav a[href*='filter=owners'] span", text: "1"
+    assert_select "nav a[href*='filter=prospects'] span", text: "0"
+  end
+
+  test "GET index filters to owners only" do
+    Contact.create!(last_name: "Bailleur", category: "owner")
+    Contact.create!(last_name: "Preneur", category: "tenant")
+    Contact.create!(last_name: "Ordinary")
+    get admin_contacts_url(filter: "owners")
+    assert_response :success
+    assert_select "table tbody tr", 1
+    assert_select "table tbody td", text: /Bailleur/
+  end
+
+  test "GET index filters to tenants only" do
+    Contact.create!(last_name: "Bailleur", category: "owner")
+    Contact.create!(last_name: "Preneur", category: "tenant")
+    get admin_contacts_url(filter: "tenants")
+    assert_response :success
+    assert_select "table tbody tr", 1
+    assert_select "table tbody td", text: /Preneur/
+  end
+
+  test "GET index filters to prospects only" do
+    Contact.create!(last_name: "Curieux", category: "prospect")
+    Contact.create!(last_name: "Ordinary")
+    get admin_contacts_url(filter: "prospects")
+    assert_response :success
+    assert_select "table tbody tr", 1
+    assert_select "table tbody td", text: /Curieux/
+  end
+
+  test "GET index contacts filter excludes the classified categories" do
+    Contact.create!(last_name: "Ordinary")
+    Contact.create!(last_name: "Bailleur", category: "owner")
+    Contact.create!(last_name: "Confrère", company: "Agency", category: "peer")
+    get admin_contacts_url(filter: "contacts")
+    assert_response :success
+    assert_select "table tbody tr", 1
+    assert_select "table tbody td", text: /Ordinary/
   end
 
   test "GET index tabs drive a full-page navigation, not a frame swap" do
