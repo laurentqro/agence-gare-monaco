@@ -3,24 +3,15 @@
     <h1 class="heading-page"><%= t("admin.information_requests.title") %></h1>
   </div>
 
-  <% tabs = [
-       [nil, t("admin.information_requests.filters.all"), @counts[:all]],
-       ["unread", t("admin.information_requests.filters.unread"), @counts[:unread]],
-       ["enquiry", t("admin.information_requests.filters.enquiry"), @counts[:enquiry]],
-       ["contact", t("admin.information_requests.filters.contact"), @counts[:contact]]
-     ] %>
+  <% tabs = [ nil, "unread", "enquiry", "contact" ].map do |value|
+       { path: admin_information_requests_path({ filter: value }.compact_blank),
+         label: t("admin.information_requests.filters.#{value || "all"}"),
+         count: @counts[(value || "all").to_sym],
+         active: @filter == value }
+     end %>
 
   <div class="flex flex-wrap items-center gap-4 mb-4">
-    <nav class="inline-flex rounded-lg border border-gray-200 bg-white p-1 text-sm">
-      <% tabs.each do |value, label, count| %>
-        <% active = @filter == value %>
-        <%= link_to admin_information_requests_path({ filter: value }.compact_blank),
-              class: "px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 #{active ? "bg-navy text-white" : "text-gray-600 hover:text-navy"}" do %>
-          <%= label %>
-          <span class="text-xs <%= active ? "text-white/80" : "text-gray-400" %>"><%= count %></span>
-        <% end %>
-      <% end %>
-    </nav>
+    <%= render "admin/shared/filter_tabs", tabs: tabs %>
   </div>
 
   <div class="bg-white rounded shadow overflow-hidden">

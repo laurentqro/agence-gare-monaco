@@ -1,0 +1,15 @@
+<%# Pill filter tab bar for admin index pages (contacts, information
+    requests). Locals: tabs — array of { path:, label:, count:, active: }
+    hashes, fully resolved by the caller — and optional link_data (data
+    attributes for each tab link, e.g. { turbo_frame: "_top" } when the tab
+    bar lives outside a turbo frame it must escape). %>
+<nav class="inline-flex rounded-lg border border-gray-200 bg-white p-1 text-sm">
+  <% tabs.each do |tab| %>
+    <%= link_to tab[:path],
+          data: local_assigns.fetch(:link_data, {}),
+          class: "px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 #{tab[:active] ? "bg-navy text-white" : "text-gray-600 hover:text-navy"}" do %>
+      <%= tab[:label] %>
+      <span class="text-xs <%= tab[:active] ? "text-white/80" : "text-gray-400" %>"><%= tab[:count] %></span>
+    <% end %>
+  <% end %>
+</nav>

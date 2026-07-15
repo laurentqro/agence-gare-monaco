@@ -17,7 +17,10 @@ module Admin
     before_action :set_contact, only: %i[edit update destroy]
 
     def index
-      @filter = params[:filter]
+      # Unknown filter values fall back to "all" entirely: the Tous tab stays
+      # highlighted and the search form's hidden field stops carrying the
+      # dead param.
+      @filter = params[:filter].presence_in(FILTERS.keys)
       @query = params[:q]
 
       scope = filtered_scope.search(@query)
@@ -71,7 +74,7 @@ module Admin
     end
 
     def filtered_scope
-      category = FILTERS[params[:filter]]
+      category = FILTERS[@filter]
       category ? Contact.where(category: category) : Contact.all
     end
 

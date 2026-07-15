@@ -197,6 +197,17 @@ class Admin::ContactsControllerTest < ActionDispatch::IntegrationTest
     assert_select "nav a.bg-navy", text: /Tous/
   end
 
+  test "GET index with an unknown filter falls back to Tous and drops the dead param" do
+    Contact.create!(last_name: "Ordinary")
+    get admin_contacts_url(filter: "agents")
+    assert_response :success
+    assert_select "table tbody tr", 1
+    # A stale/typoed filter must not leave the tab bar with no active tab...
+    assert_select "nav a.bg-navy", text: /Tous/
+    # ...nor be perpetuated by the search form's hidden field.
+    assert_select "input[type=hidden][name='filter'][value='agents']", 0
+  end
+
   test "GET index renders a search field" do
     get admin_contacts_url
     assert_response :success
