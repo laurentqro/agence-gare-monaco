@@ -28,6 +28,11 @@ class PropertyPdfDownloadTest < ActionDispatch::IntegrationTest
     assert_match /MC-PDF-DL/, response.headers["Content-Disposition"]
   end
 
+  test "GET pdf sends X-Robots-Tag noindex so brochures stay out of search indexes" do
+    get "/biens/#{@property.id}-studio-carre-dor/pdf"
+    assert_equal "noindex", response.headers["X-Robots-Tag"]
+  end
+
   # English locale
   test "GET pdf returns PDF for English locale" do
     get "/en/properties/#{@property.id}-sea-view-studio/pdf"

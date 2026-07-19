@@ -62,6 +62,8 @@ class PropertiesController < ApplicationController
     include_logo = params[:include_logo] != "0"
 
     pdf_bytes = PropertyBrochureCache.fetch(@property, locale: locale, include_logo: include_logo)
+    # Brochures duplicate the property page's content; keep them out of search indexes.
+    response.set_header("X-Robots-Tag", "noindex")
     send_data pdf_bytes, filename: @property.brochure_filename, type: "application/pdf", disposition: :attachment
   end
 
