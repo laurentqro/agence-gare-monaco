@@ -15,7 +15,7 @@ class ArticlesController < ApplicationController
     @category = Category.find_by_localized_slug(params[:slug], I18n.locale)
     if @category
       @articles = @category.articles.published.order(published_at: :desc)
-      set_seo(page_type: :articles)
+      set_seo(page_type: :articles, category: @category)
       render :index
     else
       @article = Article.published.find_by!(slug: params[:slug])

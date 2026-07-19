@@ -215,6 +215,24 @@ class SeoIntegrationTest < ActionDispatch::IntegrationTest
     assert_select 'link[rel="canonical"][href="https://agencegaremonaco.com/en/articles"]'
   end
 
+  test "category page has its own canonical and localized hreflang alternates" do
+    Category.create!(
+      name: {
+        "fr" => "Guides pratiques", "en" => "Practical Guides",
+        "ru" => "Практические руководства"
+      },
+      slug: "guides-pratiques"
+    )
+
+    get "/en/articles/practical-guides"
+    assert_response :success
+    # Canonical is the category page itself, not the articles index
+    assert_select 'link[rel="canonical"][href="https://agencegaremonaco.com/en/articles/practical-guides"]'
+    # Alternates carry each locale's own slug
+    assert_select 'link[rel="alternate"][hreflang="ru"][href="https://agencegaremonaco.com/ru/stati/prakticheskie-rukovodstva"]'
+    assert_select 'link[rel="alternate"][hreflang="x-default"][href="https://agencegaremonaco.com/articles/guides-pratiques"]'
+  end
+
   # --- Contact & Privacy SEO ---
 
   test "contact page has canonical URL" do

@@ -86,6 +86,27 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
+  test "canonical_url for category page appends the localized category slug" do
+    category = Category.new(name: { "fr" => "Actualités", "en" => "News" }, slug: "actualites")
+    I18n.with_locale(:en) do
+      result = canonical_url(page_type: :articles, category: category)
+      assert_equal "https://agencegaremonaco.com/en/articles/news", result
+    end
+  end
+
+  test "hreflang_tags for category page localize the slug per locale" do
+    category = Category.new(name: { "fr" => "Actualités", "de" => "Aktuelles", "ru" => "Новости" }, slug: "actualites")
+    I18n.with_locale(:en) do
+      tags = hreflang_tags(page_type: :articles, category: category)
+      assert_includes tags, 'href="https://agencegaremonaco.com/de/artikel/aktuelles"'
+      assert_includes tags, 'href="https://agencegaremonaco.com/ru/stati/novosti"'
+      # Locales without a name fall back to the base slug
+      assert_includes tags, 'href="https://agencegaremonaco.com/it/articoli/actualites"'
+      # x-default points to the French category page
+      assert_includes tags, 'hreflang="x-default" href="https://agencegaremonaco.com/articles/actualites"'
+    end
+  end
+
   test "canonical_url for article show" do
     I18n.with_locale(:en) do
       result = canonical_url(page_type: :article, article: @article)
@@ -253,6 +274,15 @@ class SeoHelperTest < ActionView::TestCase
     I18n.with_locale(:en) do
       result = seo_title(page_type: :article, article: @article)
       assert_includes result, "Monaco Market Update"
+      assert_includes result, "Agence Immobilière de la Gare"
+    end
+  end
+
+  test "seo_title for category page uses the category name" do
+    category = Category.new(name: { "fr" => "Actualités", "en" => "News" }, slug: "actualites")
+    I18n.with_locale(:en) do
+      result = seo_title(page_type: :articles, category: category)
+      assert_includes result, "News"
       assert_includes result, "Agence Immobilière de la Gare"
     end
   end

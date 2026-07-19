@@ -102,7 +102,8 @@ module SeoHelper
     when :listings
       "#{seo_listings_title(opts)} | #{t('site_name')}"
     when :articles
-      "#{t('nav.articles')} | #{t('site_name')} Monaco"
+      label = opts[:category] ? opts[:category].name_for(I18n.locale) : t("nav.articles")
+      "#{label} | #{t('site_name')} Monaco"
     when :contact
       "#{t('nav.contact')} | #{t('site_name')}"
     when :privacy
@@ -400,7 +401,10 @@ module SeoHelper
     when :property
       locale_property_path(opts[:property], locale)
     when :articles
-      locale_articles_path(locale)
+      # With a category, this is a category filter page: its canonical and
+      # alternates must carry each locale's own category slug.
+      base = locale_articles_path(locale)
+      opts[:category] ? "#{base}/#{opts[:category].slug_for(locale)}" : base
     when :article
       "#{locale_articles_path(locale)}/#{opts[:article].slug}"
     when :contact
