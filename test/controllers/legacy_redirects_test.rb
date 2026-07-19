@@ -166,6 +166,12 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
     assert_redirected_to "/en/rentals"
   end
 
+  test "EN legacy /en/rental/monaco/2-rooms redirects to /en/rentals" do
+    get "/en/rental/monaco/2-rooms"
+    assert_response :moved_permanently
+    assert_redirected_to "/en/rentals"
+  end
+
   test "EN legacy /en/property/{id} redirects to property detail" do
     get "/en/property/12345"
     assert_response :moved_permanently

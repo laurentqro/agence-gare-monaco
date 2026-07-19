@@ -112,6 +112,7 @@ Rails.application.routes.draw do
   # English legacy routes
   scope "/en", defaults: { locale: "en" } do
     get "rental/monaco", to: redirect("/en/rentals", status: 301)
+    get "rental/monaco/*filters", to: redirect("/en/rentals", status: 301)
     get "property/:legacy_id",                to: "legacy_redirects#property"
     get "property-off-market/:legacy_id",     to: "legacy_redirects#off_market_property"
     get "properties-off-market/:transaction", to: "legacy_redirects#off_market_listing"
