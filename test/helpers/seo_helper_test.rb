@@ -310,6 +310,40 @@ class SeoHelperTest < ActionView::TestCase
 
   # --- Page title ---
 
+  test "seo_title for gestion is descriptive in every locale" do
+    I18n.available_locales.each do |locale|
+      I18n.with_locale(locale) do
+        title = seo_title(page_type: :gestion)
+        assert_not_includes title, "translation missing"
+        assert_not title.start_with?("Gestion |"), "generic title in #{locale}: #{title}"
+        assert_includes title, "Agence Immobilière de la Gare"
+      end
+    end
+  end
+
+  test "seo_title for gestion targets rental management queries in French" do
+    I18n.with_locale(:fr) do
+      assert seo_title(page_type: :gestion).start_with?("Gestion locative à Monaco")
+    end
+  end
+
+  test "seo_title for offmarket is descriptive in every locale" do
+    I18n.available_locales.each do |locale|
+      I18n.with_locale(locale) do
+        title = seo_title(page_type: :offmarket)
+        assert_not_includes title, "translation missing"
+        assert_not title.start_with?("Off-market |"), "generic title in #{locale}: #{title}"
+        assert_includes title, "Agence Immobilière de la Gare"
+      end
+    end
+  end
+
+  test "seo_title for offmarket targets off-market property queries in English" do
+    I18n.with_locale(:en) do
+      assert seo_title(page_type: :offmarket).start_with?("Off-Market Properties in Monaco")
+    end
+  end
+
   test "seo_title for homepage" do
     I18n.with_locale(:en) do
       result = seo_title(page_type: :homepage)

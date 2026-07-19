@@ -110,9 +110,9 @@ module SeoHelper
     when :privacy
       "#{t('nav.privacy')} | #{t('site_name')}"
     when :offmarket
-      "Off-market | #{t('site_name')}"
+      t("seo.offmarket_title")
     when :gestion
-      "#{t('nav.management')} | #{t('site_name')}"
+      t("seo.gestion_title")
     when :vendre
       "#{t('nav.sell')} | #{t('site_name')}"
     when :faq
