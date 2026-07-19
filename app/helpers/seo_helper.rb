@@ -56,7 +56,7 @@ module SeoHelper
     when :property
       Nokogiri::HTML.fragment(opts[:property]&.description_for(I18n.locale).to_s).text
     when :article
-      Nokogiri::HTML.fragment(opts[:article]&.body_for(I18n.locale).to_s).text
+      article_meta_excerpt(opts[:article], I18n.locale)
     when :listings
       seo_listings_description(opts)
     when :articles
@@ -279,7 +279,7 @@ module SeoHelper
       "@context" => "https://schema.org",
       "@type" => "Article",
       "headline" => article.title_for(locale),
-      "description" => truncate(strip_tags(article.body_for(locale)), length: 200, omission: "..."),
+      "description" => article_meta_excerpt(article, locale, length: 200),
       "datePublished" => article.published_at&.iso8601,
       "dateModified" => article.updated_at&.iso8601,
       "author" => {
@@ -391,6 +391,29 @@ module SeoHelper
   end
 
   private
+
+  # Article bodies are markdown: render then extract text so syntax markers
+  # never leak into meta tags. Headings are dropped — a description should
+  # read as prose, not as a table of contents.
+  def article_meta_excerpt(article, locale, length: 160)
+    html = Commonmarker.to_html(article&.body_for(locale).to_s)
+    fragment = Nokogiri::HTML.fragment(html)
+    headingless = fragment.dup
+    headingless.css("h1, h2, h3, h4, h5, h6").remove
+    text = headingless.text.gsub("\u00A0", " ").squish
+    text = fragment.text.gsub("\u00A0", " ").squish if text.blank?
+    truncate_at_sentence(text, length)
+  end
+
+  def truncate_at_sentence(text, length)
+    return text if text.length <= length
+
+    head = text[0, length]
+    boundary = head.rindex(/[.!?](?=\s|\z)/)
+    return head[0..boundary] if boundary
+
+    truncate(text, length: length, separator: " ", omission: "…")
+  end
 
   def locale_path_for(page_type, locale, **opts)
     case page_type

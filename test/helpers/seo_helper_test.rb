@@ -242,6 +242,56 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
+  test "seo_meta_description for article strips markdown syntax" do
+    @article.update!(body: { "en" => "### How does the tax system work?\n\nThe Monegasque tax system is **unique** and *simple*." })
+    I18n.with_locale(:en) do
+      result = seo_meta_description(page_type: :article, article: @article)
+      assert_not_includes result, "###"
+      assert_not_includes result, "**"
+      assert_includes result, "The Monegasque tax system is unique and simple."
+    end
+  end
+
+  test "seo_meta_description for article skips headings and starts with paragraph text" do
+    @article.update!(body: { "en" => "### How does the tax system work?\n\nResidents pay no income tax in Monaco." })
+    I18n.with_locale(:en) do
+      result = seo_meta_description(page_type: :article, article: @article)
+      assert result.start_with?("Residents pay no income tax in Monaco."), "expected paragraph text first, got: #{result}"
+    end
+  end
+
+  test "seo_meta_description for article falls back to heading text when body has only headings" do
+    @article.update!(body: { "en" => "### How does the tax system work?" })
+    I18n.with_locale(:en) do
+      result = seo_meta_description(page_type: :article, article: @article)
+      assert_equal "How does the tax system work?", result
+    end
+  end
+
+  test "seo_meta_description for article truncates at a sentence boundary" do
+    first = "Monaco offers residents an exceptional quality of life."
+    second = "The Principality combines security, sunshine and a central European location."
+    third = "This third sentence pushes the total text well beyond the maximum length allowed for a meta description tag."
+    @article.update!(body: { "en" => "#{first} #{second} #{third}" })
+    I18n.with_locale(:en) do
+      result = seo_meta_description(page_type: :article, article: @article)
+      assert_equal "#{first} #{second}", result
+    end
+  end
+
+  test "seo_meta_description for article truncates on a word when the first sentence is too long" do
+    long_sentence = "Monaco is a sovereign city-state on the French Riviera whose residents benefit from an absence of income tax, a remarkably low crime rate, a mild Mediterranean climate and direct access to the wider European market."
+    @article.update!(body: { "en" => long_sentence })
+    I18n.with_locale(:en) do
+      result = seo_meta_description(page_type: :article, article: @article)
+      assert result.length <= 160
+      assert result.end_with?("…"), "expected ellipsis, got: #{result}"
+      assert_not result[..-2].end_with?(" "), "expected no trailing space before ellipsis"
+      words = long_sentence.split(" ")
+      assert words.include?(result.delete_suffix("…").split(" ").last), "expected truncation on a word boundary"
+    end
+  end
+
   # --- Page title ---
 
   test "seo_title for homepage" do
@@ -443,6 +493,17 @@ class SeoHelperTest < ActionView::TestCase
       assert_equal "Article", parsed["@type"]
       assert_equal "Monaco Market Update", parsed["headline"]
       assert_equal "en", parsed["inLanguage"]
+    end
+  end
+
+  test "json_ld_article description strips markdown syntax" do
+    @article.update!(body: { "en" => "### How does the tax system work?\n\nThe Monegasque tax system is **unique** and simple." })
+    I18n.with_locale(:en) do
+      result = json_ld_article(@article)
+      parsed = JSON.parse(result.match(/<script[^>]*>(.*)<\/script>/m)[1])
+      assert_not_includes parsed["description"], "###"
+      assert_not_includes parsed["description"], "**"
+      assert parsed["description"].start_with?("The Monegasque tax system is unique and simple.")
     end
   end
 
