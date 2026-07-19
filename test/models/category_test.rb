@@ -65,6 +65,20 @@ class CategoryTest < ActiveSupport::TestCase
     assert_equal "actualites", category.slug_for(:fr)
   end
 
+  test "slug_for transliterates with the target locale's rules regardless of runtime locale" do
+    category = Category.new(name: { "fr" => "Actualités", "ru" => "Новости" }, slug: "actualites")
+    I18n.with_locale(:de) do
+      assert_equal "novosti", category.slug_for(:ru)
+    end
+  end
+
+  test "find_by_localized_slug finds Cyrillic-derived slug regardless of runtime locale" do
+    category = Category.create!(name: { "fr" => "Actualités", "ru" => "Новости" }, slug: "actualites")
+    I18n.with_locale(:fr) do
+      assert_equal category, Category.find_by_localized_slug("novosti", :ru)
+    end
+  end
+
   test "slug_for falls back to base slug" do
     category = Category.new(name: { "fr" => "Actualités" }, slug: "actualites")
     assert_equal "actualites", category.slug_for(:de)

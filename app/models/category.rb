@@ -11,7 +11,10 @@ class Category < ApplicationRecord
 
   def slug_for(locale = I18n.locale)
     localized_name = name.is_a?(Hash) && name[locale.to_s].presence
-    localized_name ? localized_name.parameterize : slug
+    # Pass the locale down: parameterize transliterates with the runtime
+    # I18n.locale's rules by default, which garbles Cyrillic names when
+    # building a link to another locale's page.
+    localized_name ? localized_name.parameterize(locale: locale) : slug
   end
 
   def self.find_by_localized_slug(slug_param, locale = I18n.locale)
