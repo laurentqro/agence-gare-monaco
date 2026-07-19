@@ -70,6 +70,8 @@ fr:
         body_legend: "Contenu"
         slug: "Slug"
         slug_placeholder: "Généré automatiquement depuis le titre français si vide"
+        meta_description: "Meta description (SEO)"
+        meta_description_hint: "Résumé affiché par Google — 160 caractères max. Traduit automatiquement. Si vide, un extrait de l'article est utilisé."
         category: "Catégorie"
         select_category: "Sélectionner une catégorie"
         published: "Publié"

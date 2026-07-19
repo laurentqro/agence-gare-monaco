@@ -41,8 +41,9 @@ class ArticleTranslator
     )
 
     body_required = fr_body.strip.present?
+    meta_required = @article.meta_description_for(:fr).present?
     LOCALES.each do |locale|
-      translate_locale!(locale, new_hash, body_required)
+      translate_locale!(locale, new_hash, body_required, meta_required)
     end
 
     finalize!(new_hash)
@@ -53,7 +54,7 @@ class ArticleTranslator
 
   private
 
-  def translate_locale!(locale, new_hash, body_required)
+  def translate_locale!(locale, new_hash, body_required, meta_required)
     if locale_already_current?(locale, new_hash)
       Rails.logger.info("[ArticleTranslator] article=#{@article.id} locale=#{locale} skipped (already translated for current source)")
       return
@@ -70,7 +71,7 @@ class ArticleTranslator
       "in=#{response.input_tokens} out=#{response.output_tokens}"
     )
 
-    fields = parse_locale(response.content, locale, body_required)
+    fields = parse_locale(response.content, locale, body_required, meta_required)
     apply_locale!(locale, fields, new_hash)
   end
 
@@ -79,14 +80,13 @@ class ArticleTranslator
     entry.is_a?(Hash) && entry["source_hash"] == new_hash && entry["translated_at"].present?
   end
 
-  def parse_locale(content, locale, body_required)
+  def parse_locale(content, locale, body_required, meta_required)
     raise BlankTranslation, "Response is not a hash for #{locale}: #{content.inspect}" unless content.is_a?(Hash)
 
-    title = require_string!(content["title"], "title", locale)
-    return { title: title } unless body_required
-
-    body = require_string!(content["body"], "body", locale)
-    { title: title, body: body }
+    fields = { title: require_string!(content["title"], "title", locale) }
+    fields[:body] = require_string!(content["body"], "body", locale) if body_required
+    fields[:meta_description] = require_string!(content["meta_description"], "meta_description", locale) if meta_required
+    fields
   end
 
   def require_string!(value, field, locale)
@@ -99,16 +99,18 @@ class ArticleTranslator
     with_locked_row do |row|
       title = (row.title || {}).dup
       body = (row.body || {}).dup
+      meta = (row.meta_description || {}).dup
       status = (row.translations_status || {}).dup
 
       title[locale] = fields[:title]
       body[locale] = fields[:body] if fields.key?(:body)
+      meta[locale] = fields[:meta_description] if fields.key?(:meta_description)
       status[locale] = {
         "translated_at" => Time.current.iso8601,
         "source_hash" => new_hash
       }
 
-      { title: title, body: body, translations_status: status }
+      { title: title, body: body, meta_description: meta, translations_status: status }
     end
   end
 

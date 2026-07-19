@@ -473,6 +473,21 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "PATCH update persists the French meta description and enqueues translation" do
+    article = Article.create!(
+      title: { "fr" => "Avec résumé" },
+      body: { "fr" => "Corps" },
+      slug: "avec-resume",
+      category: @category
+    )
+    assert_enqueued_with(job: ArticleTranslationJob, args: [ article.id ]) do
+      patch admin_article_url(article), params: {
+        article: { meta_description: { fr: "Résumé pour Google." } }
+      }
+    end
+    assert_equal "Résumé pour Google.", article.reload.meta_description["fr"]
+  end
+
   # TRANSLATION STATUS SURFACE
   test "GET index shows pending status with 0/8 count when translation_source_hash is nil" do
     article = Article.create!(

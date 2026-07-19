@@ -385,6 +385,30 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal expected, article.current_fr_hash
   end
 
+  test "current_fr_hash includes FR meta description when present" do
+    article = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      meta_description: { "fr" => "Résumé" }, category: @category
+    )
+    expected = Digest::SHA256.hexdigest("Titre\nCorps\nRésumé")
+    assert_equal expected, article.current_fr_hash
+  end
+
+  test "meta_description_for returns the requested locale value" do
+    article = Article.new(meta_description: { "fr" => "Résumé", "en" => "Summary" })
+    assert_equal "Summary", article.meta_description_for(:en)
+  end
+
+  test "meta_description_for falls back to French when locale missing" do
+    article = Article.new(meta_description: { "fr" => "Résumé" })
+    assert_equal "Résumé", article.meta_description_for(:en)
+  end
+
+  test "meta_description_for returns empty string when unset" do
+    article = Article.new(meta_description: nil)
+    assert_equal "", article.meta_description_for(:en)
+  end
+
   # translation_status :stale
   test "translation_status returns :stale when FR text changed since last translation and at least one locale has been translated" do
     fr_title = "Titre"

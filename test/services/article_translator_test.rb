@@ -111,6 +111,34 @@ class ArticleTranslatorTest < ActiveSupport::TestCase
     assert_equal "Première raison : le climat. Deuxième raison : la sécurité.", @article.body["fr"]
   end
 
+  test "writes meta_description for all target locales when FR meta description present" do
+    @article.update!(meta_description: { "fr" => "Résumé FR." })
+    responses = %w[en it de sv no da fi ru].each_with_object({}) do |loc, h|
+      h[loc] = { "title" => "Title #{loc.upcase}", "body" => "Body #{loc.upcase}", "meta_description" => "Meta #{loc.upcase}" }
+    end
+
+    with_stubbed_chat(content_per_locale: responses) do
+      ArticleTranslator.new(@article).translate!
+    end
+
+    @article.reload
+    %w[en it de sv no da fi ru].each do |locale|
+      assert_equal "Meta #{locale.upcase}", @article.meta_description[locale]
+    end
+    assert_equal "Résumé FR.", @article.meta_description["fr"]
+  end
+
+  test "raises BlankTranslation when meta_description is required but blank in the response" do
+    @article.update!(meta_description: { "fr" => "Résumé FR." })
+    bad = ->(loc) { { "title" => "T #{loc}", "body" => "B #{loc}", "meta_description" => "  " } }
+
+    assert_raises ArticleTranslator::BlankTranslation do
+      with_stubbed_chat(content_per_locale: bad) do
+        ArticleTranslator.new(@article).translate!
+      end
+    end
+  end
+
   test "calls the LLM exactly once per target locale" do
     count = with_stubbed_chat(content_per_locale: canned_responses) do
       ArticleTranslator.new(@article).translate!

@@ -77,11 +77,25 @@ class ArticleTranslator::PromptBuilder
 
       <french_body>
       #{@article.body_for(:fr)}
-      </french_body>
+      </french_body>#{meta_description_section}
     PROMPT
   end
 
   private
+
+  def meta_description_section
+    meta = @article.meta_description_for(:fr)
+    return "" if meta.blank?
+
+    <<~SECTION.chomp.prepend("\n\n")
+      <french_meta_description>
+      #{meta}
+      </french_meta_description>
+
+      Also translate the meta description (max 160 characters) and return it in
+      the `meta_description` field.
+    SECTION
+  end
 
   def glossary_terms
     MonacoGlossary::ALL

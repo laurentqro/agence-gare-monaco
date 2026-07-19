@@ -56,7 +56,8 @@ module SeoHelper
     when :property
       Nokogiri::HTML.fragment(opts[:property]&.description_for(I18n.locale).to_s).text
     when :article
-      article_meta_excerpt(opts[:article], I18n.locale)
+      opts[:article]&.meta_description_for(I18n.locale).presence ||
+        article_meta_excerpt(opts[:article], I18n.locale)
     when :listings
       seo_listings_description(opts)
     when :articles
@@ -279,7 +280,7 @@ module SeoHelper
       "@context" => "https://schema.org",
       "@type" => "Article",
       "headline" => article.title_for(locale),
-      "description" => article_meta_excerpt(article, locale, length: 200),
+      "description" => article.meta_description_for(locale).presence || article_meta_excerpt(article, locale, length: 200),
       "datePublished" => article.published_at&.iso8601,
       "dateModified" => article.updated_at&.iso8601,
       "author" => {

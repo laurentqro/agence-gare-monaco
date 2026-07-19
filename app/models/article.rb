@@ -22,6 +22,11 @@ class Article < ApplicationRecord
     body[locale.to_s].presence || body[I18n.default_locale.to_s].presence || body.values.first || ""
   end
 
+  def meta_description_for(locale = I18n.locale)
+    return "" unless meta_description.is_a?(Hash)
+    meta_description[locale.to_s].presence || meta_description[I18n.default_locale.to_s].presence || ""
+  end
+
   def first_image_url
     text = body_for
     return nil if text.blank?
@@ -56,7 +61,7 @@ class Article < ApplicationRecord
   end
 
   def enqueue_post_save_jobs!
-    text_changed = saved_changes.keys.intersect?(%w[title body])
+    text_changed = saved_changes.keys.intersect?(%w[title body meta_description])
     if text_changed || translation_source_hash.nil?
       ArticleTranslationJob.perform_later(id)
     end
@@ -101,8 +106,14 @@ class Article < ApplicationRecord
   # and call translation_stale? once each — the inputs don't change within a
   # request, so memoize. The translator reads the same value to decide whether
   # to skip the LLM call.
+  # The FR meta description joins the hash only when present, so pre-existing
+  # articles without one keep their stored hash and are not mass-retranslated.
   def current_fr_hash
-    @current_fr_hash ||= Digest::SHA256.hexdigest("#{title_for(:fr)}\n#{body_for(:fr)}")
+    @current_fr_hash ||= begin
+      parts = [ title_for(:fr), body_for(:fr) ]
+      parts << meta_description_for(:fr) if meta_description_for(:fr).present?
+      Digest::SHA256.hexdigest(parts.join("\n"))
+    end
   end
 
   private

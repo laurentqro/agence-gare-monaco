@@ -55,7 +55,8 @@ module Admin
       params.require(:article).permit(
         :slug, :category_id, :published, :featured, :cover_image_url,
         title: [ :fr ],
-        body: [ :fr ]
+        body: [ :fr ],
+        meta_description: [ :fr ]
       )
     end
 

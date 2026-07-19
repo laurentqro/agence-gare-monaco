@@ -20,6 +20,13 @@ class ArticleTranslator::SchemaTest < ActiveSupport::TestCase
     assert_equal "string", @properties[:body][:type].to_s
   end
 
+  test "declares meta_description as an optional string" do
+    assert @properties.key?(:meta_description), "schema missing :meta_description"
+    refute(@required.include?("meta_description") || @required.include?(:meta_description),
+           "schema should NOT mark :meta_description as required (most articles have none)")
+    assert_equal "string", @properties[:meta_description][:type].to_s
+  end
+
   test "schema has no per-locale fields" do
     ArticleTranslator::LOCALES.each do |locale|
       refute @properties.key?(:"title_#{locale}"), "schema should not have title_#{locale}"

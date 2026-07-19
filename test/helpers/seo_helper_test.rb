@@ -242,6 +242,22 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
+  test "seo_meta_description for article prefers the handwritten meta description" do
+    @article.update!(meta_description: { "en" => "Handwritten summary for search engines." })
+    I18n.with_locale(:en) do
+      result = seo_meta_description(page_type: :article, article: @article)
+      assert_equal "Handwritten summary for search engines.", result
+    end
+  end
+
+  test "seo_meta_description for article falls back to body excerpt when meta description blank" do
+    @article.update!(meta_description: { "en" => "" })
+    I18n.with_locale(:en) do
+      result = seo_meta_description(page_type: :article, article: @article)
+      assert_includes result, "The Monaco real estate market"
+    end
+  end
+
   test "seo_meta_description for article strips markdown syntax" do
     @article.update!(body: { "en" => "### How does the tax system work?\n\nThe Monegasque tax system is **unique** and *simple*." })
     I18n.with_locale(:en) do
@@ -493,6 +509,15 @@ class SeoHelperTest < ActionView::TestCase
       assert_equal "Article", parsed["@type"]
       assert_equal "Monaco Market Update", parsed["headline"]
       assert_equal "en", parsed["inLanguage"]
+    end
+  end
+
+  test "json_ld_article description prefers the handwritten meta description" do
+    @article.update!(meta_description: { "en" => "Handwritten summary for search engines." })
+    I18n.with_locale(:en) do
+      result = json_ld_article(@article)
+      parsed = JSON.parse(result.match(/<script[^>]*>(.*)<\/script>/m)[1])
+      assert_equal "Handwritten summary for search engines.", parsed["description"]
     end
   end
 

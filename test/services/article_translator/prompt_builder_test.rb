@@ -81,4 +81,15 @@ class ArticleTranslator::PromptBuilderTest < ActiveSupport::TestCase
     assert_includes prompt, "Category: Actualités"
     assert_includes prompt, "Slug: cinq-raisons-de-vivre-a-monaco"
   end
+
+  test "user prompt wraps FR meta description in tags when present" do
+    @article.meta_description = { "fr" => "Résumé pour les moteurs de recherche." }
+    prompt = builder_for("en").user_prompt
+    assert_match %r{<french_meta_description>\nRésumé pour les moteurs de recherche\.\n</french_meta_description>}, prompt
+  end
+
+  test "user prompt omits meta description tags when absent" do
+    prompt = builder_for("en").user_prompt
+    assert_not_includes prompt, "<french_meta_description>"
+  end
 end
