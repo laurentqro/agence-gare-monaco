@@ -295,7 +295,10 @@ module ApplicationHelper
   end
 
   def switch_locale_article_path(locale)
-    slug = params[:slug]
+    # articles#show serves both article pages (global slug — pass it through)
+    # and category filter pages (per-locale slug — re-localize it, or the
+    # switcher pairs one locale's slug with another locale's segment, a 404).
+    slug = @category ? @category.slug_for(locale) : params[:slug]
     articles_segment = I18n.t("routes.articles", locale: locale)
     "#{locale_prefix(locale)}/#{articles_segment}/#{slug}"
   end

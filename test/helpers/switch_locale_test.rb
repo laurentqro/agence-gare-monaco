@@ -68,6 +68,37 @@ class SwitchLocaleTest < ActionDispatch::IntegrationTest
     assert_select "a[href='/it/articoli/#{article.slug}']"
   end
 
+  # === Category filter page (served by articles#show) ===
+
+  test "switching locale from a category page localizes the category slug" do
+    Category.create!(
+      name: {
+        "fr" => "Actualités", "en" => "News", "de" => "Aktuelles", "ru" => "Новости"
+      },
+      slug: "actualites"
+    )
+
+    get "/en/articles/news"
+    assert_response :success
+    # French category (unprefixed locale)
+    assert_select "a[href='/articles/actualites']"
+    # German category
+    assert_select "a[href='/de/artikel/aktuelles']"
+    # Russian category, transliterated with Russian rules
+    assert_select "a[href='/ru/stati/novosti']"
+    # The current-locale slug must not leak into other locales' links
+    assert_select "a[href='/de/artikel/news']", count: 0
+  end
+
+  test "switching locale from a category page falls back to base slug when locale name missing" do
+    Category.create!(name: { "fr" => "Actualités", "en" => "News" }, slug: "actualites")
+
+    get "/en/articles/news"
+    assert_response :success
+    # No Italian name: fall back to the base (French) slug
+    assert_select "a[href='/it/articoli/actualites']"
+  end
+
   # === Sales listings ===
 
   test "switching locale from EN sales goes to translated sales" do
