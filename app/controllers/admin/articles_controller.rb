@@ -51,13 +51,32 @@ module Admin
       @categories = Category.order(:name)
     end
 
+    TRANSLATED_COLUMNS = %w[title body meta_description].freeze
+
     def article_params
-      params.require(:article).permit(
+      permitted = params.require(:article).permit(
         :slug, :category_id, :published, :featured, :cover_image_url,
         title: [ :fr ],
         body: [ :fr ],
         meta_description: [ :fr ]
       )
+
+      merge_translated_columns(permitted)
+    end
+
+    # The form only submits the French value, but assigning it would replace the
+    # whole JSON column and destroy the eight translated locales. Merge instead:
+    # the translator cannot always rebuild them (API outage, spend cap).
+    def merge_translated_columns(permitted)
+      TRANSLATED_COLUMNS.each do |column|
+        submitted = permitted[column]
+        next if submitted.nil?
+
+        existing = @article&.public_send(column) || {}
+        permitted[column] = existing.merge(submitted.to_h)
+      end
+
+      permitted
     end
 
     def set_published_at

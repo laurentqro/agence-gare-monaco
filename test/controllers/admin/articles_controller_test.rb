@@ -473,6 +473,65 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # Editing FR in the admin form must never destroy the translated locales:
+  # the translator may be unable to rebuild them (API outage, spend cap).
+  test "PATCH update preserves translated title locales when editing French" do
+    article = Article.create!(
+      title: { "fr" => "Titre FR", "en" => "English title", "sv" => "Svensk titel" },
+      body: { "fr" => "Corps FR", "en" => "English body", "sv" => "Svensk text" },
+      slug: "keeps-translations",
+      category: @category
+    )
+    patch admin_article_url(article), params: { article: { title: { fr: "Titre FR modifié" } } }
+
+    article.reload
+    assert_equal "Titre FR modifié", article.title["fr"]
+    assert_equal "English title", article.title["en"]
+    assert_equal "Svensk titel", article.title["sv"]
+  end
+
+  test "PATCH update preserves translated body locales when editing French" do
+    article = Article.create!(
+      title: { "fr" => "Titre FR", "en" => "English title" },
+      body: { "fr" => "Corps FR", "en" => "English body", "de" => "Deutscher Text" },
+      slug: "keeps-body-translations",
+      category: @category
+    )
+    patch admin_article_url(article), params: { article: { body: { fr: "Corps FR modifié" } } }
+
+    article.reload
+    assert_equal "Corps FR modifié", article.body["fr"]
+    assert_equal "English body", article.body["en"]
+    assert_equal "Deutscher Text", article.body["de"]
+  end
+
+  test "PATCH update preserves translated meta descriptions when editing French" do
+    article = Article.create!(
+      title: { "fr" => "Titre FR" },
+      body: { "fr" => "Corps FR" },
+      meta_description: { "fr" => "Résumé FR", "en" => "English summary" },
+      slug: "keeps-meta-translations",
+      category: @category
+    )
+    patch admin_article_url(article), params: { article: { meta_description: { fr: "Résumé FR modifié" } } }
+
+    article.reload
+    assert_equal "Résumé FR modifié", article.meta_description["fr"]
+    assert_equal "English summary", article.meta_description["en"]
+  end
+
+  test "POST create accepts a French-only title and body" do
+    assert_difference "Article.count", 1 do
+      post admin_articles_url, params: {
+        article: {
+          title: { fr: "Nouveau" }, body: { fr: "Contenu" },
+          slug: "nouveau-article", category_id: @category.id
+        }
+      }
+    end
+    assert_equal({ "fr" => "Nouveau" }, Article.find_by(slug: "nouveau-article").title)
+  end
+
   test "PATCH update persists the French meta description and enqueues translation" do
     article = Article.create!(
       title: { "fr" => "Avec résumé" },
