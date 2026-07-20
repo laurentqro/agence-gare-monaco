@@ -111,7 +111,7 @@ Covered by four regression tests (title, body, meta description, create path).
   | Controller | Permits | Verdict |
   |---|---|---|
   | `admin/articles` | `title/body/meta_description: [:fr]` | was broken, fixed in `3dcaf12` |
-  | `admin/properties` | `title: ["fr"], description: ["fr"]` | had the same bug, fixed in `5cb2929` |
+  | `admin/properties` | `title: ["fr"], description: ["fr"]` | had the same bug, fixed in `cd4e228` |
   | `admin/categories` | `name: <all locales>` | safe |
   | `ImmotoolboxSync` | writes a `.dup` of the stored hash | safe (already merges) |
 
