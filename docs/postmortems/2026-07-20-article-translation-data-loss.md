@@ -110,16 +110,23 @@ Covered by four regression tests (title, body, meta description, create path).
 
   | Controller | Permits | Verdict |
   |---|---|---|
-  | `admin/articles` | `title/body/meta_description: [:fr]` | **was broken**, fixed in `3dcaf12` |
-  | `admin/properties` | `title: ["fr"], description: ["fr"]` | **still broken** — see below |
+  | `admin/articles` | `title/body/meta_description: [:fr]` | was broken, fixed in `3dcaf12` |
+  | `admin/properties` | `title: ["fr"], description: ["fr"]` | had the same bug, fixed in `5cb2929` |
   | `admin/categories` | `name: <all locales>` | safe |
+  | `ImmotoolboxSync` | writes a `.dup` of the stored hash | safe (already merges) |
 
-  `admin/properties` has the same defect and is **more dangerous**: 24 of 27
-  production properties carry multi-locale titles, and properties have no
-  translator job, so there is no self-healing to mask or repair the loss. Their
-  translations come from Immotoolbox sync, so a re-sync may restore them, but
-  this should be fixed with the same merge before anyone edits a property in
-  the admin. Not fixed here to keep this change scoped to the incident.
+  `admin/properties` carried the identical defect. Exposure was narrower than it
+  first appeared: `block_synced_edits!` makes Immotoolbox-synced properties
+  read-only, so only the 3 off-market properties are editable, and all 3 are
+  currently French-only. But `PropertyTranslationJob` fills in the other locales
+  after a save, so any edited property would have become multi-locale and then
+  lost those locales on the next edit — the same latent destroy/restore cycle
+  that hid the article bug.
+
+  Both controllers now share `MergesTranslatedColumns`, and each declares its
+  own `TRANSLATED_COLUMNS`. `properties.intro` is a JSON locale column that is
+  not on the form today; it is listed anyway so it is protected if a field is
+  ever added.
 - **No backups existed for a production SQLite database.** This incident lost
   only regenerable content; the next one might not. Automated backups are the
   highest-value follow-up from this postmortem.

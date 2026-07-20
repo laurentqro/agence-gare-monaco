@@ -1,5 +1,11 @@
 module Admin
   class PropertiesController < BaseController
+    include MergesTranslatedColumns
+
+    # JSON columns holding every locale. `intro` is not on the form today, but
+    # is listed so it is protected if a field is ever added.
+    TRANSLATED_COLUMNS = %w[title description intro].freeze
+
     before_action :set_property, only: %i[show edit update destroy]
     before_action :block_synced_edits!, only: %i[edit update destroy]
     before_action :set_form_data, only: %i[new create edit update]
@@ -67,7 +73,7 @@ module Admin
     end
 
     def property_params
-      params.require(:property).permit(
+      permitted = params.require(:property).permit(
         :reference, :price, :currency, :service_charges, :service_charges_included,
         :transaction_type, :property_type, :subtype,
         :country, :city, :address, :district_id, :building_id,
@@ -79,6 +85,8 @@ module Admin
         title: [ "fr" ],
         description: [ "fr" ]
       )
+
+      merge_translated_columns(permitted, @property, TRANSLATED_COLUMNS)
     end
   end
 end

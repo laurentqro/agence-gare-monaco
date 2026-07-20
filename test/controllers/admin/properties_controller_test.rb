@@ -176,6 +176,68 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1_500_000, prop.price
   end
 
+  # Editing FR in the admin form must never destroy the translated locales:
+  # the translator may be unable to rebuild them (API outage, spend cap).
+  test "PATCH update preserves translated title locales when editing French" do
+    prop = create_property(
+      reference: "MC-TRANS-1",
+      title: { "fr" => "Studio", "en" => "Studio flat", "sv" => "Etta" }
+    )
+    patch admin_property_url(prop), params: { property: { title: { fr: "Studio rénové" } } }
+
+    prop.reload
+    assert_equal "Studio rénové", prop.title["fr"]
+    assert_equal "Studio flat", prop.title["en"]
+    assert_equal "Etta", prop.title["sv"]
+  end
+
+  test "PATCH update preserves translated description locales when editing French" do
+    prop = create_property(
+      reference: "MC-TRANS-2",
+      description: { "fr" => "Beau studio", "en" => "Lovely studio", "de" => "Schönes Studio" }
+    )
+    patch admin_property_url(prop), params: { property: { description: { fr: "Très beau studio" } } }
+
+    prop.reload
+    assert_equal "Très beau studio", prop.description["fr"]
+    assert_equal "Lovely studio", prop.description["en"]
+    assert_equal "Schönes Studio", prop.description["de"]
+  end
+
+  test "PATCH update preserves other locales when editing title and description together" do
+    prop = create_property(
+      reference: "MC-TRANS-3",
+      title: { "fr" => "Studio", "it" => "Monolocale" },
+      description: { "fr" => "Beau studio", "it" => "Bel monolocale" }
+    )
+    patch admin_property_url(prop), params: {
+      property: { title: { fr: "Studio vue mer" }, description: { fr: "Studio avec vue" } }
+    }
+
+    prop.reload
+    assert_equal "Monolocale", prop.title["it"]
+    assert_equal "Bel monolocale", prop.description["it"]
+  end
+
+  test "POST create accepts a French-only title and description" do
+    assert_difference "Property.count", 1 do
+      post admin_properties_url, params: {
+        property: {
+          reference: "MC-NEW-1",
+          title: { fr: "Nouveau bien" },
+          description: { fr: "Description" },
+          transaction_type: "sale",
+          property_type: "apartment",
+          country: "MC",
+          city: "Monaco"
+        }
+      }
+    end
+    prop = Property.find_by(reference: "MC-NEW-1")
+    assert_equal({ "fr" => "Nouveau bien" }, prop.title)
+    assert_equal({ "fr" => "Description" }, prop.description)
+  end
+
   test "PATCH update can toggle published flag" do
     prop = create_property(reference: "MC-001", published: false)
     patch admin_property_url(prop), params: {
