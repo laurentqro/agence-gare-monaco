@@ -1,4 +1,8 @@
 class ArticleTranslator::PromptBuilder
+  # Target locales whose script differs from the French source. These get
+  # transliteration guidance instead of verbatim proper-noun preservation.
+  NON_LATIN_SCRIPTS = { "ru" => "Cyrillic" }.freeze
+
   def initialize(article, locale)
     @article = article
     @locale = locale.to_s
@@ -30,6 +34,12 @@ class ArticleTranslator::PromptBuilder
       - Do not omit content from the French source, even if it feels redundant.
       - If the French is awkward or ambiguous, translate it faithfully — do not
         "fix" it.
+      - No untranslated French fragments. Every word must be a real
+        #{@language_name} word. Never carry a French word, stem, or contraction
+        into the output and inflect it — "S'installer" must become a natural
+        #{@language_name} verb phrase, never "S'installing". Reflexive
+        constructions (s'installer, se loger, s'établir) have no French form in
+        #{@language_name}: render the meaning.
 
       Markdown rules:
       - The body is Markdown. Preserve ALL markdown syntax exactly:
@@ -40,14 +50,7 @@ class ArticleTranslator::PromptBuilder
       - For links [text](url): translate the link text, keep the URL identical.
       - Keep numerals, currency symbols, and units (m², €, %) as-is.
 
-      Proper nouns and addresses (do not translate):
-      - Preserve all proper nouns exactly as written in French: building names,
-        hotel names, restaurant names, residence names, place names, person names.
-      - Preserve all street addresses in their French form (street type, name,
-        numbering) — do not translate "Avenue", "Boulevard", "Place", "Rue", etc.
-      - Common Monaco proper nouns include (non-exhaustive — apply the rule above
-        to any others encountered):
-      #{glossary_terms.map { |term| "  - #{term}" }.join("\n")}
+      #{proper_noun_block}
 
       Rules:
       - Translate ONLY the French title and body provided by the user.
@@ -82,6 +85,63 @@ class ArticleTranslator::PromptBuilder
   end
 
   private
+
+  # Latin-script targets keep proper nouns in their French spelling. Cyrillic
+  # targets must transliterate them: leaving "Monaco" in Latin script inside
+  # Russian prose reads as untranslated text.
+  def proper_noun_block
+    non_latin_script? ? cyrillic_proper_noun_block : latin_proper_noun_block
+  end
+
+  def non_latin_script?
+    NON_LATIN_SCRIPTS.key?(@locale)
+  end
+
+  def latin_proper_noun_block
+    <<~BLOCK.strip
+      Proper nouns and addresses (do not translate):
+      - Preserve all proper nouns exactly as written in French: building names,
+        hotel names, restaurant names, residence names, place names, person names.
+      - Preserve all street addresses in their French form (street type, name,
+        numbering) — do not translate "Avenue", "Boulevard", "Place", "Rue", etc.
+      - Common Monaco proper nouns include (non-exhaustive — apply the rule above
+        to any others encountered):
+      #{indented_terms(glossary_terms)}
+    BLOCK
+  end
+
+  def cyrillic_proper_noun_block
+    script = NON_LATIN_SCRIPTS.fetch(@locale)
+
+    <<~BLOCK.strip
+      Proper nouns and addresses (transliterate into #{script}):
+      - #{@language_name} is written in #{script}. Do NOT leave proper nouns in
+        Latin script — transliterate them using the established #{script} form.
+        Writing "Monaco" instead of "Монако" in #{@language_name} prose is an
+        error, even though it is the correct French spelling.
+      - Use the conventional #{script} rendering of place names, districts,
+        building names and street names. Keep street types translated naturally
+        ("Avenue" → "Авеню", "Boulevard" → "Бульвар").
+      - Use the same form in the title, body, and meta description of one
+        article. Never mix scripts for the same name across fields.
+      - Established #{script} forms for common Monaco terms:
+      #{indented_terms(cyrillic_pairs)}
+      - Apply the same transliteration rule to any proper noun not listed here:
+      #{indented_terms(unmapped_glossary_terms)}
+    BLOCK
+  end
+
+  def cyrillic_pairs
+    MonacoGlossary::CYRILLIC.map { |french, cyrillic| "#{french} → #{cyrillic}" }
+  end
+
+  def unmapped_glossary_terms
+    glossary_terms - MonacoGlossary::CYRILLIC.keys
+  end
+
+  def indented_terms(terms)
+    terms.map { |term| "  - #{term}" }.join("\n")
+  end
 
   def meta_description_section
     meta = @article.meta_description_for(:fr)
