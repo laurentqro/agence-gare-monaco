@@ -99,4 +99,36 @@ class CyrillicProperNounFixerTest < ActiveSupport::TestCase
     assert_equal "", CyrillicProperNounFixer.new(nil).call
     assert_equal "", CyrillicProperNounFixer.new("").call
   end
+
+  # District names, so a list of districts does not come out half-Cyrillic.
+  test "transliterates the remaining district names" do
+    assert_equal "район Ла-Кондамин здесь", fix("район La Condamine здесь")
+    assert_equal "район Фонвьей здесь", fix("район Fontvieille здесь")
+    assert_equal "район Ла-Русс здесь", fix("район La Rousse здесь")
+    assert_equal "район Ларвотто здесь", fix("район Larvotto здесь")
+    assert_equal "район Монегетти здесь", fix("район Moneghetti здесь")
+    assert_equal "район Жарден-Экзотик здесь", fix("район Jardin Exotique здесь")
+    assert_equal "район Ле-Роше здесь", fix("район Le Rocher здесь")
+    assert_equal "район Сен-Роман здесь", fix("район Saint-Roman здесь")
+  end
+
+  test "drops the French article before a district name" do
+    assert_equal "## 7. Ларвотто: открытка", fix("## 7. Le Larvotto: открытка")
+    assert_equal "## 6. Монегетти: жить", fix("## 6. Les Moneghetti: жить")
+    assert_equal "на Ле-Роше, он принимает", fix("на Le Rocher, он принимает")
+  end
+
+  test "transliterates Monte Carlo written without a hyphen" do
+    assert_equal "кварталами Ларвотто и Монте-Карло, а также", fix("кварталами Le Larvotto и Monte Carlo, а также")
+  end
+
+  test "renders a district list entirely in Cyrillic" do
+    assert_equal "Монако-Вилль, Монте-Карло, Ла-Кондамин, Фонвьей, Ла-Русс: харак",
+      fix("Monaco-Ville, Monte-Carlo, La Condamine, Fontvieille, La Rousse: харак")
+  end
+
+  test "keeps district names that belong to a Latin phrase" do
+    assert_equal "стадион Louis II de Fontvieille", fix("стадион Louis II de Fontvieille")
+    assert_equal "Port de Fontvieille", fix("Port de Fontvieille")
+  end
 end

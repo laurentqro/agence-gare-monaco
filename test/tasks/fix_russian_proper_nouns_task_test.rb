@@ -97,4 +97,56 @@ class FixRussianProperNounsTaskTest < ActiveJob::TestCase
 
     assert_equal "мероприятие Monaco Yacht Show прошло", article.reload.body["ru"]
   end
+
+  # The French-fragment repair is a separate, slug-keyed task.
+  def run_fragment_task
+    Rake::Task["articles:fix_french_fragments"].reenable
+    capture_io { Rake::Task["articles:fix_french_fragments"].invoke }
+  end
+
+  def create_settling_article(en_body:)
+    Article.create!(
+      slug: "quelles-sont-les-conditions-a-remplir-pour-s-installer-a-monaco",
+      category: @category,
+      title: { "fr" => "Titre", "en" => "Title" },
+      body: { "fr" => "S'installer en Principauté…", "en" => en_body },
+      translation_source_hash: "frag-hash"
+    )
+  end
+
+  test "replaces the French reflexive carried into English" do
+    article = create_settling_article(en_body: "S'installing in the Principality as an expatriate")
+    ENV["APPLY"] = "1"
+
+    run_fragment_task
+
+    assert_equal "Settling in the Principality as an expatriate", article.reload.body["en"]
+  end
+
+  test "leaves the French source untouched when repairing a fragment" do
+    article = create_settling_article(en_body: "S'installing in the Principality")
+    ENV["APPLY"] = "1"
+
+    run_fragment_task
+
+    assert_equal "S'installer en Principauté…", article.reload.body["fr"]
+  end
+
+  test "fragment repair is a no-op when the text is already correct" do
+    article = create_settling_article(en_body: "Settling in the Principality")
+    ENV["APPLY"] = "1"
+
+    out, = run_fragment_task
+
+    assert_includes out, "not present"
+    assert_equal "Settling in the Principality", article.reload.body["en"]
+  end
+
+  test "fragment dry run does not write" do
+    article = create_settling_article(en_body: "S'installing in the Principality")
+
+    run_fragment_task
+
+    assert_equal "S'installing in the Principality", article.reload.body["en"]
+  end
 end

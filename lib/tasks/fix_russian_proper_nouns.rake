@@ -49,6 +49,57 @@ namespace :articles do
     puts "Re-run with APPLY=1 to write." unless apply
   end
 
+  # A single French reflexive that the pre-75c52bf prompt carried into English
+  # and inflected: "S'installer en Principauté" became "S'installing in the
+  # Principality". Keyed by slug and locale, with the exact expected string, so
+  # it is a no-op once corrected or if the text is ever retranslated.
+  FRAGMENT_FIXES = [
+    {
+      slug: "quelles-sont-les-conditions-a-remplir-pour-s-installer-a-monaco",
+      locale: "en",
+      field: "body",
+      from: "S'installing in the Principality",
+      to: "Settling in the Principality"
+    }
+  ].freeze
+
+  desc "Repair untranslated French fragments carried into translations (APPLY=1 to write)"
+  task fix_french_fragments: :environment do
+    apply = ENV["APPLY"] == "1"
+    puts apply ? "APPLYING changes" : "DRY RUN — pass APPLY=1 to write"
+    puts
+
+    applied = 0
+
+    FRAGMENT_FIXES.each do |fix|
+      article = Article.find_by(slug: fix[:slug])
+      next puts("MISSING article #{fix[:slug]}") if article.nil?
+
+      column = article.public_send(fix[:field])
+      next puts("SKIP #{fix[:slug]} #{fix[:locale]}: column is not a hash") unless column.is_a?(Hash)
+
+      current = column[fix[:locale]].to_s
+      unless current.include?(fix[:from])
+        puts "SKIP #{fix[:slug]} #{fix[:locale]}: #{fix[:from].inspect} not present"
+        next
+      end
+
+      puts "id=#{article.id} #{fix[:field]}[#{fix[:locale]}]"
+      puts "  - #{fix[:from]}"
+      puts "  + #{fix[:to]}"
+      applied += 1
+
+      next unless apply
+
+      updated = column.dup.merge(fix[:locale] => current.sub(fix[:from], fix[:to]))
+      article.update_columns(fix[:field] => updated, updated_at: Time.current)
+    end
+
+    puts
+    puts "#{applied} fragment(s)"
+    puts "Re-run with APPLY=1 to write." unless apply
+  end
+
   def report(article, field, before, after)
     before_windows = windows(before)
     after_windows = windows(after)

@@ -27,9 +27,15 @@ module MonacoGlossary
   CYRILLIC = {
     "Monaco" => "Монако",
     "Monte-Carlo" => "Монте-Карло",
+    "Monaco-Ville" => "Монако-Вилль",
     "La Condamine" => "Ла-Кондамин",
     "Fontvieille" => "Фонвьей",
     "Larvotto" => "Ларвотто",
-    "Le Rocher" => "Ле-Роше"
+    "La Rousse" => "Ла-Русс",
+    "Moneghetti" => "Монегетти",
+    "Jardin Exotique" => "Жарден-Экзотик",
+    "Saint-Roman" => "Сен-Роман",
+    "Le Rocher" => "Ле-Роше",
+    "Carré d'Or" => "Карре д'Ор"
   }.freeze
 end
