@@ -33,7 +33,7 @@ namespace :articles do
         updates[field] = column.dup.merge("ru" => fixer.call)
         changed_fields += 1
 
-        report(article, field, current, fixer.call)
+        report(article, field, current)
       end
 
       next if updates.empty?
@@ -100,11 +100,10 @@ namespace :articles do
     puts "Re-run with APPLY=1 to write." unless apply
   end
 
-  def report(article, field, before, after)
+  def report(article, field, before)
     before_windows = windows(before)
-    after_windows = windows(after)
-
-    before_windows.zip(after_windows).each do |was, now|
+    before_windows.each do |was|
+      now = CyrillicProperNounFixer.new(was).call
       next if was == now
 
       puts "id=#{article.id} #{field}"
@@ -113,8 +112,13 @@ namespace :articles do
     end
   end
 
+  # Each window is run through the fixer independently, so the before/after
+  # lines always describe the same span. Zipping the two texts' windows would
+  # drift out of alignment, because a replacement changes how many windows the
+  # scan finds.
   def windows(text)
-    text.scan(/.{0,35}(?:Monaco|Monte-Carlo|Монако|Монте-Карло).{0,35}/m)
+    names = Regexp.union(CyrillicProperNounFixer::REPLACEMENTS.keys)
+    text.scan(/.{0,35}#{names}.{0,35}/m)
       .map { |window| window.gsub(/\s+/, " ").strip }
   end
 end
