@@ -38,6 +38,34 @@ class PropertyTranslationJobTest < ActiveJob::TestCase
     assert_equal @property.id, received.id
   end
 
+  test "records a failure when retries are exhausted, not just on discard" do
+    # retry_on without a block re-raises after the last attempt, recording
+    # nothing. The property then keeps translation_source_hash nil with no
+    # "_error" marker, so the sync's nil-hash path re-enqueues a paid LLM call
+    # every 5 minutes forever. A sustained outage would do this catalogue-wide.
+    fake_new = ->(_property) {
+      Object.new.tap do |o|
+        o.define_singleton_method(:translate!) { raise RubyLLM::ServerError.new(nil, "upstream down") }
+      end
+    }
+
+    # retry_on counts attempts per rescued-exception group in exception_executions,
+    # keyed by that group's Array#to_s. Pre-load it at the attempts limit so this
+    # run is the final attempt and the handler takes its give-up branch.
+    job = PropertyTranslationJob.new(@property.id)
+    retry_group = [ RubyLLM::RateLimitError, RubyLLM::ServerError,
+                    RubyLLM::ServiceUnavailableError, RubyLLM::OverloadedError,
+                    Net::OpenTimeout, JSON::ParserError ]
+    job.exception_executions = { retry_group.to_s => 5 }
+
+    SingletonStub.with(PropertyTranslator, :new, fake_new) do
+      assert_raises(RubyLLM::ServerError) { job.perform_now }
+    end
+
+    assert @property.reload.translation_error.present?,
+           "exhausted retries must record a failure so the sync stops retrying forever"
+  end
+
   test "retry_on covers transient transport errors" do
     handled = PropertyTranslationJob.rescue_handlers.map(&:first)
     assert_includes handled, "RubyLLM::RateLimitError"

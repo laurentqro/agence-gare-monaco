@@ -4,7 +4,12 @@ namespace :translations do
   desc "Enqueue PropertyTranslationJob for properties missing a translation hash (staggered)"
   task backfill: :environment do
     stagger_step_seconds = Integer(ENV.fetch("STAGGER_SECONDS", DEFAULT_STAGGER_SECONDS.to_s))
-    ids = Property.where(translation_source_hash: nil).pluck(:id)
+    # Skip properties carrying a recorded hard failure: they also have a nil
+    # hash, but re-running them here would just fail again without clearing the
+    # marker. Use translations:retry_failed for those, once the cause is fixed.
+    ids = Property.where(translation_source_hash: nil)
+                  .reject { |p| p.translation_error.present? }
+                  .map(&:id)
 
     ids.each_with_index do |id, i|
       PropertyTranslationJob.set(wait: (i * stagger_step_seconds).seconds).perform_later(id)

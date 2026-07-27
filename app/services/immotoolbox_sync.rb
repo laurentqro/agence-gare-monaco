@@ -1,6 +1,13 @@
 class ImmotoolboxSync
   include ActionView::Helpers::SanitizeHelper
 
+  # PropertyImage rows are looked up globally by immotoolbox_id because one image
+  # can be shared across properties (building shots). These attributes describe
+  # the image's role *within a property*, so each owner's turn in the sync
+  # rewrites them. They must not count as a change, or a shared image would look
+  # permanently modified and regenerate 18 PDFs for both owners on every tick.
+  PER_PROPERTY_IMAGE_ATTRIBUTES = %w[property_id position is_plan].freeze
+
   def initialize(api_token:)
     @client = ImmotoolboxClient.new(api_token: api_token)
   end
@@ -131,10 +138,18 @@ class ImmotoolboxSync
         shared_exclusivity: data["sharedExclusivity"] || false,
         video_url: data["urlVideo"] || data["videoUrl"],
         virtual_tour_url: data["urlVirtual"] || data["virtualTourUrl"],
-        has_360_tour: data["has360Tour"] || false,
-        synced_at: Time.current
+        has_360_tour: data["has360Tour"] || false
       )
-      property.save!
+      # Record synced_at without touching updated_at when nothing else changed.
+      # The sitemap publishes updated_at as <lastmod>, and at a 5-minute cadence
+      # an unchanged property would otherwise claim ~288 modifications a day —
+      # a crawl signal Google learns to distrust, plus needless SQLite writes.
+      if property.changed?
+        property.synced_at = Time.current
+        property.save!
+      else
+        property.update_columns(synced_at: Time.current)
+      end
       # Defer the brochure job: it must be enqueued AFTER images are synced so an
       # async worker can't regenerate brochures against the old image set.
       enqueued = property.enqueue_post_save_jobs!(defer_brochure: true)
@@ -254,12 +269,10 @@ class ImmotoolboxSync
         position: img_data["order"] || img_data["position"] || 0,
         is_plan: img_data["isPlan"] || false
       )
-      # Ignore property_id when deciding whether the image changed. Images are
-      # looked up globally because one can be shared across properties, and each
-      # owner's turn in the sync reassigns it — so property_id alone flips back
-      # and forth every run and would report a permanent change, regenerating
-      # brochures for both properties on every tick.
-      changed = true if image.new_record? || image.changed.any? { |attr| attr != "property_id" }
+      # Only the image's own content counts as a change; see
+      # PER_PROPERTY_IMAGE_ATTRIBUTES for why per-property fields are excluded.
+      content_changed = (image.changed - PER_PROPERTY_IMAGE_ATTRIBUTES).any?
+      changed = true if image.new_record? || content_changed
       image.save!
     end
 

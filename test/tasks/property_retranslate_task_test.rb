@@ -11,6 +11,7 @@ class PropertyRetranslateTaskTest < ActiveSupport::TestCase
   teardown do
     Rake::Task["translations:retranslate"].reenable
     Rake::Task["translations:retry_failed"].reenable
+    Rake::Task["translations:backfill"].reenable
   end
 
   def silence_stdout
@@ -110,6 +111,23 @@ class PropertyRetranslateTaskTest < ActiveSupport::TestCase
     waits = ActiveJob::Base.queue_adapter.enqueued_jobs.map { |j| j[:at] }.compact
     assert_equal 3, waits.size, "every enqueue should carry a wait/at timestamp"
     assert_equal waits.sort, waits, "enqueues should be in increasing order"
+  end
+
+  test "backfill skips properties with a recorded failure" do
+    # backfill selects on translation_source_hash: nil, which also matches every
+    # hard-failed property. Without this filter it silently re-runs known
+    # failures that will fail again, duplicating retry_failed's job but without
+    # clearing the marker first.
+    stuck = build_property(reference: "BF-001", error: "RubyLLM::UnauthorizedError")
+    pending = build_property(reference: "BF-002")
+
+    assert_enqueued_with(job: PropertyTranslationJob, args: [ pending.id ]) do
+      silence_stdout { Rake::Task["translations:backfill"].invoke }
+    end
+
+    enqueued_ids = enqueued_jobs.select { |j| j[:job] == PropertyTranslationJob }.map { |j| j[:args].first }
+    refute_includes enqueued_ids, stuck.id,
+                    "a recorded failure needs retry_failed, not a silent backfill re-run"
   end
 
   test "retry_failed reports how many properties it retried" do

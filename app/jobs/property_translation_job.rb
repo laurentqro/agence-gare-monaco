@@ -1,13 +1,21 @@
 class PropertyTranslationJob < ApplicationJob
   queue_as :default
 
+  # Record the failure when retries run out, not just on discard. Without this
+  # the job dies leaving translation_source_hash nil and no marker, so the
+  # 5-minute sync re-enqueues a paid LLM call every tick forever — a sustained
+  # outage would do that catalogue-wide. Re-raise so the job still lands in
+  # Solid Queue's failed set for visibility.
   retry_on RubyLLM::RateLimitError,
            RubyLLM::ServerError,
            RubyLLM::ServiceUnavailableError,
            RubyLLM::OverloadedError,
            Net::OpenTimeout,
            JSON::ParserError,
-           wait: :polynomially_longer, attempts: 5
+           wait: :polynomially_longer, attempts: 5 do |job, error|
+    job.record_failure(error)
+    raise error
+  end
 
   discard_on RubyLLM::UnauthorizedError,
              RubyLLM::ForbiddenError,

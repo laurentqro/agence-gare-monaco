@@ -323,22 +323,78 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
       reference: "SH-B", transaction_type: "sale", property_type: "apartment",
       country: "MC", city: "Monaco", immotoolbox_id: 9002
     )
-    shared = {
-      "id" => 77_001, "order" => 1,
+    # The two properties list the same image at DIFFERENT positions, which is the
+    # realistic case: `order` is per-property, as are `property_id` and `is_plan`.
+    # Every one of them flips on each owner's turn, so none may count as a change.
+    base = {
+      "id" => 77_001,
       "large" => "https://cdn.example.com/large/shared.jpg",
-      "thumb" => "https://cdn.example.com/thumb/shared.jpg",
-      "isPlan" => false
+      "thumb" => "https://cdn.example.com/thumb/shared.jpg"
     }
+    for_a = base.merge("order" => 1, "isPlan" => false)
+    for_b = base.merge("order" => 5, "isPlan" => true)
     sync = ImmotoolboxSync.new(api_token: "test-token")
     sync_images = sync.method(:sync_property_images)
 
-    assert sync_images.call(a, [ shared ]), "first sync creates the image, so it changed"
-    sync_images.call(b, [ shared ])
+    assert sync_images.call(a, [ for_a ]), "first sync creates the image, so it changed"
+    sync_images.call(b, [ for_b ])
 
-    refute sync_images.call(a, [ shared ]),
+    refute sync_images.call(a, [ for_a ]),
            "a shared image must not report a change just because another property owns it"
-    refute sync_images.call(b, [ shared ]),
+    refute sync_images.call(b, [ for_b ]),
            "ownership must not ping-pong between properties sharing an image"
+    refute sync_images.call(a, [ for_a ]),
+           "steady state must stay quiet across repeated ticks"
+  end
+
+  test "an unchanged property keeps its updated_at so sitemap lastmod stays honest" do
+    setup_districts_and_buildings
+    # synced_at is written on every run, and the sitemap publishes updated_at as
+    # <lastmod>. At a 5-minute cadence an unchanged property would otherwise claim
+    # ~288 modifications a day, which is both a bad crawl signal and pointless
+    # write amplification on SQLite.
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+    prop = Property.find_by(immotoolbox_id: 100)
+    prop.update_columns(translation_source_hash: "seeded-hash", updated_at: 3.days.ago)
+    before = prop.reload.updated_at
+
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+
+    assert_equal before.to_i, prop.reload.updated_at.to_i,
+                 "a no-op sync must not bump updated_at"
+    assert prop.synced_at > before, "synced_at should still record that the sync ran"
+  end
+
+  test "a real change still bumps updated_at" do
+    setup_districts_and_buildings
+    # The lastmod guard must not blind the sitemap to genuine edits.
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+    prop = Property.find_by(immotoolbox_id: 100)
+    prop.update_columns(translation_source_hash: "seeded-hash", updated_at: 3.days.ago, price: 1)
+    before = prop.reload.updated_at
+
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+
+    assert_operator prop.reload.updated_at, :>, before,
+                    "a genuine price change must move updated_at for the sitemap"
+  end
+
+  test "a genuine change to a shared image's own content still reports a change" do
+    setup_districts_and_buildings
+    # The per-property exclusions must not blind the gate to real edits: if the
+    # CDN URL changes, brochures genuinely need regenerating.
+    prop = Property.create!(
+      reference: "SH-C", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", immotoolbox_id: 9003
+    )
+    img = { "id" => 77_002, "order" => 1, "large" => "https://cdn.example.com/large/v1.jpg" }
+    sync_images = ImmotoolboxSync.new(api_token: "test-token").method(:sync_property_images)
+
+    sync_images.call(prop, [ img ])
+    refute sync_images.call(prop, [ img ]), "unchanged image must stay quiet"
+
+    assert sync_images.call(prop, [ img.merge("large" => "https://cdn.example.com/large/v2.jpg") ]),
+           "a new remote URL is a real change and must regenerate brochures"
   end
 
   test "brochure job is enqueued only after images are synced (no stale image set)" do
