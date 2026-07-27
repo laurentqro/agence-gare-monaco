@@ -27,6 +27,13 @@ class Property < ApplicationRecord
   scope :in_country, ->(country) { where(country: country) }
   scope :in_district, ->(district) { where(district: district) }
   scope :of_type, ->(type) { where(property_type: type) }
+  # A failed re-translation keeps its old non-nil hash (only success updates
+  # it), so failure is detected by the recorded "_error" itself, in SQL:
+  # loading every row's four multi-locale JSON columns to find the usual
+  # handful of failures would not scale with casual operator use.
+  scope :translation_failed, -> {
+    where("json_extract(translations_status, '$._error.class') IS NOT NULL")
+  }
 
   def title_for(locale)
     title&.dig(locale.to_s).presence || title&.dig(I18n.default_locale.to_s).presence || ""
@@ -101,6 +108,17 @@ class Property < ApplicationRecord
     return nil unless translations_status.is_a?(Hash)
     err = translations_status["_error"]
     err.is_a?(Hash) && err["class"].present? ? err : nil
+  end
+
+  # Drops the recorded failure and nils the source hash together: the nil hash
+  # is what makes the next PropertyTranslationJob actually translate instead of
+  # no-opping on an unchanged digest, and dropping the marker stops the admin
+  # reporting a failure that is being retried right now. update_columns skips
+  # callbacks on purpose so this does not itself enqueue another job.
+  def clear_translation_failure!
+    status = (translations_status || {}).dup
+    status.delete("_error")
+    update_columns(translations_status: status, translation_source_hash: nil)
   end
 
   # The translation job enqueues brochure regen itself on success, so the

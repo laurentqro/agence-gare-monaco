@@ -133,4 +133,29 @@ class PropertyRetranslateTaskTest < ActiveSupport::TestCase
     output = silence_stdout { Rake::Task["translations:retry_failed"].invoke }
     assert_match(/2/, output)
   end
+
+  test "retry_failed catches a failed re-translation that kept its old hash" do
+    # Only success updates translation_source_hash, so a property whose
+    # RE-translation failed still carries the previous hash. It must be
+    # retried like any other failure.
+    stuck = build_property(reference: "RF-006", error: "RubyLLM::ServerError", hash: "old-hash")
+
+    assert_enqueued_with(job: PropertyTranslationJob, args: [ stuck.id ]) do
+      silence_stdout { Rake::Task["translations:retry_failed"].invoke }
+    end
+    assert_nil stuck.reload.translation_source_hash,
+               "the old hash must be nilled or the retry would no-op on an unchanged digest"
+  end
+
+  test "task helpers do not leak into the global namespace" do
+    # `def` inside a Rake namespace block defines a private method on Object,
+    # and a bare constant becomes a global: any same-named definition in a
+    # sibling rake file would silently win by load order, and a typo'd call on
+    # the wrong receiver would still resolve and run. Failure-clearing lives on
+    # Property; the stagger default lives inside each task.
+    refute Object.private_method_defined?(:clear_translation_failure!),
+           "clear_translation_failure! must not be a global method (use Property#clear_translation_failure!)"
+    refute Object.const_defined?(:DEFAULT_STAGGER_SECONDS),
+           "DEFAULT_STAGGER_SECONDS must not be a global constant"
+  end
 end

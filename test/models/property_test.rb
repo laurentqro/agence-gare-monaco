@@ -455,6 +455,63 @@ class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase
     assert_empty brochure_jobs, "no brochures while the property is untranslated"
   end
 
+  test "translation_failed scope finds failed properties in SQL, old hash or not" do
+    # A re-translation that fails after a text change keeps the OLD non-nil
+    # hash (only success updates it), so the scope must filter on the recorded
+    # "_error" itself, not on a nil hash. And it must be SQL: loading the whole
+    # table (four multi-locale JSON columns per row) to find the usual handful
+    # of failures does not belong in a scope operators run casually.
+    failed_no_hash = @property
+    failed_no_hash.update_columns(
+      translation_source_hash: nil,
+      translations_status: { "_error" => { "class" => "RubyLLM::UnauthorizedError",
+                                           "message" => "bad key",
+                                           "failed_at" => Time.current.iso8601 } }
+    )
+    failed_old_hash = Property.create!(
+      reference: "MC-TF-OLD", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", title: { "fr" => "Titre" }
+    )
+    failed_old_hash.update_columns(
+      translation_source_hash: "stale-but-present",
+      translations_status: { "_error" => { "class" => "RubyLLM::ServerError",
+                                           "message" => "boom",
+                                           "failed_at" => Time.current.iso8601 } }
+    )
+    healthy = Property.create!(
+      reference: "MC-TF-OK", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", title: { "fr" => "Titre" }
+    )
+    healthy.update_columns(translation_source_hash: "good-hash")
+
+    found = Property.translation_failed
+    assert_includes found, failed_no_hash
+    assert_includes found, failed_old_hash,
+                    "a failed re-translation still carrying its old hash must be found"
+    refute_includes found, healthy
+  end
+
+  test "clear_translation_failure! drops the marker and forces the next run to translate" do
+    @property.update_columns(
+      translation_source_hash: "stale-hash",
+      translations_status: { "en" => { "translated_at" => Time.current.iso8601 },
+                             "_error" => { "class" => "RubyLLM::UnauthorizedError",
+                                           "message" => "bad key",
+                                           "failed_at" => Time.current.iso8601 } }
+    )
+
+    assert_no_enqueued_jobs do
+      @property.clear_translation_failure!
+    end
+
+    @property.reload
+    assert_nil @property.translation_error, "the recorded failure must be gone"
+    assert_nil @property.translation_source_hash,
+               "the hash must be nilled so the next job translates instead of no-opping"
+    assert @property.translations_status["en"].present?,
+           "per-locale status entries must survive the clear"
+  end
+
   test "retries a failed translation when the FR text actually changed" do
     # New source text is a genuine reason to try again: it may well succeed
     # where the previous text failed (e.g. ContextLengthExceededError).
