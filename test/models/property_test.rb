@@ -418,4 +418,40 @@ class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase
     refute_empty translation_jobs,
                  "properties with no source hash should always retranslate on save"
   end
+
+  test "does not retry a permanently failed translation when text did not change" do
+    # A hard translation failure (UnauthorizedError, BadRequestError, ...) is
+    # discarded and recorded in translations_status without ever setting
+    # translation_source_hash. With the sync running every 5 minutes, retrying
+    # that nil hash on each tick means ~288 paid LLM calls a day per stuck
+    # property, and the failure will not fix itself.
+    @property.update_columns(
+      translation_source_hash: nil,
+      translations_status: { "_error" => { "class" => "RubyLLM::UnauthorizedError",
+                                           "message" => "bad key",
+                                           "failed_at" => Time.current.iso8601 } }
+    )
+    @property.update!(price: 2_000_000)
+    @property.enqueue_post_save_jobs!
+
+    translation_jobs = enqueued_jobs.select { |j| j[:job] == PropertyTranslationJob }
+    assert_empty translation_jobs,
+                 "a recorded hard failure must not be retried on every sync tick"
+  end
+
+  test "retries a failed translation when the FR text actually changed" do
+    # New source text is a genuine reason to try again: it may well succeed
+    # where the previous text failed (e.g. ContextLengthExceededError).
+    @property.update_columns(
+      translation_source_hash: nil,
+      translations_status: { "_error" => { "class" => "RubyLLM::ContextLengthExceededError",
+                                           "message" => "too long",
+                                           "failed_at" => Time.current.iso8601 } }
+    )
+    @property.update!(title: { "fr" => "Titre retravaillé" })
+
+    assert_enqueued_with(job: PropertyTranslationJob, args: [ @property.id ]) do
+      @property.enqueue_post_save_jobs!
+    end
+  end
 end

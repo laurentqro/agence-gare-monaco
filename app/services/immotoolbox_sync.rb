@@ -254,7 +254,12 @@ class ImmotoolboxSync
         position: img_data["order"] || img_data["position"] || 0,
         is_plan: img_data["isPlan"] || false
       )
-      changed = true if image.new_record? || image.changed?
+      # Ignore property_id when deciding whether the image changed. Images are
+      # looked up globally because one can be shared across properties, and each
+      # owner's turn in the sync reassigns it — so property_id alone flips back
+      # and forth every run and would report a permanent change, regenerating
+      # brochures for both properties on every tick.
+      changed = true if image.new_record? || image.changed.any? { |attr| attr != "property_id" }
       image.save!
     end
 

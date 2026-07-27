@@ -309,6 +309,38 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
                  "an unchanged property must not regenerate its brochures on every sync"
   end
 
+  test "an image shared between properties does not report a change on every sync" do
+    setup_districts_and_buildings
+    # Images are looked up globally by immotoolbox_id because a building image can
+    # be shared across properties. Reassigning `property` on every pass would make
+    # the two owners steal the row back and forth, so the image would look changed
+    # forever and regenerate 18 PDFs per property per tick.
+    a = Property.create!(
+      reference: "SH-A", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", immotoolbox_id: 9001
+    )
+    b = Property.create!(
+      reference: "SH-B", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", immotoolbox_id: 9002
+    )
+    shared = {
+      "id" => 77_001, "order" => 1,
+      "large" => "https://cdn.example.com/large/shared.jpg",
+      "thumb" => "https://cdn.example.com/thumb/shared.jpg",
+      "isPlan" => false
+    }
+    sync = ImmotoolboxSync.new(api_token: "test-token")
+    sync_images = sync.method(:sync_property_images)
+
+    assert sync_images.call(a, [ shared ]), "first sync creates the image, so it changed"
+    sync_images.call(b, [ shared ])
+
+    refute sync_images.call(a, [ shared ]),
+           "a shared image must not report a change just because another property owns it"
+    refute sync_images.call(b, [ shared ]),
+           "ownership must not ping-pong between properties sharing an image"
+  end
+
   test "brochure job is enqueued only after images are synced (no stale image set)" do
     setup_districts_and_buildings
     # Same direct-brochure setup as above: metadata changes but FR text does not,

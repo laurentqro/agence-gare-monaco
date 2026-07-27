@@ -90,6 +90,10 @@ class PropertyTranslator
     intro = (@property.intro || {}).dup
     description = (@property.description || {}).dup
     status = (@property.translations_status || {}).dup
+    # Clear any recorded hard failure: this run succeeded. enqueue_post_save_jobs!
+    # refuses to retry while an "_error" is present, so a stale marker would block
+    # every future retranslation of this property.
+    status.delete("_error")
     timestamp = Time.current.iso8601
 
     translations.each do |locale, fields|
