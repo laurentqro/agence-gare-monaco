@@ -57,18 +57,32 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET index shows one chip per target locale, green when translated" do
-    create_property(
+    property = create_property(
       reference: "MC-001",
       title: { "fr" => "Studio", "en" => "Studio", "it" => "Monolocale" },
       description: { "fr" => "Description", "en" => "Description", "it" => "Descrizione" }
     )
+    property.update_columns(translation_source_hash: property.current_fr_hash)
     get admin_properties_url
     assert_select "th", /Traductions/
     assert_select "[data-locale-chip]", Property::TARGET_LOCALES.size
-    assert_select "[data-locale-chip='en'][data-translated='true']", text: "EN"
-    assert_select "[data-locale-chip='it'][data-translated='true']", text: "IT"
-    assert_select "[data-locale-chip='de'][data-translated='false']", text: "DE"
-    assert_select "[data-locale-chip='ru'][data-translated='false']", text: "RU"
+    assert_select "[data-locale-chip='en'][data-locale-status='translated']", text: "EN"
+    assert_select "[data-locale-chip='it'][data-locale-status='translated']", text: "IT"
+    assert_select "[data-locale-chip='de'][data-locale-status='missing']", text: "DE"
+    assert_select "[data-locale-chip='ru'][data-locale-status='missing']", text: "RU"
+  end
+
+  test "GET index shows stale chips when the FR text changed since translation" do
+    property = create_property(
+      reference: "MC-STALE",
+      title: { "fr" => "Studio", "en" => "Studio" },
+      description: { "fr" => "Description", "en" => "Description" }
+    )
+    property.update_columns(translation_source_hash: property.current_fr_hash)
+    property.update_columns(title: { "fr" => "Studio rénové", "en" => "Studio" })
+    get admin_properties_url
+    assert_select "[data-locale-chip='en'][data-locale-status='stale']", text: "EN"
+    assert_select "[data-locale-chip='de'][data-locale-status='missing']", text: "DE"
   end
 
   test "GET index shows a translation error marker with the exception class" do

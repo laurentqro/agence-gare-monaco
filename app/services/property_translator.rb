@@ -27,10 +27,11 @@ class PropertyTranslator
   end
 
   def translate!
-    fr_title = @property.title_for(:fr)
     fr_intro = @property.intro_for(:fr)
     fr_description = @property.description_for(:fr)
-    new_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_intro}\n#{fr_description}")
+    # Property#current_fr_hash is the single definition of the source digest;
+    # the admin staleness chips compare against the same value.
+    new_hash = @property.current_fr_hash
     expected_hash = @property.translation_source_hash
     if new_hash == expected_hash
       # The stored hash covers the current FR text, so the translation is

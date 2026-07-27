@@ -413,6 +413,50 @@ class PropertyTest < ActiveSupport::TestCase
     )
     assert property.translated_locale?(:en)
   end
+
+  test "current_fr_hash matches the translator's source digest" do
+    property = Property.create!(
+      reference: "MC-TX-007", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco",
+      title: { "fr" => "Studio" }, intro: { "fr" => "Intro" }, description: { "fr" => "Desc" }
+    )
+    expected = Digest::SHA256.hexdigest("Studio\nIntro\nDesc")
+    assert_equal expected, property.current_fr_hash
+  end
+
+  test "translation_stale? compares the stored hash to the current FR text" do
+    property = Property.create!(
+      reference: "MC-TX-008", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco",
+      title: { "fr" => "Studio", "en" => "Studio" }
+    )
+    assert property.translation_stale?, "a nil hash means the translation never ran"
+
+    property.update_columns(translation_source_hash: property.current_fr_hash)
+    refute property.reload.translation_stale?
+
+    property.update_columns(title: { "fr" => "Studio rénové", "en" => "Studio" })
+    assert property.reload.translation_stale?, "an FR edit must mark stored translations stale"
+  end
+
+  test "locale_translation_status distinguishes translated, stale and missing" do
+    property = Property.create!(
+      reference: "MC-TX-009", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco",
+      title: { "fr" => "Studio", "en" => "Studio" }
+    )
+    property.update_columns(translation_source_hash: property.current_fr_hash)
+    property.reload
+
+    assert_equal :translated, property.locale_translation_status(:en)
+    assert_equal :missing, property.locale_translation_status(:de)
+
+    property.update_columns(title: { "fr" => "Studio rénové", "en" => "Studio" })
+    property = Property.find(property.id)
+    assert_equal :stale, property.locale_translation_status(:en)
+    assert_equal :missing, property.locale_translation_status(:de),
+      "a locale with no content stays missing even when the property is stale"
+  end
 end
 
 class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase

@@ -206,6 +206,10 @@ fr:
         price: "Prix"
         status: "Statut"
         translations: "Traductions"
+      translations:
+        translated: "Traduction à jour"
+        stale: "Texte français modifié, retraduction en attente"
+        missing: "Pas de traduction"
       transaction_labels:
         sale: "Vente"
         rental: "Location"

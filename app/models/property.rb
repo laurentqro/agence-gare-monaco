@@ -127,6 +127,33 @@ class Property < ApplicationRecord
     end
   end
 
+  # Digest of the FR source text, mirroring what PropertyTranslator stores in
+  # translation_source_hash on success. Memoized: the index renders it once
+  # per chip and the inputs cannot change within a request.
+  def current_fr_hash
+    @current_fr_hash ||= Digest::SHA256.hexdigest(
+      "#{title_for(:fr)}\n#{intro_for(:fr)}\n#{description_for(:fr)}"
+    )
+  end
+
+  # reload does not clear plain ivars, and a digest memoized before the reload
+  # would silently mask a staleness flip.
+  def reload(options = nil)
+    @current_fr_hash = nil
+    super
+  end
+
+  # A blank hash counts as stale: the translation never ran (or was reset for
+  # a retry), so any stored locale content cannot be trusted as current.
+  def translation_stale?
+    translation_source_hash.blank? || current_fr_hash != translation_source_hash
+  end
+
+  def locale_translation_status(locale)
+    return :missing unless translated_locale?(locale)
+    translation_stale? ? :stale : :translated
+  end
+
   # Drops the recorded failure and nils the source hash together: the nil hash
   # is what makes the next PropertyTranslationJob actually translate instead of
   # no-opping on an unchanged digest, and dropping the marker stops the admin
