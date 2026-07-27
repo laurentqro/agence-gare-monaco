@@ -5,6 +5,8 @@ class Property < ApplicationRecord
     video_url virtual_tour_url
   ].freeze
 
+  TARGET_LOCALES = PropertyTranslator::LOCALES
+
   belongs_to :district, optional: true
   belongs_to :building, optional: true
   has_many :property_images, dependent: :destroy
@@ -108,6 +110,14 @@ class Property < ApplicationRecord
     return nil unless translations_status.is_a?(Hash)
     err = translations_status["_error"]
     err.is_a?(Hash) && err["class"].present? ? err : nil
+  end
+
+  # Checks the title JSON itself rather than the translations_status stamps:
+  # the translator fills all locales in one pass, but content can still go
+  # partial (manually created properties, historical partial-update wipes),
+  # and the admin badge must report what a visitor would actually see.
+  def translated_locale?(locale)
+    title.is_a?(Hash) && title[locale.to_s].present?
   end
 
   # Drops the recorded failure and nils the source hash together: the nil hash

@@ -364,6 +364,32 @@ class PropertyTest < ActiveSupport::TestCase
     )
     assert_nil property.translated_at_for(:de)
   end
+
+  test "TARGET_LOCALES matches the translator's locales" do
+    assert_equal PropertyTranslator::LOCALES, Property::TARGET_LOCALES
+  end
+
+  test "translated_locale? reflects actual title content, not status stamps" do
+    property = Property.create!(
+      reference: "MC-TX-003", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco",
+      title: { "fr" => "Studio", "en" => "Studio", "it" => "Monolocale" },
+      translations_status: { "de" => { "translated_at" => "2026-04-21T12:00:00Z" } }
+    )
+    assert property.translated_locale?(:en)
+    assert property.translated_locale?("it")
+    refute property.translated_locale?(:de), "a status stamp without content must not count"
+    refute property.translated_locale?(:sv)
+  end
+
+  test "translated_locale? treats blank strings as untranslated" do
+    property = Property.create!(
+      reference: "MC-TX-004", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco",
+      title: { "fr" => "Studio", "en" => "  " }
+    )
+    refute property.translated_locale?(:en)
+  end
 end
 
 class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase

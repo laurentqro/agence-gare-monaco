@@ -205,6 +205,7 @@ fr:
         type: "Type"
         price: "Prix"
         status: "Statut"
+        translations: "Traductions"
       transaction_labels:
         sale: "Vente"
         rental: "Location"

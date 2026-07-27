@@ -56,6 +56,30 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{new_admin_property_share_path(prop)}']"
   end
 
+  test "GET index shows one chip per target locale, green when translated" do
+    create_property(
+      reference: "MC-001",
+      title: { "fr" => "Studio", "en" => "Studio", "it" => "Monolocale" }
+    )
+    get admin_properties_url
+    assert_select "th", /Traductions/
+    assert_select "[data-locale-chip]", Property::TARGET_LOCALES.size
+    assert_select "[data-locale-chip='en'][data-translated='true']", text: "EN"
+    assert_select "[data-locale-chip='it'][data-translated='true']", text: "IT"
+    assert_select "[data-locale-chip='de'][data-translated='false']", text: "DE"
+    assert_select "[data-locale-chip='ru'][data-translated='false']", text: "RU"
+  end
+
+  test "GET index shows a translation error marker with the exception class" do
+    create_property(
+      reference: "MC-ERR",
+      translations_status: { "_error" => { "class" => "RubyLLM::RateLimitError", "message" => "quota" } }
+    )
+    create_property(reference: "MC-OK", title: { "fr" => "Studio" })
+    get admin_properties_url
+    assert_select "[data-translation-error][title=?]", "RubyLLM::RateLimitError", count: 1
+  end
+
   test "GET index orders by most recent first" do
     create_property(reference: "MC-OLD", title: { "fr" => "Old" }, created_at: 2.days.ago)
     create_property(reference: "MC-NEW", title: { "fr" => "New" }, created_at: 1.hour.ago)
