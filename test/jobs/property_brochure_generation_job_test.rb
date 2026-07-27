@@ -15,8 +15,56 @@ class PropertyBrochureGenerationJobTest < ActiveJob::TestCase
       price: 1_000_000,
       published: true
     )
+    # The job declines to render an untranslated property, so the default
+    # fixture must look translated. Tests that exercise the decline path
+    # nil this out themselves.
+    @property.update_columns(translation_source_hash: "translated-hash")
     # Clear attachments that a model callback may have enqueued + run.
     @property.brochures.purge if @property.brochures.attached?
+  end
+
+  test "generates nothing for a property whose translation failed" do
+    # Enforced here rather than at each caller: five places enqueue this job
+    # (sync, image callback, model, translator, backfill rake task), and an
+    # untranslated property must get brochures from none of them. 8 of the 9
+    # locales would otherwise render from missing translations.
+    @property.update_columns(
+      translation_source_hash: nil,
+      translations_status: { "_error" => { "class" => "RubyLLM::UnauthorizedError",
+                                           "message" => "bad key",
+                                           "failed_at" => Time.current.iso8601 } }
+    )
+
+    PropertyPdfGenerator.stub_any_instance(:generate, "%PDF-1.4 fake") do
+      PropertyBrochureGenerationJob.perform_now(@property.id)
+    end
+
+    refute @property.reload.brochures.attached?,
+           "an untranslated property must not get a brochure cache"
+  end
+
+  test "does not purge existing brochures when it declines to regenerate" do
+    # A property that had good brochures and later fails a re-translation must
+    # keep serving what it has: purging would leave every download paying full
+    # Typst generation for a property we are refusing to regenerate.
+    PropertyPdfGenerator.stub_any_instance(:generate, "%PDF-1.4 fake") do
+      PropertyBrochureGenerationJob.perform_now(@property.id)
+    end
+    assert @property.reload.brochures.attached?, "precondition: brochures exist"
+    count_before = @property.brochures.count
+
+    @property.update_columns(
+      translation_source_hash: nil,
+      translations_status: { "_error" => { "class" => "RubyLLM::ServerError",
+                                           "message" => "later failure",
+                                           "failed_at" => Time.current.iso8601 } }
+    )
+    PropertyPdfGenerator.stub_any_instance(:generate, "%PDF-1.4 fake") do
+      PropertyBrochureGenerationJob.perform_now(@property.id)
+    end
+
+    assert_equal count_before, @property.reload.brochures.count,
+                 "existing brochures must survive a declined regeneration"
   end
 
   test "attaches one PDF per locale in both logo variants" do

@@ -15,6 +15,14 @@ class PropertyBrochureGenerationJob < ApplicationJob
     property = Property.find_by(id: property_id)
     return unless property
 
+    # Never render an untranslated property: 8 of the 9 locales would come out
+    # of missing translations. Enforced here rather than at each caller because
+    # five places enqueue this job (the sync, the PropertyImage callback, the
+    # model, the translator, and the backfill rake task). Return before the
+    # purge so a property that had good brochures and later failed a
+    # re-translation keeps serving the ones it already has.
+    return if property.translation_source_hash.nil?
+
     property.brochures.purge
 
     LOCALES.each do |locale|

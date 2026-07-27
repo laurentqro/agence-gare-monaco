@@ -419,12 +419,11 @@ class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase
                  "properties with no source hash should always retranslate on save"
   end
 
-  test "does not retry a permanently failed translation when text did not change" do
-    # A hard translation failure (UnauthorizedError, BadRequestError, ...) is
-    # discarded and recorded in translations_status without ever setting
-    # translation_source_hash. With the sync running every 5 minutes, retrying
-    # that nil hash on each tick means ~288 paid LLM calls a day per stuck
-    # property, and the failure will not fix itself.
+  test "keeps retrying a failed translation until it succeeds" do
+    # A translation-failed property must keep trying: the causes are usually
+    # transient or operator-fixable (expired key, quota, outage), and a property
+    # stuck untranslated is worse than the retry cost. The recorded failure is a
+    # visibility marker, not a stop sign.
     @property.update_columns(
       translation_source_hash: nil,
       translations_status: { "_error" => { "class" => "RubyLLM::UnauthorizedError",
@@ -432,11 +431,28 @@ class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase
                                            "failed_at" => Time.current.iso8601 } }
     )
     @property.update!(price: 2_000_000)
-    @property.enqueue_post_save_jobs!
 
-    translation_jobs = enqueued_jobs.select { |j| j[:job] == PropertyTranslationJob }
-    assert_empty translation_jobs,
-                 "a recorded hard failure must not be retried on every sync tick"
+    assert_enqueued_with(job: PropertyTranslationJob, args: [ @property.id ]) do
+      @property.enqueue_post_save_jobs!
+    end
+  end
+
+  test "a failed translation suppresses the brochure branch" do
+    # An untranslated property must not get brochures: 8 of the 9 locales would
+    # render from missing translations. The :translation branch already takes
+    # precedence over :brochure, so a retrying property never reaches it.
+    @property.update_columns(
+      translation_source_hash: nil,
+      translations_status: { "_error" => { "class" => "RubyLLM::UnauthorizedError",
+                                           "message" => "bad key",
+                                           "failed_at" => Time.current.iso8601 } }
+    )
+    @property.update!(price: 2_000_000)
+
+    assert_equal :translation, @property.enqueue_post_save_jobs!(defer_brochure: true),
+                 "a failed property must take the translation branch, not the brochure one"
+    brochure_jobs = enqueued_jobs.select { |j| j[:job] == PropertyBrochureGenerationJob }
+    assert_empty brochure_jobs, "no brochures while the property is untranslated"
   end
 
   test "retries a failed translation when the FR text actually changed" do

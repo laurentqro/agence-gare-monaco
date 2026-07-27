@@ -4,12 +4,9 @@ namespace :translations do
   desc "Enqueue PropertyTranslationJob for properties missing a translation hash (staggered)"
   task backfill: :environment do
     stagger_step_seconds = Integer(ENV.fetch("STAGGER_SECONDS", DEFAULT_STAGGER_SECONDS.to_s))
-    # Skip properties carrying a recorded hard failure: they also have a nil
-    # hash, but re-running them here would just fail again without clearing the
-    # marker. Use translations:retry_failed for those, once the cause is fixed.
-    ids = Property.where(translation_source_hash: nil)
-                  .reject { |p| p.translation_error.present? }
-                  .map(&:id)
+    # Includes properties carrying a recorded failure: they keep retrying until
+    # they succeed, so a manual backfill should pick them up too.
+    ids = Property.where(translation_source_hash: nil).pluck(:id)
 
     ids.each_with_index do |id, i|
       PropertyTranslationJob.set(wait: (i * stagger_step_seconds).seconds).perform_later(id)
@@ -29,13 +26,13 @@ namespace :translations do
     puts "Enqueued re-translation for property #{property.id} (#{property.reference})"
   end
 
-  desc "Retry every property whose translation failed permanently (staggered)"
+  desc "Retry every property whose translation failed, now, without waiting for a sync (staggered)"
   task retry_failed: :environment do
     stagger_step_seconds = Integer(ENV.fetch("STAGGER_SECONDS", DEFAULT_STAGGER_SECONDS.to_s))
-    # A hard failure is recorded under translations_status["_error"], which blocks
-    # the automatic retry path in Property#enqueue_post_save_jobs! so the 5-minute
-    # sync can't burn LLM calls on a failure that won't fix itself. This is the
-    # operator's way back in once the underlying cause is resolved.
+    # Failed properties do retry themselves on the next sync tick that saves them,
+    # but that can be a while if nothing about the property changes. This forces
+    # the retry immediately after fixing the cause (an expired key, say), and
+    # clears the recorded marker so the admin stops showing a stale failure.
     failed = Property.find_each.select { |p| p.translation_error.present? }
 
     failed.each_with_index do |property, i|
@@ -46,8 +43,9 @@ namespace :translations do
     puts "Retried #{failed.size} failed translation(s) (staggered by #{stagger_step_seconds}s each)."
   end
 
-  # Clear the recorded failure and the source hash together: the marker is what
-  # blocks the retry, and the nil hash is what makes the job actually translate.
+  # Clear the recorded failure and the source hash together: the nil hash is what
+  # makes the job actually translate, and dropping the marker stops the admin
+  # reporting a failure that is being retried right now.
   # update_columns skips callbacks so this doesn't enqueue a second job itself.
   def clear_translation_failure!(property)
     status = (property.translations_status || {}).dup

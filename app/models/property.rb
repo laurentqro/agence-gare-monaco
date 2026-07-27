@@ -114,12 +114,13 @@ class Property < ApplicationRecord
   # caller responsible for the brochure job.
   def enqueue_post_save_jobs!(defer_brochure: false)
     text_changed = saved_changes.keys.intersect?(%w[title intro description])
-    # A hard translation failure is discarded without ever setting
-    # translation_source_hash, so the nil-hash retry path would re-enqueue a paid
-    # LLM call on every sync tick (every 5 minutes) for a failure that will not
-    # fix itself. New source text is still a genuine reason to try again.
-    retry_translation = translation_source_hash.nil? && translation_error.nil?
-    if text_changed || retry_translation
+    # A property with no translation hash keeps retrying until it succeeds,
+    # including one carrying a recorded failure: the causes are transient or
+    # operator-fixable (expired key, quota, outage), and leaving a property
+    # permanently untranslated is worse than the retry cost. Taking this branch
+    # also suppresses the brochure branch below, so an untranslated property
+    # never gets brochures rendered from missing translations.
+    if text_changed || translation_source_hash.nil?
       PropertyTranslationJob.perform_later(id)
       :translation
     elsif saved_changes.keys.intersect?(BROCHURE_TRIGGER_COLUMNS)

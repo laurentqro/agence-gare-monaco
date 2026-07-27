@@ -37,10 +37,10 @@ class PropertyRetranslateTaskTest < ActiveSupport::TestCase
 
   # --- translations:retranslate[ID] ---
 
-  test "retranslate clears a recorded failure so the property is no longer stuck" do
-    # enqueue_post_save_jobs! refuses to retry while an "_error" is recorded, so
-    # clearing the marker is the whole point of the task: without it the enqueued
-    # job would be the last one this property ever gets.
+  test "retranslate clears a recorded failure and forces a fresh attempt" do
+    # Clearing the marker stops the admin reporting a stale failure while the
+    # retry this task just enqueued is in flight; nilling the hash is what makes
+    # that job actually translate rather than no-op on an unchanged digest.
     property = build_property(reference: "RT-001", error: "RubyLLM::UnauthorizedError")
 
     silence_stdout { Rake::Task["translations:retranslate"].invoke(property.id.to_s) }
@@ -113,21 +113,17 @@ class PropertyRetranslateTaskTest < ActiveSupport::TestCase
     assert_equal waits.sort, waits, "enqueues should be in increasing order"
   end
 
-  test "backfill skips properties with a recorded failure" do
-    # backfill selects on translation_source_hash: nil, which also matches every
-    # hard-failed property. Without this filter it silently re-runs known
-    # failures that will fail again, duplicating retry_failed's job but without
-    # clearing the marker first.
+  test "backfill includes properties with a recorded failure" do
+    # Failed properties keep retrying until they succeed, so a manual backfill
+    # should pick them up alongside the never-translated ones.
     stuck = build_property(reference: "BF-001", error: "RubyLLM::UnauthorizedError")
     pending = build_property(reference: "BF-002")
 
-    assert_enqueued_with(job: PropertyTranslationJob, args: [ pending.id ]) do
-      silence_stdout { Rake::Task["translations:backfill"].invoke }
-    end
+    silence_stdout { Rake::Task["translations:backfill"].invoke }
 
     enqueued_ids = enqueued_jobs.select { |j| j[:job] == PropertyTranslationJob }.map { |j| j[:args].first }
-    refute_includes enqueued_ids, stuck.id,
-                    "a recorded failure needs retry_failed, not a silent backfill re-run"
+    assert_includes enqueued_ids, stuck.id, "a failed property should be retried by backfill"
+    assert_includes enqueued_ids, pending.id, "a never-translated property should be backfilled"
   end
 
   test "retry_failed reports how many properties it retried" do
