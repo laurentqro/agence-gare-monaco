@@ -85,6 +85,19 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-locale-chip='de'][data-locale-status='missing']", text: "DE"
   end
 
+  test "GET index attributes chips to their own row" do
+    full = Property::TARGET_LOCALES.index_with { "Translated" }.merge("fr" => "Original")
+    translated = create_property(
+      reference: "MC-ALL", title: full, description: full, created_at: 1.hour.ago
+    )
+    translated.update_columns(translation_source_hash: translated.current_fr_hash)
+    create_property(reference: "MC-NONE", title: { "fr" => "Studio" }, created_at: 2.days.ago)
+
+    get admin_properties_url
+    assert_select "tbody tr:first-child [data-locale-chip='en'][data-locale-status='translated']"
+    assert_select "tbody tr:last-child [data-locale-chip='en'][data-locale-status='missing']"
+  end
+
   test "GET index shows a translation error marker with the exception class" do
     create_property(
       reference: "MC-ERR",
