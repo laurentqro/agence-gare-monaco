@@ -371,10 +371,9 @@ class ArticleTest < ActiveSupport::TestCase
     assert Article.find(article.id).translation_stale?
   end
 
-  # TARGET_LOCALES sourced from translator
-  test "TARGET_LOCALES equals ArticleTranslator::LOCALES" do
-    assert_equal ArticleTranslator::LOCALES.sort, Article::TARGET_LOCALES.sort,
-                 "Article must derive its target-locale list from the translator's LOCALES so the two cannot drift"
+  test "TARGET_LOCALES covers every app locale except FR" do
+    assert_equal (I18n.available_locales.map(&:to_s) - [ "fr" ]).sort, Article::TARGET_LOCALES.sort,
+                 "a locale added to config/application.rb must also be added to ArticleTranslator's locales"
   end
 
   test "current_fr_hash returns SHA256 of FR title and body, joined by newline" do

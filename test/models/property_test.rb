@@ -365,8 +365,9 @@ class PropertyTest < ActiveSupport::TestCase
     assert_nil property.translated_at_for(:de)
   end
 
-  test "TARGET_LOCALES matches the translator's locales" do
-    assert_equal PropertyTranslator::LOCALES, Property::TARGET_LOCALES
+  test "TARGET_LOCALES covers every app locale except FR" do
+    assert_equal (I18n.available_locales.map(&:to_s) - [ "fr" ]).sort, Property::TARGET_LOCALES.sort,
+                 "a locale added to config/application.rb must also be added to PropertyTranslator::LOCALE_NAMES"
   end
 
   test "translated_locale? reflects actual title content, not status stamps" do
