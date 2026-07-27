@@ -59,7 +59,8 @@ class Admin::PropertiesControllerTest < ActionDispatch::IntegrationTest
   test "GET index shows one chip per target locale, green when translated" do
     create_property(
       reference: "MC-001",
-      title: { "fr" => "Studio", "en" => "Studio", "it" => "Monolocale" }
+      title: { "fr" => "Studio", "en" => "Studio", "it" => "Monolocale" },
+      description: { "fr" => "Description", "en" => "Description", "it" => "Descrizione" }
     )
     get admin_properties_url
     assert_select "th", /Traductions/

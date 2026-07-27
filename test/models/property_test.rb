@@ -390,6 +390,29 @@ class PropertyTest < ActiveSupport::TestCase
     )
     refute property.translated_locale?(:en)
   end
+
+  test "translated_locale? requires every field with FR content, not just the title" do
+    property = Property.create!(
+      reference: "MC-TX-005", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco",
+      title: { "fr" => "Studio", "en" => "Studio", "it" => "Monolocale" },
+      intro: { "fr" => "Belle situation", "en" => "Great location" },
+      description: { "fr" => "Grande description", "en" => "Long description" }
+    )
+    assert property.translated_locale?(:en)
+    refute property.translated_locale?(:it), "IT title alone must not count when FR has intro and description"
+  end
+
+  test "translated_locale? ignores intro and description when FR has none" do
+    property = Property.create!(
+      reference: "MC-TX-006", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco",
+      title: { "fr" => "Parking", "en" => "Parking" },
+      intro: {},
+      description: { "fr" => "" }
+    )
+    assert property.translated_locale?(:en)
+  end
 end
 
 class PropertyEnqueuePostSaveJobsTest < ActiveJob::TestCase

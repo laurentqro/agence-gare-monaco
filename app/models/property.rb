@@ -112,12 +112,19 @@ class Property < ApplicationRecord
     err.is_a?(Hash) && err["class"].present? ? err : nil
   end
 
-  # Checks the title JSON itself rather than the translations_status stamps:
+  # Checks the content JSON itself rather than the translations_status stamps:
   # the translator fills all locales in one pass, but content can still go
   # partial (manually created properties, historical partial-update wipes),
-  # and the admin badge must report what a visitor would actually see.
+  # and the admin badge must report what a visitor would actually see. A
+  # locale only counts when every field the FR original has (title, intro,
+  # description) also has content for that locale; otherwise the public page
+  # falls back to French for the missing field.
   def translated_locale?(locale)
-    title.is_a?(Hash) && title[locale.to_s].present?
+    loc = locale.to_s
+    return false unless locale_content?(title, loc)
+    [ intro, description ].all? do |column|
+      !locale_content?(column, "fr") || locale_content?(column, loc)
+    end
   end
 
   # Drops the recorded failure and nils the source hash together: the nil hash
@@ -155,5 +162,11 @@ class Property < ApplicationRecord
       PropertyBrochureGenerationJob.perform_later(id) unless defer_brochure
       :brochure
     end
+  end
+
+  private
+
+  def locale_content?(column, locale)
+    column.is_a?(Hash) && column[locale].present?
   end
 end
