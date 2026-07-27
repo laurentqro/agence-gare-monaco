@@ -36,8 +36,17 @@ module AdminHelper
     gray: "bg-gray-100 text-gray-500",
     accent: "bg-accent/10 text-accent",
     green: "bg-green-100 text-green-700",
+    amber: "bg-amber-100 text-amber-700",
+    red: "bg-red-100 text-red-700",
     blue: "bg-blue-100 text-blue-700",
     purple: "bg-purple-100 text-purple-700"
+  }.freeze
+
+  # Badge color per locale chip state (Property#locale_translation_status).
+  LOCALE_CHIP_VARIANTS = {
+    translated: :green,
+    stale: :amber,
+    missing: :gray
   }.freeze
 
   # Badge color per contact category. Total over Contact::CATEGORIES
@@ -67,6 +76,27 @@ module AdminHelper
     category = contact.raw_category.to_s
     admin_badge t("admin.contacts.badges.#{category}", default: category),
                 variant: CONTACT_CATEGORY_BADGE_VARIANTS.fetch(category, :gray)
+  end
+
+  # Tiny per-locale pill for the property index translations column.
+  #
+  #   admin_locale_chip("en", property.locale_translation_status("en"))
+  def admin_locale_chip(locale, status)
+    tag.span(locale.upcase,
+             data: { locale_chip: locale, locale_status: status },
+             title: t("admin.properties.translations.#{status}"),
+             class: "inline-block px-1 py-0.5 text-[10px] font-mono font-medium rounded " \
+                    "#{BADGE_VARIANTS.fetch(LOCALE_CHIP_VARIANTS.fetch(status))}")
+  end
+
+  # Red "!" dot shown before the locale chips when a hard translation
+  # failure is recorded; the exception class rides along as the tooltip.
+  def admin_translation_error_marker(error)
+    tag.span("!",
+             data: { translation_error: true },
+             title: error["class"],
+             class: "inline-flex items-center justify-center w-4 h-4 text-[10px] font-bold rounded-full " \
+                    "#{BADGE_VARIANTS.fetch(:red)}")
   end
 
   # Whether a sidebar nav link should be marked active for the current path.

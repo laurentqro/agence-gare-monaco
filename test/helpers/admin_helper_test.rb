@@ -21,4 +21,25 @@ class AdminHelperTest < ActionView::TestCase
     assert admin_nav_active?("/admin", "/admin", exact: true)
     assert_not admin_nav_active?("/admin/articles", "/admin", exact: true)
   end
+
+  test "admin_locale_chip renders data attributes, tooltip and uppercased code" do
+    chip = admin_locale_chip("en", :stale)
+    assert_includes chip, 'data-locale-chip="en"'
+    assert_includes chip, 'data-locale-status="stale"'
+    assert_includes chip, ">EN<"
+    assert_includes chip, I18n.t("admin.properties.translations.stale")
+  end
+
+  test "admin_locale_chip colors come from the shared badge palette" do
+    assert_includes admin_locale_chip("de", :translated), AdminHelper::BADGE_VARIANTS[:green]
+    assert_includes admin_locale_chip("de", :stale), AdminHelper::BADGE_VARIANTS[:amber]
+    assert_includes admin_locale_chip("de", :missing), AdminHelper::BADGE_VARIANTS[:gray]
+  end
+
+  test "admin_translation_error_marker carries the exception class as tooltip" do
+    marker = admin_translation_error_marker({ "class" => "RubyLLM::RateLimitError" })
+    assert_includes marker, "data-translation-error"
+    assert_includes marker, 'title="RubyLLM::RateLimitError"'
+    assert_includes marker, AdminHelper::BADGE_VARIANTS[:red]
+  end
 end

@@ -56,14 +56,10 @@
             <td class="px-4 py-3 align-middle">
               <div class="flex items-center gap-0.5 whitespace-nowrap">
                 <% if (error = property.translation_error) %>
-                  <span data-translation-error class="inline-flex items-center justify-center w-4 h-4 mr-0.5 text-[10px] font-bold bg-red-100 text-red-700 rounded-full" title="<%= error["class"] %>">!</span>
+                  <%= admin_translation_error_marker(error) %>
                 <% end %>
                 <% Property::TARGET_LOCALES.each do |locale| %>
-                  <% status = property.locale_translation_status(locale) %>
-                  <% chip_classes = { translated: "bg-green-100 text-green-700", stale: "bg-amber-100 text-amber-700", missing: "bg-gray-100 text-gray-400" } %>
-                  <span data-locale-chip="<%= locale %>" data-locale-status="<%= status %>"
-                        title="<%= t("admin.properties.translations.#{status}") %>"
-                        class="inline-block px-1 py-0.5 text-[10px] font-mono font-medium rounded <%= chip_classes.fetch(status) %>"><%= locale.upcase %></span>
+                  <%= admin_locale_chip(locale, property.locale_translation_status(locale)) %>
                 <% end %>
               </div>
             </td>
