@@ -508,6 +508,45 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     assert prop.synced_at > before, "synced_at should still record that the sync ran"
   end
 
+  test "a no-op sync writes synced_at as one batched statement, not one per property" do
+    setup_districts_and_buildings
+    # In steady state every property takes the unchanged branch every 5 minutes.
+    # Per-property single-row updates would mean ~288 x N write transactions a
+    # day competing for SQLite's single writer; one update_all per run carries
+    # the same information.
+    stub_request(:get, "#{@base_url}/properties")
+      .with(query: { "status" => "published", "page" => "1" })
+      .to_return(
+        status: 200,
+        body: [ property_data, property_data.merge("id" => 101, "reference" => "AG-002") ].to_json,
+        headers: { "Content-Type" => "application/json" }
+      )
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+    Property.where(immotoolbox_id: [ 100, 101 ]).find_each do |prop|
+      prop.update_columns(translation_source_hash: "seeded-hash")
+      attach_complete_brochure_cache(prop)
+    end
+    before = 2.hours.ago
+    Property.where(immotoolbox_id: [ 100, 101 ]).update_all(synced_at: before)
+
+    synced_at_updates = []
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      sql = payload[:sql].to_s
+      synced_at_updates << sql if sql.match?(/UPDATE "properties"/i) && sql.include?("synced_at")
+    end
+    begin
+      ImmotoolboxSync.new(api_token: "test-token").sync_properties
+    ensure
+      ActiveSupport::Notifications.unsubscribe(subscriber)
+    end
+
+    assert_equal 1, synced_at_updates.size,
+                 "unchanged properties must share one batched synced_at write per run"
+    Property.where(immotoolbox_id: [ 100, 101 ]).find_each do |prop|
+      assert_operator prop.synced_at, :>, before, "every unchanged property must still get synced_at"
+    end
+  end
+
   test "a real change still bumps updated_at" do
     setup_districts_and_buildings
     # The lastmod guard must not blind the sitemap to genuine edits.

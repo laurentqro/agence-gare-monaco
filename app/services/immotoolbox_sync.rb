@@ -69,6 +69,7 @@ class ImmotoolboxSync
 
     api_properties = @client.fetch_all_properties
     synced_ids = []
+    unchanged_ids = []
 
     district_ids = api_properties.map { |d| d.dig("district", "id") }.compact.uniq
     building_ids = api_properties.map { |d| d["building_id"] }.compact.uniq
@@ -133,15 +134,18 @@ class ImmotoolboxSync
         virtual_tour_url: data["urlVirtual"] || data["virtualTourUrl"],
         has_360_tour: data["has360Tour"] || false
       )
-      # Record synced_at without touching updated_at when nothing else changed.
-      # The sitemap publishes updated_at as <lastmod>, and at a 5-minute cadence
-      # an unchanged property would otherwise claim ~288 modifications a day —
-      # a crawl signal Google learns to distrust, plus needless SQLite writes.
+      # Record synced_at without touching updated_at when nothing else changed:
+      # the sitemap publishes updated_at as <lastmod>, and at a 5-minute cadence
+      # an unchanged property would otherwise claim ~288 modifications a day,
+      # a crawl signal Google learns to distrust. Unchanged properties are
+      # collected and written as ONE update_all after the loop; per-property
+      # single-row updates would compete with request-serving writes for
+      # SQLite's single writer ~288 x N times a day for zero information gain.
       if property.changed?
         property.synced_at = Time.current
         property.save!
       else
-        property.update_columns(synced_at: Time.current)
+        unchanged_ids << property.id
       end
       # Defer the brochure job: it must be enqueued AFTER images are synced so an
       # async worker can't regenerate brochures against the old image set.
@@ -176,6 +180,8 @@ class ImmotoolboxSync
       synced_ids << data["id"]
       is_new ? stats[:created] += 1 : stats[:updated] += 1
     end
+
+    Property.where(id: unchanged_ids).update_all(synced_at: Time.current) if unchanged_ids.any?
 
     # Unpublish synced properties that are no longer in the API response
     stats[:unpublished] = Property.where.not(immotoolbox_id: nil)
