@@ -32,7 +32,15 @@ class PropertyTranslator
     fr_description = @property.description_for(:fr)
     new_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_intro}\n#{fr_description}")
     expected_hash = @property.translation_source_hash
-    return if new_hash == expected_hash
+    if new_hash == expected_hash
+      # The stored hash covers the current FR text, so the translation is
+      # provably current and any recorded failure is stale (the FR text flapped
+      # back to its pre-failure value). Without this, the admin failure banner
+      # would stay up forever and an operator would pay for a full
+      # retranslation of already-correct content just to dismiss it.
+      clear_stale_failure!
+      return
+    end
 
     builder = PromptBuilder.new(@property)
     chat = RubyLLM.chat(model: self.class.model)
@@ -49,6 +57,16 @@ class PropertyTranslator
   end
 
   private
+
+  # update_columns on purpose: nothing about the content changed, so callbacks
+  # and updated_at (the sitemap's lastmod) must stay untouched.
+  def clear_stale_failure!
+    return unless @property.translation_error
+
+    status = @property.translations_status.dup
+    status.delete("_error")
+    @property.update_columns(translations_status: status)
+  end
 
   def log_usage(response)
     Rails.logger.info(

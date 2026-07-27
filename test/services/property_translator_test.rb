@@ -104,6 +104,33 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
     refute called
   end
 
+  test "the unchanged-hash early return clears a stale failure marker" do
+    # A failed run leaves "_error" while keeping the old valid hash. If the FR
+    # text then flaps back to the value that hash covers (typo-then-undo in
+    # admin, or an Immotoolbox field reverting), every later job takes the
+    # early return: the translation is provably current, yet the admin failure
+    # banner would stay up forever and an operator would pay for a pointless
+    # full retranslation just to dismiss it.
+    fr_title = @property.title["fr"]
+    fr_intro = @property.intro["fr"]
+    fr_description = @property.description["fr"]
+    current_hash = Digest::SHA256.hexdigest("#{fr_title}\n#{fr_intro}\n#{fr_description}")
+    @property.update_columns(
+      translation_source_hash: current_hash,
+      translations_status: { "_error" => { "class" => "RubyLLM::ServerError",
+                                           "message" => "boom",
+                                           "failed_at" => Time.current.iso8601 } }
+    )
+
+    called = with_failing_chat do
+      PropertyTranslator.new(@property).translate!
+    end
+
+    refute called, "a current translation must not pay for an LLM call"
+    assert_nil @property.reload.translation_error,
+               "a provably current translation must drop the stale failure marker"
+  end
+
   test "blank title field raises BlankTranslation" do
     with_stubbed_chat(content: canned_response.merge("title_de" => "   ")) do
       assert_raises(PropertyTranslator::BlankTranslation) do
