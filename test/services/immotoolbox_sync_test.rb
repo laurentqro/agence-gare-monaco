@@ -286,6 +286,29 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
                  "expected a single brochure job for the property, not one per image"
   end
 
+  test "sync does not enqueue a brochure job when nothing about the property changed" do
+    setup_districts_and_buildings
+    # First sync establishes the property exactly as the API describes it. The
+    # second sync sees identical data, so it must enqueue no brochure job at all:
+    # regenerating 18 PDFs per property per run is what makes a frequent sync
+    # schedule (every 5 minutes) untenable.
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+    prop = Property.find_by(immotoolbox_id: 100)
+    # The first sync leaves translation pending; simulate the translation job
+    # having completed so the second sync takes neither the :translation branch
+    # nor a text-changed branch.
+    prop.update_columns(translation_source_hash: "seeded-hash")
+    clear_enqueued_jobs
+
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+
+    brochure_jobs = enqueued_jobs.select do |j|
+      j[:job] == PropertyBrochureGenerationJob && j[:args] == [ prop.id ]
+    end
+    assert_empty brochure_jobs,
+                 "an unchanged property must not regenerate its brochures on every sync"
+  end
+
   test "brochure job is enqueued only after images are synced (no stale image set)" do
     setup_districts_and_buildings
     # Same direct-brochure setup as above: metadata changes but FR text does not,

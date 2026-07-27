@@ -143,14 +143,20 @@ class ImmotoolboxSync
       # enqueue so a property with many images produces one job, not one per
       # image, then enqueue a single brochure job below.
       images = data["images"] || []
-      PropertyImage.suppress_brochure_generation do
+      images_changed = PropertyImage.suppress_brochure_generation do
         sync_property_images(property, images)
       end
 
-      # Now that images are current, enqueue exactly one brochure job per
-      # property. Skip only when a translation job was enqueued — that job
-      # regenerates brochures on success, and it runs after this sync.
-      PropertyBrochureGenerationJob.perform_later(property.id) unless enqueued == :translation
+      # Now that images are current, enqueue at most one brochure job per
+      # property. Skip when a translation job was enqueued — that job regenerates
+      # brochures on success, and it runs after this sync. Also skip when neither
+      # the property record nor its image set actually changed: this sync runs
+      # every few minutes over the whole catalogue, and each brochure job renders
+      # 18 PDFs (9 locales x 2 logo variants), so regenerating unchanged
+      # properties would saturate the workers and churn Active Storage blobs.
+      if enqueued != :translation && (enqueued == :brochure || images_changed)
+        PropertyBrochureGenerationJob.perform_later(property.id)
+      end
 
       synced_ids << data["id"]
       is_new ? stats[:created] += 1 : stats[:updated] += 1
@@ -220,13 +226,17 @@ class ImmotoolboxSync
     Integer(value, exception: false)
   end
 
+  # Returns true when the property's image set actually changed (any image
+  # removed, created, or modified), so the caller can decide whether a brochure
+  # regeneration is warranted.
   def sync_property_images(property, images_data)
     api_image_ids = images_data.map { |img| img["id"] }
 
     # Remove images that are no longer in API
-    property.property_images.where.not(immotoolbox_id: nil)
-            .where.not(immotoolbox_id: api_image_ids)
-            .destroy_all
+    removed = property.property_images.where.not(immotoolbox_id: nil)
+                      .where.not(immotoolbox_id: api_image_ids)
+                      .destroy_all
+    changed = removed.any?
 
     # Create or update images (look up globally since images can be shared across properties)
     images_data.each do |img_data|
@@ -244,7 +254,10 @@ class ImmotoolboxSync
         position: img_data["order"] || img_data["position"] || 0,
         is_plan: img_data["isPlan"] || false
       )
+      changed = true if image.new_record? || image.changed?
       image.save!
     end
+
+    changed
   end
 end

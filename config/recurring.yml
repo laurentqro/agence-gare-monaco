@@ -12,7 +12,7 @@
 production:
   immotoolbox_sync:
     class: ImmotoolboxSyncJob
-    schedule: every day at 6am
+    schedule: every 5 minutes
   exchange_rate_refresh:
     class: ExchangeRateRefreshJob
     schedule: every day at 7am
