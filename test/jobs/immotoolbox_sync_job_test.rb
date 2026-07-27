@@ -73,6 +73,41 @@ class ImmotoolboxSyncJobTest < ActiveJob::TestCase
     end
   end
 
+  test "never runs two syncs at once" do
+    # The recurring schedule fires every 5 minutes, but a run has no fixed
+    # duration: it pulls every page of the catalogue and each HTTP call allows a
+    # 30s read timeout. A slow run must delay the next one rather than race it,
+    # since two concurrent syncs write the same rows and the loser re-triggers
+    # change detection, re-enqueuing brochure jobs for unchanged properties.
+    assert_equal 1, ImmotoolboxSyncJob.concurrency_limit,
+                 "expected the sync to be serialized (concurrency limit 1)"
+
+    # The job takes no arguments, so every run must share one global key —
+    # unlike the per-property brochure job, whose key is scoped to its argument.
+    key = ImmotoolboxSyncJob.new.concurrency_key
+    assert key.present?, "expected a global concurrency key for the sync"
+    assert_equal key, ImmotoolboxSyncJob.new.concurrency_key,
+                 "two sync runs must compute the same key so they serialize"
+  end
+
+  test "skips a scheduled sync instead of queueing it behind a running one" do
+    # Every run is a full catalogue pull, so a run that fires while another is
+    # in flight is redundant: the next scheduled tick supersedes it. Blocking
+    # (Solid Queue's default) would stack those ticks and release them
+    # back-to-back once the slow run finished, producing a burst of pointless
+    # full syncs. Discarding keeps the cadence at "every 5 minutes at most".
+    assert_equal "discard", ImmotoolboxSyncJob.concurrency_on_conflict.to_s,
+                 "a sync that collides with a running one must be dropped, not queued"
+  end
+
+  test "concurrency lock outlasts a slow full-catalogue sync" do
+    # The lock must outlive the worst-case run so it cannot expire mid-sync and
+    # let a second run in. A full pull is many paginated calls at up to 30s each,
+    # so the Solid Queue default of 3 minutes is not enough headroom.
+    assert_operator ImmotoolboxSyncJob.concurrency_duration, :>=, 10.minutes,
+                    "expected a concurrency duration well above worst-case sync time"
+  end
+
   private
 
   def capture_log
