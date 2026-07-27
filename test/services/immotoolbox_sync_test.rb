@@ -296,8 +296,10 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     prop = Property.find_by(immotoolbox_id: 100)
     # The first sync leaves translation pending; simulate the translation job
     # having completed so the second sync takes neither the :translation branch
-    # nor a text-changed branch.
+    # nor a text-changed branch. The brochure cache must be complete, or the
+    # sync would (rightly) enqueue a job to fill it in.
     prop.update_columns(translation_source_hash: "seeded-hash")
+    attach_complete_brochure_cache(prop)
     clear_enqueued_jobs
 
     ImmotoolboxSync.new(api_token: "test-token").sync_properties
@@ -307,6 +309,70 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
     end
     assert_empty brochure_jobs,
                  "an unchanged property must not regenerate its brochures on every sync"
+  end
+
+  test "sync re-enqueues brochures for a translated property whose cache is empty" do
+    setup_districts_and_buildings
+    # The brochure job purges before attaching 18 PDFs one by one, and declares
+    # no retry_on: a worker killed mid-run (deploy restart, OOM) leaves the
+    # property with no cache. Nothing about the property changes afterwards, so
+    # a purely change-driven gate would never fire again and every download
+    # would silently pay full on-demand Typst generation forever. The sync is
+    # the natural healer: it visits every property every tick anyway.
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+    prop = Property.find_by(immotoolbox_id: 100)
+    prop.update_columns(translation_source_hash: "seeded-hash")
+    clear_enqueued_jobs
+
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+
+    brochure_jobs = enqueued_jobs.select do |j|
+      j[:job] == PropertyBrochureGenerationJob && j[:args] == [ prop.id ]
+    end
+    assert_equal 1, brochure_jobs.size,
+                 "a translated property with no cached brochures must be re-enqueued"
+  end
+
+  test "sync completes a partial brochure cache" do
+    setup_districts_and_buildings
+    # A share flow can attach a single on-demand variant, and a killed job can
+    # leave any count between 1 and 17. brochures.attached? alone would treat
+    # those as healthy; only the full 18-variant set counts as complete.
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+    prop = Property.find_by(immotoolbox_id: 100)
+    prop.update_columns(translation_source_hash: "seeded-hash")
+    prop.brochures.attach(
+      io: StringIO.new("%PDF-1.4 fake"), filename: "b-fr.pdf",
+      content_type: "application/pdf", metadata: { locale: "fr", include_logo: true }
+    )
+    clear_enqueued_jobs
+
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+
+    brochure_jobs = enqueued_jobs.select do |j|
+      j[:job] == PropertyBrochureGenerationJob && j[:args] == [ prop.id ]
+    end
+    assert_equal 1, brochure_jobs.size,
+                 "a partial brochure cache must be completed, not treated as healthy"
+  end
+
+  test "sync does not re-enqueue brochures for an untranslated property with no cache" do
+    setup_districts_and_buildings
+    # An untranslated property takes the :translation branch, and the brochure
+    # job would decline it anyway. The self-heal check must not turn that into
+    # 288 no-op brochure enqueues a day.
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+    prop = Property.find_by(immotoolbox_id: 100)
+    assert_nil prop.translation_source_hash, "precondition: property is untranslated"
+    clear_enqueued_jobs
+
+    ImmotoolboxSync.new(api_token: "test-token").sync_properties
+
+    brochure_jobs = enqueued_jobs.select do |j|
+      j[:job] == PropertyBrochureGenerationJob && j[:args] == [ prop.id ]
+    end
+    assert_empty brochure_jobs,
+                 "an untranslated property gets its brochures after translation, not from the self-heal"
   end
 
   test "an image shared between properties does not report a change on every sync" do
@@ -750,6 +816,21 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
   end
 
   private
+
+  # A "complete" cache is one PDF per locale in both logo variants (18 files),
+  # matching what PropertyBrochureGenerationJob produces.
+  def attach_complete_brochure_cache(property)
+    PropertyBrochureGenerationJob::LOCALES.each do |locale|
+      PropertyBrochureGenerationJob::LOGO_VARIANTS.each do |include_logo|
+        property.brochures.attach(
+          io: StringIO.new("%PDF-1.4 fake"),
+          filename: "b-#{locale}#{include_logo ? '' : '-no-logo'}.pdf",
+          content_type: "application/pdf",
+          metadata: { locale: locale.to_s, include_logo: include_logo }
+        )
+      end
+    end
+  end
 
   def setup_districts_and_buildings
     District.create!(name: "Monte-Carlo", city: "Monaco", immotoolbox_id: 1)

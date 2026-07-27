@@ -162,7 +162,14 @@ class ImmotoolboxSync
       # every few minutes over the whole catalogue, and each brochure job renders
       # 18 PDFs (9 locales x 2 logo variants), so regenerating unchanged
       # properties would saturate the workers and churn Active Storage blobs.
-      if enqueued != :translation && (enqueued == :brochure || images_changed)
+      #
+      # An incomplete cache re-enqueues even without a change: the brochure job
+      # purges before attaching 18 PDFs one by one, so a worker killed mid-run
+      # leaves 0-17 variants that a purely change-driven gate would never heal.
+      # The :translation branch stays exempt because the brochure job declines
+      # untranslated properties; healing them here would be daily no-op churn.
+      if enqueued != :translation &&
+         (enqueued == :brochure || images_changed || brochure_cache_incomplete?(property))
         PropertyBrochureGenerationJob.perform_later(property.id)
       end
 
@@ -232,6 +239,16 @@ class ImmotoolboxSync
   def parse_integer(value)
     return nil if value.blank?
     Integer(value, exception: false)
+  end
+
+  # Complete means one PDF per locale in both logo variants, exactly what a full
+  # PropertyBrochureGenerationJob run produces. Fewer than that is either a
+  # killed job or a lone on-demand variant from the share flow; both deserve a
+  # full regeneration.
+  def brochure_cache_incomplete?(property)
+    expected = PropertyBrochureGenerationJob::LOCALES.size *
+               PropertyBrochureGenerationJob::LOGO_VARIANTS.size
+    property.brochures.count < expected
   end
 
   # Returns true when the property's image set actually changed (any image
