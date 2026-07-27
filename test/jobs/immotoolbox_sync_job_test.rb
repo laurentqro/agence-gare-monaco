@@ -63,6 +63,24 @@ class ImmotoolboxSyncJobTest < ActiveJob::TestCase
     assert_includes rescue_classes, "Net::OpenTimeout"
   end
 
+  test "logs every failing attempt so a fault is visible even when retries are discarded" do
+    # on_conflict: :discard applies to retry_on's re-enqueues too: a retry whose
+    # due time lands while the next 5-minute tick holds the semaphore is
+    # destroyed, and discarded runs never burn the attempts counter, so a
+    # persistent upstream fault may never exhaust into Solid Queue's failed set.
+    # The error log line is the operator visibility that does not depend on it.
+    stub_request(:get, "https://clientapi.immotoolbox.com/api/districts")
+      .to_return(status: 500, body: "upstream down")
+
+    output = nil
+    with_credentials(immotoolbox: { api_token: "test-token" }) do
+      output = capture_log { ImmotoolboxSyncJob.perform_now }
+    end
+
+    assert_match(/sync failed/i, output, "each failing attempt must produce an error log line")
+    assert_match(/ApiError/, output, "the log line must name the error")
+  end
+
   test "is enqueued on default queue" do
     assert_equal "default", ImmotoolboxSyncJob.new.queue_name
   end

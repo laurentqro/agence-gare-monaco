@@ -29,8 +29,18 @@ class ImmotoolboxSyncJob < ApplicationJob
     result = sync.sync_all
 
     Rails.logger.info("[ImmotoolboxSyncJob] Immotoolbox sync complete:")
-    Rails.logger.info("  Districts — created: #{result[:districts][:created]}, updated: #{result[:districts][:updated]}")
-    Rails.logger.info("  Buildings — created: #{result[:buildings][:created]}, updated: #{result[:buildings][:updated]}")
-    Rails.logger.info("  Properties — created: #{result[:properties][:created]}, updated: #{result[:properties][:updated]}, unpublished: #{result[:properties][:unpublished]}")
+    Rails.logger.info("  Districts: created #{result[:districts][:created]}, updated #{result[:districts][:updated]}")
+    Rails.logger.info("  Buildings: created #{result[:buildings][:created]}, updated #{result[:buildings][:updated]}")
+    Rails.logger.info("  Properties: created #{result[:properties][:created]}, updated #{result[:properties][:updated]}, unpublished #{result[:properties][:unpublished]}")
+  rescue StandardError => e
+    # Operator visibility must not depend on Solid Queue's failed set. A
+    # scheduled retry whose due time lands while the next 5-minute tick holds
+    # the concurrency semaphore is destroyed (on_conflict: :discard applies to
+    # retry re-enqueues too), and discarded runs never burn the attempts
+    # counter, so a persistent upstream fault could churn forever without ever
+    # producing a FailedExecution. Log every failing attempt, then let retry_on
+    # handle the error as before.
+    Rails.logger.error("[ImmotoolboxSyncJob] Sync failed: #{e.class}: #{e.message}")
+    raise
   end
 end
