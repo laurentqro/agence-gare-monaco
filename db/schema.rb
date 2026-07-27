@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_19_215854) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_131124) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -226,7 +226,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_19_215854) do
     t.string "small_url"
     t.string "thumb_url"
     t.datetime "updated_at", null: false
-    t.index ["immotoolbox_id"], name: "index_property_images_on_immotoolbox_id", unique: true
+    t.index ["property_id", "immotoolbox_id"], name: "index_property_images_on_property_id_and_immotoolbox_id", unique: true
     t.index ["property_id", "position"], name: "index_property_images_on_property_id_and_position"
     t.index ["property_id"], name: "index_property_images_on_property_id"
   end

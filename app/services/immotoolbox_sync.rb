@@ -1,13 +1,6 @@
 class ImmotoolboxSync
   include ActionView::Helpers::SanitizeHelper
 
-  # PropertyImage rows are looked up globally by immotoolbox_id because one image
-  # can be shared across properties (building shots). These attributes describe
-  # the image's role *within a property*, so each owner's turn in the sync
-  # rewrites them. They must not count as a change, or a shared image would look
-  # permanently modified and regenerate 18 PDFs for both owners on every tick.
-  PER_PROPERTY_IMAGE_ATTRIBUTES = %w[property_id position is_plan].freeze
-
   def initialize(api_token:)
     @client = ImmotoolboxClient.new(api_token: api_token)
   end
@@ -253,14 +246,17 @@ class ImmotoolboxSync
                       .destroy_all
     changed = removed.any?
 
-    # Create or update images (look up globally since images can be shared across properties)
+    # Look up scoped to the property: a building shot shared by several
+    # properties gets one row per property, since position and is_plan describe
+    # the image's role within THIS property's gallery. A single global row would
+    # ping-pong ownership between the sharers on every pass, leaving whichever
+    # synced first one photo short.
     images_data.each do |img_data|
       remote_url = img_data["large"] || img_data["medium"] || img_data["small"] || img_data["thumb"] || img_data["original"]
       next if remote_url.blank?
 
-      image = PropertyImage.find_or_initialize_by(immotoolbox_id: img_data["id"])
+      image = property.property_images.find_or_initialize_by(immotoolbox_id: img_data["id"])
       image.assign_attributes(
-        property: property,
         remote_url: remote_url,
         thumb_url: img_data["thumb"],
         small_url: img_data["small"],
@@ -269,10 +265,7 @@ class ImmotoolboxSync
         position: img_data["order"] || img_data["position"] || 0,
         is_plan: img_data["isPlan"] || false
       )
-      # Only the image's own content counts as a change; see
-      # PER_PROPERTY_IMAGE_ATTRIBUTES for why per-property fields are excluded.
-      content_changed = (image.changed - PER_PROPERTY_IMAGE_ATTRIBUTES).any?
-      changed = true if image.new_record? || content_changed
+      changed = true if image.new_record? || image.changed?
       image.save!
     end
 

@@ -311,10 +311,10 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
 
   test "an image shared between properties does not report a change on every sync" do
     setup_districts_and_buildings
-    # Images are looked up globally by immotoolbox_id because a building image can
-    # be shared across properties. Reassigning `property` on every pass would make
-    # the two owners steal the row back and forth, so the image would look changed
-    # forever and regenerate 18 PDFs per property per tick.
+    # A building image shared across properties gets one row per property, each
+    # carrying that property's own position and is_plan. If the sharers instead
+    # fought over a single row, the image would look changed forever and
+    # regenerate 18 PDFs per property per tick.
     a = Property.create!(
       reference: "SH-A", transaction_type: "sale", property_type: "apartment",
       country: "MC", city: "Monaco", immotoolbox_id: 9001
@@ -324,8 +324,8 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
       country: "MC", city: "Monaco", immotoolbox_id: 9002
     )
     # The two properties list the same image at DIFFERENT positions, which is the
-    # realistic case: `order` is per-property, as are `property_id` and `is_plan`.
-    # Every one of them flips on each owner's turn, so none may count as a change.
+    # realistic case: `order` is per-property, as is `isPlan`. Each property's own
+    # row holds its own values, so neither owner disturbs the other.
     base = {
       "id" => 77_001,
       "large" => "https://cdn.example.com/large/shared.jpg",
@@ -345,6 +345,83 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
            "ownership must not ping-pong between properties sharing an image"
     refute sync_images.call(a, [ for_a ]),
            "steady state must stay quiet across repeated ticks"
+  end
+
+  test "an image shared between two properties appears in both galleries" do
+    setup_districts_and_buildings
+    # A building shot listed by two properties must end up in BOTH galleries.
+    # A single globally-unique row can only belong to one property at a time, so
+    # whichever synced last would steal it and the other would render one photo
+    # short (and bake incomplete brochures).
+    a = Property.create!(
+      reference: "GAL-A", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", immotoolbox_id: 9010
+    )
+    b = Property.create!(
+      reference: "GAL-B", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", immotoolbox_id: 9011
+    )
+    shared = {
+      "id" => 77_010,
+      "large" => "https://cdn.example.com/large/building.jpg",
+      "order" => 1
+    }
+    sync_images = ImmotoolboxSync.new(api_token: "test-token").method(:sync_property_images)
+
+    sync_images.call(a, [ shared ])
+    sync_images.call(b, [ shared ])
+
+    assert_equal 1, a.property_images.reload.count, "property A must keep the shared image"
+    assert_equal 1, b.property_images.reload.count, "property B must also have the shared image"
+
+    # And it must stay that way across further ticks, not alternate owners.
+    sync_images.call(a, [ shared ])
+    sync_images.call(b, [ shared ])
+    assert_equal 1, a.property_images.reload.count, "A must not lose the image to B on later ticks"
+    assert_equal 1, b.property_images.reload.count, "B must not lose the image to A on later ticks"
+  end
+
+  test "reordering a property's photos reports a change so brochures regenerate" do
+    setup_districts_and_buildings
+    # The PDF generator orders photos by position: a reorder in Immotoolbox is a
+    # real visual change (new cover photo, new page order) and the cached
+    # brochures must follow it.
+    prop = Property.create!(
+      reference: "ORD-A", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", immotoolbox_id: 9020
+    )
+    first = { "id" => 77_020, "order" => 1, "large" => "https://cdn.example.com/large/one.jpg" }
+    second = { "id" => 77_021, "order" => 2, "large" => "https://cdn.example.com/large/two.jpg" }
+    sync_images = ImmotoolboxSync.new(api_token: "test-token").method(:sync_property_images)
+
+    sync_images.call(prop, [ first, second ])
+    refute sync_images.call(prop, [ first, second ]), "unchanged order must stay quiet"
+
+    swapped = [ first.merge("order" => 2), second.merge("order" => 1) ]
+    assert sync_images.call(prop, swapped),
+           "a photo reorder changes the brochure cover and page order and must regenerate"
+    assert_equal [ 77_021, 77_020 ],
+                 prop.property_images.reload.order(:position).pluck(:immotoolbox_id),
+                 "the new order must be persisted"
+  end
+
+  test "reclassifying a photo as a floor plan reports a change" do
+    setup_districts_and_buildings
+    # is_plan decides whether the image renders in the photo section or the plan
+    # section of the PDF, so flipping it must regenerate brochures.
+    prop = Property.create!(
+      reference: "PLN-A", transaction_type: "sale", property_type: "apartment",
+      country: "MC", city: "Monaco", immotoolbox_id: 9030
+    )
+    img = { "id" => 77_030, "order" => 1, "isPlan" => false,
+            "large" => "https://cdn.example.com/large/plan.jpg" }
+    sync_images = ImmotoolboxSync.new(api_token: "test-token").method(:sync_property_images)
+
+    sync_images.call(prop, [ img ])
+    refute sync_images.call(prop, [ img ]), "unchanged classification must stay quiet"
+
+    assert sync_images.call(prop, [ img.merge("isPlan" => true) ]),
+           "moving an image between photo and plan sections must regenerate brochures"
   end
 
   test "an unchanged property keeps its updated_at so sitemap lastmod stays honest" do
@@ -381,8 +458,8 @@ class ImmotoolboxSyncTest < ActiveSupport::TestCase
 
   test "a genuine change to a shared image's own content still reports a change" do
     setup_districts_and_buildings
-    # The per-property exclusions must not blind the gate to real edits: if the
-    # CDN URL changes, brochures genuinely need regenerating.
+    # The change gate must see real edits: if the CDN URL changes, brochures
+    # genuinely need regenerating.
     prop = Property.create!(
       reference: "SH-C", transaction_type: "sale", property_type: "apartment",
       country: "MC", city: "Monaco", immotoolbox_id: 9003
