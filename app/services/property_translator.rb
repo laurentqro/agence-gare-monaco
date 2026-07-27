@@ -108,9 +108,9 @@ class PropertyTranslator
     intro = (@property.intro || {}).dup
     description = (@property.description || {}).dup
     status = (@property.translations_status || {}).dup
-    # Clear any recorded hard failure: this run succeeded. enqueue_post_save_jobs!
-    # refuses to retry while an "_error" is present, so a stale marker would block
-    # every future retranslation of this property.
+    # Clear any recorded hard failure: this run succeeded, so the marker is
+    # stale. It is a visibility signal (admin banner, Property.translation_failed),
+    # not a retry gate, and it must not outlive the failure it reports.
     status.delete("_error")
     timestamp = Time.current.iso8601
 

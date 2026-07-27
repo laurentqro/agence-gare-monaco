@@ -40,9 +40,9 @@ class PropertyTranslationJobTest < ActiveJob::TestCase
 
   test "records a failure when retries are exhausted, not just on discard" do
     # retry_on without a block re-raises after the last attempt, recording
-    # nothing. The property then keeps translation_source_hash nil with no
-    # "_error" marker, so the sync's nil-hash path re-enqueues a paid LLM call
-    # every 5 minutes forever. A sustained outage would do this catalogue-wide.
+    # nothing. The retries continue either way (the marker is not a gate), but
+    # without it the failure is invisible: no admin banner, nothing for
+    # Property.translation_failed or translations:retry_failed to find.
     fake_new = ->(_property) {
       Object.new.tap do |o|
         o.define_singleton_method(:translate!) { raise RubyLLM::ServerError.new(nil, "upstream down") }
@@ -63,7 +63,7 @@ class PropertyTranslationJobTest < ActiveJob::TestCase
     end
 
     assert @property.reload.translation_error.present?,
-           "exhausted retries must record a failure so the sync stops retrying forever"
+           "exhausted retries must record a failure so the operator can see the property is stuck"
   end
 
   test "retry_on covers transient transport errors" do

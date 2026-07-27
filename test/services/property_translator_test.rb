@@ -342,9 +342,9 @@ class PropertyTranslatorTest < ActiveSupport::TestCase
   end
 
   test "a successful translation clears a previously recorded failure" do
-    # enqueue_post_save_jobs! refuses to retry a translation while an "_error" is
-    # recorded, so a stale marker left behind by a since-fixed failure would block
-    # every future retranslation for that property.
+    # The marker reports a failure to the operator (admin banner,
+    # Property.translation_failed). Once a run succeeds it is stale, and left
+    # in place it would show a failure banner for a healthy property forever.
     @property.update_columns(
       translation_source_hash: nil,
       translations_status: { "_error" => { "class" => "RubyLLM::UnauthorizedError",

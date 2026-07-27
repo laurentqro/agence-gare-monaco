@@ -160,7 +160,7 @@ class ImmotoolboxSync
       end
 
       # Now that images are current, enqueue at most one brochure job per
-      # property. Skip when a translation job was enqueued — that job regenerates
+      # property. Skip when a translation job was enqueued: that job regenerates
       # brochures on success, and it runs after this sync. Also skip when neither
       # the property record nor its image set actually changed: this sync runs
       # every few minutes over the whole catalogue, and each brochure job renders

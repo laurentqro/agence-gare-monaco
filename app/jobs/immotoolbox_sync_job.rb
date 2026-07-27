@@ -12,7 +12,7 @@ class ImmotoolboxSyncJob < ApplicationJob
   # the Solid Queue default is only 3 minutes.
   #
   # on_conflict: :discard because every run is a full catalogue pull, so a tick
-  # that collides with a run already in flight is redundant — the next tick
+  # that collides with a run already in flight is redundant; the next tick
   # supersedes it. Blocking (the default) would stack those ticks and release
   # them back-to-back once the slow run finished, bursting redundant full syncs.
   limits_concurrency to: 1, key: "immotoolbox_sync", duration: 30.minutes, on_conflict: :discard

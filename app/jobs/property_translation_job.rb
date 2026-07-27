@@ -1,11 +1,13 @@
 class PropertyTranslationJob < ApplicationJob
   queue_as :default
 
-  # Record the failure when retries run out, not just on discard. Without this
-  # the job dies leaving translation_source_hash nil and no marker, so the
-  # 5-minute sync re-enqueues a paid LLM call every tick forever — a sustained
-  # outage would do that catalogue-wide. Re-raise so the job still lands in
-  # Solid Queue's failed set for visibility.
+  # Record the failure when retries run out, not just on discard. The marker
+  # does not stop anything: the sync keeps re-enqueuing an untranslated
+  # property regardless, deliberately, because the causes are transient or
+  # operator-fixable and a permanently untranslated property is worse than the
+  # retry cost. It exists purely for visibility: the admin failure banner,
+  # Property.translation_failed, and translations:retry_failed all read it.
+  # Re-raise so the job still lands in Solid Queue's failed set too.
   retry_on RubyLLM::RateLimitError,
            RubyLLM::ServerError,
            RubyLLM::ServiceUnavailableError,

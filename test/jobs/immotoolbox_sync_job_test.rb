@@ -100,7 +100,7 @@ class ImmotoolboxSyncJobTest < ActiveJob::TestCase
     assert_equal 1, ImmotoolboxSyncJob.concurrency_limit,
                  "expected the sync to be serialized (concurrency limit 1)"
 
-    # The job takes no arguments, so every run must share one global key —
+    # The job takes no arguments, so every run must share one global key,
     # unlike the per-property brochure job, whose key is scoped to its argument.
     key = ImmotoolboxSyncJob.new.concurrency_key
     assert key.present?, "expected a global concurrency key for the sync"
