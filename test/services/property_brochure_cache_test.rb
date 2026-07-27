@@ -12,6 +12,10 @@ class PropertyBrochureCacheTest < ActiveSupport::TestCase
       city: "Monaco",
       published: true
     )
+    # ensure_cached declines to persist variants for an untranslated property,
+    # so the default fixture must look translated. Tests exercising the decline
+    # path nil this out themselves.
+    @property.update_columns(translation_source_hash: "translated-hash")
   end
 
   def attach_fake_brochure(include_logo:, bytes: "%PDF-fake")
@@ -52,5 +56,30 @@ class PropertyBrochureCacheTest < ActiveSupport::TestCase
 
     assert @property.reload.cached_brochure(locale: :fr, include_logo: false).present?
     assert_equal 2, @property.brochures.count
+  end
+
+  test "ensure_cached does not persist a variant for an untranslated property" do
+    # A lone attached variant makes the property look cached (attached? is true)
+    # and would survive until translation succeeds. The share flow can still
+    # generate on demand; it just must not leave a persistent artifact of the
+    # untranslated state.
+    @property.update_columns(translation_source_hash: nil)
+
+    PropertyBrochureCache.ensure_cached(@property, locale: :fr, include_logo: true)
+
+    refute @property.reload.brochures.attached?,
+           "an untranslated property must not accumulate cached brochure variants"
+  end
+
+  test "fetch still serves an on-demand PDF for an untranslated property without caching it" do
+    # The public page for an untranslated property already renders FR-fallback
+    # text, so its download button must keep working; the PDF matches the page.
+    # What must not happen is the bytes being persisted as a cached variant.
+    @property.update_columns(translation_source_hash: nil)
+
+    pdf_bytes = PropertyBrochureCache.fetch(@property, locale: :fr, include_logo: true)
+
+    assert pdf_bytes.start_with?("%PDF"), "fetch must still produce a PDF on demand"
+    refute @property.reload.brochures.attached?, "fetch must not cache for an untranslated property"
   end
 end

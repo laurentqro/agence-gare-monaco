@@ -16,6 +16,9 @@ class Admin::PropertySharesControllerTest < ActionDispatch::IntegrationTest
       price: 1_290_000,
       published: true
     )
+    # The cache-warming path declines untranslated properties, so the default
+    # fixture must look translated.
+    @property.update_columns(translation_source_hash: "translated-hash")
 
     @contact1 = Contact.create!(first_name: "Jean", last_name: "Dupont", email: "jean@example.com")
     @contact2 = Contact.create!(first_name: "Pierre", last_name: "Martin", email: "pierre@example.com")

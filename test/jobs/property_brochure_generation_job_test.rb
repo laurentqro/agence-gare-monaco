@@ -43,6 +43,26 @@ class PropertyBrochureGenerationJobTest < ActiveJob::TestCase
            "an untranslated property must not get a brochure cache"
   end
 
+  test "logs its decline so an operator can see why a property has no cache" do
+    # A bare return is invisible: brochures:backfill reports "N enqueued" while
+    # the jobs all no-op, and an operator has nothing to grep for.
+    @property.update_columns(translation_source_hash: nil)
+
+    io = StringIO.new
+    original_logger = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+    begin
+      PropertyPdfGenerator.stub_any_instance(:generate, "%PDF-1.4 fake") do
+        PropertyBrochureGenerationJob.perform_now(@property.id)
+      end
+    ensure
+      Rails.logger = original_logger
+    end
+
+    assert_match(/#{@property.id}/, io.string, "the declined property id must be logged")
+    assert_match(/translat/i, io.string, "the log line must say why the job declined")
+  end
+
   test "does not purge existing brochures when it declines to regenerate" do
     # A property that had good brochures and later fails a re-translation must
     # keep serving what it has: purging would leave every download paying full

@@ -20,8 +20,15 @@ class PropertyBrochureGenerationJob < ApplicationJob
     # five places enqueue this job (the sync, the PropertyImage callback, the
     # model, the translator, and the backfill rake task). Return before the
     # purge so a property that had good brochures and later failed a
-    # re-translation keeps serving the ones it already has.
-    return if property.translation_source_hash.nil?
+    # re-translation keeps serving the ones it already has. Log the decline so
+    # an operator wondering why a property has no cache has something to find.
+    if property.translation_source_hash.nil?
+      Rails.logger.info(
+        "[PropertyBrochureGenerationJob] Skipping property #{property.id} (#{property.reference}): " \
+        "not translated yet, brochures are generated after translation succeeds"
+      )
+      return
+    end
 
     property.brochures.purge
 

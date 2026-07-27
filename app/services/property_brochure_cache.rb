@@ -13,6 +13,11 @@ class PropertyBrochureCache
   # the attachments unique index, and that job's purge clears any extras.
   def self.ensure_cached(property, locale:, include_logo:)
     return if property.cached_brochure(locale: locale, include_logo: include_logo)
+    # Never persist a variant for an untranslated property: a lone attached PDF
+    # makes the property look cached and would linger until translation
+    # succeeds. Callers still get on-demand bytes via fetch; only the caching
+    # is declined. Mirrors the guard in PropertyBrochureGenerationJob.
+    return if property.translation_source_hash.nil?
 
     pdf_bytes = PropertyPdfGenerator.new(property, locale: locale, include_logo: include_logo).generate
     suffix = include_logo ? "" : "-no-logo"
