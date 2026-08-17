@@ -25,7 +25,10 @@ namespace :articles do
         localized_title = article.title.is_a?(Hash) ? article.title[locale].to_s.strip : ""
         next if localized_title.empty? # no translation yet, leave to FR fallback
 
-        merged[locale] = localized_title.parameterize(locale: locale.to_sym)
+        localized_slug = localized_title.parameterize(locale: locale.to_sym)
+        next if localized_slug.empty? # punctuation-only title: leave to FR fallback
+
+        merged[locale] = localized_slug
       end
 
       if merged != existing

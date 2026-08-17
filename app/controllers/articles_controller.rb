@@ -28,7 +28,9 @@ class ArticlesController < ApplicationController
       if params[:slug] != canonical_slug
         prefix = I18n.locale == I18n.default_locale ? "" : "/#{I18n.locale}"
         articles_segment = I18n.t("routes.articles")
-        redirect_to "#{prefix}/#{articles_segment}/#{canonical_slug}", status: :moved_permanently
+        target = "#{prefix}/#{articles_segment}/#{canonical_slug}"
+        target = "#{target}?#{request.query_string}" if request.query_string.present?
+        redirect_to target, status: :moved_permanently
         return
       end
 

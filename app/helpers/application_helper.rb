@@ -158,6 +158,14 @@ module ApplicationHelper
     "#{locale_prefix(locale)}/#{props}/#{property.id}-#{slug}"
   end
 
+  # Canonical article path for a locale, using the article's per-locale slug
+  # (SEO audit 0.2). Internal links must use this so a non-FR click lands on the
+  # canonical URL directly instead of 301-hopping through the shared FR slug.
+  def locale_article_path(article, locale = I18n.locale)
+    articles = I18n.t("routes.articles", locale: locale)
+    "#{locale_prefix(locale)}/#{articles}/#{article.slug_for(locale)}"
+  end
+
   def listing_heading
     transaction = params[:transaction_type]
 

@@ -146,6 +146,27 @@ class HomepageTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "homepage article links use the canonical per-locale slug" do
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Contenu.", "en" => "Content." },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: category,
+      published: true,
+      featured: true,
+      published_at: Time.current
+    )
+
+    get "/en"
+    assert_response :success
+    # The carousel must link to the EN slug so a homepage click does not take a
+    # 301 hop through the shared FR slug.
+    assert_select "a[href='/en/articles/how-to-sell-your-property']"
+    assert_select "a[href='/en/articles/comment-vendre']", count: 0
+  end
+
   test "homepage does not show unpublished articles" do
     category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites")
     Article.create!(

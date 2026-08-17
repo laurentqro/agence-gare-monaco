@@ -102,6 +102,20 @@ class BackfillArticleSlugsTaskTest < ActiveJob::TestCase
     assert_equal "hand-authored-en-slug", article.reload.slugs["en"]
   end
 
+  test "does not store an empty slug when a title parameterizes to nothing" do
+    article = Article.create!(
+      slug: "comment-vendre",
+      category: @category, published: true,
+      title: { "fr" => "Comment vendre", "en" => "!!!???" },
+      body: { "fr" => "Corps" }
+    )
+
+    run_task
+    slugs = article.reload.slugs
+    assert_not_includes slugs.keys, "en",
+      "a punctuation-only title parameterizes to '' and must be skipped, not stored blank"
+  end
+
   test "does not enqueue translation jobs" do
     article = Article.create!(
       slug: "comment-vendre",

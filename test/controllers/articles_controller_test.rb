@@ -288,6 +288,25 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
   end
 
   # Per-locale localised slugs (SEO audit 0.2)
+  test "article index links to the canonical per-locale slug, not the FR slug" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Corps", "en" => "Body" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/en/articles"
+    assert_response :success
+    # The featured card must link straight to the EN slug (no 301 hop through
+    # the shared FR slug), or internal links point at non-canonical URLs.
+    assert_select "a[href='/en/articles/how-to-sell-your-property']"
+    assert_select "a[href='/en/articles/comment-vendre']", count: 0
+  end
+
   test "article show resolves an article by its per-locale slug" do
     Article.create!(
       title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
@@ -321,6 +340,22 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get "/en/articles/comment-vendre"
     assert_response :moved_permanently
     assert_redirected_to "/en/articles/how-to-sell-your-property"
+  end
+
+  test "article show preserves the query string on the canonical 301" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Corps", "en" => "Body" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/en/articles/comment-vendre?utm_source=newsletter"
+    assert_response :moved_permanently
+    assert_redirected_to "/en/articles/how-to-sell-your-property?utm_source=newsletter"
   end
 
   test "article show does not redirect when the URL already carries the canonical slug" do
