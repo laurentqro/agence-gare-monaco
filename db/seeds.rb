@@ -163,6 +163,10 @@ Dir.glob(Rails.root.join("lib/tasks/translate_article_*.rb")).sort.each do |file
   load file
 end
 
+# Backfill per-locale article slugs from the translated titles now in place
+# (SEO audit 0.2). Idempotent and frozen: never overwrites an existing value.
+Rake::Task["articles:backfill_slugs"].invoke if Rake::Task.task_defined?("articles:backfill_slugs")
+
 # Off-market properties for sale
 [
   {

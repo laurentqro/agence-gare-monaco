@@ -76,7 +76,7 @@ class LegacyRedirectsController < ApplicationController
     if article
       prefix = locale == "fr" ? "" : "/#{locale}"
       articles_segment = I18n.t("routes.articles", locale: locale)
-      redirect_to "#{prefix}/#{articles_segment}/#{article.slug}", status: :moved_permanently
+      redirect_to "#{prefix}/#{articles_segment}/#{article.slug_for(locale)}", status: :moved_permanently
     else
       head :gone
     end

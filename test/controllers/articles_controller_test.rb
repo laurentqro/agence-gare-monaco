@@ -287,6 +287,77 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "img.article-cover-image", count: 0
   end
 
+  # Per-locale localised slugs (SEO audit 0.2)
+  test "article show resolves an article by its per-locale slug" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "**gras**", "en" => "**bold** content" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/en/articles/how-to-sell-your-property"
+    assert_response :success
+    assert_select ".article-body strong", "bold"
+  end
+
+  test "article show 301s the shared FR slug to the canonical per-locale slug" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Corps", "en" => "Body" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    # An indexed /en/articles/comment-vendre (the old shared slug) must not
+    # serve a 200 under a non-canonical URL: it 301s to the EN slug so all
+    # authority consolidates on one URL per locale.
+    get "/en/articles/comment-vendre"
+    assert_response :moved_permanently
+    assert_redirected_to "/en/articles/how-to-sell-your-property"
+  end
+
+  test "article show does not redirect when the URL already carries the canonical slug" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Corps", "en" => "Body" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/en/articles/how-to-sell-your-property"
+    assert_response :success
+  end
+
+  test "article show serves the FR slug under FR without redirecting" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Corps", "en" => "Body" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/articles/comment-vendre"
+    assert_response :success
+  end
+
+  test "article show still 404s a slug that matches no article" do
+    get "/en/articles/no-such-article-anywhere"
+    assert_response :not_found
+  end
+
   test "all 8 locales render markdown on article show" do
     article = Article.create!(
       title: { "fr" => "Article FR", "en" => "Article EN" },

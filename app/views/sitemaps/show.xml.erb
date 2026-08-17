@@ -50,11 +50,11 @@
 
 <% @articles.each do |article| %>
 <url>
-  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{articles_segment}/#{article.slug}" %></loc>
+  <loc><%= "https://agencegaremonaco.com#{locale_prefix.(@locale)}/#{articles_segment}/#{article.slug_for(@locale)}" %></loc>
   <lastmod><%= article.updated_at.iso8601 %></lastmod>
   <% I18n.available_locales.each do |alt_locale| %>
   <% alt_articles = I18n.t("routes.articles", locale: alt_locale) %>
-  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_articles}/#{article.slug}" %>" />
+  <xhtml:link rel="alternate" hreflang="<%= SeoHelper::HREFLANG_CODES[alt_locale] %>" href="<%= "https://agencegaremonaco.com#{locale_prefix.(alt_locale)}/#{alt_articles}/#{article.slug_for(alt_locale)}" %>" />
   <% end %>
 </url>
 <% end %>

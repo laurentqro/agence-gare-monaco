@@ -114,6 +114,39 @@ class SeoHelperTest < ActionView::TestCase
     end
   end
 
+  test "canonical_url for article show uses the per-locale slug" do
+    article = Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Corps", "en" => "Body" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category, published: true, published_at: Time.current
+    )
+    I18n.with_locale(:en) do
+      result = canonical_url(page_type: :article, article: article)
+      assert_equal "https://agencegaremonaco.com/en/articles/how-to-sell-your-property", result
+    end
+  end
+
+  test "hreflang_tags for article show localize the slug per locale" do
+    article = Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell", "it" => "Come vendere" },
+      body: { "fr" => "Corps", "en" => "Body", "it" => "Corpo" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell", "it" => "come-vendere" },
+      category: @category, published: true, published_at: Time.current
+    )
+    I18n.with_locale(:en) do
+      tags = hreflang_tags(page_type: :article, article: article)
+      assert_includes tags, 'href="https://agencegaremonaco.com/en/articles/how-to-sell"'
+      assert_includes tags, 'href="https://agencegaremonaco.com/it/articoli/come-vendere"'
+      # A locale without its own slug falls back to the canonical FR slug.
+      assert_includes tags, 'href="https://agencegaremonaco.com/de/artikel/comment-vendre"'
+      # x-default points to the French (unprefixed) article using the FR slug.
+      assert_includes tags, 'hreflang="x-default" href="https://agencegaremonaco.com/articles/comment-vendre"'
+    end
+  end
+
   test "canonical_url for contact" do
     I18n.with_locale(:de) do
       result = canonical_url(page_type: :contact)

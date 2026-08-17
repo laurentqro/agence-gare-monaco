@@ -27,6 +27,25 @@ class Article < ApplicationRecord
     meta_description[locale.to_s].presence || meta_description[I18n.default_locale.to_s].presence || ""
   end
 
+  # Per-locale localised slug (SEO audit 0.2). FR always resolves to the pinned
+  # `slug` column (the canonical, indexed slug and stable lookup key); other
+  # locales use their entry in the `slugs` JSON hash, falling back to the FR
+  # slug when they have none yet.
+  def slug_for(locale = I18n.locale)
+    return slug if locale.to_s == I18n.default_locale.to_s
+    (slugs.is_a?(Hash) && slugs[locale.to_s].presence) || slug
+  end
+
+  # Resolve a URL slug back to its article for the given locale. Matches the
+  # locale's own slug first, then the canonical FR slug so previously-indexed
+  # shared-slug URLs (one slug across all locales) still resolve.
+  def self.find_by_localized_slug(slug_param, locale = I18n.locale)
+    find_each do |article|
+      return article if article.slug_for(locale) == slug_param
+    end
+    find_by(slug: slug_param)
+  end
+
   def first_image_url
     text = body_for
     return nil if text.blank?
