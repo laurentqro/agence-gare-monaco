@@ -426,6 +426,60 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal({}, article.reload.slugs)
   end
 
+  # mint_localized_slug — collision-aware slug generation (SEO audit 0.2)
+  test "mint_localized_slug parameterizes the title for the locale" do
+    assert_equal "how-to-sell-your-property",
+      Article.mint_localized_slug("How to sell your property", :en)
+  end
+
+  test "mint_localized_slug transliterates Russian with Russian rules" do
+    slug = Article.mint_localized_slug("Как продать недвижимость", :ru)
+    assert slug.present?
+    assert_match(/\A[a-z0-9-]+\z/, slug)
+  end
+
+  test "mint_localized_slug returns empty string for a punctuation-only title" do
+    assert_equal "", Article.mint_localized_slug("!!!???", :en)
+  end
+
+  test "mint_localized_slug suffixes when the slug collides with another article's per-locale slug" do
+    Article.create!(
+      title: { "fr" => "A", "en" => "Monaco real estate" }, body: { "fr" => "C" },
+      slug: "a-fr", slugs: { "en" => "monaco-real-estate" },
+      category: @category
+    )
+    assert_equal "monaco-real-estate-2",
+      Article.mint_localized_slug("Monaco Real Estate", :en)
+  end
+
+  test "mint_localized_slug suffixes when the slug collides with another article's FR slug" do
+    Article.create!(
+      title: { "fr" => "Cinq raisons" }, body: { "fr" => "C" },
+      slug: "cinq-raisons", category: @category
+    )
+    # A different article's EN title parameterizes to an existing FR slug: it
+    # must not shadow the other article at /en/articles/cinq-raisons.
+    assert_equal "cinq-raisons-2",
+      Article.mint_localized_slug("Cinq raisons", :en)
+  end
+
+  test "mint_localized_slug ignores the article being updated via except_id" do
+    article = Article.create!(
+      title: { "fr" => "A", "en" => "Monaco real estate" }, body: { "fr" => "C" },
+      slug: "a-fr", slugs: { "en" => "monaco-real-estate" },
+      category: @category
+    )
+    # Re-minting for the same article must see its own slug as free, not a clash.
+    assert_equal "monaco-real-estate",
+      Article.mint_localized_slug("Monaco Real Estate", :en, except_id: article.id)
+  end
+
+  test "mint_localized_slug increments past multiple collisions" do
+    Article.create!(title: { "fr" => "A" }, body: { "fr" => "C" }, slug: "x", slugs: { "en" => "guide" }, category: @category)
+    Article.create!(title: { "fr" => "B" }, body: { "fr" => "C" }, slug: "y", slugs: { "en" => "guide-2" }, category: @category)
+    assert_equal "guide-3", Article.mint_localized_slug("Guide", :en)
+  end
+
   # find_by_localized_slug — resolve a per-locale URL back to its article
   test "find_by_localized_slug matches a per-locale slug under that locale" do
     article = Article.create!(

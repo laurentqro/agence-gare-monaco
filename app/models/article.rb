@@ -36,6 +36,35 @@ class Article < ApplicationRecord
     (slugs.is_a?(Hash) && slugs[locale.to_s].presence) || slug
   end
 
+  # Generate a collision-free localised slug from a title (SEO audit 0.2). The
+  # base is the locale-transliterated parameterization; if that already belongs
+  # to another article (its FR `slug` or its own `slugs[locale]`), a numeric
+  # suffix is appended (-2, -3, ...) so two articles never share one locale's
+  # URL. Returns "" for a title that parameterizes to nothing (caller skips it).
+  # Pass except_id to exclude the article being re-minted from the clash check.
+  def self.mint_localized_slug(title, locale, except_id: nil)
+    base = title.to_s.parameterize(locale: locale.to_sym)
+    return "" if base.blank?
+
+    candidate = base
+    suffix = 1
+    while localized_slug_taken?(candidate, locale, except_id: except_id)
+      suffix += 1
+      candidate = "#{base}-#{suffix}"
+    end
+    candidate
+  end
+
+  # True if any OTHER article already uses this slug for the locale, either as
+  # its canonical FR `slug` or its per-locale `slugs[locale]`.
+  def self.localized_slug_taken?(candidate, locale, except_id: nil)
+    scope = where(slug: candidate).or(
+      where("json_extract(slugs, ?) = ?", "$.#{locale}", candidate)
+    )
+    scope = scope.where.not(id: except_id) if except_id
+    scope.exists?
+  end
+
   # Resolve a URL slug back to its article for the given locale. Matches the
   # locale's own slug first, then the canonical FR slug so previously-indexed
   # shared-slug URLs (one slug across all locales) still resolve.

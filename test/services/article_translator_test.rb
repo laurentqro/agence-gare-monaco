@@ -157,6 +157,21 @@ class ArticleTranslatorTest < ActiveSupport::TestCase
     assert_equal "title-en", @article.slugs["en"], "slug should stay frozen"
   end
 
+  test "suffixes a minted slug that collides with another article's slug" do
+    # Another article already owns the EN slug the translation would produce.
+    Article.create!(
+      title: { "fr" => "Autre", "en" => "Title EN" }, body: { "fr" => "Corps" },
+      slug: "autre", slugs: { "en" => "title-en" }, category: @category
+    )
+
+    with_stubbed_chat(content_per_locale: canned_responses) do
+      ArticleTranslator.new(@article).translate!
+    end
+
+    assert_equal "title-en-2", @article.reload.slugs["en"],
+      "colliding minted slug must be suffixed, not shared"
+  end
+
   test "the minted Russian slug is ASCII-safe" do
     responses = canned_responses
     responses["ru"] = { "title" => "Как продать недвижимость в Монако", "body" => "Body RU" }

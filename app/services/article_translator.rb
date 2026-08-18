@@ -109,9 +109,10 @@ class ArticleTranslator
 
       # Mint a per-locale slug from the new translation (SEO audit 0.2), but only
       # when this locale has none yet: slugs are frozen, so a later FR edit that
-      # re-translates the title must not move an already-indexed URL.
+      # re-translates the title must not move an already-indexed URL. Minting is
+      # collision-aware (suffixes on clash) so two articles never share a URL.
       if slugs[locale].blank?
-        localized_slug = fields[:title].parameterize(locale: locale.to_sym)
+        localized_slug = Article.mint_localized_slug(fields[:title], locale, except_id: row.id)
         slugs[locale] = localized_slug if localized_slug.present?
       end
 
