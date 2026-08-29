@@ -100,17 +100,28 @@ class ArticleTranslator
       title = (row.title || {}).dup
       body = (row.body || {}).dup
       meta = (row.meta_description || {}).dup
+      slugs = (row.slugs || {}).dup
       status = (row.translations_status || {}).dup
 
       title[locale] = fields[:title]
       body[locale] = fields[:body] if fields.key?(:body)
       meta[locale] = fields[:meta_description] if fields.key?(:meta_description)
+
+      # Mint a per-locale slug from the new translation (SEO audit 0.2), but only
+      # when this locale has none yet: slugs are frozen, so a later FR edit that
+      # re-translates the title must not move an already-indexed URL. Minting is
+      # collision-aware (suffixes on clash) so two articles never share a URL.
+      if slugs[locale].blank?
+        localized_slug = Article.mint_localized_slug(fields[:title], locale, except_id: row.id)
+        slugs[locale] = localized_slug if localized_slug.present?
+      end
+
       status[locale] = {
         "translated_at" => Time.current.iso8601,
         "source_hash" => new_hash
       }
 
-      { title: title, body: body, meta_description: meta, translations_status: status }
+      { title: title, body: body, meta_description: meta, slugs: slugs, translations_status: status }
     end
   end
 

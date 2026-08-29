@@ -117,16 +117,19 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
     assert_redirected_to "/fr/posts/actualites"
   end
 
-  test "FR legacy /fr/article/{id}/{slug} redirects to article" do
+  # FR is the prefix-less default locale, so its canonical article URL is
+  # /articles/{slug} with no /fr. Redirecting straight there avoids a 301->301
+  # chain through the /fr/*path wildcard (SEO audit 0.3).
+  test "FR legacy /fr/article/{id}/{slug} redirects to the unprefixed article in one hop" do
     get "/fr/article/42/mon-article-test"
     assert_response :moved_permanently
-    assert_redirected_to "/fr/articles/mon-article-test"
+    assert_redirected_to "/articles/mon-article-test"
   end
 
   test "FR legacy /fr/article/{id}/{slug} looks up by legacy id, ignoring a stale slug" do
     get "/fr/article/42/an-old-outdated-slug"
     assert_response :moved_permanently
-    assert_redirected_to "/fr/articles/mon-article-test"
+    assert_redirected_to "/articles/mon-article-test"
   end
 
   test "FR legacy /fr/article/{id}/{slug} returns 410 when legacy id is unknown" do
@@ -140,10 +143,16 @@ class LegacyRedirectsTest < ActionDispatch::IntegrationTest
     assert_redirected_to "/fr/article/42/mon-article-test"
   end
 
-  test "FR legacy /fr/post/{id}/{slug} redirects to article" do
+  test "FR legacy /fr/post/{id}/{slug} redirects to the unprefixed article in one hop" do
     get "/fr/post/42/mon-article-test"
     assert_response :moved_permanently
-    assert_redirected_to "/fr/articles/mon-article-test"
+    assert_redirected_to "/articles/mon-article-test"
+  end
+
+  test "FR legacy article redirect lands on a live page without a second hop" do
+    get "/fr/article/42/mon-article-test"
+    follow_redirect!
+    assert_response :success
   end
 
   test "FR legacy /fr/recherche/{location} redirects to sales" do

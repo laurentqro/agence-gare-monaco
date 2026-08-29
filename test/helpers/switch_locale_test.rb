@@ -49,23 +49,44 @@ class SwitchLocaleTest < ActionDispatch::IntegrationTest
 
   # === Article show ===
 
-  test "switching locale from article show page preserves slug" do
+  test "switching locale from article show page localizes the slug per locale" do
     category = Category.create!(name: { "fr" => "Test" }, slug: "test-category")
-    article = Article.create!(
+    Article.create!(
       title: { "fr" => "Mon Article", "en" => "My Article", "it" => "Mio Articolo" },
       body: { "fr" => "Contenu", "en" => "Content", "it" => "Contenuto" },
       slug: "mon-article",
+      slugs: { "en" => "my-article", "it" => "mio-articolo" },
       category: category,
       published: true,
       published_at: 1.day.ago
     )
 
-    get "/en/articles/#{article.slug}"
+    get "/en/articles/my-article"
     assert_response :success
-    # French article
-    assert_select "a[href='/articles/#{article.slug}']"
-    # Italian article
-    assert_select "a[href='/it/articoli/#{article.slug}']"
+    # French article uses the canonical FR slug (unprefixed locale)
+    assert_select "a[href='/articles/mon-article']"
+    # Italian article uses the Italian slug
+    assert_select "a[href='/it/articoli/mio-articolo']"
+    # The current-locale (EN) slug must not leak into other locales' links
+    assert_select "a[href='/it/articoli/my-article']", count: 0
+  end
+
+  test "switching locale from an article falls back to the FR slug when a locale has none" do
+    category = Category.create!(name: { "fr" => "Test" }, slug: "test-category")
+    Article.create!(
+      title: { "fr" => "Mon Article", "en" => "My Article" },
+      body: { "fr" => "Contenu", "en" => "Content" },
+      slug: "mon-article",
+      slugs: { "en" => "my-article" },
+      category: category,
+      published: true,
+      published_at: 1.day.ago
+    )
+
+    get "/en/articles/my-article"
+    assert_response :success
+    # German has no slug of its own: fall back to the canonical FR slug.
+    assert_select "a[href='/de/artikel/mon-article']"
   end
 
   # === Category filter page (served by articles#show) ===

@@ -430,7 +430,7 @@ module SeoHelper
       base = locale_articles_path(locale)
       opts[:category] ? "#{base}/#{opts[:category].slug_for(locale)}" : base
     when :article
-      "#{locale_articles_path(locale)}/#{opts[:article].slug}"
+      "#{locale_articles_path(locale)}/#{opts[:article].slug_for(locale)}"
     when :contact
       locale_contact_path(locale)
     when :privacy

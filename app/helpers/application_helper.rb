@@ -158,6 +158,14 @@ module ApplicationHelper
     "#{locale_prefix(locale)}/#{props}/#{property.id}-#{slug}"
   end
 
+  # Canonical article path for a locale, using the article's per-locale slug
+  # (SEO audit 0.2). Internal links must use this so a non-FR click lands on the
+  # canonical URL directly instead of 301-hopping through the shared FR slug.
+  def locale_article_path(article, locale = I18n.locale)
+    articles = I18n.t("routes.articles", locale: locale)
+    "#{locale_prefix(locale)}/#{articles}/#{article.slug_for(locale)}"
+  end
+
   def listing_heading
     transaction = params[:transaction_type]
 
@@ -295,10 +303,18 @@ module ApplicationHelper
   end
 
   def switch_locale_article_path(locale)
-    # articles#show serves both article pages (global slug — pass it through)
-    # and category filter pages (per-locale slug — re-localize it, or the
-    # switcher pairs one locale's slug with another locale's segment, a 404).
-    slug = @category ? @category.slug_for(locale) : params[:slug]
+    # articles#show serves both article pages and category filter pages. Both
+    # carry a per-locale slug (SEO audit 0.2): re-localize via the record's own
+    # slug_for(locale), or the switcher pairs one locale's slug with another
+    # locale's segment, a 404. Fall back to params[:slug] if neither is loaded.
+    slug =
+      if @category
+        @category.slug_for(locale)
+      elsif @article
+        @article.slug_for(locale)
+      else
+        params[:slug]
+      end
     articles_segment = I18n.t("routes.articles", locale: locale)
     "#{locale_prefix(locale)}/#{articles_segment}/#{slug}"
   end

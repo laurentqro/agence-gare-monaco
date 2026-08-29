@@ -60,18 +60,23 @@ class LegacyRedirectsController < ApplicationController
     end
   end
 
-  # FR: /fr/article/{id}/{slug}/ or /fr/post/{id}/{slug} → /fr/articles/{current-slug}
+  # FR: /fr/article/{id}/{slug}/ or /fr/post/{id}/{slug} → /articles/{current-slug}
   # EN: /en/article/{id}/{slug} → /en/articles/{current-slug}
   #
   # The old numeric id is stable; the slug in the URL is the OLD slug and no
   # longer matches the article's current slug. Look the article up by its
   # legacy id and redirect to its current slug. 410 if no such article exists.
+  #
+  # FR is the prefix-less default locale, so its canonical URL carries no /fr.
+  # Redirecting straight to /articles/{slug} avoids a 301->301 chain through the
+  # /fr/*path wildcard in routes.rb.
   def article
     locale = params[:locale]
     article = Article.published.find_by(legacy_id: params[:id])
     if article
+      prefix = locale == "fr" ? "" : "/#{locale}"
       articles_segment = I18n.t("routes.articles", locale: locale)
-      redirect_to "/#{locale}/#{articles_segment}/#{article.slug}", status: :moved_permanently
+      redirect_to "#{prefix}/#{articles_segment}/#{article.slug_for(locale)}", status: :moved_permanently
     else
       head :gone
     end

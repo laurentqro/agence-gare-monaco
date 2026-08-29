@@ -71,7 +71,13 @@ class ArticleAutoTranslationTest < ActionDispatch::IntegrationTest
       assert_equal "Title #{locale.upcase}", article.title[locale]
       assert_equal "Body #{locale.upcase}", article.body[locale]
       assert article.translations_status[locale]["translated_at"].present?
+      # Writing a new FR article auto-mints a localised slug per locale (0.2),
+      # so the translated pages get canonical URLs with no manual backfill.
+      assert_equal "title-#{locale}", article.slugs[locale],
+        "expected an auto-minted localised slug for #{locale}"
     end
+    assert_not_includes article.slugs.keys, "fr"
+    assert_equal "cinq-raisons", article.slug
     assert article.translation_source_hash.present?
   end
 

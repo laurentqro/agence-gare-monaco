@@ -27,6 +27,54 @@ class Article < ApplicationRecord
     meta_description[locale.to_s].presence || meta_description[I18n.default_locale.to_s].presence || ""
   end
 
+  # Per-locale localised slug (SEO audit 0.2). FR always resolves to the pinned
+  # `slug` column (the canonical, indexed slug and stable lookup key); other
+  # locales use their entry in the `slugs` JSON hash, falling back to the FR
+  # slug when they have none yet.
+  def slug_for(locale = I18n.locale)
+    return slug if locale.to_s == I18n.default_locale.to_s
+    (slugs.is_a?(Hash) && slugs[locale.to_s].presence) || slug
+  end
+
+  # Generate a collision-free localised slug from a title (SEO audit 0.2). The
+  # base is the locale-transliterated parameterization; if that already belongs
+  # to another article (its FR `slug` or its own `slugs[locale]`), a numeric
+  # suffix is appended (-2, -3, ...) so two articles never share one locale's
+  # URL. Returns "" for a title that parameterizes to nothing (caller skips it).
+  # Pass except_id to exclude the article being re-minted from the clash check.
+  def self.mint_localized_slug(title, locale, except_id: nil)
+    base = title.to_s.parameterize(locale: locale.to_sym)
+    return "" if base.blank?
+
+    candidate = base
+    suffix = 1
+    while localized_slug_taken?(candidate, locale, except_id: except_id)
+      suffix += 1
+      candidate = "#{base}-#{suffix}"
+    end
+    candidate
+  end
+
+  # True if any OTHER article already uses this slug for the locale, either as
+  # its canonical FR `slug` or its per-locale `slugs[locale]`.
+  def self.localized_slug_taken?(candidate, locale, except_id: nil)
+    scope = where(slug: candidate).or(
+      where("json_extract(slugs, ?) = ?", "$.#{locale}", candidate)
+    )
+    scope = scope.where.not(id: except_id) if except_id
+    scope.exists?
+  end
+
+  # Resolve a URL slug back to its article for the given locale. Matches the
+  # locale's own slug first, then the canonical FR slug so previously-indexed
+  # shared-slug URLs (one slug across all locales) still resolve.
+  def self.find_by_localized_slug(slug_param, locale = I18n.locale)
+    find_each do |article|
+      return article if article.slug_for(locale) == slug_param
+    end
+    find_by(slug: slug_param)
+  end
+
   def first_image_url
     text = body_for
     return nil if text.blank?

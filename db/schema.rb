@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_27_131124) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_17_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -50,6 +50,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_131124) do
     t.boolean "published", default: false
     t.datetime "published_at"
     t.string "slug", null: false
+    t.json "slugs", default: {}, null: false
     t.json "title"
     t.string "translation_source_hash"
     t.json "translations_status", default: {}
