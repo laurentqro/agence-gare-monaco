@@ -12,6 +12,7 @@ it:
     contact: "Contatto"
     privacy: "Privacy"
     faq: "FAQ"
+    about: "Chi siamo"
     estimate: "Stima immobiliare"
 
   footer:
@@ -23,9 +24,8 @@ it:
     hero_title: "Immobiliare a Monaco dal 1942"
     hero_subtitle: "Membro della Chambre Immobilière Monégasque"
     about_title: "Agence Immobilière de la Gare"
-    about_history: "Fondata nel 1942, l'Agence Immobilière de la Gare è un'impresa familiare indipendente, membro della Chambre Immobilière Monégasque. Situata nel cuore del vivace quartiere della Condamine, ai piedi della maestosa Rocca dove sorge il Palazzo dei Principi, la nostra agenzia è diretta da Pierre Maré e suo figlio Adrien Maré. Forti di una ricca esperienza e di un approccio dinamico, abbiamo saputo costruire rapporti di fiducia con i nostri clienti, di generazione in generazione."
-    about_services: "Proponiamo servizi completi di vendita, locazione e gestione immobiliare a Monaco. Offriamo una gestione personalizzata dei vostri beni, con manutenzione accurata e monitoraggio rigoroso, per garantire un rendimento locativo ottimale. Ci occupiamo di tutte le pratiche amministrative: redazione di contratti, registrazione fiscale, inventari di ingresso e uscita e sottoscrizione di contratti di elettricità, acqua e assicurazione."
-    about_expertise: "La nostra competenza ci permette di collaborare con notai e avvocati monegaschi per la stima e la valutazione di beni immobiliari. In collaborazione con lo studio Tania Architettura d'interni, proponiamo progetti di ristrutturazione di appartamenti. Il nostro ambito di intervento si estende al Principato di Monaco e alla regione francese limitrofa. Contattateci al (+377) 93 30 22 36 o a info@agencegaremonaco.com."
+    about_teaser: "Fondata nel 1942, l'Agence Immobilière de la Gare è un'agenzia familiare indipendente, membro della Chambre Immobilière Monégasque, nel cuore della Condamine. Guidata da Pierre e Adrien Maré, accompagna i clienti nella vendita, nell'affitto e nella gestione di immobili a Monaco da quattro generazioni."
+    about_link: "Scopri di più sull'agenzia"
     team_title: "Il Nostro Team"
     team:
       email_member: "Invia un'email a %{name}"
@@ -187,6 +187,7 @@ it:
     vendre_description: "Vendete il vostro immobile a Monaco con l'Agence Immobilière de la Gare, agenzia indipendente dal 1942. Stima, mandato, compromesso e atto notarile."
     faq_title: "FAQ | Agence Immobilière de la Gare"
     faq_description: "Domande frequenti sull'immobiliare a Monaco. L'Agence Immobilière de la Gare, agenzia familiare indipendente dal 1942, risponde alle vostre domande."
+    about_description: "Agenzia familiare indipendente a Monaco dal 1942, membro della Chambre Immobilière Monégasque. Storia, servizi e team dell'Agence Immobilière de la Gare."
     estimate_title: "Stima il tuo immobile a Monaco | Agence Immobilière de la Gare"
     estimate_description: "Stima il valore del tuo immobile a Monaco con il nostro strumento basato sui dati IMSEE 2025. Prezzo al m² per quartiere e fascia di stima."
 
@@ -475,5 +476,17 @@ it:
     gestion: "gestione"
     vendre: "vendere"
     faq: "faq"
+    about: "chi-siamo"
     team: "team"
     estimate: "stima"
+
+  about:
+    title: "Chi è l'Agence Immobilière de la Gare"
+    history: "Fondata nel 1942, l'Agence Immobilière de la Gare è un'impresa familiare indipendente, membro della Chambre Immobilière Monégasque. Situata nel cuore del vivace quartiere della Condamine, ai piedi della maestosa Rocca dove sorge il Palazzo dei Principi, la nostra agenzia è diretta da Pierre Maré e suo figlio Adrien Maré. Forti di una ricca esperienza e di un approccio dinamico, abbiamo saputo costruire rapporti di fiducia con i nostri clienti, di generazione in generazione."
+    services: "Proponiamo servizi completi di vendita, locazione e gestione immobiliare a Monaco. Offriamo una gestione personalizzata dei vostri beni, con manutenzione accurata e monitoraggio rigoroso, per garantire un rendimento locativo ottimale. Ci occupiamo di tutte le pratiche amministrative: redazione di contratti, registrazione fiscale, inventari di ingresso e uscita e sottoscrizione di contratti di elettricità, acqua e assicurazione."
+    expertise: "La nostra competenza ci permette di collaborare con notai e avvocati monegaschi per la stima e la valutazione di beni immobiliari. In collaborazione con lo studio Tania Architettura d'interni, proponiamo progetti di ristrutturazione di appartamenti. Il nostro ambito di intervento si estende al Principato di Monaco e alla regione francese limitrofa. Contattateci al (+377) 93 30 22 36 o a info@agencegaremonaco.com."
+    facts_title: "L'agenzia in breve"
+    founded: "Fondata nel 1942, agenzia familiare indipendente"
+    member: "Membro della Chambre Immobilière Monégasque"
+    address: "3, Rue Langlé, MC 98000 Monaco · +377 93 30 22 36 · info@agencegaremonaco.com"
+    hours: "Aperto dal lunedì al venerdì, dalle 9 alle 18"

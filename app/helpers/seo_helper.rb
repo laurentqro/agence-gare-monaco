@@ -74,6 +74,8 @@ module SeoHelper
       t("seo.vendre_description")
     when :faq
       t("seo.faq_description")
+    when :about
+      t("seo.about_description")
     when :estimate
       t("seo.estimate_description")
     when :team_member
@@ -117,6 +119,8 @@ module SeoHelper
       "#{t('nav.sell')} | #{t('site_name')}"
     when :faq
       t("seo.faq_title")
+    when :about
+      "#{t('nav.about')} | #{t('site_name')}"
     when :estimate
       t("seo.estimate_title")
     when :team_member
@@ -338,6 +342,18 @@ module SeoHelper
     json_ld_script_tag(data)
   end
 
+  def json_ld_about_page
+    data = {
+      "@context" => "https://schema.org",
+      "@type" => "AboutPage",
+      "name" => t("about.title"),
+      "url" => canonical_url(page_type: :about),
+      "inLanguage" => I18n.locale.to_s,
+      "mainEntity" => { "@id" => ORGANIZATION_ID }
+    }
+    json_ld_script_tag(data)
+  end
+
   def json_ld_faq(faqs)
     data = {
       "@context" => "https://schema.org",
@@ -464,6 +480,8 @@ module SeoHelper
       locale_vendre_path(locale)
     when :faq
       locale_faq_path(locale)
+    when :about
+      locale_about_path(locale)
     when :estimate
       locale_estimate_path(locale)
     when :team_member
@@ -503,7 +521,7 @@ module SeoHelper
     when :property
       img = opts[:property]&.cover_image
       img&.large_url || img&.remote_url
-    when :homepage, :listings, :articles, :contact, :privacy, :offmarket, :gestion, :vendre, :faq, :estimate, :team_member
+    when :homepage, :listings, :articles, :contact, :privacy, :offmarket, :gestion, :vendre, :faq, :about, :estimate, :team_member
       "#{SITE_HOST}/images/og-default.jpg"
     when :article
       opts[:article]&.cover_image_display_url

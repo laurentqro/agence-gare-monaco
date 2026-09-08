@@ -190,6 +190,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
       assert_select "a[href='/gestion']", text: /Gestion/
       assert_select "a[href='/articles']", text: /Articles/
       assert_select "a[href='/faq']", text: /FAQ/
+      assert_select "a[href='/a-propos']", text: /À propos/
     end
   end
 
@@ -203,6 +204,7 @@ class LayoutTest < ActionDispatch::IntegrationTest
       assert_select "a[href='/en/management']", text: /Management/
       assert_select "a[href='/en/articles']", text: /Articles/
       assert_select "a[href='/en/faq']", text: /FAQ/
+      assert_select "a[href='/en/about']", text: /About/
     end
   end
 

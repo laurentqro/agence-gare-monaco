@@ -135,6 +135,13 @@ class SitemapsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "/en/privacy"
   end
 
+  test "language sitemap includes the about page with alternates" do
+    get "/sitemaps/en.xml"
+    assert_includes response.body, "<loc>https://agencegaremonaco.com/en/about</loc>"
+    assert_includes response.body, 'hreflang="fr" href="https://agencegaremonaco.com/a-propos"'
+    assert_includes response.body, 'hreflang="de" href="https://agencegaremonaco.com/de/ueber-uns"'
+  end
+
   test "language sitemap includes off-market page" do
     get "/sitemaps/en.xml"
     assert_includes response.body, "/en/off-market"

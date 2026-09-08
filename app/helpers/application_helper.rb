@@ -84,6 +84,11 @@ module ApplicationHelper
     "#{locale_prefix(locale)}/#{faq}"
   end
 
+  def locale_about_path(locale = I18n.locale)
+    about = I18n.t("routes.about", locale: locale)
+    "#{locale_prefix(locale)}/#{about}"
+  end
+
   def locale_estimate_path(locale = I18n.locale)
     estimate = I18n.t("routes.estimate", locale: locale)
     "#{locale_prefix(locale)}/#{estimate}"

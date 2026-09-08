@@ -1,0 +1,51 @@
+<%# === About Page === %>
+<section data-testid="about-content" class="max-w-3xl mx-auto px-4 py-16">
+  <h1 class="heading-section !text-2xl md:!text-3xl text-center mb-8">
+    <%= t("about.title") %>
+  </h1>
+
+  <div class="text-body text-justify space-y-6">
+    <div data-citation="history" class="space-y-4">
+      <%= simple_format(t("about.history"), {}, wrapper_tag: "p") %>
+    </div>
+    <div data-citation="services" class="space-y-4">
+      <%= simple_format(t("about.services"), {}, wrapper_tag: "p") %>
+    </div>
+    <div data-citation="expertise" class="space-y-4">
+      <%= simple_format(t("about.expertise"), {}, wrapper_tag: "p") %>
+    </div>
+  </div>
+
+  <div data-testid="about-facts" class="mt-12 border-t border-gray-200 pt-8">
+    <h2 class="heading-section !text-xl mb-4"><%= t("about.facts_title") %></h2>
+    <ul class="list-disc list-inside space-y-2 text-body">
+      <li><%= t("about.founded") %></li>
+      <li><%= t("about.member") %></li>
+      <li><%= t("about.address") %></li>
+      <li><%= t("about.hours") %></li>
+    </ul>
+  </div>
+
+  <div data-testid="about-team" class="mt-12 border-t border-gray-200 pt-8">
+    <h2 class="heading-section !text-xl text-center mb-8"><%= t("homepage.team_title") %></h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <% PagesController::TEAM_MEMBERS.each do |slug, member| %>
+        <div class="text-center">
+          <a href="<%= locale_team_member_path(slug) %>">
+            <%= image_tag member[:image], alt: member[:name], class: "w-36 h-36 mx-auto rounded-full object-cover mb-4 border-2 border-gray-200" %>
+          </a>
+          <h3 class="text-sm font-bold text-navy uppercase tracking-wide">
+            <a href="<%= locale_team_member_path(slug) %>" class="hover:underline"><%= member[:name] %></a>
+          </h3>
+          <p class="text-xs text-gray-500"><%= t("homepage.team.#{member[:key]}_role") %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mt-12 text-center">
+    <a href="<%= locale_contact_path %>" class="inline-block bg-navy text-white px-6 py-3 rounded text-sm font-semibold hover:bg-navy/90 transition-colors">
+      <%= t("nav.contact") %>
+    </a>
+  </div>
+</section>

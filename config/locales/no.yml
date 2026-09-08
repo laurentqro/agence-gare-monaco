@@ -12,6 +12,7 @@
     contact: "Kontakt"
     privacy: "Personvern"
     faq: "FAQ"
+    about: "Om oss"
     estimate: "Verdivurdering"
 
   footer:
@@ -23,9 +24,8 @@
     hero_title: "Eiendom i Monaco siden 1942"
     hero_subtitle: "Medlem av Chambre Immobilière Monégasque"
     about_title: "Agence Immobilière de la Gare"
-    about_history: "Agence Immobilière de la Gare ble grunnlagt i 1942 og er et uavhengig familieforetak samt medlem av Chambre Immobilière Monégasque. Ideelt beliggende i hjertet av det livlige Condamine-kvarteret, ved foten av den majestetiske klippen der Fyrstepalasset troner, ledes vårt byrå av Pierre Maré og hans sønn Adrien Maré. Med rik erfaring og en dynamisk tilnærming har vi bygget tillitsfulle relasjoner med våre kunder, fra generasjon til generasjon."
-    about_services: "Vi tilbyr omfattende eiendomssalg, utleie og forvaltningstjenester i Monaco. Vi tilbyr personlig forvaltning av eiendommene deres, med nøye vedlikehold og streng oppfølging, for å garantere optimal leieavkastning. Vi tar hånd om alle administrative formaliteter: utarbeidelse av leiekontrakter, skatteregistrering, inn- og utflyttingsbefaring samt strøm-, vann- og forsikringsavtaler."
-    about_expertise: "Vår ekspertise gjør det mulig å samarbeide med monegaskiske notarer og advokater for estimering og verdivurdering av eiendommer. I samarbeid med firmaet Tania Interiørarkitektur tilbyr vi prosjekter for ominnredning av leiligheter. Vårt virkeområde strekker seg til Fyrstedømmet Monaco og den tilgrensende franske regionen. Kontakt oss på (+377) 93 30 22 36 eller info@agencegaremonaco.com."
+    about_teaser: "Agence Immobilière de la Gare ble grunnlagt i 1942 og er et uavhengig familieeid byrå, medlem av Chambre Immobilière Monégasque, midt i La Condamine. Under ledelse av Pierre og Adrien Maré har byrået hjulpet kunder med salg, utleie og forvaltning av eiendom i Monaco i fire generasjoner."
+    about_link: "Les mer om byrået"
     team_title: "Vårt Team"
     team:
       email_member: "Send e-post til %{name}"
@@ -187,6 +187,7 @@
     vendre_description: "Selg eiendommen din i Monaco med Agence Immobilière de la Gare, uavhengig byrå siden 1942. Verdivurdering, mandat, foreløpig kontrakt og notarialbekreftelse."
     faq_title: "FAQ | Agence Immobilière de la Gare"
     faq_description: "Ofte stilte spørsmål om eiendom i Monaco. Agence Immobilière de la Gare, uavhengig familiebyrå siden 1942, svarer på dine spørsmål."
+    about_description: "Uavhengig familieeid byrå i Monaco siden 1942, medlem av Chambre Immobilière Monégasque. Historie, tjenester og team hos Agence Immobilière de la Gare."
     estimate_title: "Verdivurder eiendommen din i Monaco | Agence Immobilière de la Gare"
     estimate_description: "Verdivurder eiendommen din i Monaco med vårt verktøy basert på IMSEE-data 2025. Pris per m² per bydel og estimatområde."
 
@@ -475,5 +476,17 @@
     gestion: "forvaltning"
     vendre: "selge"
     faq: "faq"
+    about: "om-oss"
     team: "team"
     estimate: "verdivurdering"
+
+  about:
+    title: "Om Agence Immobilière de la Gare"
+    history: "Agence Immobilière de la Gare ble grunnlagt i 1942 og er et uavhengig familieforetak samt medlem av Chambre Immobilière Monégasque. Ideelt beliggende i hjertet av det livlige Condamine-kvarteret, ved foten av den majestetiske klippen der Fyrstepalasset troner, ledes vårt byrå av Pierre Maré og hans sønn Adrien Maré. Med rik erfaring og en dynamisk tilnærming har vi bygget tillitsfulle relasjoner med våre kunder, fra generasjon til generasjon."
+    services: "Vi tilbyr omfattende eiendomssalg, utleie og forvaltningstjenester i Monaco. Vi tilbyr personlig forvaltning av eiendommene deres, med nøye vedlikehold og streng oppfølging, for å garantere optimal leieavkastning. Vi tar hånd om alle administrative formaliteter: utarbeidelse av leiekontrakter, skatteregistrering, inn- og utflyttingsbefaring samt strøm-, vann- og forsikringsavtaler."
+    expertise: "Vår ekspertise gjør det mulig å samarbeide med monegaskiske notarer og advokater for estimering og verdivurdering av eiendommer. I samarbeid med firmaet Tania Interiørarkitektur tilbyr vi prosjekter for ominnredning av leiligheter. Vårt virkeområde strekker seg til Fyrstedømmet Monaco og den tilgrensende franske regionen. Kontakt oss på (+377) 93 30 22 36 eller info@agencegaremonaco.com."
+    facts_title: "Byrået i korte trekk"
+    founded: "Grunnlagt i 1942, uavhengig familieeid byrå"
+    member: "Medlem av Chambre Immobilière Monégasque"
+    address: "3, Rue Langlé, MC 98000 Monaco · +377 93 30 22 36 · info@agencegaremonaco.com"
+    hours: "Åpent mandag til fredag, kl. 9–18"

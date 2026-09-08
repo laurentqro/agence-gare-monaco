@@ -132,15 +132,10 @@
     <%= t("homepage.about_title") %>
   </h2>
   <div class="text-body text-justify space-y-6">
-    <div data-citation="history" class="space-y-4">
-      <%= simple_format(t("homepage.about_history"), {}, wrapper_tag: "p") %>
-    </div>
-    <div data-citation="services" class="space-y-4">
-      <%= simple_format(t("homepage.about_services"), {}, wrapper_tag: "p") %>
-    </div>
-    <div data-citation="expertise" class="space-y-4">
-      <%= simple_format(t("homepage.about_expertise"), {}, wrapper_tag: "p") %>
-    </div>
+    <p data-testid="about-teaser" data-citation="teaser"><%= t("homepage.about_teaser") %></p>
+    <p class="text-center">
+      <a href="<%= locale_about_path %>" class="text-sm text-navy font-semibold hover:underline"><%= t("homepage.about_link") %> &rarr;</a>
+    </p>
   </div>
 </section>
 

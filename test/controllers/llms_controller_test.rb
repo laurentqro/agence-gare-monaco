@@ -57,7 +57,7 @@ class LlmsControllerTest < ActionDispatch::IntegrationTest
   test "llms.txt links the key pages" do
     get "/llms.txt"
     assert_match(/^## Pages$/, response.body)
-    %w[/ventes /locations /off-market /articles /contact /confidentialite /faq /estimer /gestion /vendre /equipe/pierre-mare].each do |path|
+    %w[/a-propos /ventes /locations /off-market /articles /contact /confidentialite /faq /estimer /gestion /vendre /equipe/pierre-mare].each do |path|
       assert_includes response.body, "](https://agencegaremonaco.com#{path})"
     end
     assert_includes response.body, "](https://agencegaremonaco.com/en/sales)"

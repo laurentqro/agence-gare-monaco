@@ -12,7 +12,7 @@ class RussianLocaleTest < ActionDispatch::IntegrationTest
   end
 
   test "Russian locale has all nav translations" do
-    %w[buy rent offmarket sell management articles contact privacy faq].each do |key|
+    %w[buy rent offmarket sell management articles contact privacy faq about].each do |key|
       assert I18n.exists?("nav.#{key}", :ru), "Missing nav.#{key} for ru"
     end
   end
@@ -24,7 +24,7 @@ class RussianLocaleTest < ActionDispatch::IntegrationTest
   end
 
   test "Russian locale has route segment translations" do
-    %w[sales rentals properties articles contact privacy france offmarket gestion vendre faq team].each do |key|
+    %w[sales rentals properties articles contact privacy france offmarket gestion vendre faq team about].each do |key|
       assert I18n.exists?("routes.#{key}", :ru), "Missing routes.#{key} for ru"
     end
   end

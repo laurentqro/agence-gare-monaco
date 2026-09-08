@@ -12,6 +12,7 @@ fi:
     contact: "Yhteystiedot"
     privacy: "Tietosuoja"
     faq: "FAQ"
+    about: "Tietoa meistä"
     estimate: "Asunnon arviointi"
 
   footer:
@@ -23,9 +24,8 @@ fi:
     hero_title: "Kiinteistöt Monacossa vuodesta 1942"
     hero_subtitle: "Chambre Immobilière Monégasquen jäsen"
     about_title: "Agence Immobilière de la Gare"
-    about_history: "Vuonna 1942 perustettu Agence Immobilière de la Gare on itsenäinen perheyritys ja Chambre Immobilière Monégasquen jäsen. Ihanteellisesti vilkkaan Condamine-kaupunginosan sydämessä, majesteettisen kallion juurella, jossa Ruhtinaan palatsi kohoaa, toimistoamme johtavat Pierre Maré ja hänen poikansa Adrien Maré. Rikkaan kokemuksen ja dynaamisen lähestymistavan ansiosta olemme rakentaneet luottamuksellisia suhteita asiakkaisiimme sukupolvesta toiseen."
-    about_services: "Tarjoamme kattavia kiinteistöjen myynti-, vuokraus- ja hallintapalveluita Monacossa. Tarjoamme kiinteistöjenne yksilöllistä hallintaa huolellisella kunnossapidolla ja tarkalla seurannalla optimaalisen vuokratuoton takaamiseksi. Hoidamme kaikki hallinnolliset muodollisuudet: vuokrasopimusten laatiminen, verorekisteröinti, sisään- ja ulosmuuttotarkastukset sekä sähkö-, vesi- ja vakuutussopimukset."
-    about_expertise: "Asiantuntemuksemme mahdollistaa yhteistyön monacalaisten notaarien ja asianajajien kanssa kiinteistöjen arvioinnissa ja arvonmäärityksessä. Yhteistyössä Tania Sisustusarkkitehtuuri -toimiston kanssa tarjoamme asuntojen uudelleensuunnitteluprojekteja. Toiminta-alueemme ulottuu Monacon ruhtinaskuntaan ja viereiselle Ranskan alueelle. Ota yhteyttä numeroon (+377) 93 30 22 36 tai osoitteeseen info@agencegaremonaco.com."
+    about_teaser: "Vuonna 1942 perustettu Agence Immobilière de la Gare on riippumaton perheyritys ja Chambre Immobilière Monégasquen jäsen La Condaminen sydämessä. Pierre ja Adrien Marén johdolla toimisto on auttanut asiakkaita asuntojen myynnissä, vuokrauksessa ja hallinnoinnissa Monacossa neljän sukupolven ajan."
+    about_link: "Lue lisää toimistosta"
     team_title: "Tiimimme"
     team:
       email_member: "Lähetä sähköpostia: %{name}"
@@ -187,6 +187,7 @@ fi:
     vendre_description: "Myy kiinteistösi Monacossa Agence Immobilière de la Garen kanssa, itsenäinen toimisto vuodesta 1942. Arviointi, toimeksianto, esisopimus ja notaarin vahvistama kauppakirja."
     faq_title: "FAQ | Agence Immobilière de la Gare"
     faq_description: "Usein kysytyt kysymykset kiinteistöistä Monacossa. Agence Immobilière de la Gare, itsenäinen perhetoimisto vuodesta 1942, vastaa kysymyksiisi."
+    about_description: "Riippumaton perheyritys Monacossa vuodesta 1942, Chambre Immobilière Monégasquen jäsen. Agence Immobilière de la Garen historia, palvelut ja tiimi."
     estimate_title: "Arvioi asuntosi arvo Monacossa | Agence Immobilière de la Gare"
     estimate_description: "Arvioi asuntosi arvo Monacossa työkalullamme, joka perustuu IMSEE-tietoihin 2025. Hinta per m² alueittain ja arviointiväli."
 
@@ -475,5 +476,17 @@ fi:
     gestion: "hallinto"
     vendre: "myy"
     faq: "faq"
+    about: "tietoa-meista"
     team: "team"
     estimate: "arviointi"
+
+  about:
+    title: "Tietoa toimistosta Agence Immobilière de la Gare"
+    history: "Vuonna 1942 perustettu Agence Immobilière de la Gare on itsenäinen perheyritys ja Chambre Immobilière Monégasquen jäsen. Ihanteellisesti vilkkaan Condamine-kaupunginosan sydämessä, majesteettisen kallion juurella, jossa Ruhtinaan palatsi kohoaa, toimistoamme johtavat Pierre Maré ja hänen poikansa Adrien Maré. Rikkaan kokemuksen ja dynaamisen lähestymistavan ansiosta olemme rakentaneet luottamuksellisia suhteita asiakkaisiimme sukupolvesta toiseen."
+    services: "Tarjoamme kattavia kiinteistöjen myynti-, vuokraus- ja hallintapalveluita Monacossa. Tarjoamme kiinteistöjenne yksilöllistä hallintaa huolellisella kunnossapidolla ja tarkalla seurannalla optimaalisen vuokratuoton takaamiseksi. Hoidamme kaikki hallinnolliset muodollisuudet: vuokrasopimusten laatiminen, verorekisteröinti, sisään- ja ulosmuuttotarkastukset sekä sähkö-, vesi- ja vakuutussopimukset."
+    expertise: "Asiantuntemuksemme mahdollistaa yhteistyön monacalaisten notaarien ja asianajajien kanssa kiinteistöjen arvioinnissa ja arvonmäärityksessä. Yhteistyössä Tania Sisustusarkkitehtuuri -toimiston kanssa tarjoamme asuntojen uudelleensuunnitteluprojekteja. Toiminta-alueemme ulottuu Monacon ruhtinaskuntaan ja viereiselle Ranskan alueelle. Ota yhteyttä numeroon (+377) 93 30 22 36 tai osoitteeseen info@agencegaremonaco.com."
+    facts_title: "Toimisto lyhyesti"
+    founded: "Perustettu 1942, riippumaton perheyritys"
+    member: "Chambre Immobilière Monégasquen jäsen"
+    address: "3, Rue Langlé, MC 98000 Monaco · +377 93 30 22 36 · info@agencegaremonaco.com"
+    hours: "Avoinna maanantaista perjantaihin klo 9–18"

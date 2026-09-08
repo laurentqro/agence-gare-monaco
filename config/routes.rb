@@ -35,6 +35,7 @@ Rails.application.routes.draw do
     faq      = I18n.t("routes.faq", locale: locale)
     team     = I18n.t("routes.team", locale: locale)
     estimate = I18n.t("routes.estimate", locale: locale)
+    about    = I18n.t("routes.about", locale: locale)
 
     prefix = locale == :fr ? "" : "/#{locale}"
     sales_target = "#{prefix}/#{sales}"
@@ -80,6 +81,9 @@ Rails.application.routes.draw do
 
       # FAQ
       get "/#{faq}", to: "pages#faq", as: :"#{locale}_faq"
+
+      # About the agency
+      get "/#{about}", to: "pages#about", as: :"#{locale}_about"
 
       # Team member pages
       get "/#{team}/:member", to: "pages#team_member", as: :"#{locale}_team_member"
@@ -129,6 +133,7 @@ Rails.application.routes.draw do
 
   # English-named path agents probe at the root; the English page lives under /en
   get "/privacy", to: redirect("/en/privacy", status: 301)
+  get "/about", to: redirect("/en/about", status: 301)
 
   # Contact form submissions
   resources :information_requests, only: [ :create ]

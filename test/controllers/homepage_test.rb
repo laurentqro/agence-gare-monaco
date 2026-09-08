@@ -69,10 +69,14 @@ class HomepageTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='about'] h2", text: /Agence Immobili/
   end
 
-  test "about section has multiple citation blocks" do
+  test "about section is a two-sentence teaser linking to the about page" do
     get "/"
-    assert_select "[data-testid='about'] [data-citation]", { minimum: 3 },
-      "About section should have at least 3 citation blocks for AI extractability"
+    assert_select "[data-testid='about'] p[data-testid='about-teaser']" do |paragraphs|
+      sentences = paragraphs.first.text.squish.scan(/[^.!?]+[.!?]/)
+      assert_equal 2, sentences.length, "teaser should be exactly two sentences"
+    end
+    assert_select "[data-testid='about'] a[href='/a-propos']"
+    assert_no_match(/#{Regexp.escape(I18n.t("about.history", locale: :fr))}/, response.body)
   end
 
   # === Team Section ===

@@ -32,6 +32,10 @@ class PagesController < ApplicationController
     set_seo(page_type: :faq)
   end
 
+  def about
+    set_seo(page_type: :about)
+  end
+
   TEAM_MEMBERS = {
     "pierre-mare" => { key: "pierre", name: "Pierre Maré", image: "team/pierre.jpg" },
     "adrien-mare" => { key: "adrien", name: "Adrien Maré", image: "team/adrien.jpg" },
