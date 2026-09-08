@@ -1,3 +1,4 @@
+<% load File.join(Dir.pwd, "lib/kamal_docker_config.rb"); KamalDockerConfig.isolate!(root: Dir.pwd) -%>
 service: agence_gare_monaco
 
 image: laurentqro/agence-gare-monaco

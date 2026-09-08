@@ -42,3 +42,5 @@
 
 # Progress tracking (local only)
 /progress.txt
+
+/.kamal/docker

@@ -12,5 +12,8 @@ ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
 
 require "rubygems"
 require "bundler/setup"
+require_relative "../lib/kamal_docker_config"
+
+KamalDockerConfig.isolate!(root: File.expand_path("..", __dir__))
 
 load Gem.bin_path("kamal", "kamal")

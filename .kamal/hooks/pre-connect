@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require File.join(Dir.pwd, "lib/kamal_docker_config")
+
+KamalDockerConfig.login!(root: Dir.pwd, env: ENV)
