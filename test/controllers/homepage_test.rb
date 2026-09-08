@@ -81,6 +81,15 @@ class HomepageTest < ActionDispatch::IntegrationTest
     assert_match(/Palais Princier/, response.body)
   end
 
+  test "about section includes services, expertise and agency facts in raw HTML" do
+    get "/"
+    assert_select "[data-testid='about-services']", text: /vente, location et gestion/
+    assert_select "[data-testid='about-expertise']", text: /notaires et avocats/
+    assert_select "[data-testid='about-facts'] li", text: /1942/
+    assert_select "[data-testid='about-facts'] li", text: /Chambre Immobilière Monégasque/
+    assert_select "[data-testid='about-facts'] li", text: /Rue Langlé/
+  end
+
   # === Team Section ===
 
   test "homepage displays team section with three members" do
@@ -533,10 +542,90 @@ class HomepageTest < ActionDispatch::IntegrationTest
     assert_nil video_script, "VideoObject JSON-LD should not appear when no videos exist"
   end
 
+  # === Content without JavaScript (Is Agentic / Ora) ===
+
+  test "homepage serves a clear H1 and at least 500 characters of meaningful HTML content" do
+    populate_homepage_listings
+
+    get "/"
+    assert_response :success
+    assert_select "h1", minimum: 1
+    assert_select "h1", text: /Monaco/
+
+    text = homepage_semantic_text(response.body)
+    assert_operator text.length, :>=, 500,
+      "Expected ≥500 characters of heading/paragraph/list text in raw HTML, got #{text.length}"
+  end
+
+  test "homepage heading levels stay sequential" do
+    populate_homepage_listings
+
+    get "/"
+    levels = Nokogiri::HTML(response.body).css("h1, h2, h3, h4, h5, h6").map { |h| h.name[1].to_i }
+    assert_equal 1, levels.first, "The first heading on the homepage should be an H1"
+
+    levels.each_cons(2) do |current, nxt|
+      assert_operator nxt, :<=, current + 1,
+        "Heading levels skip from h#{current} to h#{nxt}"
+    end
+  end
+
+  test "homepage content-to-markup ratio is at least 5%" do
+    populate_homepage_listings
+
+    get "/"
+    html = response.body
+    text = homepage_semantic_text(html)
+    markup = homepage_content_markup(html)
+    ratio = (text.length * 100.0) / markup.length
+
+    assert_operator ratio, :>=, 5.0,
+      "Content ratio #{ratio.round(1)}% is below the 5% target (#{text.length} chars in #{markup.length} of markup)"
+  end
+
   # === Navbar Transparency on Homepage ===
 
   test "homepage navbar has white background" do
     get "/"
     assert_select "nav.bg-white"
+  end
+
+  private
+
+  def populate_homepage_listings
+    category = Category.create!(name: { "fr" => "Actualités" }, slug: "actualites-home")
+    9.times do |i|
+      Article.create!(
+        title: { "fr" => "Article de test #{i + 1} sur l'immobilier à Monaco" },
+        body: { "fr" => "Contenu." },
+        slug: "article-home-#{i + 1}",
+        category: category,
+        published: true,
+        published_at: (i + 1).days.ago,
+        cover_image_url: "/images/categories/sales-monaco.jpg"
+      )
+      YoutubeVideo.create!(
+        video_id: "video#{i + 1}abcd",
+        title: "Monaco property video #{i + 1}",
+        published_at: (i + 1).days.ago
+      )
+    end
+  end
+
+  def homepage_semantic_text(html)
+    document = Nokogiri::HTML(html)
+    document.css("script, style, noscript, svg").remove
+    document.css("h1, h2, h3, h4, h5, h6, p, li, td, th, figcaption, blockquote, dt, dd")
+      .map { |node| node.text }
+      .join(" ")
+      .gsub(/\s+/, " ")
+      .strip
+  end
+
+  def homepage_content_markup(html)
+    document = Nokogiri::HTML(html)
+    document.css("script, style, noscript").remove
+    main = document.at("main")
+    (main || document.at("body")).inner_html
   end
 end

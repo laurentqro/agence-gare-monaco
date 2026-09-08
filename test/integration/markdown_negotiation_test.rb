@@ -9,6 +9,7 @@ class MarkdownNegotiationTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal MARKDOWN, response.content_type
     assert_includes response.body, "# "
+    assert_includes response.body, "vente, location et gestion"
     assert_no_match(/<(div|main|html|script)\b/i, response.body)
   end
 

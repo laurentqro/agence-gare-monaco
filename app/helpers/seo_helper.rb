@@ -196,27 +196,21 @@ module SeoHelper
   ORGANIZATION_LOGO = "#{PRODUCTION_HOST}/images/logo.png".freeze
   ORGANIZATION_PHONE = "+377 93 30 22 36".freeze
   ORGANIZATION_EMAIL = "info@agencegaremonaco.com".freeze
+  ORGANIZATION_SAME_AS = [
+    "https://www.linkedin.com/company/agence-de-la-gare-monaco",
+    "https://www.facebook.com/agencedelagaremonaco",
+    "https://www.instagram.com/agencedelagaremonaco",
+    "https://www.youtube.com/channel/UC2w6AJOPj37wDZxXjWLRxtg"
+  ].freeze
 
   def json_ld_organization
-    data = {
-      "@context" => "https://schema.org",
-      "@type" => "RealEstateAgent",
-      "@id" => ORGANIZATION_ID,
-      "name" => ORGANIZATION_NAME,
-      "url" => PRODUCTION_HOST,
-      "logo" => ORGANIZATION_LOGO,
+    data = { "@context" => "https://schema.org" }.merge(
+      organization_identity_fields("Organization", "RealEstateAgent")
+    ).merge(
       "image" => "#{PRODUCTION_HOST}/images/og-default.jpg",
       "telephone" => ORGANIZATION_PHONE,
       "fax" => "+377 93 25 05 34",
       "email" => ORGANIZATION_EMAIL,
-      "address" => organization_address,
-      "contactPoint" => organization_contact_points,
-      "sameAs" => [
-        "https://www.linkedin.com/company/agence-de-la-gare-monaco",
-        "https://www.facebook.com/agencedelagaremonaco",
-        "https://www.instagram.com/agencedelagaremonaco",
-        "https://www.youtube.com/channel/UC2w6AJOPj37wDZxXjWLRxtg"
-      ],
       "foundingDate" => "1942",
       "openingHoursSpecification" => [
         {
@@ -226,7 +220,7 @@ module SeoHelper
           "closes" => "18:00"
         }
       ]
-    }
+    )
     json_ld_script_tag(data)
   end
 
@@ -253,15 +247,22 @@ module SeoHelper
     ]
   end
 
-  def organization_reference(type: "Organization")
+  def organization_identity_fields(*types)
     {
-      "@type" => type,
+      "@type" => (types.one? ? types.first : types),
       "@id" => ORGANIZATION_ID,
       "name" => ORGANIZATION_NAME,
+      "description" => I18n.t("seo.homepage_description"),
       "url" => PRODUCTION_HOST,
+      "logo" => ORGANIZATION_LOGO,
       "address" => organization_address,
-      "contactPoint" => organization_contact_points
+      "contactPoint" => organization_contact_points,
+      "sameAs" => ORGANIZATION_SAME_AS
     }
+  end
+
+  def organization_reference(type: "Organization")
+    organization_identity_fields(type)
   end
 
   def json_ld_property(property)

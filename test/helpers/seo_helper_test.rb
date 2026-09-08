@@ -488,9 +488,21 @@ class SeoHelperTest < ActionView::TestCase
   test "json_ld_organization includes RealEstateAgent" do
     result = json_ld_organization
     parsed = JSON.parse(result.match(/<script[^>]*>(.*)<\/script>/m)[1])
-    assert_equal "RealEstateAgent", parsed["@type"]
+    assert_includes Array(parsed["@type"]), "RealEstateAgent"
     assert_equal "Agence Immobilière de la Gare", parsed["name"]
     assert_equal "+377 93 30 22 36", parsed["telephone"]
+  end
+
+  test "json_ld_organization is a complete Organization identity" do
+    parsed = parse_json_ld(json_ld_organization)
+    assert_includes Array(parsed["@type"]), "Organization"
+    assert_equal "Agence Immobilière de la Gare", parsed["name"]
+    assert_equal I18n.t("seo.homepage_description"), parsed["description"]
+    assert_equal "https://agencegaremonaco.com", parsed["url"]
+    assert_equal "https://agencegaremonaco.com/images/logo.png", parsed["logo"]
+    assert_includes parsed["sameAs"], "https://www.linkedin.com/company/agence-de-la-gare-monaco"
+    assert_equal "PostalAddress", parsed["address"]["@type"]
+    assert_equal "3, Rue Langlé", parsed["address"]["streetAddress"]
   end
 
   test "json_ld_organization identifies the agency with a stable @id" do
@@ -522,6 +534,20 @@ class SeoHelperTest < ActionView::TestCase
     assert_equal "https://agencegaremonaco.com/#organization", publisher["@id"]
     assert_equal "PostalAddress", publisher["address"]["@type"]
     assert_equal "ContactPoint", publisher["contactPoint"].first["@type"]
+  end
+
+  test "nested Organization references carry description, logo and sameAs" do
+    publisher = parse_json_ld(json_ld_website)["publisher"]
+    assert_equal I18n.t("seo.homepage_description"), publisher["description"]
+    assert_equal "https://agencegaremonaco.com/images/logo.png", publisher["logo"]
+    assert_includes publisher["sameAs"], "https://www.instagram.com/agencedelagaremonaco"
+
+    videos = [ YoutubeVideo.new(video_id: "abc123", title: "Monaco Tour", published_at: Time.zone.parse("2025-01-15")) ]
+    nested = parse_json_ld(json_ld_videos(videos))["itemListElement"][0]["item"]["publisher"]
+    assert_includes Array(nested["@type"]), "Organization"
+    assert_equal I18n.t("seo.homepage_description"), nested["description"]
+    assert_equal "https://agencegaremonaco.com/images/logo.png", nested["logo"]
+    assert_includes nested["sameAs"], "https://www.facebook.com/agencedelagaremonaco"
   end
 
   test "json_ld_article publisher and author reference the organization with its address and contact point" do

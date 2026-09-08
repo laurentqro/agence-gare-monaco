@@ -133,6 +133,17 @@
   </h2>
   <div class="text-body text-justify space-y-6">
     <p data-testid="about-teaser" data-citation="teaser"><%= t("homepage.about_teaser") %></p>
+    <p data-testid="about-services" data-citation="services"><%= t("about.services") %></p>
+    <p data-testid="about-expertise" data-citation="expertise"><%= t("about.expertise") %></p>
+    <div data-testid="about-facts">
+      <h3 class="heading-section !text-xl mb-4 text-left"><%= t("about.facts_title") %></h3>
+      <ul class="list-disc list-inside space-y-2 text-left">
+        <li><%= t("about.founded") %></li>
+        <li><%= t("about.member") %></li>
+        <li><%= t("about.address") %></li>
+        <li><%= t("about.hours") %></li>
+      </ul>
+    </div>
     <p class="text-center">
       <a href="<%= locale_about_path %>" class="text-sm text-navy font-semibold hover:underline"><%= t("homepage.about_link") %> &rarr;</a>
     </p>

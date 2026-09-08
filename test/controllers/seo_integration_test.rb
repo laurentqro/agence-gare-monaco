@@ -92,9 +92,51 @@ class SeoIntegrationTest < ActionDispatch::IntegrationTest
     assert_select 'script[type="application/ld+json"]', minimum: 1
     scripts = css_select('script[type="application/ld+json"]')
     json_contents = scripts.map { |s| JSON.parse(s.text) }
-    org = json_contents.find { |j| j["@type"] == "RealEstateAgent" }
+    org = json_contents.find { |j| Array(j["@type"]).include?("RealEstateAgent") }
     assert_not_nil org
     assert_equal "Agence Immobilière de la Gare", org["name"]
+  end
+
+  test "homepage JSON-LD identity includes name, description, url, sameAs, logo and address" do
+    get "/en"
+    assert_response :success
+    scripts = css_select('script[type="application/ld+json"]').map { |s| JSON.parse(s.text) }
+    org = scripts.find { |j| Array(j["@type"]).include?("Organization") }
+    assert_not_nil org, "Expected a top-level Organization JSON-LD block"
+    assert_equal "Agence Immobilière de la Gare", org["name"]
+    assert_equal I18n.t("seo.homepage_description", locale: :en), org["description"]
+    assert_equal "https://agencegaremonaco.com", org["url"]
+    assert_equal "https://agencegaremonaco.com/images/logo.png", org["logo"]
+    assert org["sameAs"].is_a?(Array) && org["sameAs"].any?
+    assert_equal "PostalAddress", org["address"]["@type"]
+    assert_equal "Monaco", org["address"]["addressLocality"]
+  end
+
+  test "French homepage JSON-LD description follows the page locale" do
+    get "/"
+    scripts = css_select('script[type="application/ld+json"]').map { |s| JSON.parse(s.text) }
+    org = scripts.find { |j| Array(j["@type"]).include?("Organization") }
+    assert_equal I18n.t("seo.homepage_description", locale: :fr), org["description"]
+  end
+
+  test "organization logo is served at the JSON-LD logo URL" do
+    get "/images/logo.png"
+    assert_response :success
+    assert_match %r{\Aimage/}, response.media_type
+  end
+
+  test "default Open Graph image is served at 1200 by 630" do
+    get "/images/og-default.jpg"
+    assert_response :success
+    assert_equal "image/jpeg", response.media_type
+    width, height = jpeg_dimensions(response.body)
+    assert_equal [ 1200, 630 ], [ width, height ]
+
+    get "/en"
+    assert_select 'meta[property="og:image"][content="https://agencegaremonaco.com/images/og-default.jpg"]'
+    org = css_select('script[type="application/ld+json"]').map { |s| JSON.parse(s.text) }
+      .find { |j| Array(j["@type"]).include?("Organization") }
+    assert_equal "https://agencegaremonaco.com/images/og-default.jpg", org["image"]
   end
 
   test "homepage has page title" do
@@ -253,5 +295,26 @@ class SeoIntegrationTest < ActionDispatch::IntegrationTest
     get "/de"
     assert_response :success
     assert_select 'html[lang="de"]'
+  end
+
+  private
+
+  def jpeg_dimensions(bytes)
+    i = 2
+    while i < bytes.bytesize - 10
+      break unless bytes.getbyte(i) == 0xFF
+      marker = bytes.getbyte(i + 1)
+      if marker == 0xD8
+        i += 2
+        next
+      end
+      if [ 0xC0, 0xC1, 0xC2 ].include?(marker)
+        height, width = bytes[i + 5, 4].unpack("nn")
+        return [ width, height ]
+      end
+      length = bytes[i + 2, 2].unpack1("n")
+      i += 2 + length
+    end
+    nil
   end
 end
