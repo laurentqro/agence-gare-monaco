@@ -77,6 +77,15 @@ class AboutPageTest < ActionDispatch::IntegrationTest
     assert_equal "en", about["inLanguage"]
   end
 
+  test "language switcher keeps the visitor on the about page" do
+    get "/a-propos"
+    assert_select "[data-controller='language-switcher'] a[href='/en/about']"
+    assert_select "[data-controller='language-switcher'] a[href='/de/ueber-uns']"
+
+    get "/en/about"
+    assert_select "[data-controller='language-switcher'] a[href='/a-propos']"
+  end
+
   test "/about redirects permanently to the English about page" do
     get "/about"
     assert_response :moved_permanently
@@ -87,7 +96,7 @@ class AboutPageTest < ActionDispatch::IntegrationTest
     I18n.available_locales.each do |locale|
       %w[about.title about.history about.services about.expertise about.facts_title about.founded about.member about.address about.hours
          homepage.about_teaser homepage.about_link nav.about routes.about seo.about_description].each do |key|
-        assert I18n.exists?(key, locale), "Missing #{key} for #{locale}"
+        assert I18n.exists?(key, locale, fallback: false), "Missing #{key} for #{locale}"
       end
     end
   end

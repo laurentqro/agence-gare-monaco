@@ -45,6 +45,16 @@ class MarkdownNegotiatorTest < ActiveSupport::TestCase
     assert_equal "text/html", seen
   end
 
+  test "falls back to the html response when the page cannot be converted" do
+    html = "<main>#{"<blockquote>" * 500}deep#{"</blockquote>" * 500}</main>"
+    app = ->(_env) { [ 200, { "content-type" => "text/html; charset=utf-8" }, [ html ] ] }
+    status, headers, body = MarkdownNegotiator.new(app).call(Rack::MockRequest.env_for("/", "HTTP_ACCEPT" => "text/markdown"))
+    assert_equal 200, status
+    assert_equal "text/html; charset=utf-8", headers["content-type"]
+    assert_equal "Accept", headers["vary"]
+    assert_equal [ html ], body
+  end
+
   test "leaves POST requests alone" do
     app = ->(_env) { [ 200, { "content-type" => "text/html" }, [ "<main>x</main>" ] ] }
     _status, headers, body = MarkdownNegotiator.new(app).call(Rack::MockRequest.env_for("/", method: "POST", "HTTP_ACCEPT" => "text/markdown"))

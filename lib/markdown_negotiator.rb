@@ -79,17 +79,20 @@ class MarkdownNegotiator
     headers.merge("vary" => values.join(", "))
   end
 
-  def render_markdown(env, status, headers, body)
+  def render_markdown(env, status, html_headers, body)
     html = +""
     body.each { |chunk| html << chunk }
     body.close if body.respond_to?(:close)
 
-    headers = headers.merge("content-type" => MARKDOWN_CONTENT_TYPE)
+    headers = html_headers.merge("content-type" => MARKDOWN_CONTENT_TYPE)
     return [ status, headers.except("content-length", "etag"), [] ] if html.empty?
 
     markdown = HtmlToMarkdown.convert(html, base_url: base_url(env))
     headers = headers.merge("content-length" => markdown.bytesize.to_s, "etag" => %(W/"#{Digest::SHA256.hexdigest(markdown)[0, 32]}"))
     [ status, headers, [ markdown ] ]
+  rescue StandardError => error
+    Rails.logger.warn("MarkdownNegotiator fell back to HTML: #{error.class}: #{error.message}") if defined?(Rails)
+    [ status, html_headers.merge("content-length" => html.bytesize.to_s), [ html ] ]
   end
 
   def base_url(env)

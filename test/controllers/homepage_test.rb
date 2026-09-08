@@ -76,7 +76,9 @@ class HomepageTest < ActionDispatch::IntegrationTest
       assert_equal 2, sentences.length, "teaser should be exactly two sentences"
     end
     assert_select "[data-testid='about'] a[href='/a-propos']"
-    assert_no_match(/#{Regexp.escape(I18n.t("about.history", locale: :fr))}/, response.body)
+    assert_no_match(/Palais Princier/, response.body)
+    get "/a-propos"
+    assert_match(/Palais Princier/, response.body)
   end
 
   # === Team Section ===

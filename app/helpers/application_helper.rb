@@ -126,6 +126,8 @@ module ApplicationHelper
       locale_vendre_path(locale)
     when "pages#faq"
       locale_faq_path(locale)
+    when "pages#about"
+      locale_about_path(locale)
     when "pages#team_member"
       locale_team_member_path(params[:member], locale)
     when "estimates#new"
