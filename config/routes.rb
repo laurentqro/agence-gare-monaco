@@ -127,8 +127,8 @@ Rails.application.routes.draw do
     get "immobile/:legacy_id", to: "legacy_redirects#property"
   end
 
-  # English-named trust-anchor path agents probe at the root (canonical page is French)
-  get "/privacy", to: redirect("/confidentialite", status: 301)
+  # English-named path agents probe at the root; the English page lives under /en
+  get "/privacy", to: redirect("/en/privacy", status: 301)
 
   # Contact form submissions
   resources :information_requests, only: [ :create ]
