@@ -44,7 +44,7 @@ class MarkdownNegotiator
     entries.each_with_index.filter_map do |(candidate, quality), position|
       specificity = specificity_of(candidate, type)
       Preference.new(quality, specificity, position) if specificity
-    end.max
+    end.max_by { |preference| [ preference.specificity, preference.quality, -preference.position ] }
   end
 
   def self.specificity_of(candidate, type)
@@ -69,10 +69,16 @@ class MarkdownNegotiator
     env["REQUEST_METHOD"] = "GET" if head
 
     status, headers, body = @app.call(env)
-    return [ status, headers, body ] unless html?(headers)
+    if html?(headers)
+      status, headers, body = render_markdown(env, status, vary_on_accept(headers), body)
+    end
 
-    status, headers, body = render_markdown(env, status, vary_on_accept(headers), body)
-    head ? [ status, headers, [] ] : [ status, headers, body ]
+    if head
+      body.close if body.respond_to?(:close)
+      body = []
+    end
+
+    [ status, headers, body ]
   end
 
   private

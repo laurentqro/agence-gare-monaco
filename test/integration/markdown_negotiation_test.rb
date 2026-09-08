@@ -28,6 +28,12 @@ class MarkdownNegotiationTest < ActionDispatch::IntegrationTest
     assert_equal HTML, response.content_type
   end
 
+  test "uses explicit media range quality before wildcard quality" do
+    get "/", headers: { "Accept" => "text/markdown;q=0.9, text/html;q=0.8, */*;q=1" }
+    assert_response :success
+    assert_equal MARKDOWN, response.content_type
+  end
+
   test "serves html to browsers" do
     get "/", headers: { "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8" }
     assert_equal HTML, response.content_type
@@ -105,6 +111,15 @@ class MarkdownNegotiationTest < ActionDispatch::IntegrationTest
 
     get "/sitemap.xml", headers: { "Accept" => "text/markdown" }
     assert_equal "application/xml; charset=utf-8", response.content_type
+  end
+
+  test "suppresses non-html response bodies on HEAD requests" do
+    { "/llms.txt" => "text/plain; charset=utf-8", "/sitemap.xml" => "application/xml; charset=utf-8" }.each do |path, content_type|
+      head path, headers: { "Accept" => "text/markdown" }
+      assert_response :success
+      assert_equal content_type, response.content_type
+      assert_empty response.body
+    end
   end
 
   private

@@ -17,6 +17,9 @@ class MarkdownNegotiatorTest < ActiveSupport::TestCase
     "text/markdown, text/html",
     "text/html;q=0.8, text/markdown;q=0.9",
     "text/markdown;q=0.9, */*;q=0.1",
+    "text/markdown;q=0.9, text/html;q=0.8, */*;q=1",
+    "text/markdown;q=0.9, text/html;q=0.8, text/*;q=1",
+    "text/html;q=0, text/*;q=0.5, */*;q=1",
     "TEXT/MARKDOWN",
     "text/markdown; charset=utf-8, text/html;q=0.5",
     "text/html; level=1; q=0.4, text/markdown; q=0.6",
@@ -37,6 +40,9 @@ class MarkdownNegotiatorTest < ActiveSupport::TestCase
     "text/html, text/markdown, */*",
     "text/markdown;q=0.8, text/html;q=0.9",
     "text/markdown;q=0",
+    "text/markdown;q=0, */*;q=1",
+    "text/markdown;q=0.8, text/html;q=0.9, */*;q=1",
+    "text/markdown;q=0.8, text/*;q=0.9, */*;q=1",
     "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     "application/json"
   ].freeze
@@ -101,6 +107,25 @@ class MarkdownNegotiatorTest < ActiveSupport::TestCase
     _status, headers, body = MarkdownNegotiator.new(app, base_url: BASE).call(Rack::MockRequest.env_for("/", method: "POST", "HTTP_ACCEPT" => "text/markdown"))
     assert_equal "text/html", headers["content-type"]
     assert_equal [ "<main>x</main>" ], body
+  end
+
+  test "suppresses and closes non-html HEAD bodies without consuming them" do
+    upstream_body = Object.new
+    closed = false
+    upstream_body.define_singleton_method(:close) { closed = true }
+    upstream_body.define_singleton_method(:each) { raise "HEAD body should not be consumed" }
+    headers = { "content-type" => "text/plain", "content-length" => "42" }
+    app = lambda do |env|
+      assert_equal "GET", env["REQUEST_METHOD"]
+      [ 200, headers, upstream_body ]
+    end
+
+    status, head_headers, body = MarkdownNegotiator.new(app, base_url: BASE).call(Rack::MockRequest.env_for("/llms.txt", method: "HEAD", "HTTP_ACCEPT" => "text/markdown"))
+
+    assert_equal 200, status
+    assert_equal headers, head_headers
+    assert_equal [], body
+    assert closed, "discarded response body must be closed"
   end
 
   PREFERS_MARKDOWN.each do |accept|
