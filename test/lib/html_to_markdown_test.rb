@@ -45,6 +45,12 @@ class HtmlToMarkdownTest < ActiveSupport::TestCase
     assert_includes md, "![Logo](https://agencegaremonaco.com/images/logo.png)"
   end
 
+  test "percent-encodes hrefs the URI parser rejects before absolutising" do
+    md = convert('<main><a href="/articles/marché">M</a> <a href="tel:+377 93 30">T</a></main>')
+    assert_includes md, "[M](https://agencegaremonaco.com/articles/march%C3%A9)"
+    assert_includes md, "[T](tel:+377%2093%2030)"
+  end
+
   test "keeps absolute links untouched" do
     md = convert('<main><a href="https://example.com/x">X</a></main>')
     assert_includes md, "[X](https://example.com/x)"
@@ -70,6 +76,16 @@ class HtmlToMarkdownTest < ActiveSupport::TestCase
   test "does not duplicate the title when the content already has an h1" do
     md = convert("<html><head><title>Ventes | Agence</title></head><body><main><h1>Ventes</h1></main></body></html>")
     assert_equal "# Ventes", md
+  end
+
+  test "keeps hard line breaks" do
+    md = convert("<main><p>Line one<br>Line two</p></main>")
+    assert_equal "Line one  \nLine two", md
+  end
+
+  test "renders details and summary as emphasised text rather than headings" do
+    md = convert("<main><h2>FAQ</h2><details><summary>How accurate?</summary><p>Quite.</p></details></main>")
+    assert_equal "## FAQ\n\n**How accurate?**\n\nQuite.", md
   end
 
   test "collapses runs of blank lines" do

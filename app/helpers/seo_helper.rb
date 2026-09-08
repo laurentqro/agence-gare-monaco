@@ -191,9 +191,11 @@ module SeoHelper
 
   # --- JSON-LD Structured Data ---
 
-  ORGANIZATION_ID = "https://agencegaremonaco.com/#organization".freeze
+  ORGANIZATION_ID = "#{PRODUCTION_HOST}/#organization".freeze
   ORGANIZATION_NAME = "Agence Immobilière de la Gare".freeze
-  ORGANIZATION_LOGO = "https://agencegaremonaco.com/images/logo.png".freeze
+  ORGANIZATION_LOGO = "#{PRODUCTION_HOST}/images/logo.png".freeze
+  ORGANIZATION_PHONE = "+377 93 30 22 36".freeze
+  ORGANIZATION_EMAIL = "info@agencegaremonaco.com".freeze
 
   def json_ld_organization
     data = {
@@ -201,12 +203,12 @@ module SeoHelper
       "@type" => "RealEstateAgent",
       "@id" => ORGANIZATION_ID,
       "name" => ORGANIZATION_NAME,
-      "url" => "https://agencegaremonaco.com",
+      "url" => PRODUCTION_HOST,
       "logo" => ORGANIZATION_LOGO,
-      "image" => "https://agencegaremonaco.com/images/og-default.jpg",
-      "telephone" => "+377 93 30 22 36",
+      "image" => "#{PRODUCTION_HOST}/images/og-default.jpg",
+      "telephone" => ORGANIZATION_PHONE,
       "fax" => "+377 93 25 05 34",
-      "email" => "info@agencegaremonaco.com",
+      "email" => ORGANIZATION_EMAIL,
       "address" => organization_address,
       "contactPoint" => organization_contact_points,
       "sameAs" => [
@@ -243,8 +245,8 @@ module SeoHelper
       {
         "@type" => "ContactPoint",
         "contactType" => "customer service",
-        "telephone" => "+377 93 30 22 36",
-        "email" => "info@agencegaremonaco.com",
+        "telephone" => ORGANIZATION_PHONE,
+        "email" => ORGANIZATION_EMAIL,
         "areaServed" => %w[MC FR],
         "availableLanguage" => %w[fr en it de sv no da fi ru]
       }
@@ -256,7 +258,7 @@ module SeoHelper
       "@type" => type,
       "@id" => ORGANIZATION_ID,
       "name" => ORGANIZATION_NAME,
-      "url" => "https://agencegaremonaco.com",
+      "url" => PRODUCTION_HOST,
       "address" => organization_address,
       "contactPoint" => organization_contact_points
     }
@@ -333,8 +335,8 @@ module SeoHelper
     data = {
       "@context" => "https://schema.org",
       "@type" => "WebSite",
-      "name" => "Agence Immobilière de la Gare",
-      "url" => "https://agencegaremonaco.com",
+      "name" => ORGANIZATION_NAME,
+      "url" => PRODUCTION_HOST,
       "description" => "Independent real estate agency in Monaco since 1942. Property sales, rentals, and management.",
       "inLanguage" => %w[fr en it de sv nb da fi ru],
       "publisher" => organization_reference(type: "RealEstateAgent")

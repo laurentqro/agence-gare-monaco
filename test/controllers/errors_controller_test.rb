@@ -35,6 +35,13 @@ class ErrorsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href='/contact']"
   end
 
+  test "404 recovery links are built from the translated route segments" do
+    get "/404"
+    assert_select "[data-testid='where-to-look-next'] a[href='/en/sales']"
+    assert_select "[data-testid='where-to-look-next'] a[href='/en/about']"
+    assert_select "[data-testid='where-to-look-next'] a[href='/articles']"
+  end
+
   test "404 page points agents at the sitemap and llms.txt" do
     get "/404"
     assert_response :not_found
@@ -47,8 +54,8 @@ class ErrorsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert_equal "text/markdown; charset=utf-8", response.content_type
     assert_includes response.body, "# 404"
-    assert_includes response.body, "http://www.example.com/sitemap.xml"
-    assert_includes response.body, "http://www.example.com/llms.txt"
+    assert_includes response.body, "https://agencegaremonaco.com/sitemap.xml"
+    assert_includes response.body, "https://agencegaremonaco.com/llms.txt"
     assert_no_match(/<(div|a|html)\b/i, response.body)
   end
 
@@ -61,7 +68,7 @@ class ErrorsControllerTest < ActionDispatch::IntegrationTest
       get "/some-path-that-does-not-exist", headers: { "Accept" => "text/markdown" }
       assert_response :not_found
       assert_equal "text/markdown; charset=utf-8", response.content_type
-      assert_includes response.body, "http://www.example.com/llms.txt"
+      assert_includes response.body, "https://agencegaremonaco.com/llms.txt"
     end
   end
 

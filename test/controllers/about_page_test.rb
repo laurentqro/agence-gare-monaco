@@ -89,7 +89,7 @@ class AboutPageTest < ActionDispatch::IntegrationTest
   test "/about redirects permanently to the English about page" do
     get "/about"
     assert_response :moved_permanently
-    assert_equal "http://www.example.com/en/about", response.location
+    assert_equal "http://www.example.com/en/#{I18n.t('routes.about', locale: :en)}", response.location
   end
 
   test "every locale has the about page translations" do

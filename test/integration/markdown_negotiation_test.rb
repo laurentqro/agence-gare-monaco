@@ -57,11 +57,21 @@ class MarkdownNegotiationTest < ActionDispatch::IntegrationTest
     assert_not_equal html_etag, response.headers["ETag"]
   end
 
-  test "reports the markdown content type on HEAD requests" do
+  test "reports the markdown content type, ETag and length on HEAD requests" do
+    get "/", headers: { "Accept" => "text/markdown" }
+    etag = response.headers["ETag"]
+
     head "/", headers: { "Accept" => "text/markdown" }
     assert_response :success
     assert_equal MARKDOWN, response.content_type
     assert_includes vary_values, "accept"
+    assert_equal etag, response.headers["ETag"]
+  end
+
+  test "revalidates the markdown representation with a 304" do
+    get "/", headers: { "Accept" => "text/markdown" }
+    get "/", headers: { "Accept" => "text/markdown", "If-None-Match" => response.headers["ETag"] }
+    assert_response :not_modified
   end
 
   test "renders the property detail page as markdown with absolute links" do

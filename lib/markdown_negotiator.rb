@@ -1,5 +1,4 @@
 require "digest"
-require "rack/utils"
 require_relative "html_to_markdown"
 
 class MarkdownNegotiator
@@ -22,7 +21,7 @@ class MarkdownNegotiator
   def self.prefers_markdown?(accept)
     return false if accept.blank?
 
-    entries = Rack::Utils.q_values(accept)
+    entries = parse_accept(accept)
     markdown = preference_for(MARKDOWN, entries)
     html = preference_for(HTML, entries)
     return false unless markdown&.acceptable?
@@ -31,9 +30,19 @@ class MarkdownNegotiator
     markdown > html
   end
 
+  def self.parse_accept(accept)
+    accept.split(",").filter_map do |element|
+      media_type, *parameters = element.split(";").map(&:strip)
+      next if media_type.blank?
+
+      quality = parameters.find { |parameter| parameter.start_with?("q=") }&.delete_prefix("q=")
+      [ media_type.downcase, quality ? quality.to_f.clamp(0.0, 1.0) : 1.0 ]
+    end
+  end
+
   def self.preference_for(type, entries)
     entries.each_with_index.filter_map do |(candidate, quality), position|
-      specificity = specificity_of(candidate.downcase.split(";").first.strip, type)
+      specificity = specificity_of(candidate, type)
       Preference.new(quality, specificity, position) if specificity
     end.max
   end
@@ -44,29 +53,37 @@ class MarkdownNegotiator
     0 if candidate == "*/*"
   end
 
-  def initialize(app)
+  def initialize(app, base_url:)
     @app = app
+    @base_url = base_url
   end
 
   def call(env)
     return @app.call(env) unless negotiable?(env)
 
     wants_markdown = self.class.prefers_markdown?(env["HTTP_ACCEPT"])
-    env["HTTP_ACCEPT"] = HTML if wants_markdown
+    return pass_through(env) unless wants_markdown
+
+    head = env["REQUEST_METHOD"] == "HEAD"
+    env["HTTP_ACCEPT"] = HTML
+    env["REQUEST_METHOD"] = "GET" if head
 
     status, headers, body = @app.call(env)
     return [ status, headers, body ] unless html?(headers)
 
-    headers = vary_on_accept(headers)
-    return [ status, headers, body ] unless wants_markdown
-
-    render_markdown(env, status, headers, body)
+    status, headers, body = render_markdown(env, status, vary_on_accept(headers), body)
+    head ? [ status, headers, [] ] : [ status, headers, body ]
   end
 
   private
 
   def negotiable?(env)
     %w[GET HEAD].include?(env["REQUEST_METHOD"])
+  end
+
+  def pass_through(env)
+    status, headers, body = @app.call(env)
+    html?(headers) ? [ status, vary_on_accept(headers), body ] : [ status, headers, body ]
   end
 
   def html?(headers)
@@ -84,19 +101,14 @@ class MarkdownNegotiator
     body.each { |chunk| html << chunk }
     body.close if body.respond_to?(:close)
 
-    headers = html_headers.merge("content-type" => MARKDOWN_CONTENT_TYPE)
-    return [ status, headers.except("content-length", "etag"), [] ] if html.empty?
+    markdown = HtmlToMarkdown.convert(html, base_url: @base_url)
+    etag = %(W/"#{Digest::SHA256.hexdigest(markdown)[0, 32]}")
+    headers = html_headers.merge("content-type" => MARKDOWN_CONTENT_TYPE, "content-length" => markdown.bytesize.to_s, "etag" => etag)
+    return [ 304, headers.except("content-type", "content-length"), [] ] if env["HTTP_IF_NONE_MATCH"] == etag
 
-    markdown = HtmlToMarkdown.convert(html, base_url: base_url(env))
-    headers = headers.merge("content-length" => markdown.bytesize.to_s, "etag" => %(W/"#{Digest::SHA256.hexdigest(markdown)[0, 32]}"))
     [ status, headers, [ markdown ] ]
   rescue StandardError => error
     Rails.logger.warn("MarkdownNegotiator fell back to HTML: #{error.class}: #{error.message}") if defined?(Rails)
     [ status, html_headers.merge("content-length" => html.bytesize.to_s), [ html ] ]
-  end
-
-  def base_url(env)
-    request = Rack::Request.new(env)
-    "#{request.scheme}://#{request.host_with_port}"
   end
 end

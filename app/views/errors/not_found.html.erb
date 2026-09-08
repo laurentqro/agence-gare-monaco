@@ -15,7 +15,7 @@
     <a href="/" class="bg-white border border-navy text-navy px-6 py-2 rounded text-xs font-semibold hover:bg-gray-50">
       Homepage
     </a>
-    <a href="/ventes" class="text-accent hover:text-navy text-xs underline">
+    <a href="<%= locale_sales_path(:fr) %>" class="text-accent hover:text-navy text-xs underline">
       Browse properties in Monaco
     </a>
   </div>
@@ -23,11 +23,11 @@
   <section data-testid="where-to-look-next" class="text-xs text-accent text-center max-w-md">
     <h2 class="font-semibold text-navy mb-2">Where to look next</h2>
     <ul class="space-y-1">
-      <li><a href="/ventes" class="underline hover:text-navy">Properties for sale in Monaco</a> (<a href="/en/sales" class="underline hover:text-navy">English</a>)</li>
-      <li><a href="/locations" class="underline hover:text-navy">Properties for rent in Monaco</a> (<a href="/en/rentals" class="underline hover:text-navy">English</a>)</li>
-      <li><a href="/articles" class="underline hover:text-navy">Articles and market news</a></li>
-      <li><a href="/en/about" class="underline hover:text-navy">About the agency</a></li>
-      <li><a href="/contact" class="underline hover:text-navy">Contact the agency</a></li>
+      <li><a href="<%= locale_sales_path(:fr) %>" class="underline hover:text-navy">Properties for sale in Monaco</a> (<a href="<%= locale_sales_path(:en) %>" class="underline hover:text-navy">English</a>)</li>
+      <li><a href="<%= locale_rentals_path(:fr) %>" class="underline hover:text-navy">Properties for rent in Monaco</a> (<a href="<%= locale_rentals_path(:en) %>" class="underline hover:text-navy">English</a>)</li>
+      <li><a href="<%= locale_articles_path(:fr) %>" class="underline hover:text-navy">Articles and market news</a></li>
+      <li><a href="<%= locale_about_path(:en) %>" class="underline hover:text-navy">About the agency</a></li>
+      <li><a href="<%= locale_contact_path(:fr) %>" class="underline hover:text-navy">Contact the agency</a></li>
       <li><a href="/sitemap.xml" class="underline hover:text-navy">Sitemap</a> — every public URL, per language</li>
       <li><a href="/llms.txt" class="underline hover:text-navy">llms.txt</a> — site summary and usage guidance for AI agents</li>
     </ul>

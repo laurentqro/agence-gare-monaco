@@ -37,9 +37,9 @@ module AgenceGareMonaco
     require_relative "../lib/trailing_slash_redirector"
     config.middleware.insert_before(0, TrailingSlashRedirector)
 
-    # Serve Markdown to agents that ask for it (acceptmarkdown.com)
+    # Content negotiation per https://acceptmarkdown.com
     require_relative "../lib/markdown_negotiator"
-    config.middleware.insert_after(TrailingSlashRedirector, MarkdownNegotiator)
+    config.middleware.insert_after(TrailingSlashRedirector, MarkdownNegotiator, base_url: ENV["SITE_HOST"].presence || "https://agencegaremonaco.com")
 
     # Use dynamic error pages (Rails routes) instead of static HTML in public/
     config.exceptions_app = routes

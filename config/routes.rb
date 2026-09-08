@@ -82,7 +82,6 @@ Rails.application.routes.draw do
       # FAQ
       get "/#{faq}", to: "pages#faq", as: :"#{locale}_faq"
 
-      # About the agency
       get "/#{about}", to: "pages#about", as: :"#{locale}_about"
 
       # Team member pages
@@ -131,9 +130,9 @@ Rails.application.routes.draw do
     get "immobile/:legacy_id", to: "legacy_redirects#property"
   end
 
-  # English-named path agents probe at the root; the English page lives under /en
-  get "/privacy", to: redirect("/en/privacy", status: 301)
-  get "/about", to: redirect("/en/about", status: 301)
+  # Agents probe English-named paths at the root; the English pages live under /en
+  get "/privacy", to: redirect("/en/#{I18n.t('routes.privacy', locale: :en)}", status: 301)
+  get "/about", to: redirect("/en/#{I18n.t('routes.about', locale: :en)}", status: 301)
 
   # Contact form submissions
   resources :information_requests, only: [ :create ]
