@@ -260,6 +260,11 @@ class LayoutTest < ActionDispatch::IntegrationTest
     assert_select "footer a[href='/en/privacy']"
   end
 
+  test "footer privacy link is marked with the privacy-policy link relation" do
+    get "/"
+    assert_select "footer a[href='/confidentialite'][rel='privacy-policy']"
+  end
+
   test "footer renders on all locale homepages" do
     get "/"
     assert_response :success

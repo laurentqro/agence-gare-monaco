@@ -94,3 +94,5 @@ group :test do
   # Read/verify generated PDFs in tests
   gem "pdf-reader"
 end
+
+gem "reverse_markdown", "~> 3.0"

@@ -12,7 +12,7 @@ class ErrorsControllerTest < ActionDispatch::IntegrationTest
   test "404 page includes navigation back to homepage" do
     get "/404"
     assert_response :not_found
-    assert_select "a[href='/fr']"
+    assert_select "a[href='/']"
   end
 
   test "404 page includes agency logo" do
@@ -30,7 +30,39 @@ class ErrorsControllerTest < ActionDispatch::IntegrationTest
   test "404 page includes browse suggestion links" do
     get "/404"
     assert_response :not_found
-    assert_select "a[href='/fr/ventes/monaco']"
+    assert_select "a[href='/ventes']"
+    assert_select "a[href='/locations']"
+    assert_select "a[href='/contact']"
+  end
+
+  test "404 page points agents at the sitemap and llms.txt" do
+    get "/404"
+    assert_response :not_found
+    assert_select "[data-testid='where-to-look-next'] a[href='/sitemap.xml']"
+    assert_select "[data-testid='where-to-look-next'] a[href='/llms.txt']"
+  end
+
+  test "404 page is served as markdown to agents that ask for it" do
+    get "/404", headers: { "Accept" => "text/markdown" }
+    assert_response :not_found
+    assert_equal "text/markdown; charset=utf-8", response.content_type
+    assert_includes response.body, "# 404"
+    assert_includes response.body, "http://www.example.com/sitemap.xml"
+    assert_includes response.body, "http://www.example.com/llms.txt"
+    assert_no_match(/<(div|a|html)\b/i, response.body)
+  end
+
+  test "nonexistent paths return a real 404 with the agent-friendly body" do
+    without_detailed_exceptions do
+      get "/some-path-that-does-not-exist"
+      assert_response :not_found
+      assert_select "[data-testid='where-to-look-next'] a[href='/sitemap.xml']"
+
+      get "/some-path-that-does-not-exist", headers: { "Accept" => "text/markdown" }
+      assert_response :not_found
+      assert_equal "text/markdown; charset=utf-8", response.content_type
+      assert_includes response.body, "http://www.example.com/llms.txt"
+    end
   end
 
   test "404 page includes noindex meta tag" do
@@ -64,7 +96,7 @@ class ErrorsControllerTest < ActionDispatch::IntegrationTest
   test "500 page includes link back to homepage" do
     get "/500"
     assert_response :internal_server_error
-    assert_select "a[href='/fr']"
+    assert_select "a[href='/']"
   end
 
   test "500 page includes noindex meta tag" do
@@ -77,5 +109,16 @@ class ErrorsControllerTest < ActionDispatch::IntegrationTest
     get "/500"
     assert_response :internal_server_error
     assert_select "img[alt='Agence Immobilière de la Gare']"
+  end
+
+  private
+
+  def without_detailed_exceptions
+    env_config = Rails.application.env_config
+    previous = env_config["action_dispatch.show_detailed_exceptions"]
+    env_config["action_dispatch.show_detailed_exceptions"] = false
+    yield
+  ensure
+    env_config["action_dispatch.show_detailed_exceptions"] = previous
   end
 end

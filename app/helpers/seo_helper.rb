@@ -187,24 +187,24 @@ module SeoHelper
 
   # --- JSON-LD Structured Data ---
 
+  ORGANIZATION_ID = "https://agencegaremonaco.com/#organization".freeze
+  ORGANIZATION_NAME = "Agence Immobilière de la Gare".freeze
+  ORGANIZATION_LOGO = "https://agencegaremonaco.com/images/logo.png".freeze
+
   def json_ld_organization
     data = {
       "@context" => "https://schema.org",
       "@type" => "RealEstateAgent",
-      "name" => "Agence Immobilière de la Gare",
+      "@id" => ORGANIZATION_ID,
+      "name" => ORGANIZATION_NAME,
       "url" => "https://agencegaremonaco.com",
-      "logo" => "https://agencegaremonaco.com/images/logo.png",
+      "logo" => ORGANIZATION_LOGO,
       "image" => "https://agencegaremonaco.com/images/og-default.jpg",
       "telephone" => "+377 93 30 22 36",
       "fax" => "+377 93 25 05 34",
       "email" => "info@agencegaremonaco.com",
-      "address" => {
-        "@type" => "PostalAddress",
-        "streetAddress" => "3, Rue Langlé",
-        "addressLocality" => "Monaco",
-        "postalCode" => "98000",
-        "addressCountry" => "MC"
-      },
+      "address" => organization_address,
+      "contactPoint" => organization_contact_points,
       "sameAs" => [
         "https://www.linkedin.com/company/agence-de-la-gare-monaco",
         "https://www.facebook.com/agencedelagaremonaco",
@@ -222,6 +222,40 @@ module SeoHelper
       ]
     }
     json_ld_script_tag(data)
+  end
+
+  def organization_address
+    {
+      "@type" => "PostalAddress",
+      "streetAddress" => "3, Rue Langlé",
+      "addressLocality" => "Monaco",
+      "postalCode" => "98000",
+      "addressCountry" => "MC"
+    }
+  end
+
+  def organization_contact_points
+    [
+      {
+        "@type" => "ContactPoint",
+        "contactType" => "customer service",
+        "telephone" => "+377 93 30 22 36",
+        "email" => "info@agencegaremonaco.com",
+        "areaServed" => %w[MC FR],
+        "availableLanguage" => %w[fr en it de sv no da fi ru]
+      }
+    ]
+  end
+
+  def organization_reference(type: "Organization")
+    {
+      "@type" => type,
+      "@id" => ORGANIZATION_ID,
+      "name" => ORGANIZATION_NAME,
+      "url" => "https://agencegaremonaco.com",
+      "address" => organization_address,
+      "contactPoint" => organization_contact_points
+    }
   end
 
   def json_ld_property(property)
@@ -283,15 +317,8 @@ module SeoHelper
       "description" => article.meta_description_for(locale).presence || article_meta_excerpt(article, locale, length: 200),
       "datePublished" => article.published_at&.iso8601,
       "dateModified" => article.updated_at&.iso8601,
-      "author" => {
-        "@type" => "Organization",
-        "name" => "Agence Immobilière de la Gare"
-      },
-      "publisher" => {
-        "@type" => "Organization",
-        "name" => "Agence Immobilière de la Gare",
-        "logo" => { "@type" => "ImageObject", "url" => "https://agencegaremonaco.com/images/logo.png" }
-      },
+      "author" => organization_reference,
+      "publisher" => organization_reference.merge("logo" => { "@type" => "ImageObject", "url" => ORGANIZATION_LOGO }),
       "inLanguage" => locale.to_s
     }
     data["articleSection"] = article.category.name_for if article.category
@@ -306,10 +333,7 @@ module SeoHelper
       "url" => "https://agencegaremonaco.com",
       "description" => "Independent real estate agency in Monaco since 1942. Property sales, rentals, and management.",
       "inLanguage" => %w[fr en it de sv nb da fi ru],
-      "publisher" => {
-        "@type" => "RealEstateAgent",
-        "name" => "Agence Immobilière de la Gare"
-      }
+      "publisher" => organization_reference(type: "RealEstateAgent")
     }
     json_ld_script_tag(data)
   end
@@ -364,10 +388,7 @@ module SeoHelper
             "embedUrl" => video.embed_url,
             "thumbnailUrl" => "https://img.youtube.com/vi/#{video.video_id}/maxresdefault.jpg",
             "uploadDate" => video.published_at&.iso8601,
-            "publisher" => {
-              "@type" => "Organization",
-              "name" => "Agence Immobilière de la Gare"
-            }
+            "publisher" => organization_reference
           }
         }
       end

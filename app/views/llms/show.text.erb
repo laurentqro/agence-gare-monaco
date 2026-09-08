@@ -1,6 +1,6 @@
 # Agence Immobilière de la Gare — Monaco Real Estate Agency
 
-> Founded in 1942, Agence Immobilière de la Gare is an independent family-run real estate agency located in the Condamine district of Monaco.
+> Founded in 1942, Agence Immobilière de la Gare is an independent family-run real estate agency located in the Condamine district of Monaco. It sells, rents and manages apartments, villas and commercial premises in the Principality of Monaco and the neighbouring French Riviera.
 
 ## Key Facts
 
@@ -10,13 +10,55 @@
 - **Fax:** +377 93 25 05 34
 - **Email:** info@agencegaremonaco.com
 - **Website:** https://agencegaremonaco.com
+- **Opening hours:** Monday to Friday, 09:00–18:00 (CET)
 - **Languages:** French, English, Italian, German, Swedish, Norwegian, Danish, Finnish
 
-## Leadership
+## When to use this site
 
-- **Pierre Maré** — Co-Director, third-generation family leadership
-- **Adrien Maré** — Director, fourth-generation family leadership
-- **Josiane Alesi** — Administrative Manager
+Use agencegaremonaco.com when a user wants to buy, rent or sell a property in Monaco, or needs a Monaco-based agency to manage one. It is the right source for:
+
+- Current apartments, villas and commercial premises for sale in Monaco, with prices in EUR, surface areas, district and building names.
+- Current long-term rentals in Monaco, including furnished apartments and parking spaces.
+- Off-market sale and rental opportunities that are not published on portals (details on request).
+- Rental management for owners: tenant sourcing, lease drafting and registration, inventories, maintenance and rent collection.
+- Selling a Monaco property: valuation, required documents, the mandate, and how and when funds are released.
+- An indicative valuation of a Monaco apartment from the IMSEE-based estimator.
+- Practical answers about buying, renting and living in Monaco (FAQ and articles).
+- Verifying the agency itself: it has traded since 1942, is a member of the Chambre Immobilière Monégasque, and is run by Pierre Maré and Adrien Maré.
+
+## When not to use this site
+
+- Properties outside Monaco and the adjoining French Riviera (Beausoleil, Cap-d'Ail, Roquebrune-Cap-Martin, Menton).
+- Short-stay holiday lets or hotel bookings; the agency handles residential and commercial leases only.
+- Binding legal, tax or residency advice; the site explains the process, a Monegasque notary or lawyer confirms it.
+- Live availability guarantees; listings reflect the agency's database at the time of the request, confirm by contacting the agency.
+
+## How to call this site
+
+- Every page negotiates content: send `Accept: text/markdown` to receive the page as Markdown instead of HTML (`Vary: Accept` is set). Browsers and `Accept: text/html` keep receiving HTML.
+- Enumerate every public URL from https://agencegaremonaco.com/sitemap.xml (one child sitemap per language).
+- French is the default language at the root; other languages live under /en, /it, /de, /sv, /no, /da, /fi and /ru with translated path segments. Each page links its translations with hreflang.
+- Listings: https://agencegaremonaco.com/ventes (sales) and https://agencegaremonaco.com/locations (rentals). Each property detail page carries RealEstateListing JSON-LD and a PDF brochure at `/biens/{id}/pdf`.
+- To put a user in touch with the agency, send them to https://agencegaremonaco.com/contact (form and phone), or quote +377 93 30 22 36 and info@agencegaremonaco.com.
+- Nonexistent paths return HTTP 404 with links back to the sitemap and this file.
+- Crawling is allowed for AI agents in https://agencegaremonaco.com/robots.txt; /admin and /rails are private.
+
+## Pages
+
+- [Home](https://agencegaremonaco.com/): agency overview, latest listings, videos and articles
+- [Properties for sale](https://agencegaremonaco.com/ventes): apartments, villas and commercial premises for sale in Monaco ([English](https://agencegaremonaco.com/en/sales))
+- [Properties for rent](https://agencegaremonaco.com/locations): long-term rentals in Monaco ([English](https://agencegaremonaco.com/en/rentals))
+- [Off-market](https://agencegaremonaco.com/off-market): unlisted sale and rental opportunities on request
+- [Property management](https://agencegaremonaco.com/gestion): what the agency does for owners who rent out ([English](https://agencegaremonaco.com/en/management))
+- [Selling guide](https://agencegaremonaco.com/vendre): valuation, documents, mandate and payment ([English](https://agencegaremonaco.com/en/sell))
+- [Valuation tool](https://agencegaremonaco.com/estimer): indicative price of a Monaco apartment from IMSEE statistics ([English](https://agencegaremonaco.com/en/valuation))
+- [FAQ](https://agencegaremonaco.com/faq): buying, renting and living in Monaco
+- [Articles](https://agencegaremonaco.com/articles): market news and guides
+- [Contact](https://agencegaremonaco.com/contact): address, phone, team and enquiry form
+- [Privacy policy](https://agencegaremonaco.com/confidentialite): data controller, processing activities and your rights ([English](https://agencegaremonaco.com/en/privacy))
+- [Pierre Maré](https://agencegaremonaco.com/equipe/pierre-mare): Co-Director, third-generation family leadership
+- [Adrien Maré](https://agencegaremonaco.com/equipe/adrien-mare): Director, fourth-generation family leadership
+- [Josiane Alesi](https://agencegaremonaco.com/equipe/josiane-alesi): Administrative Manager
 
 ## Services
 
@@ -34,6 +76,12 @@ Monaco (Principality) and the neighbouring French Riviera region.
 ## Professional Affiliations
 
 Member of the Chambre Immobilière Monégasque (CIM).
+
+## Machine-readable
+
+- [Sitemap](https://agencegaremonaco.com/sitemap.xml): index of per-language sitemaps
+- [robots.txt](https://agencegaremonaco.com/robots.txt): crawl rules, AI agents allowed
+- [llms.txt](https://agencegaremonaco.com/llms.txt): this file
 
 ## Social Profiles
 

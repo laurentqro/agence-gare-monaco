@@ -121,4 +121,18 @@ class PrivacyPageTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", text: /#{I18n.t("privacy.title", locale: :ru)}/
   end
+
+  test "/privacy redirects permanently to the French privacy page" do
+    get "/privacy"
+    assert_response :moved_permanently
+    assert_equal "http://www.example.com/confidentialite", response.location
+  end
+
+  test "privacy pages carry at least 500 characters of policy text" do
+    %w[/confidentialite /en/privacy].each do |path|
+      get path
+      text = css_select("[data-testid='privacy-content']").text.squish
+      assert_operator text.length, :>=, 500, "#{path} privacy content is too short"
+    end
+  end
 end

@@ -493,6 +493,59 @@ class SeoHelperTest < ActionView::TestCase
     assert_equal "+377 93 30 22 36", parsed["telephone"]
   end
 
+  test "json_ld_organization identifies the agency with a stable @id" do
+    parsed = parse_json_ld(json_ld_organization)
+    assert_equal "https://agencegaremonaco.com/#organization", parsed["@id"]
+  end
+
+  test "json_ld_organization includes a postal address" do
+    parsed = parse_json_ld(json_ld_organization)
+    assert_equal "PostalAddress", parsed["address"]["@type"]
+    assert_equal "3, Rue Langlé", parsed["address"]["streetAddress"]
+    assert_equal "98000", parsed["address"]["postalCode"]
+    assert_equal "MC", parsed["address"]["addressCountry"]
+  end
+
+  test "json_ld_organization includes a contact point with phone, email and type" do
+    parsed = parse_json_ld(json_ld_organization)
+    contact = parsed["contactPoint"].first
+    assert_equal "ContactPoint", contact["@type"]
+    assert_equal "customer service", contact["contactType"]
+    assert_equal "+377 93 30 22 36", contact["telephone"]
+    assert_equal "info@agencegaremonaco.com", contact["email"]
+    assert_includes contact["availableLanguage"], "fr"
+    assert_includes contact["availableLanguage"], "en"
+  end
+
+  test "json_ld_website publisher references the organization with its address and contact point" do
+    publisher = parse_json_ld(json_ld_website)["publisher"]
+    assert_equal "https://agencegaremonaco.com/#organization", publisher["@id"]
+    assert_equal "PostalAddress", publisher["address"]["@type"]
+    assert_equal "ContactPoint", publisher["contactPoint"].first["@type"]
+  end
+
+  test "json_ld_article publisher and author reference the organization with its address and contact point" do
+    I18n.with_locale(:en) do
+      parsed = parse_json_ld(json_ld_article(@article))
+      %w[publisher author].each do |role|
+        assert_equal "Organization", parsed[role]["@type"]
+        assert_equal "https://agencegaremonaco.com/#organization", parsed[role]["@id"]
+        assert_equal "Monaco", parsed[role]["address"]["addressLocality"]
+        assert_equal "customer service", parsed[role]["contactPoint"].first["contactType"]
+      end
+      assert_equal "https://agencegaremonaco.com/images/logo.png", parsed["publisher"]["logo"]["url"]
+    end
+  end
+
+  test "json_ld_videos publisher references the organization with its address and contact point" do
+    videos = [ YoutubeVideo.new(video_id: "abc123", title: "Monaco Tour", published_at: Time.zone.parse("2025-01-15")) ]
+    publisher = parse_json_ld(json_ld_videos(videos))["itemListElement"][0]["item"]["publisher"]
+    assert_equal "Organization", publisher["@type"]
+    assert_equal "https://agencegaremonaco.com/#organization", publisher["@id"]
+    assert_equal "PostalAddress", publisher["address"]["@type"]
+    assert_equal "+377 93 30 22 36", publisher["contactPoint"].first["telephone"]
+  end
+
   test "json_ld_organization includes openingHoursSpecification" do
     result = json_ld_organization
     parsed = JSON.parse(result.match(/<script[^>]*>(.*)<\/script>/m)[1])
@@ -636,5 +689,11 @@ class SeoHelperTest < ActionView::TestCase
     parsed = JSON.parse(result.match(/<script[^>]*>(.*)<\/script>/m)[1])
     video = parsed["itemListElement"][0]["item"]
     assert_equal "Property Visit", video["description"]
+  end
+
+  private
+
+  def parse_json_ld(tag)
+    JSON.parse(tag.match(/<script[^>]*>(.*)<\/script>/m)[1])
   end
 end
