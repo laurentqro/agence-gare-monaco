@@ -164,6 +164,14 @@ it:
     qr_code: "QR Code"
     download_pdf: "Brochure"
     without_agency_logo: "Brochure senza logo"
+    share:
+      label: "Condividi"
+      heading: "Condividi questo immobile"
+      email: "E-mail"
+      whatsapp: "WhatsApp"
+      copy_link: "Copia il link"
+      link_copied: "Link copiato"
+      email_subject: "%{title} — Agence Immobilière de la Gare"
 
   articles:
     all: "Tutti"

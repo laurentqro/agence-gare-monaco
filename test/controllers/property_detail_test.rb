@@ -587,4 +587,67 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[data-testid='no-image-placeholder'] img[src*='logo-monogram']"
   end
+
+  # === Share ===
+
+  test "displays share control on a sale property page" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='share-button']"
+  end
+
+  test "displays share control on a rental property page" do
+    @property.update!(transaction_type: "rental")
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='share-button']"
+  end
+
+  test "displays share control on an off-market property page" do
+    @property.update!(off_market: true)
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='share-button']"
+  end
+
+  test "share panel offers email, WhatsApp and copy link" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='share-panel'] a[href^='mailto:']"
+    assert_select "[data-testid='share-panel'] a[href^='https://wa.me/?text=']"
+    assert_select "[data-testid='share-copy-link']"
+  end
+
+  test "share links carry the absolute property URL for the current locale" do
+    get "/en/properties/#{@property.id}-slug"
+    url = "https://agencegaremonaco.com/en/properties/#{@property.id}-#{@property.slug_for(:en)}"
+
+    mailto = css_select("[data-testid='share-panel'] a[href^='mailto:']").first
+    assert_includes CGI.unescape(mailto["href"]), url
+
+    whatsapp = css_select("[data-testid='share-panel'] a[href^='https://wa.me/?text=']").first
+    assert_includes CGI.unescape(whatsapp["href"]), url
+  end
+
+  test "share email subject names the property" do
+    get "/en/properties/#{@property.id}-slug"
+    mailto = css_select("[data-testid='share-panel'] a[href^='mailto:']").first
+    href = CGI.unescape(mailto["href"])
+
+    assert_includes href, "subject="
+    assert_includes href, "Sea view studio"
+  end
+
+  test "share copy-link control exposes the property URL for the clipboard" do
+    get "/en/properties/#{@property.id}-slug"
+    url = "https://agencegaremonaco.com/en/properties/#{@property.id}-#{@property.slug_for(:en)}"
+
+    assert_select "[data-controller='share'][data-share-url-value='#{url}']"
+    assert_select "[data-testid='share-copy-link'][data-action*='share#copyLink']"
+  end
+
+  test "share control is localized and links to the localized property URL" do
+    get "/biens/#{@property.id}-slug"
+    url = "https://agencegaremonaco.com/biens/#{@property.id}-#{@property.slug_for(:fr)}"
+
+    assert_select "[data-testid='share-button']", text: /Partager/
+    mailto = css_select("[data-testid='share-panel'] a[href^='mailto:']").first
+    assert_includes CGI.unescape(mailto["href"]), url
+  end
 end

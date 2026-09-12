@@ -53,3 +53,26 @@
 .section-padding {
   @apply py-16;
 }
+
+/* === Share panel === */
+
+@keyframes share-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+details[open] > .share-panel {
+  animation: share-panel-in 140ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  details[open] > .share-panel {
+    animation: none;
+  }
+}

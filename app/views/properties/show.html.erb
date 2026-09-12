@@ -1,20 +1,24 @@
 <% title = @property.title_for(I18n.locale) %>
 
 <div class="max-w-7xl mx-auto px-4 py-8">
-  <%# Back link (hidden for off-market properties) %>
-  <% unless @property.off_market? %>
-    <div data-testid="back-link" class="mb-6">
-      <% if @property.transaction_type == "sale" %>
-        <a href="<%= locale_sales_path %>" class="text-accent hover:text-navy text-xs">
-          &larr; <%= t("property_detail.back_to_sales") %>
-        </a>
-      <% else %>
-        <a href="<%= locale_rentals_path %>" class="text-accent hover:text-navy text-xs">
-          &larr; <%= t("property_detail.back_to_rentals") %>
-        </a>
-      <% end %>
-    </div>
-  <% end %>
+  <div class="relative z-30 mb-6 flex items-center gap-4">
+    <%# Back link (hidden for off-market properties) %>
+    <% unless @property.off_market? %>
+      <div data-testid="back-link">
+        <% if @property.transaction_type == "sale" %>
+          <a href="<%= locale_sales_path %>" class="text-accent hover:text-navy text-xs">
+            &larr; <%= t("property_detail.back_to_sales") %>
+          </a>
+        <% else %>
+          <a href="<%= locale_rentals_path %>" class="text-accent hover:text-navy text-xs">
+            &larr; <%= t("property_detail.back_to_rentals") %>
+          </a>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= render "properties/share", property: @property %>
+  </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <%# Left column: gallery + description %>

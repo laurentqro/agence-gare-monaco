@@ -164,6 +164,14 @@ da:
     qr_code: "QR-kode"
     download_pdf: "Brochure"
     without_agency_logo: "Brochure uden logo"
+    share:
+      label: "Del"
+      heading: "Del denne bolig"
+      email: "E-mail"
+      whatsapp: "WhatsApp"
+      copy_link: "Kopiér link"
+      link_copied: "Link kopieret"
+      email_subject: "%{title} — Agence Immobilière de la Gare"
 
   articles:
     all: "Alle"

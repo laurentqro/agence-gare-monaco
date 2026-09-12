@@ -164,6 +164,14 @@ fi:
     qr_code: "QR-koodi"
     download_pdf: "Esite"
     without_agency_logo: "Esite ilman logoa"
+    share:
+      label: "Jaa"
+      heading: "Jaa tämä kohde"
+      email: "Sähköposti"
+      whatsapp: "WhatsApp"
+      copy_link: "Kopioi linkki"
+      link_copied: "Linkki kopioitu"
+      email_subject: "%{title} — Agence Immobilière de la Gare"
 
   articles:
     all: "Kaikki"

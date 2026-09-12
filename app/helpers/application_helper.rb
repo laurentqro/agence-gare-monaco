@@ -285,6 +285,14 @@ module ApplicationHelper
     I18n.t("contact_form.whatsapp_enquiry_message", description: description, url: property_url, locale: wa_locale)
   end
 
+  def property_share_message(property, url)
+    "#{property.title_for(I18n.locale)} — #{t('property_detail.reference')} #{property.reference}\n#{url}"
+  end
+
+  def property_share_subject(property)
+    t("property_detail.share.email_subject", title: property.title_for(I18n.locale))
+  end
+
   def nav_active_class(nav_path)
     request.path.start_with?(nav_path) ? "nav-active" : ""
   end
