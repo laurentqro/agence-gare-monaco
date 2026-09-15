@@ -166,8 +166,19 @@ ru:
     documents: "Документы"
     download: "Скачать"
     qr_code: "QR-код"
-    download_pdf: "Брошюра"
-    without_agency_logo: "Брошюра без логотипа"
+    brochure:
+      label: "Брошюра"
+      heading: "Скачать брошюру"
+      with_logo: "С логотипом агентства"
+      without_logo: "Без логотипа"
+    share:
+      label: "Поделиться"
+      heading: "Поделиться объектом"
+      email: "Эл. почта"
+      whatsapp: "WhatsApp"
+      copy_link: "Копировать ссылку"
+      link_copied: "Ссылка скопирована"
+      email_subject: "%{title} — Agence Immobilière de la Gare"
 
   articles:
     all: "Все"

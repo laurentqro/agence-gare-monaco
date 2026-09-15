@@ -162,8 +162,19 @@ de:
     documents: "Dokumente"
     download: "Herunterladen"
     qr_code: "QR-Code"
-    download_pdf: "Broschüre"
-    without_agency_logo: "Broschüre ohne Logo"
+    brochure:
+      label: "Broschüre"
+      heading: "Broschüre herunterladen"
+      with_logo: "Mit Agenturlogo"
+      without_logo: "Ohne Logo"
+    share:
+      label: "Teilen"
+      heading: "Diese Immobilie teilen"
+      email: "E-Mail"
+      whatsapp: "WhatsApp"
+      copy_link: "Link kopieren"
+      link_copied: "Link kopiert"
+      email_subject: "%{title} — Agence Immobilière de la Gare"
 
   articles:
     all: "Alle"

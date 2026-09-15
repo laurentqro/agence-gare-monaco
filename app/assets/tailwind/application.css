@@ -53,3 +53,62 @@
 .section-padding {
   @apply py-16;
 }
+
+/* === Disclosure menus (brochure, share) === */
+
+.menu-trigger {
+  @apply inline-flex cursor-pointer select-none items-center gap-2 text-xs font-semibold text-navy transition-colors hover:text-gold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold;
+  list-style: none;
+}
+
+.menu-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.menu-trigger > svg {
+  @apply h-4 w-4 shrink-0 text-gold;
+}
+
+details[open] > .menu-trigger {
+  color: var(--color-gold);
+}
+
+.menu-panel {
+  @apply absolute z-20 mt-2 w-64 border-l-2 border-gold bg-[#faf8f4] px-5 py-5;
+  box-shadow: 0 16px 40px -16px rgba(9, 9, 86, 0.45);
+}
+
+.menu-item {
+  @apply flex items-center gap-3 border-t border-accent/20 py-2.5 text-xs text-navy transition-colors hover:text-gold;
+}
+
+.menu-item > svg {
+  @apply h-4 w-4 shrink-0 text-accent transition-colors;
+}
+
+@media (hover: hover) {
+  .menu-item:hover > svg {
+    color: var(--color-gold);
+  }
+}
+
+@keyframes menu-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+details[open] > .menu-panel {
+  animation: menu-panel-in 140ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  details[open] > .menu-panel {
+    animation: none;
+  }
+}

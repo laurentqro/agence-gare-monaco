@@ -162,8 +162,19 @@ sv:
     documents: "Dokument"
     download: "Ladda ner"
     qr_code: "QR-kod"
-    download_pdf: "Broschyr"
-    without_agency_logo: "Broschyr utan logotyp"
+    brochure:
+      label: "Broschyr"
+      heading: "Ladda ner broschyren"
+      with_logo: "Med byråns logotyp"
+      without_logo: "Utan logotyp"
+    share:
+      label: "Dela"
+      heading: "Dela den här bostaden"
+      email: "E-post"
+      whatsapp: "WhatsApp"
+      copy_link: "Kopiera länk"
+      link_copied: "Länk kopierad"
+      email_subject: "%{title} — Agence Immobilière de la Gare"
 
   articles:
     all: "Alla"
