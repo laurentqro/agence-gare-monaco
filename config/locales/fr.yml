@@ -163,7 +163,7 @@ fr:
     download: "Télécharger"
     qr_code: "QR Code"
     download_pdf: "Brochure"
-    without_agency_logo: "Brochure sans logo"
+    without_agency_logo: "Sans logo"
     share:
       label: "Partager"
       heading: "Partager ce bien"

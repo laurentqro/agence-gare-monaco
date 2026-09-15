@@ -163,7 +163,7 @@ de:
     download: "Herunterladen"
     qr_code: "QR-Code"
     download_pdf: "Broschüre"
-    without_agency_logo: "Broschüre ohne Logo"
+    without_agency_logo: "Ohne Logo"
     share:
       label: "Teilen"
       heading: "Diese Immobilie teilen"

@@ -607,9 +607,27 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='share-button']"
   end
 
-  test "share trigger renders as a bordered button" do
+  test "share trigger carries its open-state style hook" do
     get "/en/properties/#{@property.id}-slug"
     assert_select "summary[data-testid='share-button'].share-trigger"
+  end
+
+  test "share control lives inside the property details card" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-details'] [data-testid='share-button']"
+  end
+
+  test "property actions group WhatsApp, brochure and share together" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-actions'] [data-testid='whatsapp-button'] a[href*='wa.me']"
+    assert_select "[data-testid='property-actions'] a[data-testid='pdf-download-link']"
+    assert_select "[data-testid='property-actions'] a[data-testid='pdf-download-no-logo-link']"
+    assert_select "[data-testid='property-actions'] [data-testid='share-button']"
+  end
+
+  test "brochure without logo reads as a variant of the brochure link" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "a[data-testid='pdf-download-no-logo-link']", text: /\AWithout logo\z/m
   end
 
   test "share panel offers email, WhatsApp and copy link" do

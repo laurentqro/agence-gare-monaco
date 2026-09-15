@@ -163,7 +163,7 @@ sv:
     download: "Ladda ner"
     qr_code: "QR-kod"
     download_pdf: "Broschyr"
-    without_agency_logo: "Broschyr utan logotyp"
+    without_agency_logo: "Utan logotyp"
     share:
       label: "Dela"
       heading: "Dela den här bostaden"

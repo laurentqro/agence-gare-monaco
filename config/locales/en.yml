@@ -163,7 +163,7 @@ en:
     download: "Download"
     qr_code: "QR Code"
     download_pdf: "Brochure"
-    without_agency_logo: "Brochure without logo"
+    without_agency_logo: "Without logo"
     share:
       label: "Share"
       heading: "Share this property"

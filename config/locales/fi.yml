@@ -163,7 +163,7 @@ fi:
     download: "Lataa"
     qr_code: "QR-koodi"
     download_pdf: "Esite"
-    without_agency_logo: "Esite ilman logoa"
+    without_agency_logo: "Ilman logoa"
     share:
       label: "Jaa"
       heading: "Jaa tämä kohde"

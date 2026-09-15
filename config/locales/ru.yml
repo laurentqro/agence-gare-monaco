@@ -167,7 +167,7 @@ ru:
     download: "Скачать"
     qr_code: "QR-код"
     download_pdf: "Брошюра"
-    without_agency_logo: "Брошюра без логотипа"
+    without_agency_logo: "Без логотипа"
     share:
       label: "Поделиться"
       heading: "Поделиться объектом"

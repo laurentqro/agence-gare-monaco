@@ -68,8 +68,7 @@
 }
 
 details[open] > .share-trigger {
-  border-color: var(--color-gold);
-  background-color: #faf8f4;
+  color: var(--color-gold);
 }
 
 details[open] > .share-panel {

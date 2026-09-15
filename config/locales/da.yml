@@ -163,7 +163,7 @@ da:
     download: "Download"
     qr_code: "QR-kode"
     download_pdf: "Brochure"
-    without_agency_logo: "Brochure uden logo"
+    without_agency_logo: "Uden logo"
     share:
       label: "Del"
       heading: "Del denne bolig"
