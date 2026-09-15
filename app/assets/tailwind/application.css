@@ -67,6 +67,11 @@
   }
 }
 
+details[open] > .share-trigger {
+  border-color: var(--color-gold);
+  background-color: #faf8f4;
+}
+
 details[open] > .share-panel {
   animation: share-panel-in 140ms ease-out;
 }

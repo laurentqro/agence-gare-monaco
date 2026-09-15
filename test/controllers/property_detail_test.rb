@@ -607,6 +607,11 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='share-button']"
   end
 
+  test "share trigger renders as a bordered button" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "summary[data-testid='share-button'].share-trigger"
+  end
+
   test "share panel offers email, WhatsApp and copy link" do
     get "/en/properties/#{@property.id}-slug"
     assert_select "[data-testid='share-panel'] a[href^='mailto:']"
