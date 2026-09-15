@@ -6,20 +6,25 @@ export default class extends Controller {
 
   connect() {
     this.defaultCopyLabel = this.hasCopyLabelTarget ? this.copyLabelTarget.textContent : ""
-    this.closeOnClickOutside = this.closeOnClickOutside.bind(this)
-    document.addEventListener("click", this.closeOnClickOutside)
   }
 
   disconnect() {
-    document.removeEventListener("click", this.closeOnClickOutside)
     clearTimeout(this.resetLabelTimer)
   }
 
   openNativeSheet(event) {
-    if (!this.nativeSheetPreferred) return
+    if (this.element.open || !this.nativeSheetPreferred) return
 
     event.preventDefault()
-    navigator.share({ title: this.titleValue, text: this.textValue, url: this.urlValue }).catch(() => {})
+    if (this.sharing) return
+
+    this.sharing = navigator.share(this.shareData)
+      .catch((error) => {
+        if (error?.name !== "AbortError") this.element.open = true
+      })
+      .finally(() => {
+        this.sharing = null
+      })
   }
 
   async copyLink() {
@@ -32,16 +37,23 @@ export default class extends Controller {
     }, 2500)
   }
 
-  close() {
-    this.element.open = false
-  }
-
-  closeOnClickOutside(event) {
-    if (this.element.open && !this.element.contains(event.target)) this.close()
+  get shareData() {
+    return { title: this.titleValue, text: this.textValue, url: this.urlValue }
   }
 
   get nativeSheetPreferred() {
-    return typeof navigator.share === "function" && window.matchMedia("(pointer: coarse)").matches
+    return this.touchDevice && this.deviceCanShare
+  }
+
+  get touchDevice() {
+    return window.matchMedia("(pointer: coarse)").matches
+  }
+
+  get deviceCanShare() {
+    if (typeof navigator.share !== "function") return false
+    if (typeof navigator.canShare !== "function") return true
+
+    return navigator.canShare(this.shareData)
   }
 
   async writeToClipboard(text) {

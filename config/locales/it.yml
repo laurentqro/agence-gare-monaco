@@ -162,8 +162,11 @@ it:
     documents: "Documenti"
     download: "Scarica"
     qr_code: "QR Code"
-    download_pdf: "Brochure"
-    without_agency_logo: "Senza logo"
+    brochure:
+      label: "Brochure"
+      heading: "Scarica la brochure"
+      with_logo: "Con il logo dell'agenzia"
+      without_logo: "Senza logo"
     share:
       label: "Condividi"
       heading: "Condividi questo immobile"

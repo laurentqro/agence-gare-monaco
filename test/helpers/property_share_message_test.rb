@@ -35,6 +35,16 @@ class PropertyShareMessageTest < ActionView::TestCase
     end
   end
 
+  test "property_share_text carries the title and reference without the URL" do
+    I18n.with_locale(:en) do
+      text = property_share_text(@property)
+
+      assert_includes text, "Sea view penthouse"
+      assert_includes text, "MC-500"
+      refute_includes text, "https://"
+    end
+  end
+
   test "property_share_subject names the property and the agency" do
     I18n.with_locale(:en) do
       subject = property_share_subject(@property)

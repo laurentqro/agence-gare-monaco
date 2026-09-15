@@ -607,9 +607,18 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='share-button']"
   end
 
+  test "native share payload keeps the URL out of the text so devices do not repeat it" do
+    get "/en/properties/#{@property.id}-slug"
+    share = css_select("[data-controller~='share']").first
+
+    assert_includes share["data-share-url-value"], "https://agencegaremonaco.com/en/properties/"
+    refute_includes share["data-share-text-value"], "https://"
+    assert_includes share["data-share-text-value"], @property.reference
+  end
+
   test "share trigger carries its open-state style hook" do
     get "/en/properties/#{@property.id}-slug"
-    assert_select "summary[data-testid='share-button'].share-trigger"
+    assert_select "summary[data-testid='share-button'].menu-trigger"
   end
 
   test "share control lives inside the property details card" do
@@ -625,9 +634,29 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid='property-actions'] [data-testid='share-button']"
   end
 
-  test "brochure without logo reads as a variant of the brochure link" do
+  test "brochure options open from a single disclosure" do
     get "/en/properties/#{@property.id}-slug"
+    assert_select "[data-testid='property-actions'] details[data-controller='menu'] summary[data-testid='brochure-button'].menu-trigger"
+    assert_select "[data-testid='brochure-panel'] a[data-testid='pdf-download-link']"
+    assert_select "[data-testid='brochure-panel'] a[data-testid='pdf-download-no-logo-link']"
+  end
+
+  test "brochure panel labels the logo variants distinctly" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "a[data-testid='pdf-download-link']", text: /\AWith agency logo\z/m
     assert_select "a[data-testid='pdf-download-no-logo-link']", text: /\AWithout logo\z/m
+  end
+
+  test "brochure downloads bypass Turbo and close the menu" do
+    get "/en/properties/#{@property.id}-slug"
+    %w[pdf-download-link pdf-download-no-logo-link].each do |id|
+      assert_select "a[data-testid='#{id}'][data-turbo='false'][data-action='click->menu#close']"
+    end
+  end
+
+  test "share control composes the menu controller for closing" do
+    get "/en/properties/#{@property.id}-slug"
+    assert_select "details[data-controller~='menu'][data-controller~='share'][data-action='keydown.esc->menu#close']"
   end
 
   test "share panel offers email, WhatsApp and copy link" do
@@ -661,7 +690,7 @@ class PropertyDetailTest < ActionDispatch::IntegrationTest
     get "/en/properties/#{@property.id}-slug"
     url = "https://agencegaremonaco.com/en/properties/#{@property.id}-#{@property.slug_for(:en)}"
 
-    assert_select "[data-controller='share'][data-share-url-value='#{url}']"
+    assert_select "[data-controller~='share'][data-share-url-value='#{url}']"
     assert_select "[data-testid='share-copy-link'][data-action*='share#copyLink']"
   end
 

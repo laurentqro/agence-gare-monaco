@@ -162,8 +162,11 @@
     documents: "Dokumenter"
     download: "Last ned"
     qr_code: "QR-kode"
-    download_pdf: "Brosjyre"
-    without_agency_logo: "Uten logo"
+    brochure:
+      label: "Brosjyre"
+      heading: "Last ned brosjyren"
+      with_logo: "Med byråets logo"
+      without_logo: "Uten logo"
     share:
       label: "Del"
       heading: "Del denne eiendommen"

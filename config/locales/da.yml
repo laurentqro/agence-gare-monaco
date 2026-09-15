@@ -162,8 +162,11 @@ da:
     documents: "Dokumenter"
     download: "Download"
     qr_code: "QR-kode"
-    download_pdf: "Brochure"
-    without_agency_logo: "Uden logo"
+    brochure:
+      label: "Brochure"
+      heading: "Download brochuren"
+      with_logo: "Med bureauets logo"
+      without_logo: "Uden logo"
     share:
       label: "Del"
       heading: "Del denne bolig"

@@ -162,8 +162,11 @@ en:
     documents: "Documents"
     download: "Download"
     qr_code: "QR Code"
-    download_pdf: "Brochure"
-    without_agency_logo: "Without logo"
+    brochure:
+      label: "Brochure"
+      heading: "Download the brochure"
+      with_logo: "With agency logo"
+      without_logo: "Without logo"
     share:
       label: "Share"
       heading: "Share this property"

@@ -162,8 +162,11 @@ sv:
     documents: "Dokument"
     download: "Ladda ner"
     qr_code: "QR-kod"
-    download_pdf: "Broschyr"
-    without_agency_logo: "Utan logotyp"
+    brochure:
+      label: "Broschyr"
+      heading: "Ladda ner broschyren"
+      with_logo: "Med byråns logotyp"
+      without_logo: "Utan logotyp"
     share:
       label: "Dela"
       heading: "Dela den här bostaden"

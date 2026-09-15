@@ -162,8 +162,11 @@ fr:
     documents: "Documents"
     download: "Télécharger"
     qr_code: "QR Code"
-    download_pdf: "Brochure"
-    without_agency_logo: "Sans logo"
+    brochure:
+      label: "Brochure"
+      heading: "Télécharger la brochure"
+      with_logo: "Avec le logo de l'agence"
+      without_logo: "Sans logo"
     share:
       label: "Partager"
       heading: "Partager ce bien"
