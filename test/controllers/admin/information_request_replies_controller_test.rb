@@ -36,6 +36,13 @@ class Admin::InformationRequestRepliesControllerTest < ActionDispatch::Integrati
     }.merge(attrs))
   end
 
+  def with_queue_down
+    SendOutgoingEmailJob.define_singleton_method(:perform_later) { |*| raise "queue down" }
+    yield
+  ensure
+    SendOutgoingEmailJob.singleton_class.remove_method(:perform_later)
+  end
+
   def reply_body
     css_select("textarea[name='outgoing_email[body]']").first.text
   end
@@ -80,14 +87,69 @@ class Admin::InformationRequestRepliesControllerTest < ActionDispatch::Integrati
   end
 
   test "GET new prefills the body with the signature above the quoted message" do
-    request = create_contact(created_at: Time.zone.local(2026, 9, 7, 17, 21))
+    request = create_contact(created_at: Time.utc(2026, 9, 7, 15, 21))
     get new_admin_information_request_reply_url(request)
     body = reply_body
     assert body.start_with?("\n\n"), "expected blank lines before the signature, got #{body.inspect}"
     assert_includes body, "Adrien Maré"
-    assert_includes body, "Le 07/09/2026 à 17:21, Carine Charlotte a écrit :"
+    assert_includes body, "Le 07/09/2026 à 17:21, Carine Charlotte a écrit :", "expected the quote to use Monaco time"
     assert_includes body, "> Bonjour,\n> Pouvez-vous estimer mon bien ?"
     assert_operator body.index("Adrien Maré"), :<, body.index("a écrit :")
+  end
+
+  test "GET new prefers the property topic over the requester's own subject" do
+    request = create_enquiry(subject: "Question sur le prix")
+    get new_admin_information_request_reply_url(request)
+    assert_equal "Re: MC-ADM-001 — Studio Test", reply_subject
+  end
+
+  test "GET new drops the title from an enquiry subject when the property has no French title" do
+    request = create_enquiry
+    request.property.update!(title: {})
+    get new_admin_information_request_reply_url(request)
+    assert_equal "Re: MC-ADM-001", reply_subject
+  end
+
+  test "GET new wraps every field in the reply form itself" do
+    request = create_contact
+    get new_admin_information_request_reply_url(request)
+    form = "form[action='#{admin_information_request_reply_path(request)}']"
+    assert_select "#{form} input[name='outgoing_email[subject]']"
+    assert_select "#{form} textarea[name='outgoing_email[body]']"
+    assert_select "#{form} input[type='file'][name='outgoing_email[file]']"
+    assert_select "input[form]", count: 0
+  end
+
+  test "GET new refuses a request whose stored address is not a single email" do
+    request = create_contact
+    request.update_column(:email, "victim@example.com, attacker@evil.com")
+    get new_admin_information_request_reply_url(request)
+    assert_redirected_to admin_information_request_url(request)
+    assert_match(/victim@example.com, attacker@evil.com/, flash[:alert])
+  end
+
+  test "POST create refuses a request whose stored address is not a single email and queues nothing" do
+    request = create_contact
+    request.update_column(:email, "victim@example.com, attacker@evil.com")
+    assert_no_enqueued_jobs only: SendOutgoingEmailJob do
+      post admin_information_request_reply_url(request), params: {
+        outgoing_email: { subject: "Re: Estimation", body: "Bonjour." }
+      }
+    end
+    assert_redirected_to admin_information_request_url(request)
+    assert_nil request.reload.replied_at
+  end
+
+  test "POST create stamps the request before queuing the delivery" do
+    request = create_contact
+    with_queue_down do
+      assert_raises(RuntimeError) do
+        post admin_information_request_reply_url(request), params: {
+          outgoing_email: { subject: "Re: Estimation", body: "Bonjour." }
+        }
+      end
+    end
+    assert_not_nil request.reload.replied_at
   end
 
   test "GET new marks an unread request as read" do

@@ -203,6 +203,7 @@ fr:
         updated: "Demande mise à jour."
         deleted: "Demande supprimée."
         replied: "Réponse envoyée à %{name}."
+        undeliverable: "Impossible de répondre : « %{email} » n'est pas une adresse e-mail valide."
     properties:
       title: "Biens"
       new: "Nouveau bien"

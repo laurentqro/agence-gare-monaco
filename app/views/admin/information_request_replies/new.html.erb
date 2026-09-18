@@ -7,28 +7,28 @@
 
   <%= render "admin/shared/form_errors", model: @outgoing_email %>
 
-  <%= form_with url: admin_information_request_reply_path(@information_request), method: :post, id: "reply_form", multipart: true do |f| %><% end %>
+  <%= form_with url: admin_information_request_reply_path(@information_request), method: :post, multipart: true do %>
+    <div class="bg-white rounded shadow p-6 mb-6 space-y-4">
+      <div>
+        <span class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.information_requests.reply.recipient") %></span>
+        <p data-testid="reply-recipient" class="text-sm text-text"><%= @information_request.name %> &lt;<%= @information_request.email %>&gt;</p>
+      </div>
+      <div>
+        <%= label_tag "outgoing_email[subject]", t("admin.outgoing_emails.fields.subject"), class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= text_field_tag "outgoing_email[subject]", @outgoing_email.subject,
+              class: "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-navy focus:ring-2 focus:ring-navy/30" %>
+      </div>
+      <div>
+        <%= label_tag "outgoing_email[body]", t("admin.outgoing_emails.fields.body"), class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= text_area_tag "outgoing_email[body]", @outgoing_email.body, rows: 14,
+              class: "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-navy focus:ring-2 focus:ring-navy/30" %>
+      </div>
+      <%= render "admin/shared/attachment_field" %>
+    </div>
 
-  <div class="bg-white rounded shadow p-6 mb-6 space-y-4">
-    <div>
-      <span class="block text-sm font-medium text-gray-700 mb-1"><%= t("admin.information_requests.reply.recipient") %></span>
-      <p data-testid="reply-recipient" class="text-sm text-text"><%= @information_request.name %> &lt;<%= @information_request.email %>&gt;</p>
+    <div class="flex gap-3">
+      <%= submit_tag t("admin.information_requests.reply.send"), class: "bg-navy text-white px-4 py-2 rounded hover:bg-navy/90 cursor-pointer" %>
+      <%= link_to t("admin.shared.cancel"), admin_information_request_path(@information_request), class: "px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50" %>
     </div>
-    <div>
-      <%= label_tag "outgoing_email[subject]", t("admin.outgoing_emails.fields.subject"), class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= text_field_tag "outgoing_email[subject]", @outgoing_email.subject, form: "reply_form",
-            class: "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-navy focus:ring-2 focus:ring-navy/30" %>
-    </div>
-    <div>
-      <%= label_tag "outgoing_email[body]", t("admin.outgoing_emails.fields.body"), class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= text_area_tag "outgoing_email[body]", @outgoing_email.body, rows: 14, form: "reply_form",
-            class: "w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-navy focus:ring-2 focus:ring-navy/30" %>
-    </div>
-    <%= render "admin/shared/attachment_field", form_id: "reply_form" %>
-  </div>
-
-  <div class="flex gap-3">
-    <%= submit_tag t("admin.information_requests.reply.send"), form: "reply_form", class: "bg-navy text-white px-4 py-2 rounded hover:bg-navy/90 cursor-pointer" %>
-    <%= link_to t("admin.shared.cancel"), admin_information_request_path(@information_request), class: "px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50" %>
-  </div>
+  <% end %>
 </div>

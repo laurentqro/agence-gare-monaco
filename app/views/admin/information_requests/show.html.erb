@@ -10,7 +10,7 @@
         <p class="text-sm text-gray-500"><%= l(@submission.created_at, format: "%d/%m/%Y %H:%M") %></p>
       </div>
       <div class="flex items-center gap-2">
-        <%= render "admin/information_requests/replied_badge", submission: @submission, large: true %>
+        <%= replied_badge @submission, large: true %>
         <% if @submission.form_type == "enquiry" %>
           <%= admin_badge t("admin.information_requests.filters.enquiry"), variant: :accent, large: true %>
         <% else %>

@@ -63,9 +63,16 @@ module AdminHelper
   #
   #   admin_badge t("admin.contacts.badges.peer"), variant: :accent
   #   admin_badge label, large: true   # detail pages use roomier padding
-  def admin_badge(label, variant: :gray, large: false)
+  def admin_badge(label, variant: :gray, large: false, data: {})
     padding = large ? "px-3 py-1" : "px-2 py-0.5"
-    tag.span(label, class: "inline-block rounded-full text-xs #{padding} #{BADGE_VARIANTS.fetch(variant)}")
+    tag.span(label, class: "inline-block rounded-full text-xs #{padding} #{BADGE_VARIANTS.fetch(variant)}", data: data)
+  end
+
+  def replied_badge(submission, large: false)
+    return unless submission.replied_at
+
+    admin_badge t("admin.information_requests.replied_on", date: l(submission.replied_at, format: "%d/%m/%Y")),
+                variant: :green, large: large, data: { testid: "replied-badge" }
   end
 
   # Category pill for a contact row. Degrades gracefully for an

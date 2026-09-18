@@ -17,7 +17,7 @@ class ReplyDraft
 
   def topic
     property = information_request.property
-    return "#{property.reference} — #{property.title_for(:fr)}" if property
+    return PropertyMailer.default_share_subject(property) if property
     return information_request.subject if information_request.subject.present?
 
     I18n.t("admin.information_requests.reply.default_topic")

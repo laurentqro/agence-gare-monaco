@@ -123,9 +123,9 @@ class Admin::InformationRequestsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET show marks an answered submission with its reply date" do
-    submission = create_contact(replied_at: Time.zone.local(2026, 9, 8, 9, 30))
+    submission = create_contact(replied_at: Time.utc(2026, 9, 7, 23, 30))
     get admin_information_request_url(submission)
-    assert_select "[data-testid='replied-badge']", text: /Répondu le 08\/09\/2026/
+    assert_select "span.rounded-full[data-testid='replied-badge']", text: /Répondu le 08\/09\/2026/
   end
 
   test "GET index marks answered submissions and leaves the others alone" do
@@ -133,7 +133,7 @@ class Admin::InformationRequestsControllerTest < ActionDispatch::IntegrationTest
     create_contact(name: "Waiting")
     get admin_information_requests_url
     assert_select "tbody tr", 2
-    assert_select "tbody tr [data-testid='replied-badge']", 1
+    assert_select "tbody tr span.rounded-full[data-testid='replied-badge']", 1
   end
 
   test "PATCH update can mark a submission unread" do
