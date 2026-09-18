@@ -9,11 +9,14 @@
         <h1 class="heading-page mb-1"><%= @submission.name %></h1>
         <p class="text-sm text-gray-500"><%= l(@submission.created_at, format: "%d/%m/%Y %H:%M") %></p>
       </div>
-      <% if @submission.form_type == "enquiry" %>
-        <%= admin_badge t("admin.information_requests.filters.enquiry"), variant: :accent, large: true %>
-      <% else %>
-        <%= admin_badge t("admin.information_requests.filters.contact"), large: true %>
-      <% end %>
+      <div class="flex items-center gap-2">
+        <%= render "admin/information_requests/replied_badge", submission: @submission, large: true %>
+        <% if @submission.form_type == "enquiry" %>
+          <%= admin_badge t("admin.information_requests.filters.enquiry"), variant: :accent, large: true %>
+        <% else %>
+          <%= admin_badge t("admin.information_requests.filters.contact"), large: true %>
+        <% end %>
+      </div>
     </div>
 
     <dl class="px-6 py-5 space-y-4 text-sm">
@@ -57,6 +60,9 @@
     </div>
 
     <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center gap-3">
+      <%= link_to t("admin.information_requests.actions.reply"),
+            new_admin_information_request_reply_path(@submission),
+            class: "text-sm bg-navy text-white px-4 py-2 rounded hover:bg-navy/90" %>
       <%= button_to t("admin.information_requests.actions.mark_unread"),
             admin_information_request_path(@submission),
             method: :patch,

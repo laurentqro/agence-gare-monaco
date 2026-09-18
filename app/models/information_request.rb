@@ -7,4 +7,8 @@ class InformationRequest < ApplicationRecord
   validates :message, presence: true
 
   scope :unread, -> { where(read: false) }
+
+  def mark_read!
+    update_column(:read, true) unless read?
+  end
 end

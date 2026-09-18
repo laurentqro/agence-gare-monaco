@@ -2,16 +2,9 @@ module Admin
   class OutgoingEmailsController < BaseController
     include RecipientLoading
 
-    # Pre-filled into the body on a fresh compose page, built from the shared
-    # agent record so the name/email/phone stay in one place. The leading blank
-    # lines put the cursor above the signature so Adrien types his message first.
-    SIGNATURE = "\n\n#{PropertyMailer::AGENT[:name]}\n" \
-                "#{PropertyMailer::AGENT[:email]}\n" \
-                "T: #{PropertyMailer::AGENT[:phone]}".freeze
-
     def new
       load_recipients
-      @outgoing_email ||= OutgoingEmail.new(body: SIGNATURE)
+      @outgoing_email ||= OutgoingEmail.new(body: OutgoingEmail::SIGNATURE)
     end
 
     def create

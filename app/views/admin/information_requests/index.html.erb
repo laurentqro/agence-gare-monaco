@@ -30,11 +30,14 @@
         <% @submissions.each do |submission| %>
           <tr class="hover:bg-gray-50 <%= "font-semibold" unless submission.read? %>">
             <td class="px-4 py-3">
-              <% if submission.form_type == "enquiry" %>
-                <%= admin_badge t("admin.information_requests.filters.enquiry"), variant: :accent %>
-              <% else %>
-                <%= admin_badge t("admin.information_requests.filters.contact") %>
-              <% end %>
+              <div class="flex items-center gap-2">
+                <% if submission.form_type == "enquiry" %>
+                  <%= admin_badge t("admin.information_requests.filters.enquiry"), variant: :accent %>
+                <% else %>
+                  <%= admin_badge t("admin.information_requests.filters.contact") %>
+                <% end %>
+                <%= render "admin/information_requests/replied_badge", submission: submission, large: false %>
+              </div>
             </td>
             <td class="px-4 py-3">
               <%= link_to submission.name, admin_information_request_path(submission), class: "text-navy hover:underline" %>

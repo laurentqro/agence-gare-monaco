@@ -15,7 +15,7 @@ module Admin
     end
 
     def show
-      @submission.update_column(:read, true) unless @submission.read?
+      @submission.mark_read!
     end
 
     def update

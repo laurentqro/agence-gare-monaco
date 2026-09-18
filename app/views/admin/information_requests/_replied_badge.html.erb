@@ -1,0 +1,5 @@
+<% if submission.replied_at %>
+  <span data-testid="replied-badge">
+    <%= admin_badge t("admin.information_requests.replied_on", date: l(submission.replied_at, format: "%d/%m/%Y")), variant: :green, large: large %>
+  </span>
+<% end %>
