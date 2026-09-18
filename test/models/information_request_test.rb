@@ -83,4 +83,20 @@ class InformationRequestTest < ActiveSupport::TestCase
     InformationRequest.create!(form_type: "contact", name: "Pierre", email: "c@d.com", message: "Hi", read: true)
     assert_equal 1, InformationRequest.unread.count
   end
+
+  test "rejects an email that is not a single well-formed address" do
+    request = InformationRequest.new(form_type: "contact", name: "X", message: "Bonjour", email: "victim@example.com, attacker@evil.com")
+    assert_not request.valid?
+    assert_includes request.errors.attribute_names, :email
+  end
+
+  test "rejects an email without a domain" do
+    request = InformationRequest.new(form_type: "contact", name: "X", message: "Bonjour", email: "not-an-email")
+    assert_not request.valid?
+  end
+
+  test "accepts a well-formed email" do
+    request = InformationRequest.new(form_type: "contact", name: "X", message: "Bonjour", email: "carine@example.com")
+    assert request.valid?
+  end
 end

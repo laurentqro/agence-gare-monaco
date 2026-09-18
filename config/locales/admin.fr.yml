@@ -173,6 +173,7 @@ fr:
       title: "Demandes de renseignements"
       empty: "Aucune demande pour le moment."
       unread: "Non lue"
+      replied_on: "Répondu le %{date}"
       filters:
         all: "Toutes"
         unread: "Non lues"
@@ -191,9 +192,18 @@ fr:
         message: "Message"
       actions:
         mark_unread: "Marquer comme non lue"
+        reply: "Répondre"
+      reply:
+        title: "Répondre à %{name}"
+        recipient: "Destinataire"
+        default_topic: "votre demande"
+        quote_intro: "Le %{date}, %{name} a écrit :"
+        send: "Envoyer la réponse"
       flash:
         updated: "Demande mise à jour."
         deleted: "Demande supprimée."
+        replied: "Réponse envoyée à %{name}."
+        undeliverable: "Impossible de répondre : « %{email} » n'est pas une adresse e-mail valide."
     properties:
       title: "Biens"
       new: "Nouveau bien"

@@ -11,7 +11,7 @@ class PropertyMailer < ApplicationMailer
   # into the share form, so an untouched field sends the same email as a blank
   # one; keep it as the single source for both.
   def self.default_share_subject(property)
-    "#{property.reference} — #{property.title_for(:fr)}"
+    [ property.reference, property.title_for(:fr).presence ].compact.join(" — ")
   end
 
   def share_property(property, contact, subject: nil, body: nil, attach_pdf: false, include_logo: true)

@@ -1,6 +1,12 @@
 class OutgoingEmail < ApplicationRecord
   MAX_ATTACHMENT_BYTES = 10.megabytes
 
+  # Pre-filled into the body of a fresh draft. The leading blank lines put the
+  # cursor above the signature so Adrien types his message first.
+  SIGNATURE = "\n\n#{PropertyMailer::AGENT[:name]}\n" \
+              "#{PropertyMailer::AGENT[:email]}\n" \
+              "T: #{PropertyMailer::AGENT[:phone]}".freeze
+
   has_one_attached :file
 
   validates :subject, presence: true

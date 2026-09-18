@@ -116,6 +116,26 @@ class Admin::InformationRequestsControllerTest < ActionDispatch::IntegrationTest
   end
 
   # UPDATE (toggle read)
+  test "GET show offers a reply action linking to the reply form" do
+    submission = create_contact
+    get admin_information_request_url(submission)
+    assert_select "a[href='#{new_admin_information_request_reply_path(submission)}']", text: /Répondre/
+  end
+
+  test "GET show marks an answered submission with its reply date" do
+    submission = create_contact(replied_at: Time.utc(2026, 9, 7, 23, 30))
+    get admin_information_request_url(submission)
+    assert_select "span.rounded-full[data-testid='replied-badge']", text: /Répondu le 08\/09\/2026/
+  end
+
+  test "GET index marks answered submissions and leaves the others alone" do
+    create_contact(name: "Answered", replied_at: Time.current)
+    create_contact(name: "Waiting")
+    get admin_information_requests_url
+    assert_select "tbody tr", 2
+    assert_select "tbody tr span.rounded-full[data-testid='replied-badge']", 1
+  end
+
   test "PATCH update can mark a submission unread" do
     submission = create_contact(read: true)
     patch admin_information_request_url(submission), params: { information_request: { read: false } }
