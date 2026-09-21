@@ -7,6 +7,14 @@ class Article < ApplicationRecord
 
   validates :slug, presence: true, uniqueness: true
 
+  # SEO Override validations. Slug overrides must be URL-safe and unique across
+  # every article's FR slug and per-locale slugs. Meta overrides respect the
+  # same 160-character limit as the French meta description field.
+  LOCALIZED_SLUG_FORMAT = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
+
+  validate :localized_slugs_are_well_formed_and_free
+  validate :meta_description_overrides_fit
+
   before_validation :generate_slug, if: -> { slug.blank? && title.is_a?(Hash) }
 
   scope :published, -> { where(published: true) }
@@ -184,6 +192,29 @@ class Article < ApplicationRecord
   end
 
   private
+
+  def localized_slugs_are_well_formed_and_free
+    return unless slugs.is_a?(Hash)
+
+    slugs.each do |locale, value|
+      next if value.blank?
+      unless value.match?(LOCALIZED_SLUG_FORMAT)
+        errors.add(:slugs, :invalid_format, lang: locale)
+        next
+      end
+      if self.class.localized_slug_taken?(value, locale, except_id: id)
+        errors.add(:slugs, :taken, lang: locale)
+      end
+    end
+  end
+
+  def meta_description_overrides_fit
+    return unless meta_description_overrides.is_a?(Hash)
+
+    meta_description_overrides.each do |locale, value|
+      errors.add(:meta_description_overrides, :too_long, lang: locale) if value.to_s.length > 160
+    end
+  end
 
   def seo_override_value(overrides, locale)
     return nil unless overrides.is_a?(Hash)

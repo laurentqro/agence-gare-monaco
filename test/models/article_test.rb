@@ -515,6 +515,78 @@ class ArticleTest < ActiveSupport::TestCase
     assert_not article.seo_override?(:en)
   end
 
+  # SEO Override validations
+  test "slugs values must be lowercase letters, digits and single hyphens" do
+    article = Article.new(title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, slug: "titre", category: @category)
+
+    %w[is-monaco-safe monaco2026 a].each do |ok|
+      article.slugs = { "en" => ok }
+      assert article.valid?, "#{ok.inspect} should be a valid slug: #{article.errors.full_messages}"
+    end
+
+    [ "Is Monaco Safe", "monaco_safe", "-leading", "trailing-", "double--hyphen", "accént", "with/slash" ].each do |bad|
+      article.slugs = { "en" => bad }
+      assert_not article.valid?, "#{bad.inspect} should be rejected"
+      assert article.errors.added?(:slugs, :invalid_format, lang: "en"), article.errors.details.inspect
+    end
+  end
+
+  test "slugs values may be blank (no override for that locale)" do
+    article = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, slug: "titre",
+      slugs: { "en" => "", "it" => nil }, category: @category
+    )
+    assert article.valid?, article.errors.full_messages.inspect
+  end
+
+  test "a slug override may not collide with another article's slug in any locale" do
+    Article.create!(
+      title: { "fr" => "Autre" }, body: { "fr" => "Corps" },
+      slug: "autre-fr", slugs: { "en" => "other-en" }, category: @category
+    )
+    article = Article.new(title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, slug: "titre", category: @category)
+
+    article.slugs = { "en" => "other-en" }
+    assert_not article.valid?
+    assert article.errors.added?(:slugs, :taken, lang: "en"), article.errors.details.inspect
+
+    article.slugs = { "de" => "autre-fr" }
+    assert_not article.valid?, "another article's FR slug is taken too"
+    assert article.errors.added?(:slugs, :taken, lang: "de")
+  end
+
+  test "a slug override does not collide with the same article's own slugs" do
+    article = Article.create!(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "titre-fr", slugs: { "en" => "title-en" }, category: @category
+    )
+    article.slugs = { "en" => "title-en", "it" => "titolo-it" }
+    assert article.valid?, article.errors.full_messages.inspect
+  end
+
+  test "meta description overrides are at most 160 characters" do
+    article = Article.new(title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, slug: "titre", category: @category)
+
+    article.meta_description_overrides = { "en" => "x" * 160 }
+    assert article.valid?, article.errors.full_messages.inspect
+
+    article.meta_description_overrides = { "en" => "x" * 161 }
+    assert_not article.valid?
+    assert article.errors.added?(:meta_description_overrides, :too_long, lang: "en"), article.errors.details.inspect
+  end
+
+  test "override validation messages are in French" do
+    article = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, slug: "titre",
+      slugs: { "en" => "Bad Slug" }, meta_description_overrides: { "it" => "x" * 161 },
+      category: @category
+    )
+    article.valid?
+    messages = article.errors.full_messages.join(" | ")
+    assert_match(/Slugs par langue.*\(en\).*minuscules, chiffres et tirets/, messages)
+    assert_match(/Meta descriptions par langue.*\(it\).*160 caractères/, messages)
+  end
+
   # mint_localized_slug — collision-aware slug generation (SEO audit 0.2)
   test "mint_localized_slug parameterizes the title for the locale" do
     assert_equal "how-to-sell-your-property",

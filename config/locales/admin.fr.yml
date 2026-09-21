@@ -4,6 +4,18 @@ fr:
       property_share:
         subject: "Sujet"
         body: "Message"
+      article:
+        slugs: "Slugs par langue"
+        meta_description_overrides: "Meta descriptions par langue"
+    errors:
+      models:
+        article:
+          attributes:
+            slugs:
+              invalid_format: "(%{lang}) doit contenir uniquement des minuscules, chiffres et tirets"
+              taken: "(%{lang}) est déjà utilisé par un autre article"
+            meta_description_overrides:
+              too_long: "(%{lang}) doit faire 160 caractères maximum"
   admin:
     layout:
       title: "Admin | Agence Gare Monaco"
