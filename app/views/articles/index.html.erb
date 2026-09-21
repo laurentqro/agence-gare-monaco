@@ -28,17 +28,15 @@
   </div>
 
   <% if @articles.any? %>
-    <% locale = params[:locale] || I18n.locale.to_s %>
-    <% articles_segment = I18n.t("routes.articles", locale: locale) %>
     <% featured = @articles.first %>
     <% rest = @articles.offset(1) %>
 
-    <%= render "shared/article_card_featured", article: featured, article_path: "/#{locale}/#{articles_segment}/#{featured.slug}" %>
+    <%= render "shared/article_card_featured", article: featured, article_path: locale_article_path(featured) %>
 
     <% if rest.any? %>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <% rest.each do |article| %>
-          <%= render "shared/article_card", article: article, article_path: "/#{locale}/#{articles_segment}/#{article.slug}" %>
+          <%= render "shared/article_card", article: article, article_path: locale_article_path(article) %>
         <% end %>
       </div>
     <% end %>

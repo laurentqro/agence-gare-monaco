@@ -111,6 +111,80 @@ class ArticleTranslatorTest < ActiveSupport::TestCase
     assert_equal "Première raison : le climat. Deuxième raison : la sécurité.", @article.body["fr"]
   end
 
+  # ---- per-locale slugs (SEO audit 0.2) ----
+
+  test "mints a per-locale slug from each translated title" do
+    with_stubbed_chat(content_per_locale: canned_responses) do
+      ArticleTranslator.new(@article).translate!
+    end
+
+    @article.reload
+    %w[en it de sv no da fi ru].each do |locale|
+      assert_equal "title-#{locale}", @article.slugs[locale],
+        "expected a localised slug derived from the #{locale} title"
+    end
+  end
+
+  test "never writes an fr slug into the slugs hash" do
+    with_stubbed_chat(content_per_locale: canned_responses) do
+      ArticleTranslator.new(@article).translate!
+    end
+
+    assert_not_includes @article.reload.slugs.keys, "fr"
+    assert_equal "cinq-raisons-de-vivre-a-monaco", @article.slug
+  end
+
+  test "freezes an existing per-locale slug across a re-translation after an FR edit" do
+    with_stubbed_chat(content_per_locale: canned_responses) do
+      ArticleTranslator.new(@article).translate!
+    end
+    assert_equal "title-en", @article.reload.slugs["en"]
+
+    # FR title changes -> hash goes stale -> the whole article re-translates with
+    # NEW titles. The slug must NOT move (the old URL is already indexed).
+    @article.update!(title: @article.title.merge("fr" => "Titre modifié"))
+    new_responses = %w[en it de sv no da fi ru].each_with_object({}) do |loc, h|
+      h[loc] = { "title" => "Completely New #{loc.upcase}", "body" => "Body #{loc.upcase}" }
+    end
+    # A fresh instance, as each web request / job loads one (current_fr_hash is
+    # memoized per-instance, so the job always runs on a freshly-loaded record).
+    with_stubbed_chat(content_per_locale: new_responses) do
+      ArticleTranslator.new(Article.find(@article.id)).translate!
+    end
+
+    @article.reload
+    assert_equal "Completely New EN", @article.title["en"], "title should update"
+    assert_equal "title-en", @article.slugs["en"], "slug should stay frozen"
+  end
+
+  test "suffixes a minted slug that collides with another article's slug" do
+    # Another article already owns the EN slug the translation would produce.
+    Article.create!(
+      title: { "fr" => "Autre", "en" => "Title EN" }, body: { "fr" => "Corps" },
+      slug: "autre", slugs: { "en" => "title-en" }, category: @category
+    )
+
+    with_stubbed_chat(content_per_locale: canned_responses) do
+      ArticleTranslator.new(@article).translate!
+    end
+
+    assert_equal "title-en-2", @article.reload.slugs["en"],
+      "colliding minted slug must be suffixed, not shared"
+  end
+
+  test "the minted Russian slug is ASCII-safe" do
+    responses = canned_responses
+    responses["ru"] = { "title" => "Как продать недвижимость в Монако", "body" => "Body RU" }
+
+    with_stubbed_chat(content_per_locale: responses) do
+      ArticleTranslator.new(@article).translate!
+    end
+
+    ru = @article.reload.slugs["ru"]
+    assert ru.present?, "expected a Russian slug"
+    assert_match(/\A[a-z0-9-]+\z/, ru, "Russian slug must be ASCII-safe: #{ru}")
+  end
+
   test "writes meta_description for all target locales when FR meta description present" do
     @article.update!(meta_description: { "fr" => "Résumé FR." })
     responses = %w[en it de sv no da fi ru].each_with_object({}) do |loc, h|

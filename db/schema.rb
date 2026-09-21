@@ -50,6 +50,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_18_111352) do
     t.boolean "published", default: false
     t.datetime "published_at"
     t.string "slug", null: false
+    t.json "slugs", default: {}, null: false
     t.json "title"
     t.string "translation_source_hash"
     t.json "translations_status", default: {}
