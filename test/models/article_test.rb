@@ -426,6 +426,16 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal({}, article.reload.slugs)
   end
 
+  test "title_overrides and meta_description_overrides default to empty hashes" do
+    article = Article.create!(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "titre-defaults", category: @category
+    )
+    article.reload
+    assert_equal({}, article.title_overrides)
+    assert_equal({}, article.meta_description_overrides)
+  end
+
   # mint_localized_slug — collision-aware slug generation (SEO audit 0.2)
   test "mint_localized_slug parameterizes the title for the locale" do
     assert_equal "how-to-sell-your-property",
