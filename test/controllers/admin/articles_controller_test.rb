@@ -1,6 +1,8 @@
 require "test_helper"
 
 class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
+
   setup do
     @user = User.create!(email_address: "adrien@agencegaremonaco.com", password: "securepassword123")
     post session_url, params: { email_address: "adrien@agencegaremonaco.com", password: "securepassword123" }
@@ -756,5 +758,99 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "details.seo-overrides", 0
     assert_select "input[name^='article[title_overrides]']", 0
     assert_select "input[name^='article[slugs]']", 0
+  end
+
+  test "PATCH update saves one locale's SEO overrides and leaves the other locales' overrides alone" do
+    article = Article.create!(
+      title: { "fr" => "La sécurité", "en" => "Safety", "it" => "Sicurezza" },
+      body: { "fr" => "Corps" },
+      title_overrides: { "it" => "Monaco è sicura?" },
+      meta_description_overrides: { "it" => "Meta IT" },
+      slugs: { "it" => "monaco-e-sicura" },
+      slug: "la-securite", category: @category
+    )
+
+    patch admin_article_url(article), params: { article: {
+      title_overrides: { en: "Is Monaco Safe?" },
+      meta_description_overrides: { en: "Is Monaco safe? Police, CCTV and healthcare explained." },
+      slugs: { en: "is-monaco-safe" }
+    } }
+    assert_redirected_to admin_articles_url
+
+    article.reload
+    assert_equal({ "it" => "Monaco è sicura?", "en" => "Is Monaco Safe?" }, article.title_overrides)
+    assert_equal({ "it" => "Meta IT", "en" => "Is Monaco safe? Police, CCTV and healthcare explained." }, article.meta_description_overrides)
+    assert_equal({ "it" => "monaco-e-sicura", "en" => "is-monaco-safe" }, article.slugs)
+    assert_equal "Safety", article.title["en"], "the Translation itself is untouched"
+  end
+
+  test "PATCH update with blank override fields removes only that locale's overrides" do
+    article = Article.create!(
+      title: { "fr" => "La sécurité", "en" => "Safety" }, body: { "fr" => "Corps" },
+      title_overrides: { "en" => "Is Monaco Safe?", "it" => "Monaco è sicura?" },
+      meta_description_overrides: { "en" => "Meta EN", "it" => "Meta IT" },
+      slugs: { "en" => "is-monaco-safe", "it" => "monaco-e-sicura" },
+      slug: "la-securite", category: @category
+    )
+
+    # The form always submits every locale's field; the ones the owner did not
+    # fill in arrive as "". Clearing EN must not disturb IT.
+    patch admin_article_url(article), params: { article: {
+      title_overrides: { en: "", it: "Monaco è sicura?" },
+      meta_description_overrides: { en: "   ", it: "Meta IT" },
+      slugs: { en: "", it: "monaco-e-sicura" }
+    } }
+    assert_redirected_to admin_articles_url
+
+    article.reload
+    assert_equal({ "it" => "Monaco è sicura?" }, article.title_overrides)
+    assert_equal({ "it" => "Meta IT" }, article.meta_description_overrides)
+    assert_equal({ "it" => "monaco-e-sicura" }, article.slugs)
+    assert_equal "Safety", article.title_for(:en), "EN falls back to the Translation"
+    assert_equal "la-securite", article.slug_for(:en), "EN falls back to the FR slug"
+  end
+
+  test "PATCH update does not enqueue a translation when only SEO overrides change" do
+    article = Article.create!(
+      title: { "fr" => "La sécurité" }, body: { "fr" => "Corps" },
+      slug: "la-securite", category: @category
+    )
+    article.update_columns(translation_source_hash: article.current_fr_hash)
+
+    assert_no_enqueued_jobs only: ArticleTranslationJob do
+      patch admin_article_url(article), params: { article: { title_overrides: { en: "Is Monaco Safe?" } } }
+    end
+  end
+
+  test "PATCH update with an invalid slug override re-renders the form with a French error" do
+    article = Article.create!(
+      title: { "fr" => "La sécurité" }, body: { "fr" => "Corps" },
+      slug: "la-securite", category: @category
+    )
+
+    patch admin_article_url(article), params: { article: { slugs: { en: "Is Monaco Safe" } } }
+    assert_response :unprocessable_entity
+    assert_select "li", /Slugs par langue \(en\) doit contenir uniquement des minuscules, chiffres et tirets/
+    assert_select "input[name='article[slugs][en]'][value='Is Monaco Safe']", 1, "the rejected value stays in the field"
+    assert_equal({}, article.reload.slugs)
+  end
+
+  test "PATCH update with a slug override taken by another article re-renders with a French error" do
+    Article.create!(title: { "fr" => "Autre" }, body: { "fr" => "C" }, slug: "autre", slugs: { "en" => "other" }, category: @category)
+    article = Article.create!(title: { "fr" => "Titre" }, body: { "fr" => "C" }, slug: "titre", category: @category)
+
+    patch admin_article_url(article), params: { article: { slugs: { en: "other" } } }
+    assert_response :unprocessable_entity
+    assert_select "li", /Slugs par langue \(en\) est déjà utilisé par un autre article/
+  end
+
+  test "PATCH update ignores SEO overrides for FR or unknown locales" do
+    article = Article.create!(title: { "fr" => "Titre" }, body: { "fr" => "C" }, slug: "titre", category: @category)
+
+    patch admin_article_url(article), params: { article: {
+      title_overrides: { fr: "Nope", xx: "Nope", en: "Yes" }
+    } }
+    assert_redirected_to admin_articles_url
+    assert_equal({ "en" => "Yes" }, article.reload.title_overrides)
   end
 end

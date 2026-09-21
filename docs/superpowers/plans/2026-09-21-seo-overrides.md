@@ -1093,20 +1093,27 @@ Replace `article_params`:
       )
 
       merge_translated_columns(permitted, @article, TRANSLATED_COLUMNS)
-      merge_translated_columns(permitted, @article, OVERRIDE_COLUMNS)
-      drop_blank_overrides(permitted)
+      # Blank override fields clear that locale's override (see the concern).
+      merge_translated_columns(permitted, @article, OVERRIDE_COLUMNS, drop_blank: true)
+    end
+```
+
+And give `MergesTranslatedColumns#merge_translated_columns` a `drop_blank: false` keyword that rejects blank values from the merged hash before assigning it back. Do not read `permitted[column]` back after assignment: `ActionController::Parameters#[]=` re-wraps a plain Hash as unpermitted Parameters, so `.to_h` on it raises `UnfilteredParameters`. (Found during execution; the original plan did exactly that.)
+
+```ruby
+  def merge_translated_columns(permitted, record, columns, drop_blank: false)
+    columns.each do |column|
+      submitted = permitted[column]
+      next if submitted.nil?
+
+      existing = record&.public_send(column) || {}
+      merged = existing.merge(submitted.to_h)
+      merged = merged.reject { |_locale, value| value.blank? } if drop_blank
+      permitted[column] = merged
     end
 
-    # Merging keeps every stored locale; a field the owner emptied is now a
-    # blank value in the MERGED hash, so removing blanks here is what clears
-    # that one override. Nothing else in the hash is touched.
-    def drop_blank_overrides(permitted)
-      OVERRIDE_COLUMNS.each do |column|
-        next if permitted[column].nil?
-        permitted[column] = permitted[column].to_h.reject { |_locale, value| value.blank? }
-      end
-      permitted
-    end
+    permitted
+  end
 ```
 
 `Article::TARGET_LOCALES` is an array of strings (`%w[en it de sv no da fi ru]`); `permit` accepts string keys in nested filters. `fr` and unknown keys are dropped by `permit`.
