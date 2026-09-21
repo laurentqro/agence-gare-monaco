@@ -287,6 +287,112 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "img.article-cover-image", count: 0
   end
 
+  # Per-locale localised slugs (SEO audit 0.2)
+  test "article index links to the canonical per-locale slug, not the FR slug" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Corps", "en" => "Body" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/en/articles"
+    assert_response :success
+    # The featured card must link straight to the EN slug (no 301 hop through
+    # the shared FR slug), or internal links point at non-canonical URLs.
+    assert_select "a[href='/en/articles/how-to-sell-your-property']"
+    assert_select "a[href='/en/articles/comment-vendre']", count: 0
+  end
+
+  test "article show resolves an article by its per-locale slug" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "**gras**", "en" => "**bold** content" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/en/articles/how-to-sell-your-property"
+    assert_response :success
+    assert_select ".article-body strong", "bold"
+  end
+
+  test "article show 301s the shared FR slug to the canonical per-locale slug" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Corps", "en" => "Body" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    # An indexed /en/articles/comment-vendre (the old shared slug) must not
+    # serve a 200 under a non-canonical URL: it 301s to the EN slug so all
+    # authority consolidates on one URL per locale.
+    get "/en/articles/comment-vendre"
+    assert_response :moved_permanently
+    assert_redirected_to "/en/articles/how-to-sell-your-property"
+  end
+
+  test "article show preserves the query string on the canonical 301" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Corps", "en" => "Body" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/en/articles/comment-vendre?utm_source=newsletter"
+    assert_response :moved_permanently
+    assert_redirected_to "/en/articles/how-to-sell-your-property?utm_source=newsletter"
+  end
+
+  test "article show does not redirect when the URL already carries the canonical slug" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Corps", "en" => "Body" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/en/articles/how-to-sell-your-property"
+    assert_response :success
+  end
+
+  test "article show serves the FR slug under FR without redirecting" do
+    Article.create!(
+      title: { "fr" => "Comment vendre", "en" => "How to sell your property" },
+      body: { "fr" => "Corps", "en" => "Body" },
+      slug: "comment-vendre",
+      slugs: { "en" => "how-to-sell-your-property" },
+      category: @category,
+      published: true,
+      published_at: Time.current
+    )
+
+    get "/articles/comment-vendre"
+    assert_response :success
+  end
+
+  test "article show still 404s a slug that matches no article" do
+    get "/en/articles/no-such-article-anywhere"
+    assert_response :not_found
+  end
+
   test "all 8 locales render markdown on article show" do
     article = Article.create!(
       title: { "fr" => "Article FR", "en" => "Article EN" },
@@ -306,5 +412,32 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     get "/en/articles/multi-locale-article"
     assert_response :success
     assert_select ".article-body strong", "bold"
+  end
+
+  # SEO Overrides: the override title/meta replaces the translated one on the page.
+  test "article show renders the EN SEO override in the title tag, h1 and meta description" do
+    Article.create!(
+      title: { "fr" => "La sécurité à Monaco", "en" => "Safety and Healthcare in Monaco", "de" => "Sicherheit in Monaco" },
+      body: { "fr" => "Corps", "en" => "Body", "de" => "Text" },
+      meta_description: { "fr" => "Résumé FR", "en" => "Translated summary", "de" => "Deutsche Zusammenfassung" },
+      title_overrides: { "en" => "Is Monaco Safe? Police, Security and Healthcare" },
+      meta_description_overrides: { "en" => "Is Monaco safe? Police, CCTV and healthcare explained." },
+      slug: "la-securite-a-monaco",
+      slugs: { "en" => "is-monaco-safe" },
+      category: @category, published: true, published_at: Time.current
+    )
+
+    get "/en/articles/is-monaco-safe"
+    assert_response :success
+    assert_select "title", text: "Is Monaco Safe? Police, Security and Healthcare | Agence Immobilière de la Gare"
+    assert_select "h1", text: "Is Monaco Safe? Police, Security and Healthcare"
+    assert_select "meta[name='description'][content='Is Monaco safe? Police, CCTV and healthcare explained.']"
+    assert_select "link[rel='canonical'][href='https://agencegaremonaco.com/en/articles/is-monaco-safe']"
+
+    # A locale without an override keeps its Translation and the FR slug.
+    get "/de/artikel/la-securite-a-monaco"
+    assert_response :success
+    assert_select "h1", text: "Sicherheit in Monaco"
+    assert_select "meta[name='description'][content='Deutsche Zusammenfassung']"
   end
 end

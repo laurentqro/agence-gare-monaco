@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_18_111352) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_21_100000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -47,10 +47,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_18_111352) do
     t.boolean "featured", default: false
     t.integer "legacy_id"
     t.json "meta_description"
+    t.json "meta_description_overrides", default: {}, null: false
     t.boolean "published", default: false
     t.datetime "published_at"
     t.string "slug", null: false
+    t.json "slugs", default: {}, null: false
     t.json "title"
+    t.json "title_overrides", default: {}, null: false
     t.string "translation_source_hash"
     t.json "translations_status", default: {}
     t.datetime "updated_at", null: false

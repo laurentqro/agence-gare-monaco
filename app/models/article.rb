@@ -7,12 +7,25 @@ class Article < ApplicationRecord
 
   validates :slug, presence: true, uniqueness: true
 
+  # SEO Override validations. Slug overrides must be URL-safe and unique across
+  # every article's FR slug and per-locale slugs. Meta overrides respect the
+  # same 160-character limit as the French meta description field.
+  LOCALIZED_SLUG_FORMAT = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
+
+  validate :localized_slugs_are_well_formed_and_free
+  validate :meta_description_overrides_fit
+
   before_validation :generate_slug, if: -> { slug.blank? && title.is_a?(Hash) }
 
   scope :published, -> { where(published: true) }
   scope :featured, -> { where(featured: true) }
 
+  # Public readers. An SEO Override for the locale wins; otherwise the
+  # Translation, then the French Source. FR never has an override (the admin
+  # only offers the target locales), so current_fr_hash is unaffected.
   def title_for(locale = I18n.locale)
+    override = seo_override_value(title_overrides, locale)
+    return override if override
     return "" unless title.is_a?(Hash)
     title[locale.to_s].presence || title[I18n.default_locale.to_s].presence || title.values.first || ""
   end
@@ -23,8 +36,70 @@ class Article < ApplicationRecord
   end
 
   def meta_description_for(locale = I18n.locale)
+    override = seo_override_value(meta_description_overrides, locale)
+    return override if override
     return "" unless meta_description.is_a?(Hash)
     meta_description[locale.to_s].presence || meta_description[I18n.default_locale.to_s].presence || ""
+  end
+
+  # True when the locale has any SEO Override (title, meta description or
+  # Localized Slug). Used by the admin form to show state; nothing else.
+  def seo_override?(locale)
+    return false if locale.to_s == I18n.default_locale.to_s
+    seo_override_value(title_overrides, locale).present? ||
+      seo_override_value(meta_description_overrides, locale).present? ||
+      seo_override_value(slugs, locale).present?
+  end
+
+  # Per-locale localised slug (SEO audit 0.2). FR always resolves to the pinned
+  # `slug` column (the canonical, indexed slug and stable lookup key); other
+  # locales use their entry in the `slugs` JSON hash, falling back to the FR
+  # slug when they have none yet.
+  def slug_for(locale = I18n.locale)
+    return slug if locale.to_s == I18n.default_locale.to_s
+    (slugs.is_a?(Hash) && slugs[locale.to_s].presence) || slug
+  end
+
+  # Generate a collision-free localised slug from a title (SEO audit 0.2). The
+  # base is the locale-transliterated parameterization; if that already belongs
+  # to another article (its FR `slug` or its own `slugs[locale]`), a numeric
+  # suffix is appended (-2, -3, ...) so two articles never share one locale's
+  # URL. Returns "" for a title that parameterizes to nothing (caller skips it).
+  # Pass except_id to exclude the article being re-minted from the clash check.
+  def self.mint_localized_slug(title, locale, except_id: nil)
+    base = title.to_s.parameterize(locale: locale.to_sym)
+    return "" if base.blank?
+
+    candidate = base
+    suffix = 1
+    while localized_slug_taken?(candidate, locale, except_id: except_id)
+      suffix += 1
+      candidate = "#{base}-#{suffix}"
+    end
+    candidate
+  end
+
+  # True if any OTHER article already uses this slug for the locale, either as
+  # its canonical FR `slug` or its per-locale `slugs[locale]`.
+  def self.localized_slug_taken?(candidate, locale, except_id: nil)
+    scope = where(slug: candidate).or(
+      where("json_extract(slugs, ?) = ?", "$.#{locale}", candidate)
+    )
+    scope = scope.where.not(id: except_id) if except_id
+    scope.exists?
+  end
+
+  # Resolve a URL slug back to its article for the given locale. Matches the
+  # locale's own slug first, then the canonical FR slug so previously-indexed
+  # shared-slug URLs (one slug across all locales) still resolve. At most two
+  # indexed lookups; never a table scan. Respects the relation it is called on
+  # (e.g. Article.published).
+  def self.find_by_localized_slug(slug_param, locale = I18n.locale)
+    unless locale.to_s == I18n.default_locale.to_s
+      match = find_by("json_extract(slugs, ?) = ?", "$.#{locale}", slug_param)
+      return match if match
+    end
+    find_by(slug: slug_param)
   end
 
   def first_image_url
@@ -117,6 +192,34 @@ class Article < ApplicationRecord
   end
 
   private
+
+  def localized_slugs_are_well_formed_and_free
+    return unless slugs.is_a?(Hash)
+
+    slugs.each do |locale, value|
+      next if value.blank?
+      unless value.match?(LOCALIZED_SLUG_FORMAT)
+        errors.add(:slugs, :invalid_format, lang: locale)
+        next
+      end
+      if self.class.localized_slug_taken?(value, locale, except_id: id)
+        errors.add(:slugs, :taken, lang: locale)
+      end
+    end
+  end
+
+  def meta_description_overrides_fit
+    return unless meta_description_overrides.is_a?(Hash)
+
+    meta_description_overrides.each do |locale, value|
+      errors.add(:meta_description_overrides, :too_long, lang: locale) if value.to_s.length > 160
+    end
+  end
+
+  def seo_override_value(overrides, locale)
+    return nil unless overrides.is_a?(Hash)
+    overrides[locale.to_s].presence
+  end
 
   def generate_slug
     fr_title = title["fr"] || title[I18n.default_locale.to_s] || title.values.first

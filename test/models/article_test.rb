@@ -371,6 +371,341 @@ class ArticleTest < ActiveSupport::TestCase
     assert Article.find(article.id).translation_stale?
   end
 
+  # slug_for — per-locale localised slugs (SEO audit 0.2)
+  test "slug_for returns the per-locale slug when present" do
+    article = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "titre-fr", slugs: { "en" => "title-en", "it" => "titolo-it" },
+      category: @category
+    )
+    assert_equal "title-en", article.slug_for(:en)
+    assert_equal "titolo-it", article.slug_for(:it)
+  end
+
+  test "slug_for falls back to the canonical FR slug when the locale is missing" do
+    article = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "titre-fr", slugs: { "en" => "title-en" },
+      category: @category
+    )
+    assert_equal "titre-fr", article.slug_for(:de)
+  end
+
+  test "slug_for returns the canonical FR slug for the FR locale itself" do
+    article = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "titre-fr", slugs: { "fr" => "should-be-ignored", "en" => "title-en" },
+      category: @category
+    )
+    # The FR slug is always the pinned `slug` column, never a slugs["fr"] entry.
+    assert_equal "titre-fr", article.slug_for(:fr)
+  end
+
+  test "slug_for falls back to FR slug when a per-locale value is blank" do
+    article = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "titre-fr", slugs: { "en" => "" },
+      category: @category
+    )
+    assert_equal "titre-fr", article.slug_for(:en)
+  end
+
+  test "slug_for tolerates a nil slugs column" do
+    article = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "titre-fr", slugs: nil, category: @category
+    )
+    assert_equal "titre-fr", article.slug_for(:en)
+  end
+
+  test "slugs defaults to an empty hash" do
+    article = Article.create!(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "defaults-slugs", category: @category
+    )
+    assert_equal({}, article.reload.slugs)
+  end
+
+  test "title_overrides and meta_description_overrides default to empty hashes" do
+    article = Article.create!(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "titre-defaults", category: @category
+    )
+    article.reload
+    assert_equal({}, article.title_overrides)
+    assert_equal({}, article.meta_description_overrides)
+  end
+
+  # SEO Overrides: a per-locale title / meta description the translator never touches.
+  test "title_for prefers the SEO override for that locale" do
+    article = Article.new(
+      title: { "fr" => "La sécurité à Monaco", "en" => "Safety in Monaco" },
+      title_overrides: { "en" => "Is Monaco Safe?" },
+      category: @category
+    )
+    assert_equal "Is Monaco Safe?", article.title_for(:en)
+    assert_equal "Is Monaco Safe?", article.title_for("en")
+    assert_equal "La sécurité à Monaco", article.title_for(:fr)
+    assert_equal "La sécurité à Monaco", article.title_for(:de), "locales without an override keep the translated-then-FR fallback"
+  end
+
+  test "title_for ignores a blank SEO override" do
+    article = Article.new(
+      title: { "fr" => "Titre", "en" => "Title" },
+      title_overrides: { "en" => "   " },
+      category: @category
+    )
+    assert_equal "Title", article.title_for(:en)
+  end
+
+  test "meta_description_for prefers the SEO override for that locale" do
+    article = Article.new(
+      title: { "fr" => "Titre" },
+      meta_description: { "fr" => "Résumé FR", "en" => "Translated summary" },
+      meta_description_overrides: { "en" => "Is Monaco safe? Police, CCTV and healthcare explained." },
+      category: @category
+    )
+    assert_equal "Is Monaco safe? Police, CCTV and healthcare explained.", article.meta_description_for(:en)
+    assert_equal "Résumé FR", article.meta_description_for(:fr)
+    assert_equal "Résumé FR", article.meta_description_for(:it)
+  end
+
+  test "meta_description_for ignores a blank SEO override" do
+    article = Article.new(
+      title: { "fr" => "Titre" },
+      meta_description: { "fr" => "Résumé FR", "en" => "Translated summary" },
+      meta_description_overrides: { "en" => "" },
+      category: @category
+    )
+    assert_equal "Translated summary", article.meta_description_for(:en)
+  end
+
+  test "current_fr_hash ignores SEO overrides" do
+    article = Article.new(title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, category: @category)
+    before = article.current_fr_hash
+    other = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      title_overrides: { "en" => "Overridden" }, meta_description_overrides: { "en" => "Overridden meta" },
+      category: @category
+    )
+    assert_equal before, other.current_fr_hash, "an override must not make the translator think the French source changed"
+  end
+
+  test "seo_override? is true when the locale has a title, meta description or slug override" do
+    article = Article.new(
+      title: { "fr" => "Titre" },
+      title_overrides: { "en" => "Title EN" },
+      meta_description_overrides: { "it" => "Meta IT" },
+      slugs: { "de" => "titel-de" },
+      category: @category
+    )
+    assert article.seo_override?(:en)
+    assert article.seo_override?("it")
+    assert article.seo_override?(:de)
+    assert_not article.seo_override?(:sv)
+    assert_not article.seo_override?(:fr), "FR is the Source, never an override"
+  end
+
+  test "seo_override? treats blank values as absent" do
+    article = Article.new(
+      title: { "fr" => "Titre" },
+      title_overrides: { "en" => "" }, meta_description_overrides: { "en" => " " }, slugs: { "en" => "" },
+      category: @category
+    )
+    assert_not article.seo_override?(:en)
+  end
+
+  # SEO Override validations
+  test "slugs values must be lowercase letters, digits and single hyphens" do
+    article = Article.new(title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, slug: "titre", category: @category)
+
+    %w[is-monaco-safe monaco2026 a].each do |ok|
+      article.slugs = { "en" => ok }
+      assert article.valid?, "#{ok.inspect} should be a valid slug: #{article.errors.full_messages}"
+    end
+
+    [ "Is Monaco Safe", "monaco_safe", "-leading", "trailing-", "double--hyphen", "accént", "with/slash" ].each do |bad|
+      article.slugs = { "en" => bad }
+      assert_not article.valid?, "#{bad.inspect} should be rejected"
+      assert article.errors.added?(:slugs, :invalid_format, lang: "en"), article.errors.details.inspect
+    end
+  end
+
+  test "slugs values may be blank (no override for that locale)" do
+    article = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, slug: "titre",
+      slugs: { "en" => "", "it" => nil }, category: @category
+    )
+    assert article.valid?, article.errors.full_messages.inspect
+  end
+
+  test "a slug override may not collide with another article's slug in any locale" do
+    Article.create!(
+      title: { "fr" => "Autre" }, body: { "fr" => "Corps" },
+      slug: "autre-fr", slugs: { "en" => "other-en" }, category: @category
+    )
+    article = Article.new(title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, slug: "titre", category: @category)
+
+    article.slugs = { "en" => "other-en" }
+    assert_not article.valid?
+    assert article.errors.added?(:slugs, :taken, lang: "en"), article.errors.details.inspect
+
+    article.slugs = { "de" => "autre-fr" }
+    assert_not article.valid?, "another article's FR slug is taken too"
+    assert article.errors.added?(:slugs, :taken, lang: "de")
+  end
+
+  test "a slug override does not collide with the same article's own slugs" do
+    article = Article.create!(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "titre-fr", slugs: { "en" => "title-en" }, category: @category
+    )
+    article.slugs = { "en" => "title-en", "it" => "titolo-it" }
+    assert article.valid?, article.errors.full_messages.inspect
+  end
+
+  test "meta description overrides are at most 160 characters" do
+    article = Article.new(title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, slug: "titre", category: @category)
+
+    article.meta_description_overrides = { "en" => "x" * 160 }
+    assert article.valid?, article.errors.full_messages.inspect
+
+    article.meta_description_overrides = { "en" => "x" * 161 }
+    assert_not article.valid?
+    assert article.errors.added?(:meta_description_overrides, :too_long, lang: "en"), article.errors.details.inspect
+  end
+
+  test "override validation messages are in French" do
+    article = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, slug: "titre",
+      slugs: { "en" => "Bad Slug" }, meta_description_overrides: { "it" => "x" * 161 },
+      category: @category
+    )
+    article.valid?
+    messages = article.errors.full_messages.join(" | ")
+    assert_match(/Slugs par langue.*\(en\).*minuscules, chiffres et tirets/, messages)
+    assert_match(/Meta descriptions par langue.*\(it\).*160 caractères/, messages)
+  end
+
+  # mint_localized_slug — collision-aware slug generation (SEO audit 0.2)
+  test "mint_localized_slug parameterizes the title for the locale" do
+    assert_equal "how-to-sell-your-property",
+      Article.mint_localized_slug("How to sell your property", :en)
+  end
+
+  test "mint_localized_slug transliterates Russian with Russian rules" do
+    slug = Article.mint_localized_slug("Как продать недвижимость", :ru)
+    assert slug.present?
+    assert_match(/\A[a-z0-9-]+\z/, slug)
+  end
+
+  test "mint_localized_slug returns empty string for a punctuation-only title" do
+    assert_equal "", Article.mint_localized_slug("!!!???", :en)
+  end
+
+  test "mint_localized_slug suffixes when the slug collides with another article's per-locale slug" do
+    Article.create!(
+      title: { "fr" => "A", "en" => "Monaco real estate" }, body: { "fr" => "C" },
+      slug: "a-fr", slugs: { "en" => "monaco-real-estate" },
+      category: @category
+    )
+    assert_equal "monaco-real-estate-2",
+      Article.mint_localized_slug("Monaco Real Estate", :en)
+  end
+
+  test "mint_localized_slug suffixes when the slug collides with another article's FR slug" do
+    Article.create!(
+      title: { "fr" => "Cinq raisons" }, body: { "fr" => "C" },
+      slug: "cinq-raisons", category: @category
+    )
+    # A different article's EN title parameterizes to an existing FR slug: it
+    # must not shadow the other article at /en/articles/cinq-raisons.
+    assert_equal "cinq-raisons-2",
+      Article.mint_localized_slug("Cinq raisons", :en)
+  end
+
+  test "mint_localized_slug ignores the article being updated via except_id" do
+    article = Article.create!(
+      title: { "fr" => "A", "en" => "Monaco real estate" }, body: { "fr" => "C" },
+      slug: "a-fr", slugs: { "en" => "monaco-real-estate" },
+      category: @category
+    )
+    # Re-minting for the same article must see its own slug as free, not a clash.
+    assert_equal "monaco-real-estate",
+      Article.mint_localized_slug("Monaco Real Estate", :en, except_id: article.id)
+  end
+
+  test "mint_localized_slug increments past multiple collisions" do
+    Article.create!(title: { "fr" => "A" }, body: { "fr" => "C" }, slug: "x", slugs: { "en" => "guide" }, category: @category)
+    Article.create!(title: { "fr" => "B" }, body: { "fr" => "C" }, slug: "y", slugs: { "en" => "guide-2" }, category: @category)
+    assert_equal "guide-3", Article.mint_localized_slug("Guide", :en)
+  end
+
+  # find_by_localized_slug — resolve a per-locale URL back to its article
+  test "find_by_localized_slug matches a per-locale slug under that locale" do
+    article = Article.create!(
+      title: { "fr" => "Titre", "en" => "Title" }, body: { "fr" => "Corps" },
+      slug: "titre-fr", slugs: { "en" => "title-en" },
+      category: @category, published: true
+    )
+    assert_equal article, Article.find_by_localized_slug("title-en", :en)
+  end
+
+  test "find_by_localized_slug falls back to the canonical FR slug" do
+    article = Article.create!(
+      title: { "fr" => "Titre", "en" => "Title" }, body: { "fr" => "Corps" },
+      slug: "titre-fr", slugs: { "en" => "title-en" },
+      category: @category, published: true
+    )
+    # Old shared-slug URL (FR slug under the EN prefix) still resolves, so a
+    # previously-indexed /en/articles/titre-fr keeps working and 301s onward.
+    assert_equal article, Article.find_by_localized_slug("titre-fr", :en)
+  end
+
+  test "find_by_localized_slug returns nil when nothing matches" do
+    Article.create!(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      slug: "titre-fr", category: @category, published: true
+    )
+    assert_nil Article.find_by_localized_slug("does-not-exist", :en)
+  end
+
+  test "find_by_localized_slug scopes to the relation it is called on" do
+    published = Article.create!(
+      title: { "fr" => "Pub", "en" => "Pub EN" }, body: { "fr" => "C" },
+      slug: "pub-fr", slugs: { "en" => "pub-en" },
+      category: @category, published: true
+    )
+    Article.create!(
+      title: { "fr" => "Draft", "en" => "Draft EN" }, body: { "fr" => "C" },
+      slug: "draft-fr", slugs: { "en" => "draft-en" },
+      category: @category, published: false
+    )
+    assert_equal published, Article.published.find_by_localized_slug("pub-en", :en)
+    assert_nil Article.published.find_by_localized_slug("draft-en", :en)
+  end
+
+  test "find_by_localized_slug looks the slug up with a WHERE clause instead of scanning every article" do
+    3.times do |i|
+      Article.create!(
+        title: { "fr" => "Titre #{i}", "en" => "Title #{i}" }, body: { "fr" => "Corps" },
+        slug: "titre-#{i}", slugs: { "en" => "title-#{i}" },
+        category: @category, published: true
+      )
+    end
+
+    selects = []
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      selects << payload[:sql] if payload[:sql].start_with?("SELECT") && payload[:name] != "SCHEMA"
+    end
+    found = Article.find_by_localized_slug("title-1", :en)
+    ActiveSupport::Notifications.unsubscribe(subscriber)
+
+    assert_equal "titre-1", found.slug
+    assert_equal 1, selects.size, selects.join("\n")
+    assert_match(/WHERE/, selects.first, "expected an indexed lookup, got a table scan")
+  end
+
   test "TARGET_LOCALES covers every app locale except FR" do
     assert_equal (I18n.available_locales.map(&:to_s) - [ "fr" ]).sort, Article::TARGET_LOCALES.sort,
                  "a locale added to config/application.rb must also be added to ArticleTranslator's locales"

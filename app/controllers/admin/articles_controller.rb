@@ -2,8 +2,12 @@ module Admin
   class ArticlesController < BaseController
     include MergesTranslatedColumns
 
-    # JSON columns holding every locale.
+    # JSON columns holding every locale. The admin edits FR only.
     TRANSLATED_COLUMNS = %w[title body meta_description].freeze
+
+    # Per-locale SEO Overrides (title, meta description, Localized Slug). The
+    # admin edits every target locale; a blank field removes that override.
+    OVERRIDE_COLUMNS = %w[title_overrides meta_description_overrides slugs].freeze
 
     before_action :set_article, only: %i[edit update destroy]
     before_action :set_categories, only: %i[new create edit update]
@@ -61,10 +65,15 @@ module Admin
         :slug, :category_id, :published, :featured, :cover_image_url,
         title: [ :fr ],
         body: [ :fr ],
-        meta_description: [ :fr ]
+        meta_description: [ :fr ],
+        title_overrides: Article::TARGET_LOCALES,
+        meta_description_overrides: Article::TARGET_LOCALES,
+        slugs: Article::TARGET_LOCALES
       )
 
       merge_translated_columns(permitted, @article, TRANSLATED_COLUMNS)
+      # Blank override fields clear that locale's override (see the concern).
+      merge_translated_columns(permitted, @article, OVERRIDE_COLUMNS, drop_blank: true)
     end
 
     def set_published_at
