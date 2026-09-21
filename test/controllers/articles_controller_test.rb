@@ -413,4 +413,31 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".article-body strong", "bold"
   end
+
+  # SEO Overrides: the override title/meta replaces the translated one on the page.
+  test "article show renders the EN SEO override in the title tag, h1 and meta description" do
+    Article.create!(
+      title: { "fr" => "La sécurité à Monaco", "en" => "Safety and Healthcare in Monaco", "de" => "Sicherheit in Monaco" },
+      body: { "fr" => "Corps", "en" => "Body", "de" => "Text" },
+      meta_description: { "fr" => "Résumé FR", "en" => "Translated summary", "de" => "Deutsche Zusammenfassung" },
+      title_overrides: { "en" => "Is Monaco Safe? Police, Security and Healthcare" },
+      meta_description_overrides: { "en" => "Is Monaco safe? Police, CCTV and healthcare explained." },
+      slug: "la-securite-a-monaco",
+      slugs: { "en" => "is-monaco-safe" },
+      category: @category, published: true, published_at: Time.current
+    )
+
+    get "/en/articles/is-monaco-safe"
+    assert_response :success
+    assert_select "title", text: "Is Monaco Safe? Police, Security and Healthcare | Agence Immobilière de la Gare"
+    assert_select "h1", text: "Is Monaco Safe? Police, Security and Healthcare"
+    assert_select "meta[name='description'][content='Is Monaco safe? Police, CCTV and healthcare explained.']"
+    assert_select "link[rel='canonical'][href='https://agencegaremonaco.com/en/articles/is-monaco-safe']"
+
+    # A locale without an override keeps its Translation and the FR slug.
+    get "/de/artikel/la-securite-a-monaco"
+    assert_response :success
+    assert_select "h1", text: "Sicherheit in Monaco"
+    assert_select "meta[name='description'][content='Deutsche Zusammenfassung']"
+  end
 end

@@ -12,7 +12,12 @@ class Article < ApplicationRecord
   scope :published, -> { where(published: true) }
   scope :featured, -> { where(featured: true) }
 
+  # Public readers. An SEO Override for the locale wins; otherwise the
+  # Translation, then the French Source. FR never has an override (the admin
+  # only offers the target locales), so current_fr_hash is unaffected.
   def title_for(locale = I18n.locale)
+    override = seo_override_value(title_overrides, locale)
+    return override if override
     return "" unless title.is_a?(Hash)
     title[locale.to_s].presence || title[I18n.default_locale.to_s].presence || title.values.first || ""
   end
@@ -23,6 +28,8 @@ class Article < ApplicationRecord
   end
 
   def meta_description_for(locale = I18n.locale)
+    override = seo_override_value(meta_description_overrides, locale)
+    return override if override
     return "" unless meta_description.is_a?(Hash)
     meta_description[locale.to_s].presence || meta_description[I18n.default_locale.to_s].presence || ""
   end
@@ -168,6 +175,11 @@ class Article < ApplicationRecord
   end
 
   private
+
+  def seo_override_value(overrides, locale)
+    return nil unless overrides.is_a?(Hash)
+    overrides[locale.to_s].presence
+  end
 
   def generate_slug
     fr_title = title["fr"] || title[I18n.default_locale.to_s] || title.values.first

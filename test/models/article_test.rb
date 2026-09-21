@@ -436,6 +436,61 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal({}, article.meta_description_overrides)
   end
 
+  # SEO Overrides: a per-locale title / meta description the translator never touches.
+  test "title_for prefers the SEO override for that locale" do
+    article = Article.new(
+      title: { "fr" => "La sécurité à Monaco", "en" => "Safety in Monaco" },
+      title_overrides: { "en" => "Is Monaco Safe?" },
+      category: @category
+    )
+    assert_equal "Is Monaco Safe?", article.title_for(:en)
+    assert_equal "Is Monaco Safe?", article.title_for("en")
+    assert_equal "La sécurité à Monaco", article.title_for(:fr)
+    assert_equal "La sécurité à Monaco", article.title_for(:de), "locales without an override keep the translated-then-FR fallback"
+  end
+
+  test "title_for ignores a blank SEO override" do
+    article = Article.new(
+      title: { "fr" => "Titre", "en" => "Title" },
+      title_overrides: { "en" => "   " },
+      category: @category
+    )
+    assert_equal "Title", article.title_for(:en)
+  end
+
+  test "meta_description_for prefers the SEO override for that locale" do
+    article = Article.new(
+      title: { "fr" => "Titre" },
+      meta_description: { "fr" => "Résumé FR", "en" => "Translated summary" },
+      meta_description_overrides: { "en" => "Is Monaco safe? Police, CCTV and healthcare explained." },
+      category: @category
+    )
+    assert_equal "Is Monaco safe? Police, CCTV and healthcare explained.", article.meta_description_for(:en)
+    assert_equal "Résumé FR", article.meta_description_for(:fr)
+    assert_equal "Résumé FR", article.meta_description_for(:it)
+  end
+
+  test "meta_description_for ignores a blank SEO override" do
+    article = Article.new(
+      title: { "fr" => "Titre" },
+      meta_description: { "fr" => "Résumé FR", "en" => "Translated summary" },
+      meta_description_overrides: { "en" => "" },
+      category: @category
+    )
+    assert_equal "Translated summary", article.meta_description_for(:en)
+  end
+
+  test "current_fr_hash ignores SEO overrides" do
+    article = Article.new(title: { "fr" => "Titre" }, body: { "fr" => "Corps" }, category: @category)
+    before = article.current_fr_hash
+    other = Article.new(
+      title: { "fr" => "Titre" }, body: { "fr" => "Corps" },
+      title_overrides: { "en" => "Overridden" }, meta_description_overrides: { "en" => "Overridden meta" },
+      category: @category
+    )
+    assert_equal before, other.current_fr_hash, "an override must not make the translator think the French source changed"
+  end
+
   # mint_localized_slug — collision-aware slug generation (SEO audit 0.2)
   test "mint_localized_slug parameterizes the title for the locale" do
     assert_equal "how-to-sell-your-property",
