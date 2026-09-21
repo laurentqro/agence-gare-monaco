@@ -524,6 +524,27 @@ class ArticleTest < ActiveSupport::TestCase
     assert_nil Article.published.find_by_localized_slug("draft-en", :en)
   end
 
+  test "find_by_localized_slug looks the slug up with a WHERE clause instead of scanning every article" do
+    3.times do |i|
+      Article.create!(
+        title: { "fr" => "Titre #{i}", "en" => "Title #{i}" }, body: { "fr" => "Corps" },
+        slug: "titre-#{i}", slugs: { "en" => "title-#{i}" },
+        category: @category, published: true
+      )
+    end
+
+    selects = []
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      selects << payload[:sql] if payload[:sql].start_with?("SELECT") && payload[:name] != "SCHEMA"
+    end
+    found = Article.find_by_localized_slug("title-1", :en)
+    ActiveSupport::Notifications.unsubscribe(subscriber)
+
+    assert_equal "titre-1", found.slug
+    assert_equal 1, selects.size, selects.join("\n")
+    assert_match(/WHERE/, selects.first, "expected an indexed lookup, got a table scan")
+  end
+
   test "TARGET_LOCALES covers every app locale except FR" do
     assert_equal (I18n.available_locales.map(&:to_s) - [ "fr" ]).sort, Article::TARGET_LOCALES.sort,
                  "a locale added to config/application.rb must also be added to ArticleTranslator's locales"

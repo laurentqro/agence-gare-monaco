@@ -67,10 +67,13 @@ class Article < ApplicationRecord
 
   # Resolve a URL slug back to its article for the given locale. Matches the
   # locale's own slug first, then the canonical FR slug so previously-indexed
-  # shared-slug URLs (one slug across all locales) still resolve.
+  # shared-slug URLs (one slug across all locales) still resolve. At most two
+  # indexed lookups; never a table scan. Respects the relation it is called on
+  # (e.g. Article.published).
   def self.find_by_localized_slug(slug_param, locale = I18n.locale)
-    find_each do |article|
-      return article if article.slug_for(locale) == slug_param
+    unless locale.to_s == I18n.default_locale.to_s
+      match = find_by("json_extract(slugs, ?) = ?", "$.#{locale}", slug_param)
+      return match if match
     end
     find_by(slug: slug_param)
   end
