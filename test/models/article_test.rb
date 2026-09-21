@@ -491,6 +491,30 @@ class ArticleTest < ActiveSupport::TestCase
     assert_equal before, other.current_fr_hash, "an override must not make the translator think the French source changed"
   end
 
+  test "seo_override? is true when the locale has a title, meta description or slug override" do
+    article = Article.new(
+      title: { "fr" => "Titre" },
+      title_overrides: { "en" => "Title EN" },
+      meta_description_overrides: { "it" => "Meta IT" },
+      slugs: { "de" => "titel-de" },
+      category: @category
+    )
+    assert article.seo_override?(:en)
+    assert article.seo_override?("it")
+    assert article.seo_override?(:de)
+    assert_not article.seo_override?(:sv)
+    assert_not article.seo_override?(:fr), "FR is the Source, never an override"
+  end
+
+  test "seo_override? treats blank values as absent" do
+    article = Article.new(
+      title: { "fr" => "Titre" },
+      title_overrides: { "en" => "" }, meta_description_overrides: { "en" => " " }, slugs: { "en" => "" },
+      category: @category
+    )
+    assert_not article.seo_override?(:en)
+  end
+
   # mint_localized_slug — collision-aware slug generation (SEO audit 0.2)
   test "mint_localized_slug parameterizes the title for the locale" do
     assert_equal "how-to-sell-your-property",

@@ -34,6 +34,15 @@ class Article < ApplicationRecord
     meta_description[locale.to_s].presence || meta_description[I18n.default_locale.to_s].presence || ""
   end
 
+  # True when the locale has any SEO Override (title, meta description or
+  # Localized Slug). Used by the admin form to show state; nothing else.
+  def seo_override?(locale)
+    return false if locale.to_s == I18n.default_locale.to_s
+    seo_override_value(title_overrides, locale).present? ||
+      seo_override_value(meta_description_overrides, locale).present? ||
+      seo_override_value(slugs, locale).present?
+  end
+
   # Per-locale localised slug (SEO audit 0.2). FR always resolves to the pinned
   # `slug` column (the canonical, indexed slug and stable lookup key); other
   # locales use their entry in the `slugs` JSON hash, falling back to the FR
