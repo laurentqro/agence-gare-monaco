@@ -157,6 +157,26 @@ class ArticleTranslatorTest < ActiveSupport::TestCase
     assert_equal "title-en", @article.slugs["en"], "slug should stay frozen"
   end
 
+  test "a French edit rewrites the translations but leaves SEO overrides and existing slugs untouched" do
+    @article.update_columns(
+      title_overrides: { "en" => "Is Monaco Safe?" },
+      meta_description_overrides: { "en" => "Pinned EN meta" },
+      slugs: { "en" => "is-monaco-safe" }
+    )
+
+    with_stubbed_chat(content_per_locale: canned_responses) do
+      ArticleTranslator.new(Article.find(@article.id)).translate!
+    end
+
+    @article.reload
+    assert_equal "Title EN", @article.title["en"], "translated title is rewritten"
+    assert_equal({ "en" => "Is Monaco Safe?" }, @article.title_overrides)
+    assert_equal({ "en" => "Pinned EN meta" }, @article.meta_description_overrides)
+    assert_equal "is-monaco-safe", @article.slugs["en"], "existing slug override is frozen"
+    assert_equal "title-it", @article.slugs["it"], "locales without a slug still get one minted"
+    assert_equal "Is Monaco Safe?", @article.title_for(:en), "the page keeps showing the override"
+  end
+
   test "suffixes a minted slug that collides with another article's slug" do
     # Another article already owns the EN slug the translation would produce.
     Article.create!(
