@@ -707,4 +707,54 @@ class Admin::ArticlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Corps français", article.body["fr"]
     assert_nil article.body["en"], "non-FR body locales should be silently dropped"
   end
+
+  # SEO Overrides ("Surcharges SEO"): per-locale title / meta / slug fields on the edit form.
+  test "GET edit shows a collapsed Surcharges SEO section with fields for every target locale" do
+    article = Article.create!(
+      title: { "fr" => "La sécurité", "en" => "Safety in Monaco" },
+      body: { "fr" => "Corps" },
+      meta_description: { "fr" => "Résumé", "en" => "Translated summary" },
+      title_overrides: { "en" => "Is Monaco Safe?" },
+      slugs: { "en" => "is-monaco-safe" },
+      slug: "la-securite",
+      category: @category
+    )
+    get edit_admin_article_url(article)
+    assert_response :success
+
+    assert_select "details.seo-overrides:not([open])" do
+      assert_select "summary", text: /Surcharges SEO/
+    end
+    Article::TARGET_LOCALES.each do |locale|
+      assert_select "input[name='article[title_overrides][#{locale}]']", 1
+      assert_select "textarea[name='article[meta_description_overrides][#{locale}]'][maxlength='160']", 1
+      assert_select "input[name='article[slugs][#{locale}]']", 1
+    end
+
+    # Values show the override; placeholders show what the page falls back to.
+    assert_select "input[name='article[title_overrides][en]'][value='Is Monaco Safe?'][placeholder='Safety in Monaco']"
+    assert_select "textarea[name='article[meta_description_overrides][en]'][placeholder='Translated summary']", text: ""
+    assert_select "input[name='article[slugs][en]'][value='is-monaco-safe'][placeholder='la-securite']"
+    assert_select "input[name='article[slugs][it]'][placeholder='la-securite']:not([value])"
+    assert_select "input[name='article[title_overrides][it]']:not([value])"
+  end
+
+  test "GET edit marks locales that have an SEO override" do
+    article = Article.create!(
+      title: { "fr" => "La sécurité" }, body: { "fr" => "Corps" },
+      title_overrides: { "en" => "Is Monaco Safe?" },
+      slug: "la-securite", category: @category
+    )
+    get edit_admin_article_url(article)
+    assert_select "details.seo-overrides [data-locale='en'] .seo-override-active", 1
+    assert_select "details.seo-overrides [data-locale='it'] .seo-override-active", 0
+  end
+
+  test "GET new does not show the Surcharges SEO section" do
+    get new_admin_article_url
+    assert_response :success
+    assert_select "details.seo-overrides", 0
+    assert_select "input[name^='article[title_overrides]']", 0
+    assert_select "input[name^='article[slugs]']", 0
+  end
 end

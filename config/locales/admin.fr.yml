@@ -89,6 +89,13 @@ fr:
         published: "Publié"
         featured: "À la une"
         cover_image: "Image de couverture"
+        seo_overrides_legend: "Surcharges SEO"
+        seo_overrides_hint: "Remplace, pour une langue donnée, le titre, la meta description ou le slug traduits automatiquement. Laisser vide pour conserver la traduction. Un champ vidé supprime la surcharge."
+        seo_override_active: "surcharge active"
+        seo_override_title: "Titre"
+        seo_override_meta_description: "Meta description"
+        seo_override_slug: "Slug"
+        seo_override_slug_hint: "Minuscules, chiffres et tirets. L'ancienne URL redirige (301) vers la nouvelle."
         create: "Créer l'article"
         update: "Mettre à jour l'article"
       flash:
